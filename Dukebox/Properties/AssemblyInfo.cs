@@ -6,11 +6,11 @@ using System.Resources;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Dukebox")]
-[assembly: AssemblyDescription("Music library Dukebox, audio file and CD player.")]
+[assembly: AssemblyTitle("Jukebox")]
+[assembly: AssemblyDescription("Music library jukebox, audio file and CD player.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Dukebox")]
+[assembly: AssemblyProduct("Jukebox")]
 [assembly: AssemblyCopyright("©Matthew Snoddy  2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

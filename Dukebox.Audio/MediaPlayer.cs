@@ -134,7 +134,7 @@ namespace Dukebox.Audio
                 string msg = "Error playing file '" + _fileName.Split('\\').LastOrDefault() + "'!" + " [BASS error code: " + Bass.BASS_ErrorGetCode().ToString() + "]";
                 Logger.log(msg);
 
-                MessageBox.Show(msg, "Dukebox: Error Playing File", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(msg, "Jukebox: Error Playing File", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 

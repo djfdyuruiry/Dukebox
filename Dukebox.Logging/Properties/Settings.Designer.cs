@@ -25,7 +25,7 @@ namespace Dukebox.Logging.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Dukebox.log")]
+        [global::System.Configuration.DefaultSettingValueAttribute("jukebox.log")]
         public string LogFileName {
             get {
                 return ((string)(this["LogFileName"]));
