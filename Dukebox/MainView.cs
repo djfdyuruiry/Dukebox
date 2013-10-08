@@ -394,13 +394,13 @@ namespace Dukebox
                 try
                 {
                     // Update pause/play background image.
-                    if (_currentPlaylist.PlayingAudio && btnPlay.BackgroundImage != Dukebox.Properties.Resources.Gnome_Media_Playback_Pause_32)
+                    if (_currentPlaylist.PlayingAudio && btnPlay.BackgroundImage != Dukebox.Properties.Resources.GnomeMediaPlaybackPause)
                     {
-                        btnPlay.BackgroundImage = Dukebox.Properties.Resources.Gnome_Media_Playback_Pause_32;
+                        btnPlay.BackgroundImage = Dukebox.Properties.Resources.GnomeMediaPlaybackPause;
                     }
-                    else if (!_currentPlaylist.PlayingAudio && btnPlay.BackgroundImage != Dukebox.Properties.Resources.Gnome_Media_Playback_Start_32)
+                    else if (!_currentPlaylist.PlayingAudio && btnPlay.BackgroundImage != Dukebox.Properties.Resources.GnomeMediaPlaybackStart)
                     {
-                        btnPlay.BackgroundImage = Dukebox.Properties.Resources.Gnome_Media_Playback_Start_32;
+                        btnPlay.BackgroundImage = Dukebox.Properties.Resources.GnomeMediaPlaybackStart;
                     }
                 }
                 catch (Exception ex)

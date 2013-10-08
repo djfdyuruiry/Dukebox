@@ -101,6 +101,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ProgressMonitorBox));
             this.prgBarImportProgress = new System.Windows.Forms.ProgressBar();
             this.lblNotification = new System.Windows.Forms.Label();
             this.SuspendLayout();
@@ -121,16 +122,17 @@
             this.lblNotification.Size = new System.Drawing.Size(0, 13);
             this.lblNotification.TabIndex = 1;
             // 
-            // LibraryImportMonitor
+            // ProgressMonitorBox
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(334, 90);
             this.Controls.Add(this.lblNotification);
             this.Controls.Add(this.prgBarImportProgress);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "LibraryImportMonitor";
+            this.Name = "ProgressMonitorBox";
             this.Text = "Jukebox - Library Import Monitor";
             this.ResumeLayout(false);
             this.PerformLayout();
