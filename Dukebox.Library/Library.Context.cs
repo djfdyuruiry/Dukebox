@@ -13,10 +13,10 @@ namespace Dukebox.Library
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
     
-    public partial class jukeboxEntities : DbContext
+    public partial class DukeboxEntities : DbContext
     {
-        public jukeboxEntities()
-            : base("name=jukeboxEntities")
+        public DukeboxEntities()
+            : base("name=DukeboxEntities")
         {
         }
     
