@@ -1,0 +1,129 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="jukeboxModel.Store" Alias="Self" Provider="System.Data.SQLite" ProviderManifestToken="ISO8601" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityContainer Name="jukeboxModelStoreContainer">
+          <EntitySet Name="albums" EntityType="jukeboxModel.Store.albums" store:Type="Tables" />
+          <EntitySet Name="artists" EntityType="jukeboxModel.Store.artists" store:Type="Tables" />
+          <EntitySet Name="songs" EntityType="jukeboxModel.Store.songs" store:Type="Tables" />
+        </EntityContainer>
+        <EntityType Name="albums">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="integer" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="name" Type="varchar" />
+        </EntityType>
+        <EntityType Name="artists">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="integer" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="name" Type="varchar" />
+        </EntityType>
+        <EntityType Name="songs">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="integer" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="filename" Type="nvarchar" />
+          <Property Name="title" Type="varchar" />
+          <Property Name="lengthInSeconds" Type="integer" />
+          <Property Name="albumId" Type="integer" />
+          <Property Name="artistId" Type="integer" />
+        </EntityType>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="jukeboxModel" Alias="Self" p1:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:p1="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityContainer Name="jukeboxEntities" p1:LazyLoadingEnabled="true">
+          <EntitySet Name="albums" EntityType="jukeboxModel.album" />
+          <EntitySet Name="artists" EntityType="jukeboxModel.artist" />
+          <EntitySet Name="songs" EntityType="jukeboxModel.song" />
+        </EntityContainer>
+        <EntityType Name="album">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int64" Nullable="false" p1:StoreGeneratedPattern="Identity" />
+          <Property Name="name" Type="String" MaxLength="2147483647" Unicode="false" FixedLength="false" />
+        </EntityType>
+        <EntityType Name="artist">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int64" Nullable="false" p1:StoreGeneratedPattern="Identity" />
+          <Property Name="name" Type="String" MaxLength="2147483647" Unicode="false" FixedLength="false" />
+        </EntityType>
+        <EntityType Name="song">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int64" Nullable="false" p1:StoreGeneratedPattern="Identity" />
+          <Property Name="filename" Type="String" MaxLength="2147483647" Unicode="true" FixedLength="false" />
+          <Property Name="title" Type="String" MaxLength="2147483647" Unicode="false" FixedLength="false" />
+          <Property Name="lengthInSeconds" Type="Int64" />
+          <Property Name="albumId" Type="Int64" />
+          <Property Name="artistId" Type="Int64" />
+        </EntityType>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="jukeboxModelStoreContainer" CdmEntityContainer="jukeboxEntities">
+          <EntitySetMapping Name="albums">
+            <EntityTypeMapping TypeName="jukeboxModel.album">
+              <MappingFragment StoreEntitySet="albums">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="name" ColumnName="name" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="artists">
+            <EntityTypeMapping TypeName="jukeboxModel.artist">
+              <MappingFragment StoreEntitySet="artists">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="name" ColumnName="name" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="songs">
+            <EntityTypeMapping TypeName="jukeboxModel.song">
+              <MappingFragment StoreEntitySet="songs">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="filename" ColumnName="filename" />
+                <ScalarProperty Name="title" ColumnName="title" />
+                <ScalarProperty Name="lengthInSeconds" ColumnName="lengthInSeconds" />
+                <ScalarProperty Name="albumId" ColumnName="albumId" />
+                <ScalarProperty Name="artistId" ColumnName="artistId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="True" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="True" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
