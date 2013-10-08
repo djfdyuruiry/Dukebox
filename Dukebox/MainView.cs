@@ -107,7 +107,7 @@ namespace Dukebox
             catch (Win32Exception ex)
             {
                 Logger.log("Error registering global multimedia hot keys: " + ex.Message + "");
-                DialogResult msgBoxResult = MessageBox.Show("Error registering global multimedia hot keys! This usually happens when another media player is open.", "Jukebox - Error Registering Hot Keys",  MessageBoxButtons.RetryCancel, MessageBoxIcon.Warning );
+                DialogResult msgBoxResult = MessageBox.Show("Error registering global multimedia hot keys! This usually happens when another media player is open.", "Dukebox - Error Registering Hot Keys",  MessageBoxButtons.RetryCancel, MessageBoxIcon.Warning );
 
                 // Retry registering hot keys.
                 if (msgBoxResult == DialogResult.Retry)
@@ -326,11 +326,11 @@ namespace Dukebox
         {
             if (numTracksAdded > 0)
             {
-                MessageBox.Show("Successfully added " + numTracksAdded + " tracks to the library!", "Jukebox - Added Tracks to Library", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Successfully added " + numTracksAdded + " tracks to the library!", "Dukebox - Added Tracks to Library", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             else
             {
-                MessageBox.Show("No compatible audio files found in specified directory!", "Jukebox - No Tracks Added to Library", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("No compatible audio files found in specified directory!", "Dukebox - No Tracks Added to Library", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
 
             _progressWindow.Hide();
@@ -516,8 +516,11 @@ namespace Dukebox
                 g.FillRectangle(new SolidBrush(Color.PowderBlue), e.Bounds);
             }
 
-            Track track = ((Track)lstPlaylist.Items[e.Index]);
-            g.DrawString(track.ToString(), e.Font, new SolidBrush(e.ForeColor), new PointF(e.Bounds.X, e.Bounds.Y));
+            if (e.Index != -1)
+            {
+                Track track = ((Track)lstPlaylist.Items[e.Index]);
+                g.DrawString(track.ToString(), e.Font, new SolidBrush(e.ForeColor), new PointF(e.Bounds.X, e.Bounds.Y));
+            }
         }
 
         /// <summary>
@@ -529,9 +532,13 @@ namespace Dukebox
         {
             e.DrawBackground();
             Graphics g = e.Graphics;
+            
 
-            Track track = ((Track)lstLibraryBrowser.Items[e.Index]);
-            g.DrawString(track.ToString(), e.Font, new SolidBrush(e.ForeColor), new PointF(e.Bounds.X, e.Bounds.Y));
+            if (e.Index != -1)
+            {
+                Track track = ((Track)lstLibraryBrowser.Items[e.Index]);
+                g.DrawString(track.ToString(), e.Font, new SolidBrush(e.ForeColor), new PointF(e.Bounds.X, e.Bounds.Y));
+            }
         }
 
         #endregion
@@ -719,7 +726,7 @@ namespace Dukebox
                     string msg = "Error loading playlist from the file '" + _playlistImportBrowser.FileName.Split('\\').LastOrDefault() + "' [" + ex.Message +"]";
                     Logger.log(msg);
 
-                    MessageBox.Show(msg, "Jukebox - Error Loading Playlist File", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show(msg, "Dukebox - Error Loading Playlist File", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
@@ -801,7 +808,7 @@ namespace Dukebox
                 string msg = "Error ripping music from Audio CD: " + ex.Message;
 
                 Logger.log(msg);
-                MessageBox.Show(msg, "Jukebox - Error Ripping from CD", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(msg, "Dukebox - Error Ripping from CD", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -811,7 +818,7 @@ namespace Dukebox
         public void CreateCdRippingMonitor()
         {
             _progressWindow = new ProgressMonitorBox();
-            _progressWindow.Text = "Jukebox - MP3 Ripping Progress";
+            _progressWindow.Text = "Dukebox - MP3 Ripping Progress";
             _progressWindow.Show();
         }
 
@@ -859,7 +866,7 @@ namespace Dukebox
     }
 
     /// <summary>
-    /// Default delegate for value updates in the Jukebox UI.
+    /// Default delegate for value updates in the Dukebox UI.
     /// </summary>
     public delegate void ValueUpdateDelegate();
 }
