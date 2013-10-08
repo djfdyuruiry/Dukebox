@@ -1,0 +1,38 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dukebox", "Dukebox\Dukebox.csproj", "{CBD05FA9-5B3E-491C-953D-7D39A3C5D391}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dukebox.Logging", "Dukebox.Logging\Dukebox.Logging.csproj", "{C010F9A0-1E15-4B32-8433-228A7A29A9B8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dukebox.Audio", "Dukebox.Audio\Dukebox.Audio.csproj", "{8EA07179-2C2A-42A3-90C4-C700C4681181}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dukebox.Library", "Dukebox.Library\Dukebox.Library.csproj", "{6C5B8890-79A4-43EE-9734-B5DB714FCF16}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CBD05FA9-5B3E-491C-953D-7D39A3C5D391}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CBD05FA9-5B3E-491C-953D-7D39A3C5D391}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CBD05FA9-5B3E-491C-953D-7D39A3C5D391}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CBD05FA9-5B3E-491C-953D-7D39A3C5D391}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C010F9A0-1E15-4B32-8433-228A7A29A9B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C010F9A0-1E15-4B32-8433-228A7A29A9B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C010F9A0-1E15-4B32-8433-228A7A29A9B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C010F9A0-1E15-4B32-8433-228A7A29A9B8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8EA07179-2C2A-42A3-90C4-C700C4681181}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8EA07179-2C2A-42A3-90C4-C700C4681181}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8EA07179-2C2A-42A3-90C4-C700C4681181}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8EA07179-2C2A-42A3-90C4-C700C4681181}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6C5B8890-79A4-43EE-9734-B5DB714FCF16}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C5B8890-79A4-43EE-9734-B5DB714FCF16}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6C5B8890-79A4-43EE-9734-B5DB714FCF16}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6C5B8890-79A4-43EE-9734-B5DB714FCF16}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
