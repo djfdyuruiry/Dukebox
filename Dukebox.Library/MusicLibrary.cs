@@ -57,7 +57,7 @@ namespace Dukebox.Library
             get
             {
 
-                return Tracks.Select(t => t.Artist).Where(a => a != null).Distinct().OrderBy(a => a.name).ToList();
+                return Tracks.Where(a => a.Artist != null).Select(t => t.Artist).Distinct().OrderBy(a => a.name).ToList();
             }
         }
 
@@ -68,7 +68,7 @@ namespace Dukebox.Library
         {
             get
             {
-                return Tracks.Select(t => t.Album).Where(a => a != null).Distinct().OrderBy(a => a.name).ToList();
+                return Tracks.Where(a => a.Album != null).Select(t => t.Album).Distinct().OrderBy(a => a.name).ToList();
             }
         }
 

@@ -23,6 +23,8 @@ namespace Dukebox
         [STAThread]
         static void Main()
         {
+            MainView view = null;
+
             try
             {
                 // Init BASS audio library.
@@ -32,14 +34,19 @@ namespace Dukebox
                 // Display the main form.
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
-                Application.Run(new MainView());
+                Application.Run((view = new MainView()));
             }
-            catch (TypeInitializationException ex)
+            catch (Exception ex)
             {
                 // Failed to load the bass library or one it's plug-ins.
-                Logger.log(ex.InnerException.Message, false);
+                Logger.log(ex.Message, false);
 
-                MessageBox.Show(ex.InnerException.Message, "Dukebox: Fatal Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, "Dukebox: Fatal Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+               
+                view.Hide();
+                view.Dispose();
+
+                Application.Exit();
             }
         }
 
