@@ -15,7 +15,7 @@ namespace Dukebox.Library
     /// </summary>
     public class MusicLibrary
     {
-        private DukeboxEntities DukeboxData;
+        private jukeboxEntities jukeboxData;
 
         #region Views on music library data
 
@@ -31,10 +31,10 @@ namespace Dukebox.Library
                 {
                     _allTrackCache = new List<Track>();
 
-                    foreach (song s in DukeboxData.songs)
+                    foreach (song s in jukeboxData.songs)
                     {
-                        var artist = s.artistId.HasValue ? DukeboxData.artists.Where(a => a.id == s.artistId.Value).FirstOrDefault() : null;
-                        var album = s.albumId.HasValue ? DukeboxData.albums.Where(a => a.id == s.albumId.Value).FirstOrDefault() : null;
+                        var artist = s.artistId.HasValue ? jukeboxData.artists.Where(a => a.id == s.artistId.Value).FirstOrDefault() : null;
+                        var album = s.albumId.HasValue ? jukeboxData.albums.Where(a => a.id == s.albumId.Value).FirstOrDefault() : null;
                         
                         _allTrackCache.Add(new Track() { Song = s, Album = album, Artist = artist, Metadata = new AudioFileMetaData(s.filename) });
                     }
@@ -77,8 +77,8 @@ namespace Dukebox.Library
         // Singleton pattern private constructor.
         private MusicLibrary()
         {
-            DukeboxData = new DukeboxEntities();
-            DukeboxData.Database.Connection.Open();
+            jukeboxData = new jukeboxEntities();
+            jukeboxData.Database.Connection.Open();
         }
 
         #region Folder/Playlist/File playback methods
@@ -240,20 +240,20 @@ namespace Dukebox.Library
         public void AddFileToLibrary(KeyValuePair<string, AudioFileMetaData> kvp)
         {
             // Find artist and album information from the library.
-            artist artistObj = DukeboxData.artists.Where(a => a.name == kvp.Value.Artist).FirstOrDefault();
-            album albumObj = DukeboxData.albums.Where(a => a.name == kvp.Value.Album).FirstOrDefault();
+            artist artistObj = jukeboxData.artists.Where(a => a.name == kvp.Value.Artist).FirstOrDefault();
+            album albumObj = jukeboxData.albums.Where(a => a.name == kvp.Value.Album).FirstOrDefault();
 
             // Insert artist/album information if missing from library.
             if (artistObj == null && kvp.Value.Artist != string.Empty)
             {
                 AddArtistToLibrary(kvp.Value);
-                artistObj = DukeboxData.artists.Where(a => a.name == kvp.Value.Artist).FirstOrDefault();
+                artistObj = jukeboxData.artists.Where(a => a.name == kvp.Value.Artist).FirstOrDefault();
             }
 
             if (albumObj == null && kvp.Value.Album != string.Empty)
             {
                 AddAlbumToLibrary(kvp.Value);
-                albumObj = DukeboxData.albums.Where(a => a.name == kvp.Value.Album).FirstOrDefault();
+                albumObj = jukeboxData.albums.Where(a => a.name == kvp.Value.Album).FirstOrDefault();
             }
 
             if (kvp.Value.Title != string.Empty || albumObj != null || artistObj != null)
@@ -295,12 +295,12 @@ namespace Dukebox.Library
         {
             if(tag.Artist != null)
             {
-                artist newArtist = new artist() { id = DukeboxData.artists.Count(), name = tag.Artist };
+                artist newArtist = new artist() { id = jukeboxData.artists.Count(), name = tag.Artist };
 
-                if (!DukeboxData.artists.Select(a => a.name).Contains(newArtist.name))
+                if (!jukeboxData.artists.Select(a => a.name).Contains(newArtist.name))
                 {
-                    DukeboxData.artists.Add(newArtist);
-                    DukeboxData.SaveChanges();    
+                    jukeboxData.artists.Add(newArtist);
+                    jukeboxData.SaveChanges();    
                 }
             }
         }
@@ -312,12 +312,12 @@ namespace Dukebox.Library
         {
             if(tag.Album != null)
             {
-                album newAlbum = new album() { id = DukeboxData.albums.Count(), name = tag.Album };
+                album newAlbum = new album() { id = jukeboxData.albums.Count(), name = tag.Album };
 
-                if (!DukeboxData.albums.Select(a => a.name).Contains(newAlbum.name))
+                if (!jukeboxData.albums.Select(a => a.name).Contains(newAlbum.name))
                 {
-                    DukeboxData.albums.Add(newAlbum);
-                    DukeboxData.SaveChanges();    
+                    jukeboxData.albums.Add(newAlbum);
+                    jukeboxData.SaveChanges();    
                 }
             }
         }
@@ -327,29 +327,29 @@ namespace Dukebox.Library
         /// </summary>
         private void AddSongToLibrary(KeyValuePair<string, AudioFileMetaData> track, artist artistObj, album albumObj)
         {
-            if (!DukeboxData.songs.Select(a => a.filename).Contains(track.Key))
+            if (!jukeboxData.songs.Select(a => a.filename).Contains(track.Key))
             {
-                int songId = DukeboxData.albums.Count();
+                int songId = jukeboxData.albums.Count();
 
                 // Insert the song will all available information.
                 if (albumObj != null && artistObj != null)
                 {
-                    DukeboxData.songs.Add(new song() { id = songId, filename = track.Key, title = track.Value.Title, albumId = albumObj.id, artistId = artistObj.id });
+                    jukeboxData.songs.Add(new song() { id = songId, filename = track.Key, title = track.Value.Title, albumId = albumObj.id, artistId = artistObj.id });
                 }
                 else if (albumObj != null && artistObj == null)
                 {
-                    DukeboxData.songs.Add(new song() { id = songId, filename = track.Key, title = track.Value.Title, albumId = albumObj.id, artistId = null });
+                    jukeboxData.songs.Add(new song() { id = songId, filename = track.Key, title = track.Value.Title, albumId = albumObj.id, artistId = null });
                 }
                 else if (albumObj == null && artistObj != null)
                 {
-                    DukeboxData.songs.Add(new song() { id = songId, filename = track.Key, title = track.Value.Title, albumId = null, artistId = artistObj.id });
+                    jukeboxData.songs.Add(new song() { id = songId, filename = track.Key, title = track.Value.Title, albumId = null, artistId = artistObj.id });
                 }
                 else if (albumObj == null && artistObj == null)
                 {
-                    DukeboxData.songs.Add(new song() { id = songId, filename = track.Key, title = track.Value.Title, albumId = null, artistId = null });
+                    jukeboxData.songs.Add(new song() { id = songId, filename = track.Key, title = track.Value.Title, albumId = null, artistId = null });
                 }
 
-                DukeboxData.SaveChanges();
+                jukeboxData.SaveChanges();
 
                 Logger.log("Added the file '" + track.Key + "' to the library [Track => {" + artistObj.name + " - " + track.Value.Title + "}");
             }

@@ -4,11 +4,11 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="DukeboxModel.Store" Alias="Self" Provider="System.Data.SQLite" ProviderManifestToken="ISO8601" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
-        <EntityContainer Name="DukeboxModelStoreContainer">
-          <EntitySet Name="albums" EntityType="DukeboxModel.Store.albums" store:Type="Tables" />
-          <EntitySet Name="artists" EntityType="DukeboxModel.Store.artists" store:Type="Tables" />
-          <EntitySet Name="songs" EntityType="DukeboxModel.Store.songs" store:Type="Tables" />
+      <Schema Namespace="jukeboxModel.Store" Alias="Self" Provider="System.Data.SQLite" ProviderManifestToken="ISO8601" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityContainer Name="jukeboxModelStoreContainer">
+          <EntitySet Name="albums" EntityType="jukeboxModel.Store.albums" store:Type="Tables" />
+          <EntitySet Name="artists" EntityType="jukeboxModel.Store.artists" store:Type="Tables" />
+          <EntitySet Name="songs" EntityType="jukeboxModel.Store.songs" store:Type="Tables" />
         </EntityContainer>
         <EntityType Name="albums">
           <Key>
@@ -39,11 +39,11 @@
     </edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
-      <Schema Namespace="DukeboxModel" Alias="Self" p1:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:p1="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
-        <EntityContainer Name="DukeboxEntities" p1:LazyLoadingEnabled="true">
-          <EntitySet Name="albums" EntityType="DukeboxModel.album" />
-          <EntitySet Name="artists" EntityType="DukeboxModel.artist" />
-          <EntitySet Name="songs" EntityType="DukeboxModel.song" />
+      <Schema Namespace="jukeboxModel" Alias="Self" p1:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:p1="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityContainer Name="jukeboxEntities" p1:LazyLoadingEnabled="true">
+          <EntitySet Name="albums" EntityType="jukeboxModel.album" />
+          <EntitySet Name="artists" EntityType="jukeboxModel.artist" />
+          <EntitySet Name="songs" EntityType="jukeboxModel.song" />
         </EntityContainer>
         <EntityType Name="album">
           <Key>
@@ -75,9 +75,9 @@
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
-        <EntityContainerMapping StorageEntityContainer="DukeboxModelStoreContainer" CdmEntityContainer="DukeboxEntities">
+        <EntityContainerMapping StorageEntityContainer="jukeboxModelStoreContainer" CdmEntityContainer="jukeboxEntities">
           <EntitySetMapping Name="albums">
-            <EntityTypeMapping TypeName="DukeboxModel.album">
+            <EntityTypeMapping TypeName="jukeboxModel.album">
               <MappingFragment StoreEntitySet="albums">
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="name" ColumnName="name" />
@@ -85,7 +85,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="artists">
-            <EntityTypeMapping TypeName="DukeboxModel.artist">
+            <EntityTypeMapping TypeName="jukeboxModel.artist">
               <MappingFragment StoreEntitySet="artists">
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="name" ColumnName="name" />
@@ -93,7 +93,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="songs">
-            <EntityTypeMapping TypeName="DukeboxModel.song">
+            <EntityTypeMapping TypeName="jukeboxModel.song">
               <MappingFragment StoreEntitySet="songs">
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="filename" ColumnName="filename" />

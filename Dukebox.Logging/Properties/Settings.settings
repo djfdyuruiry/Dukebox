@@ -1,9 +1,9 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Dukebox.Logging.Properties" GeneratedClassName="Settings">
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Jukebox.Logging.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
     <Setting Name="LogFileName" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Dukebox.log</Value>
+      <Value Profile="(Default)">jukebox.log</Value>
     </Setting>
     <Setting Name="AppendLogEntries" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
