@@ -63,9 +63,9 @@ namespace Dukebox.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Gnome_Media_Optical_32 {
+        internal static System.Drawing.Bitmap app {
             get {
-                object obj = ResourceManager.GetObject("Gnome-Media-Optical-32", resourceCulture);
+                object obj = ResourceManager.GetObject("app", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -73,9 +73,9 @@ namespace Dukebox.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Gnome_Media_Playback_Pause_32 {
+        internal static System.Drawing.Bitmap GnomeMediaOptical {
             get {
-                object obj = ResourceManager.GetObject("Gnome-Media-Playback-Pause-32", resourceCulture);
+                object obj = ResourceManager.GetObject("GnomeMediaOptical", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -83,9 +83,9 @@ namespace Dukebox.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Gnome_Media_Playback_Start_32 {
+        internal static System.Drawing.Bitmap GnomeMediaPlaybackPause {
             get {
-                object obj = ResourceManager.GetObject("Gnome-Media-Playback-Start-32", resourceCulture);
+                object obj = ResourceManager.GetObject("GnomeMediaPlaybackPause", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -93,9 +93,9 @@ namespace Dukebox.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Gnome_Media_Playback_Stop_32 {
+        internal static System.Drawing.Bitmap GnomeMediaPlaybackStart {
             get {
-                object obj = ResourceManager.GetObject("Gnome-Media-Playback-Stop-32", resourceCulture);
+                object obj = ResourceManager.GetObject("GnomeMediaPlaybackStart", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -103,9 +103,9 @@ namespace Dukebox.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Gnome_Media_Playlist_Repeat_32 {
+        internal static System.Drawing.Bitmap GnomeMediaPlaybackStop {
             get {
-                object obj = ResourceManager.GetObject("Gnome-Media-Playlist-Repeat-32", resourceCulture);
+                object obj = ResourceManager.GetObject("GnomeMediaPlaybackStop", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -113,9 +113,9 @@ namespace Dukebox.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Gnome_Media_Playlist_Shuffle_32 {
+        internal static System.Drawing.Bitmap GnomeMediaPlaylistRepeat {
             get {
-                object obj = ResourceManager.GetObject("Gnome-Media-Playlist-Shuffle-32", resourceCulture);
+                object obj = ResourceManager.GetObject("GnomeMediaPlaylistRepeat", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -123,9 +123,9 @@ namespace Dukebox.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Gnome_Media_Record_32 {
+        internal static System.Drawing.Bitmap GnomeMediaPlaylistShuffle {
             get {
-                object obj = ResourceManager.GetObject("Gnome-Media-Record-32", resourceCulture);
+                object obj = ResourceManager.GetObject("GnomeMediaPlaylistShuffle", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -133,9 +133,9 @@ namespace Dukebox.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Gnome_Media_Seek_Backward_32 {
+        internal static System.Drawing.Bitmap GnomeMediaRecord {
             get {
-                object obj = ResourceManager.GetObject("Gnome-Media-Seek-Backward-32", resourceCulture);
+                object obj = ResourceManager.GetObject("GnomeMediaRecord", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -143,9 +143,9 @@ namespace Dukebox.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Gnome_Media_Seek_Forward_32 {
+        internal static System.Drawing.Bitmap GnomeMediaSeekBackward {
             get {
-                object obj = ResourceManager.GetObject("Gnome-Media-Seek-Forward-32", resourceCulture);
+                object obj = ResourceManager.GetObject("GnomeMediaSeekBackward", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -153,9 +153,9 @@ namespace Dukebox.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Gnome_Media_Skip_Backward_32 {
+        internal static System.Drawing.Bitmap GnomeMediaSeekForward {
             get {
-                object obj = ResourceManager.GetObject("Gnome-Media-Skip-Backward-32", resourceCulture);
+                object obj = ResourceManager.GetObject("GnomeMediaSeekForward", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -163,9 +163,9 @@ namespace Dukebox.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Gnome_Media_Skip_Forward_32 {
+        internal static System.Drawing.Bitmap GnomeMediaSkipBackward {
             get {
-                object obj = ResourceManager.GetObject("Gnome-Media-Skip-Forward-32", resourceCulture);
+                object obj = ResourceManager.GetObject("GnomeMediaSkipBackward", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -173,9 +173,9 @@ namespace Dukebox.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Gnome_Media_Tape_32 {
+        internal static System.Drawing.Bitmap GnomeMediaSkipForward {
             get {
-                object obj = ResourceManager.GetObject("Gnome-Media-Tape-32", resourceCulture);
+                object obj = ResourceManager.GetObject("GnomeMediaSkipForward", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -183,9 +183,9 @@ namespace Dukebox.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Gnome_Multimedia_Player_32 {
+        internal static System.Drawing.Bitmap GnomeMediaTape {
             get {
-                object obj = ResourceManager.GetObject("Gnome-Multimedia-Player-32", resourceCulture);
+                object obj = ResourceManager.GetObject("GnomeMediaTape", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -193,9 +193,19 @@ namespace Dukebox.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Gnome_Multimedia_Volume_Control_32 {
+        internal static System.Drawing.Bitmap GnomeMultimediaPlayer {
             get {
-                object obj = ResourceManager.GetObject("Gnome-Multimedia-Volume-Control-32", resourceCulture);
+                object obj = ResourceManager.GetObject("GnomeMultimediaPlayer", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap GnomeMultimediaVolumeControl {
+            get {
+                object obj = ResourceManager.GetObject("GnomeMultimediaVolumeControl", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

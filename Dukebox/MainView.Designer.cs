@@ -30,6 +30,7 @@
         {
             System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Artists");
             System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Albums");
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainView));
             this.btnPlay = new System.Windows.Forms.Button();
             this.lstPlaylist = new System.Windows.Forms.ListBox();
             this.mnuMain = new System.Windows.Forms.MenuStrip();
@@ -90,7 +91,7 @@
             // 
             // btnPlay
             // 
-            this.btnPlay.BackgroundImage = global::Dukebox.Properties.Resources.Gnome_Media_Playback_Start_32;
+            this.btnPlay.BackgroundImage = global::Dukebox.Properties.Resources.GnomeMediaPlaybackStart;
             this.btnPlay.Location = new System.Drawing.Point(3, 3);
             this.btnPlay.Name = "btnPlay";
             this.btnPlay.Size = new System.Drawing.Size(35, 32);
@@ -321,7 +322,7 @@
             // 
             // btnStop
             // 
-            this.btnStop.BackgroundImage = global::Dukebox.Properties.Resources.Gnome_Media_Playback_Stop_32;
+            this.btnStop.BackgroundImage = global::Dukebox.Properties.Resources.GnomeMediaPlaybackStop;
             this.btnStop.Location = new System.Drawing.Point(41, 3);
             this.btnStop.Name = "btnStop";
             this.btnStop.Size = new System.Drawing.Size(35, 32);
@@ -341,7 +342,7 @@
             // 
             // btnNext
             // 
-            this.btnNext.BackgroundImage = global::Dukebox.Properties.Resources.Gnome_Media_Seek_Forward_32;
+            this.btnNext.BackgroundImage = global::Dukebox.Properties.Resources.GnomeMediaSeekForward;
             this.btnNext.Location = new System.Drawing.Point(123, 3);
             this.btnNext.Name = "btnNext";
             this.btnNext.Size = new System.Drawing.Size(35, 32);
@@ -351,7 +352,7 @@
             // 
             // btnPrevious
             // 
-            this.btnPrevious.BackgroundImage = global::Dukebox.Properties.Resources.Gnome_Media_Seek_Backward_32;
+            this.btnPrevious.BackgroundImage = global::Dukebox.Properties.Resources.GnomeMediaSeekBackward;
             this.btnPrevious.Location = new System.Drawing.Point(82, 3);
             this.btnPrevious.Name = "btnPrevious";
             this.btnPrevious.Size = new System.Drawing.Size(35, 32);
@@ -545,6 +546,7 @@
             this.Controls.Add(this.tblMain);
             this.Controls.Add(this.mnuMain);
             this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.mnuMain;
             this.MinimumSize = new System.Drawing.Size(361, 761);
             this.Name = "MainView";
