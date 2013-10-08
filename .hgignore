@@ -258,3 +258,7 @@ Dukebox/obj/Release/DesignTimeResolveAssemblyReferences.cache
 desktop.ini
 Dukebox/bin/Release/Dukebox.log
 Dukebox.Logging/obj/Debug/Dukebox.Logging.csprojResolveAssemblyReference.cache
+Dukebox/bin/Debug/System.Data.SQLite.Linq.dll
+Dukebox/bin/Debug/System.Data.SQLite.dll
+Dukebox/bin/Release/System.Data.SQLite.Linq.dll
+Dukebox/bin/Release/System.Data.SQLite.dll
