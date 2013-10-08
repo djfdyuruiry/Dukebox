@@ -17,7 +17,7 @@ namespace Dukebox
     static class Program
     {
         /// <summary>
-        /// The main entry point for the Jukebox application.
+        /// The main entry point for the Dukebox application.
         /// Load BASS audio library and display main form.
         /// </summary>
         [STAThread]
@@ -39,7 +39,7 @@ namespace Dukebox
                 // Failed to load the bass library or one it's plug-ins.
                 Logger.log(ex.InnerException.Message, false);
 
-                MessageBox.Show(ex.InnerException.Message, "Jukebox: Fatal Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.InnerException.Message, "Dukebox: Fatal Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -47,7 +47,7 @@ namespace Dukebox
         /// Initalise the BASS audio library and
         /// log any plug-ins loaded. The number of plugins
         /// loaded is checked against the application setting 
-        /// 'Jukebox.Properties.Settings.Default.bassPluginCount'.
+        /// 'Dukebox.Properties.Settings.Default.bassPluginCount'.
         /// </summary>
         /// <exception cref="TypeInitializationException.TypeInitializationException">if there was an error loading 'bass.dll' or a BASS Plug-In library.</exception>
         private static void InitaliseBassLibrary()
@@ -75,7 +75,7 @@ namespace Dukebox
         /// <summary>
         /// Get all the supported streaming extensions from the
         /// BASS library core and all add-ons. These are stored
-        /// in the static field 'Jukebox.Audio.AudioFileFormats.SupportedFormats'.
+        /// in the static field 'Dukebox.Audio.AudioFileFormats.SupportedFormats'.
         /// </summary>
         private static void RegisterSupportedAudioFileFormats()
         {

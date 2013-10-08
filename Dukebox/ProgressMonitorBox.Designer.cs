@@ -133,7 +133,7 @@
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "ProgressMonitorBox";
-            this.Text = "Jukebox - Library Import Monitor";
+            this.Text = "Dukebox - Library Import Monitor";
             this.ResumeLayout(false);
             this.PerformLayout();
 
