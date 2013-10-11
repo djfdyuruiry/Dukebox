@@ -156,7 +156,7 @@ namespace Dukebox
 
                 TAG_INFO ti = BassTags.BASS_TAG_GetFromFile(fileName);
 
-                Track track = MusicLibrary.GetInstance().GetTrackFromFile(new KeyValuePair<string, AudioFileMetaData>(fileName, new AudioFileMetaData(fileName)));
+                Track track = MusicLibrary.GetInstance().GetTrackFromFile(fileName);
                 
                 if (track != null)
                 {
@@ -314,7 +314,7 @@ namespace Dukebox
             }
 
             _progressWindow.ImportProgressBarStep();
-            _progressWindow.NotifcationLabelUpdate(prepend + "'" + e.FileAdded.Split('\\').LastOrDefault() + "' [" + e.ImportIndex + "/" + e.TotalFilesThisImport + "]");
+            _progressWindow.NotifcationLabelUpdate(prepend + "'" + e.FileAdded.Split('\\').LastOrDefault());
         }
 
         /// <summary>
@@ -442,45 +442,56 @@ namespace Dukebox
             }
 
             _progressWindow = new ProgressMonitorBox();
+            _progressWindow.TopMost = true;
             _progressWindow.Show();
-               
-            _progressWindow.NotifcationLabelUpdate("Refreshing the library cache, this may take a minute or so!");
+
+            (new Thread(() => RefreshLibraryCache(artists, albums))).Start();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void RefreshLibraryCache(TreeNode artists, TreeNode albums)
+        {
+            _progressWindow.NotifcationLabelUpdate("Refreshing the library cache, this may take a few seconds!");
             Cursor.Current = Cursors.WaitCursor;
 
-            int numArtists = MusicLibrary.GetInstance().Artists.Count;
+            List<artist> artistsInLibrary = MusicLibrary.GetInstance().Artists;
+            int artistCount = artistsInLibrary.Count();
+
+            List<album> albumsInLibrary = MusicLibrary.GetInstance().Albums;
+            int albumCount = albumsInLibrary.Count();
 
             Cursor.Current = Cursors.Default;
 
-            _progressWindow.ProgressBarMaximum = numArtists;
-            
-            for (int i = 0; i < numArtists; i++)
+            _progressWindow.ProgressBarMaximum = artistCount + albumCount;
+
+            for (int i = 0; i < artistCount; i++)
             {
-                var artist = MusicLibrary.GetInstance().Artists[i];
-
                 _progressWindow.ImportProgressBarStep();
-                _progressWindow.NotifcationLabelUpdate("Adding artist '" + artist.name + "' to library" + "' [" + i + "/" + numArtists + "]");                
+                _progressWindow.NotifcationLabelUpdate("Loading artist '" + artistsInLibrary[i].name + "' from library" + "' [" + i + "/" + artistCount + "]");
 
-                artists.Nodes.Add(artist.name);
+                Invoke(new ValueUpdateDelegate(() => artists.Nodes.Add(artistsInLibrary[i].name)));
             }
 
-            int numAlbums = MusicLibrary.GetInstance().Albums.Count;
-
-            _progressWindow.ResetProgressBar();
-            _progressWindow.ProgressBarMaximum = numArtists;
-
-            for (int i = 0; i < numAlbums; i++)
+            for (int i = 0; i < albumCount; i++)
             {
-                var album = MusicLibrary.GetInstance().Albums[i];
-
                 _progressWindow.ImportProgressBarStep();
-                _progressWindow.NotifcationLabelUpdate("Adding album '" + album.name + "' to library" + "' [" + i + "/" + numAlbums + "]");
+                _progressWindow.NotifcationLabelUpdate("Loading album '" + albumsInLibrary[i].name + "' from library" + "' [" + i + "/" + albumCount + "]");
 
-                albums.Nodes.Add(album.name);
+                Invoke(new ValueUpdateDelegate(() => albums.Nodes.Add(albumsInLibrary[i].name)));
             }
 
-            _progressWindow.Hide();
-            _progressWindow.Dispose();
-            _progressWindow = null;
+            Invoke(new ValueUpdateDelegate(() =>
+            {
+                _progressWindow.Hide();
+                _progressWindow.Dispose();
+                _progressWindow = null;
+
+                Form frm = new Form();
+                frm.Controls.Add(new AlbumBrowser());
+                frm.Show();
+            }));
         }
 
         /// <summary>
@@ -641,11 +652,11 @@ namespace Dukebox
 
                 if (node.Parent.Text == "Artists")
                 {
-                    MusicLibrary.GetInstance().Tracks.Where(t => t.Artist != null).Where(t => t.Artist.name == e.Node.Text).OrderBy(t => t.Album != null ? t.Album.id : 0).ToList().ForEach(t => lstLibraryBrowser.Items.Add(t));
+                    MusicLibrary.GetInstance().Tracks.Where(t => t.Artist != null).Where(t => t.Artist.name == e.Node.Text).OrderBy(t => t.Song.artistId.HasValue ? t.Song.artistId.Value : 0).ToList().ForEach(t => lstLibraryBrowser.Items.Add(t));
                 }
                 else if (node.Parent.Text == "Albums")
                 {
-                    MusicLibrary.GetInstance().Tracks.Where(t => t.Album != null).Where(t => t.Album.name == e.Node.Text).OrderBy(t => t.Artist != null ? t.Artist.id : 0).ToList().ForEach(t => lstLibraryBrowser.Items.Add(t));
+                    MusicLibrary.GetInstance().Tracks.Where(t => t.Album != null).Where(t => t.Album.name == e.Node.Text).OrderBy(t => t.Song.albumId.HasValue ? t.Song.albumId.Value : 0).ToList().ForEach(t => lstLibraryBrowser.Items.Add(t));
                 }
 
                 RefreshUI();
@@ -781,7 +792,7 @@ namespace Dukebox
                 for (int i = 0; i < maxIdx; i++)
                 {
 
-                    Track t = MusicLibrary.GetInstance().GetTrackFromFile(new KeyValuePair<string, AudioFileMetaData>(inFiles[i], cdMetadata[i]));
+                    Track t = MusicLibrary.GetInstance().GetTrackFromFile(inFiles[i], cdMetadata[i]);
                     string outFile = outPath + "\\" + t.ToString() + ".mp3";
 
                     MediaPlayer.ConvertCdaFileToMp3(inFiles[i], outFile, new BaseEncoder.ENCODEFILEPROC((a, b) => CdRippingProgressMonitor(a, b, t, maxIdx, i)), true);

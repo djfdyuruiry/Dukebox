@@ -71,7 +71,7 @@
         {
             if (prgBarImportProgress.Value == prgBarImportProgress.Maximum)
             {
-                prgBarImportProgress.Value = 0;
+                Invoke(new ValueUpdateDelegate(() => prgBarImportProgress.Value = 0));
             }
         }
         
@@ -81,7 +81,7 @@
         /// <returns></returns>
         public void ImportProgressBarStep()
         {
-            prgBarImportProgress.PerformStep();
+            Invoke(new ValueUpdateDelegate(prgBarImportProgress.PerformStep));
         }
 
         /// <summary>
