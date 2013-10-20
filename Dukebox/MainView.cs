@@ -153,9 +153,6 @@ namespace Dukebox
             if (_fileBrowserDialog.ShowDialog() == DialogResult.OK)
             {
                 string fileName = _fileBrowserDialog.FileName;
-
-                TAG_INFO ti = BassTags.BASS_TAG_GetFromFile(fileName);
-
                 Track track = MusicLibrary.GetInstance().GetTrackFromFile(fileName);
                 
                 if (track != null)
@@ -167,15 +164,6 @@ namespace Dukebox
                     _currentPlaylist.StartPlaylistPlayback();
 
                     RefreshUI();
-
-                    int pictureCount = track.Metadata.Tag.PictureCount;
-
-                    for (int i = 0; i < pictureCount; i++)
-                    {
-                        Image img = track.Metadata.Tag.PictureGetImage(i);
-                        img.Save(track.ToString() + "_" + i + ".jpg", ImageFormat.Jpeg);
-                    }
-
                 }
             }
         }
@@ -377,12 +365,11 @@ namespace Dukebox
             {
                 // Display currently playing song.
                 lblCurrentlyPlaying.Text = _currentPlaylist.CurrentlyLoadedTrack.ToString();
-                Image albumArt = _currentPlaylist.CurrentlyLoadedTrack.Metadata.Tag.PictureGetImage(0);
 
                 // Draw the album art if available in the currently playing file.
-                if (albumArt != null)
+                if (_currentPlaylist.CurrentlyLoadedTrack.Metadata.HasFutherMetadataTag && _currentPlaylist.CurrentlyLoadedTrack.Metadata.HasAlbumArt)
                 {
-                    picAlbumArt.Image = (Image)(new Bitmap(albumArt, picAlbumArt.Size));
+                    picAlbumArt.Image = (Image)(new Bitmap(_currentPlaylist.CurrentlyLoadedTrack.Metadata.AlbumArt, picAlbumArt.Size));
                     picAlbumArt.Visible = true;
                 }
                 else if (picAlbumArt.Visible)
@@ -487,10 +474,6 @@ namespace Dukebox
                 _progressWindow.Hide();
                 _progressWindow.Dispose();
                 _progressWindow = null;
-
-                Form frm = new Form();
-                frm.Controls.Add(new AlbumBrowser());
-                frm.Show();
             }));
         }
 

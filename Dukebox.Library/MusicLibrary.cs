@@ -148,10 +148,14 @@ namespace Dukebox.Library
             {
                 track.Metadata = metadata;
             }
+            else
+            {
+                track.Metadata = new AudioFileMetaData(fileName);
+            }
 
             track.Song.title = track.Metadata.Title;
             track.Album.name = track.Metadata.Album;
-            track.Album.name = track.Metadata.Artist;
+            track.Artist.name = track.Metadata.Artist;
 
             return track;
         }
@@ -337,14 +341,14 @@ namespace Dukebox.Library
 
                 DukeboxData.SaveChanges();
 
-                if(albumObj !=  null && track.Value.Tag.PictureCount > 0)
+                if(albumObj !=  null && track.Value.HasFutherMetadataTag && track.Value.HasAlbumArt)
                 {
                     if (!Directory.Exists("./albumArtCache"))
                     {
                         Directory.CreateDirectory("./albumArtCache");
                     }
 
-                    Image img = track.Value.Tag.PictureGet(0).PictureImage;
+                    Image img = track.Value.AlbumArt;
 
                     if (img != null && !File.Exists("./albumArtCache/" + albumObj.id))
                     {
