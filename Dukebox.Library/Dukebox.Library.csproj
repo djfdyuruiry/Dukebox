@@ -34,6 +34,12 @@
     <Reference Include="EntityFramework">
       <HintPath>..\packages\EntityFramework.5.0.0\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
+    <Reference Include="IKVM.OpenJDK.Core">
+      <HintPath>C:\Program Files\ikvm-7.2.4630.5\bin\IKVM.OpenJDK.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="jaudiotagger-2.2.0">
+      <HintPath>..\packages\Jaudiotagger-2.2.0\jaudiotagger-2.2.0.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.5.0.6\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>

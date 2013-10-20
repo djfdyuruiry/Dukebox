@@ -1,8 +1,11 @@
 ﻿using Dukebox.Audio;
 using Dukebox.Library.Model;
 using Dukebox.Logging;
+using org.jaudiotagger.audio;
+using org.jaudiotagger.tag;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -18,20 +21,34 @@ namespace Dukebox.Model
     {
         #region Metadata properties
 
-        private string _title;
-        private string _artist;
-        private string _album;
+        private string _title = string.Empty;
+        private string _artist = string.Empty;
+        private string _album = string.Empty;
+
+        private AudioFile _audioFile;
+        private Tag _tag;
         
         public string Title 
         {
             get
             {
-                if (Tag != null)
+                if (HasFutherMetadataTag)
                 {
-                    return Tag.title;
+                    return ExtractFieldText(FieldKey.TITLE);
                 }
 
                 return _title;
+            }
+            set
+            {
+                if (HasFutherMetadataTag)
+                {
+                    _tag.setField(FieldKey.TITLE, value);
+                }
+                else
+                {
+                    _artist = value;
+                }
             }
         }
 
@@ -39,12 +56,23 @@ namespace Dukebox.Model
         {
             get
             {
-                if (Tag != null)
+                if (HasFutherMetadataTag)
                 {
-                    return Tag.artist;
+                    return ExtractFieldText(FieldKey.ARTIST);
                 }
 
                 return _artist;
+            }
+            set
+            {
+                if (HasFutherMetadataTag)
+                {
+                    _tag.setField(FieldKey.ARTIST, value);
+                }
+                else
+                {
+                    _artist = value;
+                }
             }
         }
 
@@ -52,16 +80,102 @@ namespace Dukebox.Model
         {
             get
             {
-                if (Tag != null)
+                if (HasFutherMetadataTag)
                 {
-                    return Tag.album;
+                    return ExtractFieldText(FieldKey.ALBUM);
                 }
 
                 return _album;
             }
+            set
+            {
+                if (HasFutherMetadataTag)
+                {
+                    _tag.setField(FieldKey.ALBUM, value);
+                }
+                else
+                {
+                    _artist = value;
+                }
+            }
         }
 
-        public TAG_INFO Tag { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool HasFutherMetadataTag
+        {
+            get
+            {
+                return _tag != null && _audioFile != null;
+            }
+        }
+
+        public int Length
+        {
+            get
+            {
+                if (!HasFutherMetadataTag)
+                {
+                    throw new NullReferenceException("There is no metadata tag available for this audio file!");
+                }
+
+                return _audioFile.getAudioHeader().getTrackLength();
+            }
+        }
+
+        /// <summary>
+        /// Is there any album art in the audio file?
+        /// </summary>
+        public bool HasAlbumArt
+        {
+            get
+            {
+                return HasFutherMetadataTag && _tag.getArtworkList().size() > 0;
+            }
+        }
+
+        /// <summary>
+        /// Get the first album art image found in the audio tag.
+        /// </summary>
+        public Image AlbumArt
+        {
+            get
+            {
+                if (!HasFutherMetadataTag)
+                {
+                    throw new NullReferenceException("There is no metadata tag available for this audio file!");
+                }
+
+                Logger.log("Fetching album artwork from " + _title + "...");
+                return Image.FromStream(new MemoryStream(_tag.getFirstArtwork().getBinaryData()));
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        private string ExtractFieldText(FieldKey key)
+        {
+            if (HasFutherMetadataTag)
+            {
+                if (_tag.getFirstField(key) != null)
+                {
+                    if (_tag.getFirstField(key).toString().Split('"').Length > 1)
+                    {
+                        return _tag.getFirstField(key).toString().Split('"')[1];
+                    }
+                    else
+                    {
+                        return _tag.getFirstField(key).toString();
+                    }
+                }
+            }
+
+            return string.Empty;
+        }
 
         #endregion
 
@@ -88,7 +202,8 @@ namespace Dukebox.Model
             {
                 if ((new FileInfo(fileName)).Extension != ".cda")
                 {
-                    Tag = BassTags.BASS_TAG_GetFromFile(fileName);
+                    _audioFile = AudioFileIO.read(new java.io.File(fileName));
+                    _tag = _audioFile.getTag();
                 }
                 else
                 {
@@ -99,7 +214,7 @@ namespace Dukebox.Model
             {
                 Logger.log("Error occured while parsing metadata from '" + fileName + "': " + ex.InnerException.Message);
                 
-                Tag = null;
+                _tag = null;
                 GetDetailsFromUnsupportedFormat(fileName);
             }
         }
@@ -118,15 +233,14 @@ namespace Dukebox.Model
             fileName = Path.GetFileNameWithoutExtension(fileName);
 
             string[] metadata = null;
-
-            if (fileName.Contains('_'))
-            {
-                metadata = fileName.Split('\\').LastOrDefault().Split('_');
-            } 
-            else if (fileName.Contains('-'))
+            if (fileName.Contains('-'))
             {
                 metadata = fileName.Split('-');
             }
+            else if (fileName.Contains('_'))
+            {
+                metadata = fileName.Split('\\').LastOrDefault().Split('_');
+            } 
             else
             {
                 metadata = fileName.Split('\\').LastOrDefault().Split(' ');
@@ -161,6 +275,21 @@ namespace Dukebox.Model
             _artist = cdData.Artist;
             _album = cdData.Album;
             _title = cdData.Tracks[trackIdx];
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void CommitChanges()
+        {
+            if (_audioFile != null)
+            {
+                _audioFile.commit();
+            }
+            else
+            {
+                throw new InvalidOperationException("There is no metadata tag available for this audio file!");
+            }            
         }
 
         /// <summary>

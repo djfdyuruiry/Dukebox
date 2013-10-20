@@ -207,6 +207,7 @@
             this.mnuPlayCd.Name = "mnuPlayCd";
             this.mnuPlayCd.Size = new System.Drawing.Size(169, 22);
             this.mnuPlayCd.Text = "Play Audio CD...";
+            this.mnuPlayCd.Click += new System.EventHandler(this.mnuPlayFolder_Click);
             // 
             // toolStripSeparator4
             // 

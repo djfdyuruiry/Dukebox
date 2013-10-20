@@ -1,9 +1,7 @@
-﻿using Dukebox.Logging;
-using Dukebox.Model;
-using Dukebox.Audio;
+﻿using Dukebox.Audio;
+using Dukebox.Logging;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
