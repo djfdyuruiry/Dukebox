@@ -67,7 +67,6 @@ namespace Dukebox
 
             _playbackMonitorTimer = new System.Timers.Timer(250);
             _playbackMonitorTimer.Elapsed += UpdatePlaybackTime;
-            _playbackMonitorTimer.Start();
 
             InitializeComponent();
 
@@ -114,6 +113,16 @@ namespace Dukebox
                     RegisterHotKeys();
                 }
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void MainView_Load(object sender, EventArgs e)
+        {
+            _playbackMonitorTimer.Start();
         }
 
         /// <summary>
@@ -407,7 +416,11 @@ namespace Dukebox
         {
             if (MediaPlayer.GetInstance().AudioLoaded)
             {
-                Invoke(new ValueUpdateDelegate(()=>lblPlaybackTime.Text = MediaPlayer.GetInstance().MinutesPlayed + " | " + MediaPlayer.GetInstance().AudioLengthInMins));
+                Invoke(new ValueUpdateDelegate(() => lblPlaybackTime.Text = MediaPlayer.GetInstance().MinutesPlayed + " | " + MediaPlayer.GetInstance().AudioLengthInMins));
+            }
+            else
+            {
+                Invoke(new ValueUpdateDelegate(() => lblPlaybackTime.Text = string.Empty));
             }
         }
 

@@ -565,6 +565,7 @@
             this.Name = "MainView";
             this.Text = "Dukebox";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.frmMainView_FormClosed);
+            this.Load += new System.EventHandler(this.MainView_Load);
             this.Resize += new System.EventHandler(this.MainView_Resize);
             this.mnuMain.ResumeLayout(false);
             this.mnuMain.PerformLayout();
