@@ -18,6 +18,8 @@ namespace Dukebox.Audio
     /// </summary>
     public class MediaPlayer
     {
+        public static readonly string MINUTE_FORMAT = "{0}:{1}";
+
         #region Playback control properties
         
         /// <summary>
@@ -29,6 +31,35 @@ namespace Dukebox.Audio
         private string _fileName;
 
         public bool AudioLoaded { get { return _stream != 0; } }
+
+        public string AudioLengthInMins
+        {
+            get
+            {
+                if (!AudioLoaded)
+                {
+                    return string.Empty;
+                }
+
+                long position = Bass.BASS_ChannelGetLength(_stream);
+                return GetMinutesFromChannelPosition(_stream, position);
+            }
+        }
+
+        public string MinutesPlayed 
+        {
+            get 
+            {
+                if (!AudioLoaded)
+                {
+                    return string.Empty;
+                }
+
+                long position = Bass.BASS_ChannelGetPosition(_stream);
+                return GetMinutesFromChannelPosition(_stream, position);
+            } 
+        }
+
         public bool Playing { get; set; }
         public bool Stopped { get; set; }
         public bool Finished { get; set; }
@@ -274,6 +305,29 @@ namespace Dukebox.Audio
             lameEncoder.EncoderDirectory = Dukebox.Audio.Properties.Settings.Default.lameEncoderPath;
 
             (new Thread(() => BaseEncoder.EncodeFile(cdaFileName, mp3OutFile, lameEncoder, progressCallback, overwriteOuputFile, false))).Start();
+        }
+
+        /// <summary>
+        /// Gets the total minutes from a channel at the given
+        /// position. Maximum length supported by formatting is
+        /// '999:59'. Uses the static property 'MINUTE_FORMAT' to
+        /// preform formatting.
+        /// </summary>
+        /// <param name="stream">The channel handler.</param>
+        /// <param name="channelPosition">The position in the channel to convert to mintues.</param>
+        /// <returns>A formatted string containing the equivalent minutes and second that the position is in the channel.</returns>
+        public static string GetMinutesFromChannelPosition(int stream, long channelPosition)
+        {
+            double lengthInSecs = Bass.BASS_ChannelBytes2Seconds(stream, channelPosition);
+            int minutes = (int)(lengthInSecs / 60f);
+            int seconds = (int)(lengthInSecs % 60f);
+
+            if (minutes > 99)
+            {
+                return string.Format(MINUTE_FORMAT, minutes.ToString("000"), seconds.ToString("00"));
+            }
+
+            return string.Format(MINUTE_FORMAT, minutes.ToString("00"), seconds.ToString("00"));
         }
     }
     

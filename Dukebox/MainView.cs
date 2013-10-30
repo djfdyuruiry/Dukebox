@@ -1,20 +1,17 @@
-﻿using GlobalHotKey;
-using Dukebox.Audio;
+﻿using Dukebox.Audio;
 using Dukebox.Library;
-using Dukebox.Library.Model;
 using Dukebox.Logging;
 using Dukebox.Model;
+using GlobalHotKey;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
 using System.Windows.Input;
-using Un4seen.Bass;
 using Un4seen.Bass.AddOn.Tags;
 using Un4seen.Bass.Misc;
 
@@ -28,6 +25,7 @@ namespace Dukebox
         // Playlist properties.
         private int _lastPlayedTrackIndex;
         private Playlist _currentPlaylist;
+        private System.Timers.Timer _playbackMonitorTimer;
 
         // File and library objects.
         private FolderBrowserDialog _folderBrowserDialog;
@@ -37,9 +35,6 @@ namespace Dukebox
         // Playlist export and import browsers.
         private OpenFileDialog _playlistImportBrowser;
         private SaveFileDialog _playlistExportBrowser;
-
-        // View monitor thread to refresh UI from time to time.
-        private Thread _viewModelMonitorThread;
 
         // Global hotkey monitor.
         private HotKeyManager hotKeyManager;
@@ -67,6 +62,13 @@ namespace Dukebox
             _currentPlaylist = new Playlist() { Repeat= false, RepeatAll = false, Shuffle = false };
             _lastPlayedTrackIndex = -1;
 
+            _currentPlaylist.NewTrackLoadedHandlers.Add(new EventHandler((o, e) => Invoke(new ValueUpdateDelegate(()=>UpdateUI(o, (NewTrackLoadedEventArgs)e)))));
+            _currentPlaylist.TrackListAccessHandlers.Add(new EventHandler((o, e) => Invoke(new ValueUpdateDelegate(()=>UpdatePlaybackControls(o, (TrackListAccessEventArgs)e)))));
+
+            _playbackMonitorTimer = new System.Timers.Timer(250);
+            _playbackMonitorTimer.Elapsed += UpdatePlaybackTime;
+            _playbackMonitorTimer.Start();
+
             InitializeComponent();
 
             this.DoubleBuffered = true;
@@ -80,9 +82,6 @@ namespace Dukebox
 
             hotKeyManager = new HotKeyManager();
             RegisterHotKeys();
-
-            _viewModelMonitorThread = new Thread(new ThreadStart(this.MonitorViewModel));
-            _viewModelMonitorThread.Start();
 
             UpdateFilters();
         }
@@ -124,8 +123,8 @@ namespace Dukebox
         /// <param name="e"></param>
         private void frmMainView_FormClosed(object sender, FormClosedEventArgs e)
         {
-            _viewModelMonitorThread.Abort();
             _currentPlaylist.StopPlaylistPlayback();
+            _playbackMonitorTimer.Stop();
             Application.Exit();
         }
 
@@ -330,28 +329,7 @@ namespace Dukebox
 
 #endregion
 
-        #region View model update thread and delgates
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private void MonitorViewModel()
-        {
-            ValueUpdateDelegate UpdateFormDelegate = new ValueUpdateDelegate(UpdateForm);
-
-            // Wait for window to render.
-            while (!this.Visible)
-            {
-                Thread.Sleep(100);
-            }
-
-            // While window is open.
-            while(this.Visible)
-            {
-                Invoke(UpdateFormDelegate);
-                Thread.Sleep(250);
-            }
-        }
+        #region Playlist/UI event handlers
 
         /// <summary>
         /// Update the forms view model to display the current
@@ -359,59 +337,77 @@ namespace Dukebox
         /// album art if available and highlight the current track
         /// in the playlist control.
         /// </summary>
-        private void UpdateForm()
-        {
-            if (_currentPlaylist.TrackLoaded)
+        /// <param name="sender">The object that invoked this event.</param>
+        /// <param name="e">The details of the new track loaded.</param>
+        private void UpdateUI(Object sender, NewTrackLoadedEventArgs e)
+        {                
+            // Display currently playing song.
+            lblCurrentlyPlaying.Text = e.Track.ToString();
+
+            // Draw the album art if available in the currently playing file.
+            if (e.Track.Metadata.HasFutherMetadataTag && e.Track.Metadata.HasAlbumArt)
             {
-                // Display currently playing song.
-                lblCurrentlyPlaying.Text = _currentPlaylist.CurrentlyLoadedTrack.ToString();
-
-                // Draw the album art if available in the currently playing file.
-                if (_currentPlaylist.CurrentlyLoadedTrack.Metadata.HasFutherMetadataTag && _currentPlaylist.CurrentlyLoadedTrack.Metadata.HasAlbumArt)
-                {
-                    picAlbumArt.Image = (Image)(new Bitmap(_currentPlaylist.CurrentlyLoadedTrack.Metadata.AlbumArt, picAlbumArt.Size));
-                    picAlbumArt.Visible = true;
-                }
-                else if (picAlbumArt.Visible)
-                {
-                    picAlbumArt.Image = null;
-                    picAlbumArt.Visible = false;
-                }
-
-                try
-                {
-                    // Update pause/play background image.
-                    if (_currentPlaylist.PlayingAudio && btnPlay.BackgroundImage != Dukebox.Properties.Resources.GnomeMediaPlaybackPause)
-                    {
-                        btnPlay.BackgroundImage = Dukebox.Properties.Resources.GnomeMediaPlaybackPause;
-                    }
-                    else if (!_currentPlaylist.PlayingAudio && btnPlay.BackgroundImage != Dukebox.Properties.Resources.GnomeMediaPlaybackStart)
-                    {
-                        btnPlay.BackgroundImage = Dukebox.Properties.Resources.GnomeMediaPlaybackStart;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Logger.log("Failed to switch background image for btnPlay on frmMainView [" + ex.Message + "]");
-                }
-
-                // Update playlist control.
-                if (_lastPlayedTrackIndex != _currentPlaylist.CurrentTrackIndex)
-                {
-                    lstPlaylist.Refresh();
-                    _lastPlayedTrackIndex = _currentPlaylist.CurrentTrackIndex;
-                    lstPlaylist.Refresh();
-                }
+                picAlbumArt.Image = (Image)(new Bitmap(e.Track.Metadata.AlbumArt, picAlbumArt.Size));
+                picAlbumArt.Visible = true;
+            }
+            else if (picAlbumArt.Visible)
+            {
+                picAlbumArt.Image = null;
+                picAlbumArt.Visible = false;
             }
 
+            try
+            {
+                // Update pause/play background image.
+                if (_currentPlaylist.PlayingAudio && btnPlay.BackgroundImage != Dukebox.Properties.Resources.GnomeMediaPlaybackPause)
+                {
+                    btnPlay.BackgroundImage = Dukebox.Properties.Resources.GnomeMediaPlaybackPause;
+                }
+                else if (!_currentPlaylist.PlayingAudio && btnPlay.BackgroundImage != Dukebox.Properties.Resources.GnomeMediaPlaybackStart)
+                {
+                    btnPlay.BackgroundImage = Dukebox.Properties.Resources.GnomeMediaPlaybackStart;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.log("Failed to switch background image for btnPlay on frmMainView [" + ex.Message + "]");
+            }
+
+            // Update playlist control.
+            if (_lastPlayedTrackIndex != e.TrackIndex)
+            {
+                lstPlaylist.Refresh();
+                _lastPlayedTrackIndex = e.TrackIndex;
+                lstPlaylist.Refresh();
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void UpdatePlaybackControls(Object sender, TrackListAccessEventArgs e)
+        {
             // Enable saving current playlist when it is not empty.
-            if (_currentPlaylist.Tracks.Count > 0 && !saveToFileToolStripMenuItem.Enabled)
+            if (e.TrackListSize > 0 && !saveToFileToolStripMenuItem.Enabled)
             {
                 saveToFileToolStripMenuItem.Enabled = true;
             }
-            else if (_currentPlaylist.Tracks.Count  < 1 && loadFromFileToolStripMenuItem.Enabled)
+            else if (e.TrackListSize < 1 && loadFromFileToolStripMenuItem.Enabled)
             {
                 saveToFileToolStripMenuItem.Enabled = false;
+            }
+        }
+
+        /// <summary>
+        /// Update the playback time monitor label.
+        /// </summary>
+        private void UpdatePlaybackTime(Object sender, System.Timers.ElapsedEventArgs e)
+        {
+            if (MediaPlayer.GetInstance().AudioLoaded)
+            {
+                Invoke(new ValueUpdateDelegate(()=>lblPlaybackTime.Text = MediaPlayer.GetInstance().MinutesPlayed + " | " + MediaPlayer.GetInstance().AudioLengthInMins));
             }
         }
 
@@ -504,7 +500,7 @@ namespace Dukebox
         {
             e.DrawBackground();
             Graphics g = e.Graphics;
-
+            
             if (e.Index == _currentPlaylist.CurrentTrackIndex)
             {
                 g.FillRectangle(new SolidBrush(Color.PowderBlue), e.Bounds);
@@ -727,15 +723,7 @@ namespace Dukebox
 
         #endregion
 
-        /// <summary>
-        /// Show the about box window.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            (new AboutBox()).Show();
-        }
+        #region CD ripping methods
 
         /// <summary>
         /// 
@@ -846,6 +834,8 @@ namespace Dukebox
             _progressWindow.NotifcationLabelUpdate("[" + currentTrackIndex + 1 + "/" + totalTracksToRip + "] Converting " + track + " to MP3 - " + percentComplete + "%");
         }
 
+        #endregion
+
         /// <summary>
         /// 
         /// </summary>
@@ -856,6 +846,16 @@ namespace Dukebox
             Point locationOnForm = lstPlaylist.FindForm().PointToClient(lstPlaylist.Parent.PointToScreen(lstPlaylist.Location));
             lblPlaylist.Location = new Point(locationOnForm.X, lblPlaylist.Location.Y);
             lblCurrentlyPlaying.Location = new Point(locationOnForm.X + lstPlaylist.Width, lblCurrentlyPlaying.Location.Y);
+        }
+
+        /// <summary>
+        /// Show the about box window.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            (new AboutBox()).Show();
         }
     }
 
