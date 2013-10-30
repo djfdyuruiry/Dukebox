@@ -78,6 +78,7 @@
             this.pnlPlaybackControls = new System.Windows.Forms.Panel();
             this.pnlOverview = new System.Windows.Forms.Panel();
             this.tblMain = new System.Windows.Forms.TableLayoutPanel();
+            this.lblPlaybackTime = new System.Windows.Forms.Label();
             this.mnuMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picAlbumArt)).BeginInit();
             this.tbLibraryNavigator.SuspendLayout();
@@ -539,11 +540,22 @@
             this.tblMain.Size = new System.Drawing.Size(1008, 706);
             this.tblMain.TabIndex = 20;
             // 
+            // lblPlaybackTime
+            // 
+            this.lblPlaybackTime.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblPlaybackTime.AutoSize = true;
+            this.lblPlaybackTime.Font = new System.Drawing.Font("Segoe UI", 9.75F);
+            this.lblPlaybackTime.Location = new System.Drawing.Point(769, 7);
+            this.lblPlaybackTime.Name = "lblPlaybackTime";
+            this.lblPlaybackTime.Size = new System.Drawing.Size(0, 17);
+            this.lblPlaybackTime.TabIndex = 19;
+            // 
             // MainView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1008, 730);
+            this.Controls.Add(this.lblPlaybackTime);
             this.Controls.Add(this.tblMain);
             this.Controls.Add(this.mnuMain);
             this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -623,6 +635,7 @@
         private System.Windows.Forms.Panel pnlPlaybackControls;
         private System.Windows.Forms.Panel pnlOverview;
         private System.Windows.Forms.TableLayoutPanel tblMain;
+        private System.Windows.Forms.Label lblPlaybackTime;
     }
 }
 
