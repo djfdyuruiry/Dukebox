@@ -16,7 +16,7 @@ namespace Dukebox.Model
     /// This class acts as an abstraction layer on top of the
     /// MediaPlayer singleton class.
     /// </summary>
-    public class Playlist
+    sealed public class Playlist : IDisposable
     {
         /// <summary>
         /// The list of tracks in the playlist.
@@ -153,7 +153,10 @@ namespace Dukebox.Model
         /// </summary>
         private void CallNewTrackEventHandlers()
         {
-            NewTrackLoadedHandlers.ForEach(a => a.Invoke(this, new NewTrackLoadedEventArgs() { Track = _tracks[_currentTrackIndex], TrackIndex = _currentTrackIndex }));
+            if (_tracks.Count > 0 && (_currentTrackIndex > -1 && _currentTrackIndex < _tracks.Count))
+            {
+                NewTrackLoadedHandlers.ForEach(a => a.Invoke(this, new NewTrackLoadedEventArgs() { Track = _tracks[_currentTrackIndex], TrackIndex = _currentTrackIndex }));
+            }
         }
 
         /// <summary>
@@ -296,15 +299,15 @@ namespace Dukebox.Model
                 }
             }
 
-            if (trackIndex == CurrentTrackIndex)
-            {
-                _forward = true;
-                CurrentTrackIndex--;
-            }
-            else if (trackIndex == 0)
+            if (trackIndex == 0)
             {
                 StopPlaylistPlayback();
                 StartPlaylistPlayback();
+            }
+            else if (trackIndex == CurrentTrackIndex)
+            {
+                _forward = true;
+                CurrentTrackIndex--;
             }
             else
             {
@@ -340,20 +343,23 @@ namespace Dukebox.Model
         {
             Random random = new Random();
 
-            // Set playback flow controls to default values.
-            CurrentTrackIndex = 0;
+            // Set playback flow controls to default values.            
             _back = false;
             _forward = false;
+            CurrentTrackIndex = 0;
 
             while (CurrentTrackIndex < Tracks.Count)
             {
-                // Load current track into media player.
-                MediaPlayer.GetInstance().LoadFile(_tracks[_currentTrackIndex].Song.filename);
-
-                // Wait until media player thread has started playback.
-                while (!MediaPlayer.GetInstance().Playing)
+                if(!_forward && !_back)
                 {
-                    Thread.Sleep(10);
+                    // Load current track into media player.
+                    MediaPlayer.GetInstance().LoadFile(_tracks[_currentTrackIndex].Song.filename);
+
+                    // Wait until media player thread has started playback.
+                    while (!MediaPlayer.GetInstance().Playing)
+                    {
+                        Thread.Sleep(10);
+                    }
                 }
                 
                 // While next and back are not pressed and the user is not finished with the song.
@@ -455,6 +461,16 @@ namespace Dukebox.Model
             playlistFile.Close();
         }
         
+        /// <summary>
+        /// 
+        /// </summary>
+        public void Dispose()
+        {
+            _currentTrackIndexMutex.Dispose();
+
+            TrackListAccessHandlers.Clear();
+            NewTrackLoadedHandlers.Clear();
+        }
     }
 
     /// <summary>

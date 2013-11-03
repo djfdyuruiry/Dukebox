@@ -34,18 +34,32 @@ namespace Dukebox
                 Application.SetCompatibleTextRenderingDefault(false);
                 Application.Run((view = new MainView()));
             }
+            catch (ObjectDisposedException ex)
+            {
+                Error(ex, ref view);
+            }
             catch (Exception ex)
             {
-                // Failed to load the bass library or one it's plug-ins.
-                Logger.log(ex.Message, false);
-
-                MessageBox.Show(ex.Message, "Dukebox: Fatal Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-               
-                view.Hide();
-                view.Dispose();
-
-                Application.Exit();
+                Error(ex, ref view);
             }
+            
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ex"></param>
+        /// <param name="view"></param>
+        static void Error(Exception ex, ref MainView view)
+        {
+            view.Hide();
+            view.Dispose();
+
+            // Failed to load the bass library or one it's plug-ins.
+            Logger.log(ex.Message, false);
+
+            MessageBox.Show(ex.Message, "Dukebox: Fatal Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            Application.Exit();
         }
 
         /// <summary>

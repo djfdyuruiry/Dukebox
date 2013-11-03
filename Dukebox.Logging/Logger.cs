@@ -61,19 +61,23 @@ namespace Dukebox.Logging
         /// <summary>
         /// 
         /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times")]
         private static void WriteToFile(string message)
         {
             _logFileMutex.WaitOne();
 
             bool firstWrite = true;
             string assemblyName = System.Reflection.Assembly.GetCallingAssembly().GetName().Name;
-            StreamWriter outFile = null;
+
+            bool testStreamDisposed = false;
+            FileStream testOfStream = null;
+            StreamWriter testOutFile = null;
 
             try
             {
                 FileInfo logInfo = new FileInfo(_fileName);
-                FileStream ofStream = new FileStream(_fileName, FileMode.Append, FileAccess.Write, FileShare.Read);
-                outFile = new StreamWriter(ofStream);
+                testOfStream = new FileStream(_fileName, FileMode.Append, FileAccess.Write, FileShare.Read);
+                testOutFile = new StreamWriter(testOfStream);
 
                 double logSizeInMB = (((double)logInfo.Length) / 1024) / 1024;
                 firstWrite = false;
@@ -81,11 +85,12 @@ namespace Dukebox.Logging
                 // Archive the log file it is too large in size.
                 if (logSizeInMB >= _maxLogSizeInMb)
                 {
-                    outFile.WriteLine(assemblyName + "[" + DateTime.Now + "] - Log file '" + _fileName + "' archived.");
-                    outFile.Close();
+                    testOutFile.WriteLine(assemblyName + "[" + DateTime.Now + "] - Log file '" + _fileName + "' archived.");
 
                     // Close handle to old log file so it can be moved.
-                    ((IDisposable)outFile).Dispose();
+                    testOutFile.Close();
+                    testOfStream.Close();
+                    testStreamDisposed = true;
 
                     File.Move(_fileName, DateTime.Now + " - " + _fileName);
 
@@ -100,11 +105,15 @@ namespace Dukebox.Logging
             catch (Exception ex)
             {} // Log file has not been created yet.
             finally
-            {
-                ((IDisposable)outFile).Dispose();
+            {           
+                if (!testStreamDisposed)
+                {
+                    testOutFile.Close(); 
+                    testOfStream.Close();
+                }
             }
 
-            outFile = null;
+            StreamWriter outFile = null;
 
             try
             {
@@ -116,7 +125,6 @@ namespace Dukebox.Logging
                 }
 
                 outFile.WriteLine(assemblyName + "[" + DateTime.Now + "] - " + message);
-                outFile.Close();
             }
             catch (IOException ex)
             {} // Unable to add to log file.

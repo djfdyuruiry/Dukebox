@@ -348,11 +348,18 @@ namespace Dukebox.Library
                         Directory.CreateDirectory("./albumArtCache");
                     }
 
-                    Image img = track.Value.AlbumArt;
-
-                    if (img != null && !File.Exists("./albumArtCache/" + albumObj.id))
+                    try
                     {
-                        img.Save("./albumArtCache/" + albumObj.id);
+                        Image img = track.Value.AlbumArt;
+
+                        if (img != null && !File.Exists("./albumArtCache/" + albumObj.id))
+                        {
+                            img.Save("./albumArtCache/" + albumObj.id);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.log("Error extracting image for caching [" + track.Key + "]: " + ex.Message);
                     }
                 }
 
@@ -377,9 +384,47 @@ namespace Dukebox.Library
         #endregion
 
         /// <summary>
+        /// Search the library database for tracks matching
+        /// the search term specified. All text returned by
+        /// a call to 'ToString' on any given track object is
+        /// searched for the the term provided.
+        /// </summary>
+        /// <param name="searchTerm">The term to search for in track descriptions.</param>
+        /// <returns>A list of tracks</returns>
+        public List<Track> SearchForTracks(string searchTerm, SearchAreas searchArea)
+        {
+            List<Track> results = null;
+
+            switch (searchArea)
+            {
+                case SearchAreas.Album:
+                {
+                    results = Tracks.Where(t => t.Album.ToString().Contains(searchTerm)).ToList();
+                    break;
+                }
+                case SearchAreas.Artist:
+                {
+                    results = Tracks.Where(t => t.Artist.ToString().Contains(searchTerm)).ToList();
+                    break;
+                }
+                case SearchAreas.Song:
+                {
+                    results = Tracks.Where(t => t.Song.ToString().Contains(searchTerm)).ToList();
+                    break;
+                }
+                default:
+                {
+                    results = Tracks.Where(t => t.ToString().Contains(searchTerm)).ToList();
+                    break;
+                }
+            }
+
+            return results == null ? new List<Track>() : results;
+        }
+
+        /// <summary>
         /// Convenience method to extract file extension
-        /// from a file info object build using the given
-        /// file name.
+        /// from a filename string.
         /// </summary>
         /// <param name="fileName">The name of the file to examine.</param>
         /// <returns>The file extension of the file.</returns>
@@ -387,7 +432,6 @@ namespace Dukebox.Library
         {
             return (new FileInfo(fileName)).Extension.ToLower();
         }
-        
 
         #region Singleton pattern instance and accessor
 

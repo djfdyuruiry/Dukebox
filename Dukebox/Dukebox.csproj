@@ -90,6 +90,9 @@
     <Compile Include="AlbumBrowser.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="BufferedListBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="MainView.cs">
       <SubType>Form</SubType>
     </Compile>
