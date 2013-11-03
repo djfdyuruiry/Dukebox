@@ -393,3 +393,6 @@ Dukebox.Library/bin/Release/jaudiotagger-2.2.0.dll
 Dukebox.Library/obj/Release/Dukebox.Library.csproj.GenerateResource.Cache
 Dukebox.Library/obj/Release/Dukebox.ProgressMonitorBox.resources
 Dukebox.Logging/obj/Debug/DesignTimeResolveAssemblyReferences.cache
+Dukebox.Audio/obj/Debug/build.force
+Dukebox.Library/obj/Debug/build.force
+Dukebox/obj/Debug/build.force

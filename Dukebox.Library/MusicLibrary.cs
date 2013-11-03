@@ -1,29 +1,33 @@
-﻿using Dukebox.Logging;
+﻿using Dukebox.Audio;
+using Dukebox.Logging;
 using Dukebox.Model;
-using Dukebox.Audio;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
-using Un4seen.Bass.AddOn.Tags;
-using Dukebox.Library.Model;
 using System.Threading;
-using System.Drawing;
 
 namespace Dukebox.Library
 {
     /// <summary>
-    /// 
+    /// Handles the SQL music library ADO entities model. Preforms
+    /// lookups and adds content to the music library database. Also
+    /// allows you to fetch temporary models of audio files from directories 
+    /// and playlists.
     /// </summary>
     public class MusicLibrary
     {
-        public DukeboxEntities DukeboxData { get; set; }
+        /// <summary>
+        /// The ADO entities model for the SQL music database.
+        /// </summary>
+        private DukeboxEntities DukeboxData { get; set; }
 
         #region Views on music library data
 
         /// <summary>
-        /// 
+        /// All tracks currently stored in the database. Cached.
         /// </summary>
         private List<Track> _allTrackCache;
         public List<Track> Tracks 
@@ -50,7 +54,7 @@ namespace Dukebox.Library
         }
 
         /// <summary>
-        /// 
+        /// All artists currently stored in the database. Cached.
         /// </summary>
         private List<artist> _allArtistsCache;
         public List<artist> Artists
@@ -67,7 +71,7 @@ namespace Dukebox.Library
         }
 
         /// <summary>
-        /// 
+        /// All albums currently stored in the database. Cached.
         /// </summary>
         private List<album> _allAlbumsCache;
         public List<album> Albums
@@ -85,7 +89,10 @@ namespace Dukebox.Library
 
         #endregion
 
-        // Singleton pattern private constructor.
+        /// <summary>
+        /// Singleton pattern private constructor. Open connection to
+        /// SQL lite database file and populate track cache
+        /// </summary>
         private MusicLibrary()
         {
             DukeboxData = new DukeboxEntities();
@@ -96,11 +103,11 @@ namespace Dukebox.Library
         #region Folder/Playlist/File playback methods
 
         /// <summary>
-        /// 
+        /// Fetch track objects from a directory of files.
         /// </summary>
-        /// <param name="directory"></param>
-        /// <param name="subDirectories"></param>
-        /// <returns></returns>
+        /// <param name="directory">The path to load files from.</param>
+        /// <param name="subDirectories">Search all sub directories in the path given?</param>
+        /// <returns>A list of tracks </returns>
         /// <exception cref="Exception">If the directory lookup operation fails.</exception>
         public List<Track> GetTracksForDirectory(string directory, bool subDirectories)
         {
@@ -121,18 +128,17 @@ namespace Dukebox.Library
 
             foreach (string file in validFiles)
             {
-                Track t = GetTrackFromFile(file);
-
-                tracksToReturn.Add(t);
+                tracksToReturn.Add(GetTrackFromFile(file));
             }
 
             return tracksToReturn;
         }
 
         /// <summary>
-        /// 
+        /// Construct a track object from a given audio file.
         /// </summary>
-        /// <param name="song"></param>
+        /// <param name="fileName">The file to model in the track object.</param>
+        /// <param name="metadata">Optional metadata object, if you wish to build this manually.</param>
         /// <returns></returns>
         public Track GetTrackFromFile(string fileName, AudioFileMetaData metadata = null)
         {
@@ -161,20 +167,21 @@ namespace Dukebox.Library
         }
 
         /// <summary>
-        /// 
+        /// Fetch track objects from a playlist of files.
         /// </summary>
-        /// <param name="filename"></param>
-        /// <returns></returns>
-        public List<Track> GetTracksFromPlaylistFile(string filename)
+        /// <param name="playlistFile">The playlist to load files from.</param>
+        /// <returns>A list of tracks </returns>
+        /// <exception cref="Exception">If the directory lookup operation fails.</exception>
+        public List<Track> GetTracksFromPlaylistFile(string playlistFile)
         {
-            StreamReader playlistFile = new StreamReader(filename);
-            string jsonTracks = playlistFile.ReadToEnd();
+            StreamReader playlistFileReader = new StreamReader(playlistFile);
+            string jsonTracks = playlistFileReader.ReadToEnd();
 
             List<string> files = JsonConvert.DeserializeObject<List<string>>(jsonTracks);
 
-            List<Track> tracks = files.Where(t => File.Exists(t)).
-                                            Select(t => MusicLibrary.GetInstance().GetTrackFromFile(t)).
-                                            ToList();
+            List<Track> tracks = files.Where(t => File.Exists(t))
+                                      .Select(t => MusicLibrary.GetInstance().GetTrackFromFile(t))
+                                      .ToList();
             return tracks;
         }
 
@@ -183,12 +190,12 @@ namespace Dukebox.Library
         #region Database update methods
 
         /// <summary>
-        /// 
+        /// Add all files specified in a directory to the library and save changes
+        /// to database.
         /// </summary>
-        /// <param name="directory"></param>
-        /// <param name="subDirectories"></param>
-        /// <returns></returns>
-        /// <exception cref="Exception">If the directory lookup operation fails.</exception>
+        /// <param name="directory">The path to the directory to ingest.</param>
+        /// <param name="subDirectories">Scan all sub directories of the path?</param>
+        /// <exception cref="Exception">If the library import operation fails.</exception>
         public void AddDirectoryToLibrary(string directory, bool subDirectories, Action<object, AudioFileImportedEventArgs> progressHandler, Action<object, int> completeHandler)
         {
             Dictionary<string, AudioFileMetaData> tracks = new Dictionary<string, AudioFileMetaData>();
@@ -222,7 +229,8 @@ namespace Dukebox.Library
         }
 
         /// <summary>
-        /// 
+        /// Add a file to the library and save changes
+        /// to database.
         /// </summary>
         /// <param name="kvp"></param>
         public void AddFileToLibrary(KeyValuePair<string, AudioFileMetaData> kvp)
@@ -251,7 +259,8 @@ namespace Dukebox.Library
         }
 
         /// <summary>
-        /// 
+        /// Add all files specified in a playlist to the library and save changes
+        /// to database.
         /// </summary>
         /// <param name="filename"></param>
         public void AddPlaylistFileToLibrary(string filename)
@@ -277,7 +286,8 @@ namespace Dukebox.Library
         }
 
         /// <summary>
-        /// 
+        /// Add an artist to the library and save changes
+        /// to database.
         /// </summary>
         private void AddArtistToLibrary(AudioFileMetaData tag)
         {
@@ -295,7 +305,8 @@ namespace Dukebox.Library
         }
 
         /// <summary>
-        /// 
+        /// Add an album to the library and save changes
+        /// to database.
         /// </summary>
         private void AddAlbumToLibrary(AudioFileMetaData tag)
         {
@@ -313,7 +324,8 @@ namespace Dukebox.Library
         }
 
         /// <summary>
-        /// 
+        /// Add a song to the library and save changes
+        /// to database.
         /// </summary>
         private void AddSongToLibrary(KeyValuePair<string, AudioFileMetaData> track, artist artistObj, album albumObj)
         {
@@ -368,7 +380,8 @@ namespace Dukebox.Library
         }
 
         /// <summary>
-        /// 
+        /// Clear the cache of tracks, artists and albums. The cache
+        /// is automatically refilled at the end of this method.
         /// </summary>
         private void ClearTrackCache()
         {
@@ -383,6 +396,8 @@ namespace Dukebox.Library
 
         #endregion
 
+        #region Library search
+
         /// <summary>
         /// Search the library database for tracks matching
         /// the search term specified. All text returned by
@@ -394,33 +409,36 @@ namespace Dukebox.Library
         public List<Track> SearchForTracks(string searchTerm, SearchAreas searchArea)
         {
             List<Track> results = null;
+            searchTerm = searchTerm.ToLower();
 
             switch (searchArea)
             {
                 case SearchAreas.Album:
                 {
-                    results = Tracks.Where(t => t.Album.ToString().Contains(searchTerm)).ToList();
+                    results = Tracks.Where(t => t.Album != null ? t.Album.ToString().ToLower().Contains(searchTerm) : false).ToList();
                     break;
                 }
                 case SearchAreas.Artist:
                 {
-                    results = Tracks.Where(t => t.Artist.ToString().Contains(searchTerm)).ToList();
+                    results = Tracks.Where(t => t.Artist != null ? t.Artist.ToString().ToLower().Contains(searchTerm) : false).ToList();
                     break;
                 }
                 case SearchAreas.Song:
                 {
-                    results = Tracks.Where(t => t.Song.ToString().Contains(searchTerm)).ToList();
+                    results = Tracks.Where(t => t.Song != null ? t.Song.ToString().ToLower().Contains(searchTerm) : false).ToList();
                     break;
                 }
                 default:
                 {
-                    results = Tracks.Where(t => t.ToString().Contains(searchTerm)).ToList();
+                    results = Tracks.Where(t => t.ToString().ToLower().Contains(searchTerm)).ToList();
                     break;
                 }
             }
 
             return results == null ? new List<Track>() : results;
         }
+
+        #endregion
 
         /// <summary>
         /// Convenience method to extract file extension
@@ -455,14 +473,29 @@ namespace Dukebox.Library
     }
     
     /// <summary>
-    /// 
+    /// Arguments in the event of an audio file being imported
+    /// or being pre-processed.
     /// </summary>
     public class AudioFileImportedEventArgs : EventArgs
     {
+        /// <summary>
+        /// Is the track going through pre-processing?
+        /// </summary>
         public bool JustProcessing { get; set; }
+
+        /// <summary>
+        /// The absolute filename that was added to the library.
+        /// </summary>
         public string FileAdded { get; set; }
+
+        /// <summary>
+        /// Total files that are scheduled for this events parent operation.
+        /// </summary>
         public int TotalFilesThisImport { get; set; }
 
+        /// <summary>
+        /// Call EventArgs constructor.
+        /// </summary>
         public AudioFileImportedEventArgs() : base()
         {
         }

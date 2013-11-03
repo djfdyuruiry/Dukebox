@@ -143,6 +143,7 @@ namespace Dukebox
         private void MainView_Load(object sender, EventArgs e)
         {
             _playbackMonitorTimer.Start();
+            txtSearchBox_TextChanged(this, null);
         }
 
         /// <summary>
@@ -461,7 +462,7 @@ namespace Dukebox
                 else
                 {
                     Invoke(new ValueUpdateDelegate(() => lblPlaybackTime.Text = string.Format(MediaPlayer.MINUTE_FORMAT, 0.ToString("00"), 0.ToString("00"))));
-                    lblCurrentlyPlaying.Text = string.Empty;
+                    Invoke(new ValueUpdateDelegate(() => lblCurrentlyPlaying.Text = string.Empty));
                 }
             }
             catch(InvalidOperationException ex)
@@ -645,12 +646,24 @@ namespace Dukebox
         #endregion
 
         #region Library browser methods
+        
+        /// <summary>
+        /// Update the library browser with results with each change of
+        /// search term text.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void txtSearchBox_TextChanged(object sender, EventArgs e)
+        {
+            lstLibraryBrowser.Items.Clear();
+            MusicLibrary.GetInstance().SearchForTracks(txtSearchBox.Text, SearchAreas.All).ForEach(t => lstLibraryBrowser.Items.Add(t));
+        }
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param name="sender">Object that fired the event.</param>
+        /// <param name="e">The event arguments.</param>
         private void treeFilters_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
         {
             if (e.Node.Parent != null)
@@ -679,8 +692,8 @@ namespace Dukebox
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param name="sender">Object that fired the event.</param>
+        /// <param name="e">The event arguments.</param>
         private void treeFilters_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
         {
             if (e.Node.Parent != null)
@@ -847,6 +860,7 @@ namespace Dukebox
         {
             (new AboutBox()).Show();
         }
+
     }
 
     /// <summary>
