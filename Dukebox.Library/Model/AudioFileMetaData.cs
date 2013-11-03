@@ -8,7 +8,9 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text.RegularExpressions;
+using Un4seen.Bass;
 using Un4seen.Bass.AddOn.Cd;
 using Un4seen.Bass.AddOn.Tags;
 
@@ -19,6 +21,8 @@ namespace Dukebox.Model
     /// </summary>
     public class AudioFileMetaData
     {
+        public static readonly Uri CDDB_SERVER = new Uri("http://www.freedb.org/");
+
         #region Metadata properties
 
         private string _title = string.Empty;
@@ -117,7 +121,7 @@ namespace Dukebox.Model
             {
                 if (!HasFutherMetadataTag)
                 {
-                    throw new NullReferenceException("There is no metadata tag available for this audio file!");
+                    throw new InvalidOperationException("There is no metadata tag available for this audio file!");
                 }
 
                 return _audioFile.getAudioHeader().getTrackLength();
@@ -131,7 +135,8 @@ namespace Dukebox.Model
         {
             get
             {
-                return HasFutherMetadataTag && _tag.getArtworkList().size() > 0;
+                // Has a jaudiotagger object, contains artwork and the artwork binary data is not empty!
+                return HasFutherMetadataTag && _tag.getArtworkList().size() > 0 && _tag.getFirstArtwork().getBinaryData() != null;
             }
         }
 
@@ -144,7 +149,7 @@ namespace Dukebox.Model
             {
                 if (!HasFutherMetadataTag)
                 {
-                    throw new NullReferenceException("There is no metadata tag available for this audio file!");
+                    throw new InvalidOperationException("There is no metadata tag available for this audio file!");
                 }
 
                 Logger.log("Fetching album artwork from " + _title + "...");
@@ -212,7 +217,7 @@ namespace Dukebox.Model
             }
             catch (Exception ex)
             {
-                Logger.log("Error occured while parsing metadata from '" + fileName + "': " + ex.InnerException.Message);
+                Logger.log("Error occured while parsing metadata from '" + fileName + "': " + ex.Message);
                 
                 _tag = null;
                 GetDetailsFromUnsupportedFormat(fileName);
@@ -325,16 +330,13 @@ namespace Dukebox.Model
                 throw new ArgumentException("'" + driveLetter + "' is not a valid drive letter! Drive letter should be a letter between a-z.");
             }
 
+            CheckForCddbServerConnection();
+
             // Find drive details.
             int driveIndex = MediaPlayer.GetCdDriveIndex(driveLetter);
 
             string cddbResponse = BassCd.BASS_CD_GetID(driveIndex, BASSCDId.BASS_CDID_CDDB_QUERY);
             string entries = BassCd.BASS_CD_GetID(driveIndex, BASSCDId.BASS_CDID_CDDB_QUERY + 1);
-
-            if (cddbResponse == null)
-            {
-                throw new Exception("Cannot connect to CDDB information server @ freedb.freedb.org!");
-            }
 
             // Get album name from server response.
             string album = string.Empty;
@@ -367,6 +369,28 @@ namespace Dukebox.Model
             }
 
             return new CdMetadata { Artist = artist, Album = album, Tracks = trackNames };
+        }
+
+        /// <summary>
+        /// This methods throws an exception if there is
+        /// no connection to the CDDB_SERVER.
+        /// </summary>
+        public static void CheckForCddbServerConnection()
+        {
+            try
+            {
+                using (var client = new WebClient())
+                {
+                    using (var stream = client.OpenRead(CDDB_SERVER))
+                    {
+
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Cannot connect to CDDB information server @ '" + CDDB_SERVER + "'! (" + ex.Message + ")");
+            }
         }
     }
 }

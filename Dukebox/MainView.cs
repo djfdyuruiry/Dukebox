@@ -1,4 +1,5 @@
 ﻿using Dukebox.Audio;
+using Dukebox.Library.CdRipping;
 using Dukebox.Library;
 using Dukebox.Logging;
 using Dukebox.Model;
@@ -62,8 +63,8 @@ namespace Dukebox
             _currentPlaylist = new Playlist() { Repeat= false, RepeatAll = false, Shuffle = false };
             _lastPlayedTrackIndex = -1;
 
-            _currentPlaylist.NewTrackLoadedHandlers.Add(new EventHandler((o, e) => Invoke(new ValueUpdateDelegate(()=>UpdateUI(o, (NewTrackLoadedEventArgs)e)))));
-            _currentPlaylist.TrackListAccessHandlers.Add(new EventHandler((o, e) => Invoke(new ValueUpdateDelegate(()=>UpdatePlaybackControls(o, (TrackListAccessEventArgs)e)))));
+            _currentPlaylist.NewTrackLoadedHandlers.Add(new EventHandler((o, e) => Invoke(new ValueUpdateDelegate(()=>{try{UpdateUI(o, (NewTrackLoadedEventArgs)e);}catch(Exception ex){}}))));
+            _currentPlaylist.TrackListAccessHandlers.Add(new EventHandler((o, e) => Invoke(new ValueUpdateDelegate(()=>{try{UpdatePlaybackControls(o, (TrackListAccessEventArgs)e);}catch(Exception ex){}}))));
 
             _playbackMonitorTimer = new System.Timers.Timer(250);
             _playbackMonitorTimer.Elapsed += UpdatePlaybackTime;
@@ -83,6 +84,25 @@ namespace Dukebox
             RegisterHotKeys();
 
             UpdateFilters();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public new void Dispose()
+        {
+            hotKeyManager.Dispose();
+
+            _currentPlaylist.Dispose();
+
+            _playbackMonitorTimer.Stop();
+            _playbackMonitorTimer.Dispose();
+
+            if (_progressWindow != null)
+            {
+                _progressWindow.Close();
+                _progressWindow.Dispose();
+            }
         }
 
         /// <summary>
@@ -349,15 +369,31 @@ namespace Dukebox
         /// <param name="sender">The object that invoked this event.</param>
         /// <param name="e">The details of the new track loaded.</param>
         private void UpdateUI(Object sender, NewTrackLoadedEventArgs e)
-        {                
+        {            
+            // Prevent over processing when no new information needs to
+            // be handled.
+            if (e.TrackIndex == _lastPlayedTrackIndex)
+            {
+                return;
+            }
+
             // Display currently playing song.
             lblCurrentlyPlaying.Text = e.Track.ToString();
 
             // Draw the album art if available in the currently playing file.
             if (e.Track.Metadata.HasFutherMetadataTag && e.Track.Metadata.HasAlbumArt)
             {
-                picAlbumArt.Image = (Image)(new Bitmap(e.Track.Metadata.AlbumArt, picAlbumArt.Size));
-                picAlbumArt.Visible = true;
+                try
+                {
+                    picAlbumArt.Image = (Image)(new Bitmap(e.Track.Metadata.AlbumArt, picAlbumArt.Size));
+                    picAlbumArt.Visible = true;
+                }
+                catch (Exception ex)
+                {
+                    Logger.log("Error fetching album art for display [" + e.Track.Song.filename + "]: " + ex.Message);
+                    picAlbumArt.Image = null;
+                    picAlbumArt.Visible = false;
+                }
             }
             else if (picAlbumArt.Visible)
             {
@@ -383,12 +419,9 @@ namespace Dukebox
             }
 
             // Update playlist control.
-            if (_lastPlayedTrackIndex != e.TrackIndex)
-            {
-                lstPlaylist.Refresh();
-                _lastPlayedTrackIndex = e.TrackIndex;
-                lstPlaylist.Refresh();
-            }
+            lstPlaylist.Refresh();
+            _lastPlayedTrackIndex = e.TrackIndex;
+            lstPlaylist.Refresh();
         }
 
         /// <summary>
@@ -406,6 +439,11 @@ namespace Dukebox
             else if (e.TrackListSize < 1 && loadFromFileToolStripMenuItem.Enabled)
             {
                 saveToFileToolStripMenuItem.Enabled = false;
+
+                lstPlaylist.Items.Clear();
+
+                lblCurrentlyPlaying.Text = string.Empty;
+                lblPlaybackTime.Text = string.Format(MediaPlayer.MINUTE_FORMAT, 0.0f, 0.0f);
             }
         }
 
@@ -414,13 +452,21 @@ namespace Dukebox
         /// </summary>
         private void UpdatePlaybackTime(Object sender, System.Timers.ElapsedEventArgs e)
         {
-            if (MediaPlayer.GetInstance().AudioLoaded)
+            try
             {
-                Invoke(new ValueUpdateDelegate(() => lblPlaybackTime.Text = MediaPlayer.GetInstance().MinutesPlayed + " | " + MediaPlayer.GetInstance().AudioLengthInMins));
+                if (_currentPlaylist.StreamingPlaylist)
+                {
+                    Invoke(new ValueUpdateDelegate(() => lblPlaybackTime.Text = MediaPlayer.GetInstance().MinutesPlayed + " | " + MediaPlayer.GetInstance().AudioLengthInMins));
+                }
+                else
+                {
+                    Invoke(new ValueUpdateDelegate(() => lblPlaybackTime.Text = string.Format(MediaPlayer.MINUTE_FORMAT, 0.ToString("00"), 0.ToString("00"))));
+                    lblCurrentlyPlaying.Text = string.Empty;
+                }
             }
-            else
+            catch(InvalidOperationException ex)
             {
-                Invoke(new ValueUpdateDelegate(() => lblPlaybackTime.Text = string.Empty));
+                Logger.log(ex);
             }
         }
 
@@ -492,6 +538,8 @@ namespace Dukebox
         /// <param name="updateFilters"></param>
         private void RefreshUI(bool updateFilters = false)
         {
+            lblPlaybackTime.Text = string.Format(MediaPlayer.MINUTE_FORMAT, 0, 0);
+
             lstPlaylist.Items.Clear();
             _currentPlaylist.Tracks.ForEach(t => { lstPlaylist.Items.Add(t); });
             lstPlaylist.Refresh();
@@ -590,8 +638,8 @@ namespace Dukebox
         {
             _currentPlaylist.StopPlaylistPlayback();
             _currentPlaylist.Tracks.Clear();
+
             lstPlaylist.Items.Clear();
-            lblCurrentlyPlaying.Text = string.Empty;
         }
 
         #endregion
@@ -615,11 +663,11 @@ namespace Dukebox
 
                 if (node.Parent.Text == "Artists")
                 {
-                    _currentPlaylist.Tracks = MusicLibrary.GetInstance().Tracks.Where(t => t.Artist.name == e.Node.Text).ToList();
+                    _currentPlaylist.Tracks = MusicLibrary.GetInstance().SearchForTracks(e.Node.Text, SearchAreas.Artist).ToList();
                 }
                 else if (node.Parent.Text == "Albums")
                 {
-                    _currentPlaylist.Tracks = MusicLibrary.GetInstance().Tracks.Where(t => t.Album.name == e.Node.Text).ToList();
+                    _currentPlaylist.Tracks = MusicLibrary.GetInstance().SearchForTracks(e.Node.Text, SearchAreas.Album).ToList();
                 }
 
                 RefreshUI();
@@ -644,11 +692,11 @@ namespace Dukebox
 
                 if (node.Parent.Text == "Artists")
                 {
-                    MusicLibrary.GetInstance().Tracks.Where(t => t.Artist != null).Where(t => t.Artist.name == e.Node.Text).OrderBy(t => t.Song.artistId.HasValue ? t.Song.artistId.Value : 0).ToList().ForEach(t => lstLibraryBrowser.Items.Add(t));
+                    MusicLibrary.GetInstance().SearchForTracks(e.Node.Text, SearchAreas.Artist).ForEach(t => lstLibraryBrowser.Items.Add(t));
                 }
                 else if (node.Parent.Text == "Albums")
                 {
-                    MusicLibrary.GetInstance().Tracks.Where(t => t.Album != null).Where(t => t.Album.name == e.Node.Text).OrderBy(t => t.Song.albumId.HasValue ? t.Song.albumId.Value : 0).ToList().ForEach(t => lstLibraryBrowser.Items.Add(t));
+                    MusicLibrary.GetInstance().SearchForTracks(e.Node.Text, SearchAreas.Album).ForEach(t => lstLibraryBrowser.Items.Add(t));
                 }
 
                 RefreshUI();
@@ -656,27 +704,46 @@ namespace Dukebox
         }
 
         /// <summary>
-        /// 
+        /// Either play a new playlist on double click of a library
+        /// browser item, or skip to the corresponding track in the
+        /// current playlist of the library browser items mirror the
+        /// current playlist's items.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param name="sender">Object that fired the event.</param>
+        /// <param name="e">The event arguments.</param>
         private void lstLibraryBrowser_DoubleClick(object sender, EventArgs e)
         {
-            if (_currentPlaylist.StreamingPlaylist)
+            // Check that current playlist contains items...
+            bool isCurrentPlaylist = _currentPlaylist.Tracks.Count > 0;
+            // ...and those items are the ones in the library browser...
+            _currentPlaylist.Tracks.ForEach(a => { if (!isCurrentPlaylist) return; isCurrentPlaylist = lstLibraryBrowser.Items.Contains(a); });            
+            // ...and in the same quantity.
+            isCurrentPlaylist = isCurrentPlaylist && _currentPlaylist.Tracks.Count == lstLibraryBrowser.Items.Count;
+
+            if (isCurrentPlaylist) // Current playlist mirrors the library browser contents, just skip to appropriate track index.
             {
-                _currentPlaylist.StopPlaylistPlayback();
+                int trackIdx = _currentPlaylist.Tracks.IndexOf((Track)lstLibraryBrowser.SelectedItem);
+
+                _currentPlaylist.SkipToTrack(trackIdx);
             }
-
-            _currentPlaylist.Tracks = new List<Track>();
-
-            foreach (Object i in lstLibraryBrowser.Items)
+            else // Reload playlist with library browser items and skip to selected track.
             {
-                _currentPlaylist.Tracks.Add((Track)i);
+                if (_currentPlaylist.StreamingPlaylist)
+                {
+                    _currentPlaylist.StopPlaylistPlayback();
+                }
+
+                _currentPlaylist.Tracks.Clear();
+
+                foreach (Object i in lstLibraryBrowser.Items)
+                {
+                    _currentPlaylist.Tracks.Add((Track)i);
+                }
+
+                RefreshUI();
+
+                _currentPlaylist.SkipToTrack(lstLibraryBrowser.SelectedIndex);
             }
-
-            RefreshUI();
-
-            _currentPlaylist.SkipToTrack(lstLibraryBrowser.SelectedIndex);
         }
 
         #endregion
@@ -752,101 +819,11 @@ namespace Dukebox
             {
                 if(outputFolderDialog.ShowDialog() == DialogResult.OK)
                 {
-                    (new Thread(() => RipCdToFolder(cdFolderDialog.SelectedPath, outputFolderDialog.SelectedPath))).Start();
+                    (new Thread(() => (new CdRipHelper()).RipCdToFolder(cdFolderDialog.SelectedPath, outputFolderDialog.SelectedPath))).Start();
                 }
             }
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="inPath"></param>
-        /// <param name="outPath"></param>
-        private void RipCdToFolder(string inPath, string outPath)
-        {
-            try
-            {
-                string[] inFiles = Directory.GetFiles(inPath);
-                List<AudioFileMetaData> cdMetadata = AudioFileMetaData.GetAudioFileMetaDataForCd(inPath[0]);
-
-                Invoke(new ValueUpdateDelegate(CreateCdRippingMonitor));
-                int maxIdx = inFiles.Length;
-
-                // Rip each 
-                for (int i = 0; i < maxIdx; i++)
-                {
-
-                    Track t = MusicLibrary.GetInstance().GetTrackFromFile(inFiles[i], cdMetadata[i]);
-                    string outFile = outPath + "\\" + t.ToString() + ".mp3";
-
-                    MediaPlayer.ConvertCdaFileToMp3(inFiles[i], outFile, new BaseEncoder.ENCODEFILEPROC((a, b) => CdRippingProgressMonitor(a, b, t, maxIdx, i)), true);
-
-                    // Wait until track has been ripped.
-                    while (_progressWindow.ProgressBarValue != 100)
-                    {
-                        Thread.Sleep(10);
-                    }
-
-                    TAG_INFO outputTag = BassTags.BASS_TAG_GetFromFile(outFile);
-
-                    outputTag.album = t.Album.name;
-                    outputTag.artist = t.Artist.name;
-                    outputTag.title = t.Song.title;
-
-                    _progressWindow.ProgressBarValue = 0;
-                }
-
-                Invoke(new ValueUpdateDelegate(DestroyCdRippingMonitor));
-            }
-            catch (Exception ex)
-            {
-                string msg = "Error ripping music from Audio CD: " + ex.Message;
-
-                Logger.log(msg);
-                MessageBox.Show(msg, "Dukebox - Error Ripping from CD", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public void CreateCdRippingMonitor()
-        {
-            _progressWindow = new ProgressMonitorBox();
-            _progressWindow.Text = "Dukebox - MP3 Ripping Progress";
-            _progressWindow.Show();
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public void DestroyCdRippingMonitor()
-        {
-            _progressWindow.Hide();
-            _progressWindow.Dispose();
-            _progressWindow = null;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="totalBytesToEncode"></param>
-        /// <param name="bytesEncodedSoFar"></param>
-        /// <param name="track"></param>
-        private void CdRippingProgressMonitor(long totalBytesToEncode, long bytesEncodedSoFar, Track track, int totalTracksToRip, int currentTrackIndex)
-        {
-            if (_progressWindow.ProgressBarMaximum != 100)
-            {
-                _progressWindow.ResetProgressBar();
-                _progressWindow.ProgressBarMaximum = 100;
-            }
-
-            int percentComplete = (int)(bytesEncodedSoFar / (totalBytesToEncode / 100));
-
-            _progressWindow.ProgressBarValue = percentComplete;
-            _progressWindow.NotifcationLabelUpdate("[" + currentTrackIndex + 1 + "/" + totalTracksToRip + "] Converting " + track + " to MP3 - " + percentComplete + "%");
-        }
-
+        
         #endregion
 
         /// <summary>

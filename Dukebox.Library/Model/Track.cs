@@ -1,5 +1,6 @@
 ﻿using Dukebox.Library;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,7 +12,7 @@ namespace Dukebox.Model
     /// An audio track, with source information and
     /// metadata properties.
     /// </summary>
-    public class Track
+    public class Track : IEqualityComparer
     {
         /// <summary>
         /// Details specific to track file.
@@ -114,6 +115,33 @@ namespace Dukebox.Model
             }
 
             return Song.ToString();
+        }
+
+        /// <summary>
+        /// Whether the tracks have the database song id.
+        /// </summary>
+        /// <param name="x">Track one.</param>
+        /// <param name="y">Track two.</param>
+        /// <returns>Are the two parameter tracks equal?</returns>
+        public bool Equals(object x, object y)
+        {
+            Track a = (Track)x;
+            Track b = (Track)y;
+
+            return a.Song.id == b.Song.id;
+        }
+
+        /// <summary>
+        /// Return the id of the song id in the database
+        ///  for a track object as the hashcode.
+        /// </summary>
+        /// <param name="obj">The track object to extract id from.</param>
+        /// <returns>The hashcode for this track.</returns>
+        public int GetHashCode(object obj)
+        {
+            Track trackObj = (Track)obj;
+
+            return (int)trackObj.Song.id;
         }
     }
 }

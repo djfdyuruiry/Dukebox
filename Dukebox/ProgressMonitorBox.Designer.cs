@@ -143,5 +143,10 @@
 
         private System.Windows.Forms.ProgressBar prgBarImportProgress;
         private System.Windows.Forms.Label lblNotification;
+
+        /// <summary>
+        /// Default delegate for value updates in the Dukebox UI.
+        /// </summary>
+        public delegate void ValueUpdateDelegate();
     }
 }

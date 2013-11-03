@@ -300,11 +300,23 @@ namespace Dukebox.Audio
         /// <param name="_fileName"></param>
         /// <returns></returns>
         public static void ConvertCdaFileToMp3(string cdaFileName, string mp3OutFile, BaseEncoder.ENCODEFILEPROC progressCallback, bool overwriteOuputFile)
-        {            
+        {
             EncoderLAME lameEncoder = new EncoderLAME(0);
             lameEncoder.EncoderDirectory = Dukebox.Audio.Properties.Settings.Default.lameEncoderPath;
 
-            (new Thread(() => BaseEncoder.EncodeFile(cdaFileName, mp3OutFile, lameEncoder, progressCallback, overwriteOuputFile, false))).Start();
+            lameEncoder.InputFile = cdaFileName;
+            lameEncoder.OutputFile = mp3OutFile;
+
+            (new Thread(() => 
+            {
+                bool result = BaseEncoder.EncodeFile(lameEncoder, progressCallback, overwriteOuputFile, false);
+                Console.WriteLine("Encoder result: " + result);
+                
+                if(!result)
+                {
+                    Console.WriteLine("Last BASS error: " + Bass.BASS_ErrorGetCode().ToString());
+                }
+            })).Start();
         }
 
         /// <summary>

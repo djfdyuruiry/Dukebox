@@ -16,7 +16,9 @@
             if (disposing && (components != null))
             {
                 components.Dispose();
+                hotKeyManager.Dispose();
             }
+
             base.Dispose(disposing);
         }
 
@@ -32,7 +34,7 @@
             System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Albums");
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainView));
             this.btnPlay = new System.Windows.Forms.Button();
-            this.lstPlaylist = new System.Windows.Forms.ListBox();
+            this.lstPlaylist = new BufferedListBox();
             this.mnuMain = new System.Windows.Forms.MenuStrip();
             this.mnuFile = new System.Windows.Forms.ToolStripMenuItem();
             this.playFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
