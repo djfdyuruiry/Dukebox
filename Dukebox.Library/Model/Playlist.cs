@@ -418,18 +418,6 @@ namespace Dukebox.Model
         /// Replace the current playlist tracks with those
         /// found in the given playlist file.
         /// </summary>
-        /// <param name="filename">The filename of the playlist file.</param>
-        /// <returns>The number of tracks added to the library</returns>
-        /// <exception cref="System.ArgumentException"></exception>
-        /// <exception cref="System.ArgumentNullException"></exception>
-        /// <exception cref="System.IO.FileNotFoundException"></exception>
-        /// <exception cref="System.IO.DirectoryNotFoundException"></exception>
-        /// <exception cref="System.IO.IOException"></exception>
-        /// <exception cref="System.Security.SecurityException"></exception>
-        /// <exception cref="System.ArgumentException"></exception>
-        /// <exception cref="System.UnauthorizedAccessException"></exception>
-        /// <exception cref="System.IO.PathTooLongException"></exception>
-        /// <exception cref="System.NotSupportedException"></exception>
         public int LoadPlaylistFromFile(string filename)
         {
             List<Track> tracksToAdd = MusicLibrary.GetInstance().GetTracksFromPlaylistFile(filename);
@@ -444,14 +432,6 @@ namespace Dukebox.Model
         /// Export a JSON playlist file ('.jpl') that represents
         /// the current list of tracks loaded.
         /// </summary>
-        /// <param name="filename"></param>
-        /// <exception cref="System.ArgumentException"></exception>
-        /// <exception cref="System.ArgumentNullException"></exception>
-        /// <exception cref="System.UnauthorizedAccessException"></exception>
-        /// <exception cref="System.IO.DirectoryNotFoundException"></exception>
-        /// <exception cref="System.IO.IOException"></exception>
-        /// <exception cref="System.IO.PathTooLongException"></exception>
-        /// <exception cref="System.Security.SecurityException"></exception>
         public void SavePlaylistToFile(string filename)
         {
             string jsonTracks = JsonConvert.SerializeObject(Tracks.Select(t => t.Song.filename).ToList());
@@ -462,7 +442,8 @@ namespace Dukebox.Model
         }
         
         /// <summary>
-        /// 
+        /// Dispose of event handlers and current
+        /// track index mutex.
         /// </summary>
         public void Dispose()
         {

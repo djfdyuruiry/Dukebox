@@ -1,6 +1,7 @@
 ﻿using Dukebox.Logging;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -304,19 +305,95 @@ namespace Dukebox.Audio
             EncoderLAME lameEncoder = new EncoderLAME(0);
             lameEncoder.EncoderDirectory = Dukebox.Audio.Properties.Settings.Default.lameEncoderPath;
 
-            lameEncoder.InputFile = cdaFileName;
-            lameEncoder.OutputFile = mp3OutFile;
+            lameEncoder.InputFile = @cdaFileName;
+            lameEncoder.OutputFile = @mp3OutFile;
 
             (new Thread(() => 
             {
-                bool result = BaseEncoder.EncodeFile(lameEncoder, progressCallback, overwriteOuputFile, false);
-                Console.WriteLine("Encoder result: " + result);
-                
-                if(!result)
+                // Extract cda file to wav file on disk.
+                string wavFile = lameEncoder.OutputFile + ".wav";
+                bool conversionResult = WriteCdaToWavFile(lameEncoder.InputFile, wavFile, progressCallback);
+
+                if (!conversionResult && lameEncoder.EncoderExists)
                 {
-                    Console.WriteLine("Last BASS error: " + Bass.BASS_ErrorGetCode().ToString());
+                    string msg = "Encoder result: " + conversionResult + "\nLast BASS error: " + Bass.BASS_ErrorGetCode().ToString();
+
+                    Logger.log(msg);
+                    return;
                 }
+
+                // Call lame encoder with arguments.
+                lameEncoder.InputFile = wavFile;
+                CallLameEncoder(lameEncoder);
+
+                // Clean up.
+                File.Delete(wavFile);
             })).Start();
+        }
+
+        public static bool WriteCdaToWavFile(string inCdaFile, string outWavFile, BaseEncoder.ENCODEFILEPROC progressCallback)
+        {
+            int stream = BassCd.BASS_CD_StreamCreateFile(inCdaFile, BASSFlag.BASS_STREAM_DECODE);
+                
+            if (stream != 0)
+            {
+                try
+                {
+                    WaveWriter ww = new WaveWriter(outWavFile, stream, true);
+                    short[] data = new short[32768];
+
+                    int bytesSoFar = 0;
+                    long totalLength = 1000000;
+
+                    while (Bass.BASS_ChannelIsActive(stream) == BASSActive.BASS_ACTIVE_PLAYING)
+                    {
+                        int length = Bass.BASS_ChannelGetData(stream, data, 32768);
+
+                        if (length > 0)
+                        {
+                            ww.Write(data, length);
+
+                            bytesSoFar += length;
+
+                            progressCallback.Invoke(totalLength, bytesSoFar);
+                        }
+                    }
+
+                    // finilize the wave file!
+                    ww.Close();
+                    return Bass.BASS_StreamFree(stream);
+                }
+                catch (Exception ex)
+                {
+                    Logger.log("Error copying cda file '" + inCdaFile + "' to wav file '" + outWavFile + "': " + ex.Message);
+                }
+            }
+
+            return false;
+        }
+
+        public static void CallLameEncoder(EncoderLAME lameEncoder)
+        {
+            Process pProcess = new System.Diagnostics.Process();
+            pProcess.StartInfo.CreateNoWindow = true;
+
+            string lamePath = lameEncoder.EncoderCommandLine.Split(' ')[0];
+            pProcess.StartInfo.FileName = lamePath;
+
+            string commandArguments = lameEncoder.EncoderCommandLine.Replace(lamePath, string.Empty);
+            pProcess.StartInfo.Arguments = commandArguments;
+
+            pProcess.StartInfo.UseShellExecute = false;
+            pProcess.StartInfo.RedirectStandardOutput = true;
+
+            pProcess.StartInfo.WorkingDirectory = Dukebox.Audio.Properties.Settings.Default.lameEncoderPath;
+            pProcess.Start();
+
+            //Get program output
+            string strOutput = pProcess.StandardOutput.ReadToEnd();
+            Logger.log("Output from lame encoding: " + strOutput);
+
+            pProcess.WaitForExit();
         }
 
         /// <summary>

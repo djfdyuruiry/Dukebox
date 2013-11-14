@@ -88,7 +88,7 @@ namespace Dukebox.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("./BASS/")]
+        [global::System.Configuration.DefaultSettingValueAttribute(".\\BASS\\")]
         public string bassAddOnsPath {
             get {
                 return ((string)(this["bassAddOnsPath"]));

@@ -21,7 +21,7 @@
       <Value Profile="(Default)">2X9193423312422</Value>
     </Setting>
     <Setting Name="bassAddOnsPath" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">./BASS/</Value>
+      <Value Profile="(Default)">.\BASS\</Value>
     </Setting>
   </Settings>
 </SettingsFile>

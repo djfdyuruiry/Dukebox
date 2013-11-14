@@ -1,4 +1,5 @@
 ﻿using Dukebox.Audio;
+using Dukebox.Library.Model;
 using Dukebox.Logging;
 using Dukebox.Model;
 using System;
@@ -31,7 +32,7 @@ namespace Dukebox.Library.CdRipping
             {
                 string[] inFiles = Directory.GetFiles(inPath);
                 string outFileFormat = outPath + "\\{0}.mp3";
-                List<AudioFileMetaData> cdMetadata = AudioFileMetaData.GetAudioFileMetaDataForCd(inPath[0]);
+                List<AudioFileMetaData> cdMetadata = CdMetadata.GetAudioFileMetaDataForCd(inPath[0]);
                 int maxIdx = inFiles.Length;
 
                 ProgressMonitorBox progressWindow = new ProgressMonitorBox();
@@ -56,7 +57,7 @@ namespace Dukebox.Library.CdRipping
                     MediaPlayer.ConvertCdaFileToMp3(inFiles[i], outFile, new BaseEncoder.ENCODEFILEPROC((a, b) => CdRippingProgressMonitor(progressWindow, a, b, t, maxIdx, i)), true);
 
                     // Wait until track has been ripped.
-                    while (progressWindow.ProgressBarValue != 100)
+                    while (progressWindow.ProgressBarValue != progressWindow.ProgressBarMaximum)
                     {
                         Thread.Sleep(10);
                     }
@@ -67,9 +68,7 @@ namespace Dukebox.Library.CdRipping
                     mp3Track.Metadata.Artist = t.Metadata.Artist;
                     mp3Track.Metadata.Title = t.Metadata.Title;
 
-                    mp3Track.Metadata.CommitChanges();
-
-                    progressWindow.ProgressBarValue = 0;
+                    mp3Track.Metadata.CommitChangesToFile();
                 }
 
                 progressWindow.Invoke(new ValueUpdateDelegate(()=>progressWindow.Hide()));
@@ -93,10 +92,10 @@ namespace Dukebox.Library.CdRipping
         /// <param name="track"></param>
         private void CdRippingProgressMonitor(ProgressMonitorBox progressWindow, long totalBytesToEncode, long bytesEncodedSoFar, Track track, int totalTracksToRip, int currentTrackIndex)
         {
-            if (progressWindow.ProgressBarMaximum != 100)
+            if (progressWindow.ProgressBarMaximum != totalBytesToEncode)
             {
                 progressWindow.ResetProgressBar();
-                progressWindow.ProgressBarMaximum = 100;
+                progressWindow.ProgressBarMaximum = (int)totalBytesToEncode;
             }
 
             int percentComplete = (int)(bytesEncodedSoFar / (totalBytesToEncode / 100));

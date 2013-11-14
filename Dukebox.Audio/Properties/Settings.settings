@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="lameEncoderPath" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">./LAME/</Value>
+      <Value Profile="(Default)">.\LAME\</Value>
     </Setting>
   </Settings>
 </SettingsFile>

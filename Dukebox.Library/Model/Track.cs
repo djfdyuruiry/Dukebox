@@ -85,7 +85,7 @@ namespace Dukebox.Model
             {
                 if (_metadata == null)
                 {
-                    _metadata = new AudioFileMetaData(Song.filename);
+                    _metadata = new AudioFileMetaData(Song.filename, Album.id);
                 }
 
                 return _metadata;
@@ -98,7 +98,7 @@ namespace Dukebox.Model
                 }
                 else
                 {
-                    throw new InvalidOperationException("Cannot manually set the property 'Metadata' if the song id is not '-1'!");
+                    throw new InvalidOperationException("Can only manually set the property 'Metadata' if the song is not stored in the database!");
                 }
             }
         }
