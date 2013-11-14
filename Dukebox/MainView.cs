@@ -19,7 +19,7 @@ using Un4seen.Bass.Misc;
 namespace Dukebox
 {
     /// <summary>
-    /// 
+    /// The main UI for Dukebox.
     /// </summary>
     public partial class MainView : Form
     {
@@ -42,32 +42,10 @@ namespace Dukebox
 
         #region Form lifecycle methods
 
-        /// <summary>
-        /// 
-        /// </summary>
         public MainView()
         {
-            _folderBrowserDialog = new FolderBrowserDialog();
-
-            _fileBrowserDialog = new OpenFileDialog();
-            _fileBrowserDialog.Filter = AudioFileFormats.FileDialogFilter;
-            _fileBrowserDialog.Multiselect = false;
-
-            _playlistExportBrowser = new SaveFileDialog();
-            _playlistExportBrowser.Filter = "Playlist Files|*.jpl";
-
-            _playlistImportBrowser = new OpenFileDialog();
-            _playlistImportBrowser.Filter = "Playlist Files|*.jpl";
-            _playlistImportBrowser.Multiselect = false;
-
-            _currentPlaylist = new Playlist() { Repeat= false, RepeatAll = false, Shuffle = false };
-            _lastPlayedTrackIndex = -1;
-
-            _currentPlaylist.NewTrackLoadedHandlers.Add(new EventHandler((o, e) => Invoke(new ValueUpdateDelegate(()=>{try{UpdateUI(o, (NewTrackLoadedEventArgs)e);}catch(Exception ex){}}))));
-            _currentPlaylist.TrackListAccessHandlers.Add(new EventHandler((o, e) => Invoke(new ValueUpdateDelegate(()=>{try{UpdatePlaybackControls(o, (TrackListAccessEventArgs)e);}catch(Exception ex){}}))));
-
-            _playbackMonitorTimer = new System.Timers.Timer(250);
-            _playbackMonitorTimer.Elapsed += UpdatePlaybackTime;
+            InitaliseFileSelectorDialogs();
+            InitalisePlaylistAndPlaybackMonitor();
 
             InitializeComponent();
 
@@ -76,19 +54,36 @@ namespace Dukebox
                           ControlStyles.ContainerControl |  ControlStyles.OptimizedDoubleBuffer |  ControlStyles.SupportsTransparentBackColor
                           , true);
 
+            LoadPlaybackControlMenuFromSettings();
+            RegisterMultimediaHotKeys();
+            UpdateFilters();
+        }
+        
+        private void InitalisePlaylistAndPlaybackMonitor()
+        {
+            _currentPlaylist = new Playlist() { Repeat = false, RepeatAll = false, Shuffle = false };
+            _lastPlayedTrackIndex = -1;
+
+            _currentPlaylist.NewTrackLoadedHandlers.Add(new EventHandler((o, e) => Invoke(new ValueUpdateDelegate(() => { try { UpdateUI(o, (NewTrackLoadedEventArgs)e); } catch (Exception ex) { } }))));
+            _currentPlaylist.TrackListAccessHandlers.Add(new EventHandler((o, e) => Invoke(new ValueUpdateDelegate(() => { try { UpdatePlaybackControls(o, (TrackListAccessEventArgs)e); } catch (Exception ex) { } }))));
+
+            _playbackMonitorTimer = new System.Timers.Timer(250);
+            _playbackMonitorTimer.Elapsed += UpdatePlaybackTime;
+        }
+
+        private void LoadPlaybackControlMenuFromSettings()
+        {
             mnuShuffle.Checked = Dukebox.Properties.Settings.Default.shuffle;
             mnuRepeat.Checked = Dukebox.Properties.Settings.Default.repeat;
             mnuRepeatAll.Checked = Dukebox.Properties.Settings.Default.repeatAll;
-
-            hotKeyManager = new HotKeyManager();
-            RegisterHotKeys();
-
-            UpdateFilters();
         }
 
         /// <summary>
-        /// 
+        /// Dispose of hotkey manager, current playlist, playback monitor
+        /// thread and the progress window if present.
         /// </summary>
+        //[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1063:ImplementIDisposableCorrectly")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1063:ImplementIDisposableCorrectly")]
         public new void Dispose()
         {
             hotKeyManager.Dispose();
@@ -103,74 +98,80 @@ namespace Dukebox
                 _progressWindow.Close();
                 _progressWindow.Dispose();
             }
-        }
+
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }        
 
         /// <summary>
-        /// 
+        /// Start playback monitor and show all tracks
+        /// in library browser.
         /// </summary>
-        private void RegisterHotKeys()
-        {
-            var noKeyMod = System.Windows.Input.ModifierKeys.None;
-            var hotKeys = new List<Key>() { Key.MediaPlayPause, Key.MediaNextTrack, Key.MediaPreviousTrack, Key.MediaStop, Key.VolumeUp, Key.VolumeDown };
-
-            try
-            {
-                hotKeys.ForEach(k => hotKeyManager.Register(new HotKey(k, noKeyMod)));
-
-                hotKeyManager.KeyPressed += new EventHandler<KeyPressedEventArgs>((o, e) => { if (e.HotKey.Key == Key.MediaPlayPause) { btnPlay_Click(o, null); } });
-                hotKeyManager.KeyPressed += new EventHandler<KeyPressedEventArgs>((o, e) => { if (e.HotKey.Key == Key.MediaStop) { btnStop_Click(o, null); } });
-                hotKeyManager.KeyPressed += new EventHandler<KeyPressedEventArgs>((o, e) => { if (e.HotKey.Key == Key.MediaNextTrack) { btnNext_Click(o, null); } });
-                hotKeyManager.KeyPressed += new EventHandler<KeyPressedEventArgs>((o, e) => { if (e.HotKey.Key == Key.MediaPreviousTrack) { btnPrevious_Click(o, null); } });
-            }
-            catch (Win32Exception ex)
-            {
-                Logger.log("Error registering global multimedia hot keys: " + ex.Message + "");
-                DialogResult msgBoxResult = MessageBox.Show("Error registering global multimedia hot keys! This usually happens when another media player is open.", "Dukebox - Error Registering Hot Keys",  MessageBoxButtons.RetryCancel, MessageBoxIcon.Warning );
-
-                // Retry registering hot keys.
-                if (msgBoxResult == DialogResult.Retry)
-                {
-                    RegisterHotKeys();
-                }
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void MainView_Load(object sender, EventArgs e)
         {
             _playbackMonitorTimer.Start();
             txtSearchBox_TextChanged(this, null);
         }
-
+        
         /// <summary>
-        /// 
+        /// Reposition the currently playing and playlist
+        /// labels.
+        /// </summary>
+        private void MainView_Resize(object sender, EventArgs e)
+        {
+            Point locationOnForm = lstPlaylist.FindForm().PointToClient(lstPlaylist.Parent.PointToScreen(lstPlaylist.Location));
+
+            lblPlaylist.Location = new Point(locationOnForm.X, lblPlaylist.Location.Y);
+            lblCurrentlyPlaying.Location = new Point(locationOnForm.X + lstPlaylist.Width, lblCurrentlyPlaying.Location.Y);
+        } 
+        
+        /// <summary>
+        /// Show the about box window.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
+        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            (new AboutBox()).Show();
+        }
+
+        /// <summary>
+        /// Stop playback monitor and current playlist
+        /// playback, then exit the application.
+        /// </summary>
         private void frmMainView_FormClosed(object sender, FormClosedEventArgs e)
         {
             _currentPlaylist.StopPlaylistPlayback();
             _playbackMonitorTimer.Stop();
+
             Application.Exit();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
            this.Close();
         }
-
+       
         #endregion
 
         #region File picker methods
+
+        private void InitaliseFileSelectorDialogs()
+        {
+            _folderBrowserDialog = new FolderBrowserDialog();
+
+            _fileBrowserDialog = new OpenFileDialog();
+            _fileBrowserDialog.Filter = AudioFileFormats.FileDialogFilter;
+            _fileBrowserDialog.Multiselect = false;
+
+            _playlistExportBrowser = new SaveFileDialog();
+            _playlistExportBrowser.Filter = "Playlist Files|*.jpl";
+
+            _playlistImportBrowser = new OpenFileDialog();
+            _playlistImportBrowser.Filter = "Playlist Files|*.jpl";
+            _playlistImportBrowser.Multiselect = false;
+        }
+
 
         /// <summary>
         /// 
@@ -220,59 +221,56 @@ namespace Dukebox
 
         #region Playback control methods
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void btnPlay_Click(object sender, EventArgs e)
+        private void RegisterMultimediaHotKeys()
+        {
+            var noKeyMod = System.Windows.Input.ModifierKeys.None;
+            var hotKeys = new List<Key>() { Key.MediaPlayPause, Key.MediaNextTrack, Key.MediaPreviousTrack, Key.MediaStop };
+
+            hotKeyManager = new HotKeyManager();
+
+            try
+            {
+                hotKeys.ForEach(k => hotKeyManager.Register(new HotKey(k, noKeyMod)));
+
+                hotKeyManager.KeyPressed += new EventHandler<KeyPressedEventArgs>((o, e) => { if (e.HotKey.Key == Key.MediaPlayPause) { btnPausePlay_Click(o, null); } });
+                hotKeyManager.KeyPressed += new EventHandler<KeyPressedEventArgs>((o, e) => { if (e.HotKey.Key == Key.MediaStop) { btnStop_Click(o, null); } });
+                hotKeyManager.KeyPressed += new EventHandler<KeyPressedEventArgs>((o, e) => { if (e.HotKey.Key == Key.MediaNextTrack) { btnNext_Click(o, null); } });
+                hotKeyManager.KeyPressed += new EventHandler<KeyPressedEventArgs>((o, e) => { if (e.HotKey.Key == Key.MediaPreviousTrack) { btnPrevious_Click(o, null); } });
+            }
+            catch (Win32Exception ex)
+            {
+                Logger.log("Error registering global multimedia hot keys: " + ex.Message + "");
+                DialogResult msgBoxResult = MessageBox.Show("Error registering global multimedia hot keys! This usually happens when another media player is open.", "Dukebox - Error Registering Hot Keys", MessageBoxButtons.RetryCancel, MessageBoxIcon.Warning);
+
+                // Retry registering hot keys.
+                if (msgBoxResult == DialogResult.Retry)
+                {
+                    RegisterMultimediaHotKeys();
+                }
+            }
+        }
+
+        private void btnPausePlay_Click(object sender, EventArgs e)
         {
             _currentPlaylist.PausePlay();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void btnStop_Click(object sender, EventArgs e)
         {
             _currentPlaylist.Stop();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void btnNext_Click(object sender, EventArgs e)
         {
-            if (_currentPlaylist.CurrentTrackIndex != _currentPlaylist.Tracks.Count - 1 || Dukebox.Properties.Settings.Default.repeatAll)
-            {
-                _currentPlaylist.Forward();
-            }
-            else
-            {
-                _currentPlaylist.StopPlaylistPlayback();
-            }
+            _currentPlaylist.Forward();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void btnPrevious_Click(object sender, EventArgs e)
         {
             _currentPlaylist.Back();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void lstFiles_DoubleClick(object sender, EventArgs e)
+        private void lstPlaylist_DoubleClick(object sender, EventArgs e)
         {
             _currentPlaylist.SkipToTrack(lstPlaylist.SelectedIndex);
         }
@@ -281,19 +279,11 @@ namespace Dukebox
         
         #region Library management methods
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void addFilesToLibraryToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (_folderBrowserDialog.ShowDialog() == DialogResult.OK)
-            {                
-                Thread addMusicThread = new Thread(() => MusicLibrary.GetInstance().AddDirectoryToLibrary(@_folderBrowserDialog.SelectedPath,
-                                                                                                          true,
-                                                                                                          new Action<object, AudioFileImportedEventArgs>((o,a) => Invoke(new ValueUpdateDelegate(() => DoTrackAddedToLibrary(o,a) ))),
-                                                                                                          new Action<object, int>((o,i) => Invoke(new ValueUpdateDelegate(() => DoImportFinished(o,i) )))));
+            {
+                Thread addMusicThread = new Thread(AddFilesToLibrary);
 
                 _progressWindow = new ProgressMonitorBox();
                 _progressWindow.Show();
@@ -302,23 +292,34 @@ namespace Dukebox
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void DoTrackAddedToLibrary(object sender, AudioFileImportedEventArgs e)
+        private void AddFilesToLibrary()
         {
-            if (_progressWindow.ProgressBarMaximum != e.TotalFilesThisImport)
+            string selectedPath = @_folderBrowserDialog.SelectedPath;
+            bool scanSubDirectories = true;
+
+            Action<object, AudioFileImportedEventArgs> progressHandler = null;
+            progressHandler = new Action<object, AudioFileImportedEventArgs>((o, a) => Invoke(new ValueUpdateDelegate(() => DoTrackAddedToLibrary(o, a))));
+
+            Action<object, int> completeHandler = null;
+            completeHandler = new Action<object, int>((o, i) => Invoke(new ValueUpdateDelegate(() => DoImportFinished(o, i))));
+
+            MusicLibrary.GetInstance().AddDirectoryToLibrary(selectedPath, scanSubDirectories, progressHandler, completeHandler);                
+        }
+
+        private void DoTrackAddedToLibrary(object sender, AudioFileImportedEventArgs audioFileImported)
+        {
+            if (_progressWindow.ProgressBarMaximum != audioFileImported.TotalFilesThisImport)
             {
-                _progressWindow.ProgressBarMaximum = e.TotalFilesThisImport;
+                // Set progress bar maximum if not set already.
+                _progressWindow.ProgressBarMaximum = audioFileImported.TotalFilesThisImport;
             }
 
-            string prepend = string.Empty;
+            // Determine if file is being pre-preprocessed or added to library.
+            string actionMsg = string.Empty;
 
-            if (e.JustProcessing)
+            if (audioFileImported.JustProcessing)
             {
-                prepend = "Processing ";
+                actionMsg = "Processing ";
             }
             else
             {
@@ -327,18 +328,14 @@ namespace Dukebox
                     _progressWindow.ResetProgressBar();
                 }
 
-                prepend = "Adding ";
+                actionMsg = "Adding ";
             }
 
+            // Move up a step in progress bar and display notification message.
             _progressWindow.ImportProgressBarStep();
-            _progressWindow.NotifcationLabelUpdate(prepend + "'" + e.FileAdded.Split('\\').LastOrDefault());
+            _progressWindow.NotifcationLabelUpdate(actionMsg + "'" + audioFileImported.FileAdded.Split('\\').LastOrDefault() + "'");
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="numTracksAdded"></param>
         private void DoImportFinished(object sender, int numTracksAdded)
         {
             if (numTracksAdded > 0)
@@ -354,7 +351,11 @@ namespace Dukebox
             _progressWindow.Dispose();
             _progressWindow = null;
 
-            RefreshUI(true);
+            if (numTracksAdded > 0)
+            {
+                // Refresh filters if files were successfully imported.
+                RefreshUI(true);
+            }
         }
 
 #endregion
@@ -367,8 +368,6 @@ namespace Dukebox
         /// album art if available and highlight the current track
         /// in the playlist control.
         /// </summary>
-        /// <param name="sender">The object that invoked this event.</param>
-        /// <param name="e">The details of the new track loaded.</param>
         private void UpdateUI(Object sender, NewTrackLoadedEventArgs e)
         {            
             // Prevent over processing when no new information needs to
@@ -381,17 +380,27 @@ namespace Dukebox
             // Display currently playing song.
             lblCurrentlyPlaying.Text = e.Track.ToString();
 
-            // Draw the album art if available in the currently playing file.
-            if (e.Track.Metadata.HasFutherMetadataTag && e.Track.Metadata.HasAlbumArt)
+            DrawAlbumArt(e.Track);
+            UpdatePausePlayGraphic();
+
+            // Update playlist control.
+            lstPlaylist.Refresh();
+            _lastPlayedTrackIndex = e.TrackIndex;
+            lstPlaylist.Refresh();
+        }
+
+        private void DrawAlbumArt(Track track)
+        {
+            if (track.Metadata.HasFutherMetadataTag && track.Metadata.HasAlbumArt)
             {
                 try
                 {
-                    picAlbumArt.Image = (Image)(new Bitmap(e.Track.Metadata.AlbumArt, picAlbumArt.Size));
+                    picAlbumArt.Image = (Image)(new Bitmap(track.Metadata.AlbumArt, picAlbumArt.Size));
                     picAlbumArt.Visible = true;
                 }
                 catch (Exception ex)
                 {
-                    Logger.log("Error fetching album art for display [" + e.Track.Song.filename + "]: " + ex.Message);
+                    Logger.log("Error fetching album art for display [" + track.Song.filename + "]: " + ex.Message);
                     picAlbumArt.Image = null;
                     picAlbumArt.Visible = false;
                 }
@@ -401,7 +410,10 @@ namespace Dukebox
                 picAlbumArt.Image = null;
                 picAlbumArt.Visible = false;
             }
+        }
 
+        private void UpdatePausePlayGraphic()
+        {
             try
             {
                 // Update pause/play background image.
@@ -418,18 +430,12 @@ namespace Dukebox
             {
                 Logger.log("Failed to switch background image for btnPlay on frmMainView [" + ex.Message + "]");
             }
-
-            // Update playlist control.
-            lstPlaylist.Refresh();
-            _lastPlayedTrackIndex = e.TrackIndex;
-            lstPlaylist.Refresh();
         }
 
         /// <summary>
-        /// 
+        /// Update the playback controls to reflect the current state 
+        /// of the media player.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void UpdatePlaybackControls(Object sender, TrackListAccessEventArgs e)
         {
             // Enable saving current playlist when it is not empty.
@@ -472,7 +478,8 @@ namespace Dukebox
         }
 
         /// <summary>
-        /// 
+        /// Clear tree node filters and call refresh library cache in
+        /// new thread with progress monitor window.
         /// </summary>
         private void UpdateFilters()
         {
@@ -491,11 +498,9 @@ namespace Dukebox
             (new Thread(() => RefreshLibraryCache(artists, albums))).Start();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         private void RefreshLibraryCache(TreeNode artists, TreeNode albums)
         {
+            // Show busy cursor and display notification.
             _progressWindow.NotifcationLabelUpdate("Refreshing the library cache, this may take a few seconds!");
             Cursor.Current = Cursors.WaitCursor;
 
@@ -506,9 +511,11 @@ namespace Dukebox
             int albumCount = albumsInLibrary.Count();
 
             Cursor.Current = Cursors.Default;
-
+            
+            // Set progress window maximum value to reflect articles to be imported.
             _progressWindow.ProgressBarMaximum = artistCount + albumCount;
 
+            // Artists
             for (int i = 0; i < artistCount; i++)
             {
                 _progressWindow.ImportProgressBarStep();
@@ -517,6 +524,7 @@ namespace Dukebox
                 Invoke(new ValueUpdateDelegate(() => artists.Nodes.Add(artistsInLibrary[i].name)));
             }
 
+            // Albums
             for (int i = 0; i < albumCount; i++)
             {
                 _progressWindow.ImportProgressBarStep();
@@ -525,6 +533,7 @@ namespace Dukebox
                 Invoke(new ValueUpdateDelegate(() => albums.Nodes.Add(albumsInLibrary[i].name)));
             }
 
+            // Dispose of progress window.
             Invoke(new ValueUpdateDelegate(() =>
             {
                 _progressWindow.Hide();
@@ -597,45 +606,25 @@ namespace Dukebox
 
         #region Playlist flow control methods
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void mnuShuffle_Click(object sender, EventArgs e)
         {
             Dukebox.Properties.Settings.Default.shuffle = !Dukebox.Properties.Settings.Default.shuffle;
             _currentPlaylist.Shuffle = Dukebox.Properties.Settings.Default.shuffle;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void mnuRepeat_Click(object sender, EventArgs e)
         {
             Dukebox.Properties.Settings.Default.repeat = !Dukebox.Properties.Settings.Default.repeat;
             _currentPlaylist.Repeat = Dukebox.Properties.Settings.Default.repeat;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void mnuRepeatAll_Click(object sender, EventArgs e)
         {
             Dukebox.Properties.Settings.Default.repeatAll = !Dukebox.Properties.Settings.Default.repeatAll;
             _currentPlaylist.RepeatAll = Dukebox.Properties.Settings.Default.repeatAll;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void btnClear_Click(object sender, EventArgs e)
+        private void btnClearPlaylist_Click(object sender, EventArgs e)
         {
             _currentPlaylist.StopPlaylistPlayback();
             _currentPlaylist.Tracks.Clear();
@@ -660,10 +649,8 @@ namespace Dukebox
         }
 
         /// <summary>
-        /// 
+        /// Load tree node items from library into playlist.
         /// </summary>
-        /// <param name="sender">Object that fired the event.</param>
-        /// <param name="e">The event arguments.</param>
         private void treeFilters_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
         {
             if (e.Node.Parent != null)
@@ -676,11 +663,11 @@ namespace Dukebox
 
                 if (node.Parent.Text == "Artists")
                 {
-                    _currentPlaylist.Tracks = MusicLibrary.GetInstance().SearchForTracks(e.Node.Text, SearchAreas.Artist).ToList();
+                    _currentPlaylist.Tracks = MusicLibrary.GetInstance().GetTracksByAttribute(SearchAreas.Artist, e.Node.Text).ToList();
                 }
                 else if (node.Parent.Text == "Albums")
                 {
-                    _currentPlaylist.Tracks = MusicLibrary.GetInstance().SearchForTracks(e.Node.Text, SearchAreas.Album).ToList();
+                    _currentPlaylist.Tracks = MusicLibrary.GetInstance().GetTracksByAttribute(SearchAreas.Album, e.Node.Text).ToList();
                 }
 
                 RefreshUI();
@@ -690,10 +677,8 @@ namespace Dukebox
         }
 
         /// <summary>
-        /// 
+        /// Load tree node items from library into browser list.
         /// </summary>
-        /// <param name="sender">Object that fired the event.</param>
-        /// <param name="e">The event arguments.</param>
         private void treeFilters_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
         {
             if (e.Node.Parent != null)
@@ -705,11 +690,11 @@ namespace Dukebox
 
                 if (node.Parent.Text == "Artists")
                 {
-                    MusicLibrary.GetInstance().SearchForTracks(e.Node.Text, SearchAreas.Artist).ForEach(t => lstLibraryBrowser.Items.Add(t));
+                    MusicLibrary.GetInstance().GetTracksByAttribute(SearchAreas.Artist, e.Node.Text).ForEach(t => lstLibraryBrowser.Items.Add(t));
                 }
                 else if (node.Parent.Text == "Albums")
                 {
-                    MusicLibrary.GetInstance().SearchForTracks(e.Node.Text, SearchAreas.Album).ForEach(t => lstLibraryBrowser.Items.Add(t));
+                    MusicLibrary.GetInstance().GetTracksByAttribute(SearchAreas.Album, e.Node.Text).ForEach(t => lstLibraryBrowser.Items.Add(t));
                 }
 
                 RefreshUI();
@@ -722,8 +707,6 @@ namespace Dukebox
         /// current playlist of the library browser items mirror the
         /// current playlist's items.
         /// </summary>
-        /// <param name="sender">Object that fired the event.</param>
-        /// <param name="e">The event arguments.</param>
         private void lstLibraryBrowser_DoubleClick(object sender, EventArgs e)
         {
             // Check that current playlist contains items...
@@ -763,11 +746,6 @@ namespace Dukebox
 
         #region Playlist export and import methods
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void saveToFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (_playlistExportBrowser.ShowDialog() == DialogResult.OK)
@@ -778,16 +756,14 @@ namespace Dukebox
                 }
                 catch (Exception ex)
                 {
+                    string msg = "Error saving playlist from the file '" + _playlistExportBrowser.FileName.Split('\\').LastOrDefault() + "' [" + ex.Message + "]";
+                    Logger.log(msg);
 
+                    MessageBox.Show(msg, "Dukebox - Error Saving Playlist File", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void loadFromFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (_playlistImportBrowser.ShowDialog() == DialogResult.OK)
@@ -816,13 +792,8 @@ namespace Dukebox
 
         #endregion
 
-        #region CD ripping methods
+        #region CD ripping menu option
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void ripCdToMP3ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             FolderBrowserDialog cdFolderDialog = new FolderBrowserDialog();
@@ -832,34 +803,13 @@ namespace Dukebox
             {
                 if(outputFolderDialog.ShowDialog() == DialogResult.OK)
                 {
-                    (new Thread(() => (new CdRipHelper()).RipCdToFolder(cdFolderDialog.SelectedPath, outputFolderDialog.SelectedPath))).Start();
+                    CdRipHelper cdRipHelper = new CdRipHelper();
+                    (new Thread(() => cdRipHelper.RipCdToFolder(cdFolderDialog.SelectedPath, outputFolderDialog.SelectedPath))).Start();
                 }
             }
         }
         
         #endregion
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void MainView_Resize(object sender, EventArgs e)
-        {
-            Point locationOnForm = lstPlaylist.FindForm().PointToClient(lstPlaylist.Parent.PointToScreen(lstPlaylist.Location));
-            lblPlaylist.Location = new Point(locationOnForm.X, lblPlaylist.Location.Y);
-            lblCurrentlyPlaying.Location = new Point(locationOnForm.X + lstPlaylist.Width, lblCurrentlyPlaying.Location.Y);
-        }
-
-        /// <summary>
-        /// Show the about box window.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            (new AboutBox()).Show();
-        }
 
     }
 

@@ -25,7 +25,7 @@ namespace Dukebox.Audio.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("./LAME/")]
+        [global::System.Configuration.DefaultSettingValueAttribute(".\\LAME\\")]
         public string lameEncoderPath {
             get {
                 return ((string)(this["lameEncoderPath"]));

@@ -17,17 +17,18 @@ using Un4seen.Bass.AddOn.Tags;
 namespace Dukebox.Model
 {
     /// <summary>
-    /// 
+    /// Holds metadata on a single audio file, including track information
+    /// and album art, if available.
     /// </summary>
     public class AudioFileMetaData
     {
-        public static readonly Uri CDDB_SERVER = new Uri("http://www.freedb.org/");
-
         #region Metadata properties
 
         private string _title = string.Empty;
         private string _artist = string.Empty;
         private string _album = string.Empty;
+
+        private long _dbAlbumId;
 
         private AudioFile _audioFile;
         private Tag _tag;
@@ -104,9 +105,6 @@ namespace Dukebox.Model
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         public bool HasFutherMetadataTag
         {
             get
@@ -128,9 +126,6 @@ namespace Dukebox.Model
             }
         }
 
-        /// <summary>
-        /// Is there any album art in the audio file?
-        /// </summary>
         public bool HasAlbumArt
         {
             get
@@ -150,6 +145,13 @@ namespace Dukebox.Model
                 if (!HasFutherMetadataTag)
                 {
                     throw new InvalidOperationException("There is no metadata tag available for this audio file!");
+                }
+
+                if (File.Exists(@".\albumArtCache\" + _dbAlbumId))
+                {
+                    // Fetch artwork from cache instead of file.
+                    Logger.log("Fetching album artwork for " + _title + " from cache...");
+                    return Image.FromFile(".\\albumArtCache\\" + _dbAlbumId);
                 }
 
                 Logger.log("Fetching album artwork from " + _title + "...");
@@ -184,12 +186,6 @@ namespace Dukebox.Model
 
         #endregion
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="title"></param>
-        /// <param name="artist"></param>
-        /// <param name="album"></param>
         public AudioFileMetaData(CdMetadata cdMetadata, int trackNumber)
         {
             _title = cdMetadata.Tracks[trackNumber];
@@ -197,11 +193,7 @@ namespace Dukebox.Model
             _album = cdMetadata.Album;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="fileName"></param>
-        public AudioFileMetaData(string fileName)
+        public AudioFileMetaData(string fileName, long albumId = -1)
         {
             try
             {
@@ -220,16 +212,13 @@ namespace Dukebox.Model
                 Logger.log("Error occured while parsing metadata from '" + fileName + "': " + ex.Message);
                 
                 _tag = null;
-                GetDetailsFromUnsupportedFormat(fileName);
+                GetTrackDetailsFromUnsupportedFormat(fileName);
             }
+
+            _dbAlbumId = albumId;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="fileName"></param>
-        /// <returns></returns>
-        private void GetDetailsFromUnsupportedFormat(string fileName)
+        private void GetTrackDetailsFromUnsupportedFormat(string fileName)
         {
             string title = string.Empty;
             string artist = string.Empty;
@@ -268,13 +257,9 @@ namespace Dukebox.Model
             _album = album;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="fileName"></param>
         private void GetDetailsFromCddbServer(string fileName)
         {
-            CdMetadata cdData = GetCdMetadata(fileName[0]);
+            CdMetadata cdData = CdMetadata.GetMetadataForCd(fileName[0]);
             int trackIdx = MediaPlayer.GetTrackNumberFromCdaFilename(fileName);
 
             _artist = cdData.Artist;
@@ -282,115 +267,16 @@ namespace Dukebox.Model
             _title = cdData.Tracks[trackIdx];
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public void CommitChanges()
+        public void CommitChangesToFile()
         {
-            if (_audioFile != null)
-            {
-                _audioFile.commit();
-            }
-            else
+            if (_audioFile == null)
             {
                 throw new InvalidOperationException("There is no metadata tag available for this audio file!");
-            }            
+            }
+
+            _audioFile.commit();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="driveLetter">CD drive letter to use.</param>
-        /// <returns></returns>
-        public static List<AudioFileMetaData> GetAudioFileMetaDataForCd(char driveLetter)
-        {
-            CdMetadata metadata = GetCdMetadata(driveLetter);
-            List<AudioFileMetaData> audioMetadata = new List<AudioFileMetaData>();
-
-            for (int i = 0; i < metadata.Tracks.Count(); i++)
-            { 
-                audioMetadata.Add(new AudioFileMetaData(metadata, i));
-            }
-            
-            return audioMetadata;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="driveLetter">CD drive letter to use.</param>
-        /// <returns></returns>
-        private static CdMetadata GetCdMetadata(char driveLetter)
-        {
-            driveLetter = Char.ToLower(driveLetter);
-
-            // Not a valid drive letter.
-            if (driveLetter < 'a' || driveLetter > 'z')
-            {
-                throw new ArgumentException("'" + driveLetter + "' is not a valid drive letter! Drive letter should be a letter between a-z.");
-            }
-
-            CheckForCddbServerConnection();
-
-            // Find drive details.
-            int driveIndex = MediaPlayer.GetCdDriveIndex(driveLetter);
-
-            string cddbResponse = BassCd.BASS_CD_GetID(driveIndex, BASSCDId.BASS_CDID_CDDB_QUERY);
-            string entries = BassCd.BASS_CD_GetID(driveIndex, BASSCDId.BASS_CDID_CDDB_QUERY + 1);
-
-            // Get album name from server response.
-            string album = string.Empty;
-            Match albumInfoMatch = Regex.Match(entries, "DTITLE=");
-
-            if (albumInfoMatch != null)
-            {
-                int ablumIdx = albumInfoMatch.Index;
-                album = entries.Substring(ablumIdx, entries.Substring(ablumIdx).IndexOf("\r")).Split('=').LastOrDefault().Split('/').LastOrDefault();
-                album = album.Substring(1);
-            }
-
-            // Get artist name from server response.
-            string artist = string.Empty;
-
-            if (albumInfoMatch != null)
-            {
-                int artistIdx = albumInfoMatch.Index;
-                artist = entries.Substring(artistIdx, entries.Substring(artistIdx).IndexOf("\r")).Split('=').LastOrDefault().Split('/').FirstOrDefault();
-                artist = artist.Substring(0, artist.Length - 1);
-            }
-
-            // Get track names from server response.
-            var matches = Regex.Matches(entries, "TTITLE");
-            List<string> trackNames = new List<string>();
-
-            foreach (Match m in matches)
-            {
-                trackNames.Add(entries.Substring(m.Index, entries.Substring(m.Index).IndexOf('\r')).Split('=')[1]);
-            }
-
-            return new CdMetadata { Artist = artist, Album = album, Tracks = trackNames };
-        }
-
-        /// <summary>
-        /// This methods throws an exception if there is
-        /// no connection to the CDDB_SERVER.
-        /// </summary>
-        public static void CheckForCddbServerConnection()
-        {
-            try
-            {
-                using (var client = new WebClient())
-                {
-                    using (var stream = client.OpenRead(CDDB_SERVER))
-                    {
-
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Cannot connect to CDDB information server @ '" + CDDB_SERVER + "'! (" + ex.Message + ")");
-            }
-        }
+        
     }
 }

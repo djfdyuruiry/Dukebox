@@ -73,26 +73,26 @@
             this.lblCurrentlyPlaying = new System.Windows.Forms.Label();
             this.picAlbumArt = new System.Windows.Forms.PictureBox();
             this.tbLibraryNavigator = new System.Windows.Forms.TableLayoutPanel();
+            this.tblLibraryContents = new System.Windows.Forms.TableLayoutPanel();
+            this.txtSearchBox = new System.Windows.Forms.TextBox();
             this.tblLibraryBrowserAndPlaylist = new System.Windows.Forms.TableLayoutPanel();
             this.pnlLibrary = new System.Windows.Forms.Panel();
             this.pnlPlaylist = new System.Windows.Forms.Panel();
+            this.lstPlaylist = new Dukebox.BufferedListBox();
             this.pnlPlaybackControls = new System.Windows.Forms.Panel();
             this.pnlOverview = new System.Windows.Forms.Panel();
             this.tblMain = new System.Windows.Forms.TableLayoutPanel();
             this.lblPlaybackTime = new System.Windows.Forms.Label();
-            this.tblLibraryContents = new System.Windows.Forms.TableLayoutPanel();
-            this.txtSearchBox = new System.Windows.Forms.TextBox();
-            this.lstPlaylist = new Dukebox.BufferedListBox();
             this.mnuMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picAlbumArt)).BeginInit();
             this.tbLibraryNavigator.SuspendLayout();
+            this.tblLibraryContents.SuspendLayout();
             this.tblLibraryBrowserAndPlaylist.SuspendLayout();
             this.pnlLibrary.SuspendLayout();
             this.pnlPlaylist.SuspendLayout();
             this.pnlPlaybackControls.SuspendLayout();
             this.pnlOverview.SuspendLayout();
             this.tblMain.SuspendLayout();
-            this.tblLibraryContents.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnPlay
@@ -103,7 +103,7 @@
             this.btnPlay.Size = new System.Drawing.Size(35, 32);
             this.btnPlay.TabIndex = 0;
             this.btnPlay.UseVisualStyleBackColor = true;
-            this.btnPlay.Click += new System.EventHandler(this.btnPlay_Click);
+            this.btnPlay.Click += new System.EventHandler(this.btnPausePlay_Click);
             // 
             // mnuMain
             // 
@@ -267,7 +267,7 @@
             this.clearToolStripMenuItem.Name = "clearToolStripMenuItem";
             this.clearToolStripMenuItem.Size = new System.Drawing.Size(215, 22);
             this.clearToolStripMenuItem.Text = "Clear";
-            this.clearToolStripMenuItem.Click += new System.EventHandler(this.btnClear_Click);
+            this.clearToolStripMenuItem.Click += new System.EventHandler(this.btnClearPlaylist_Click);
             // 
             // toolStripSeparator3
             // 
@@ -333,7 +333,7 @@
             this.btnClear.TabIndex = 7;
             this.btnClear.Text = "Clear";
             this.btnClear.UseVisualStyleBackColor = true;
-            this.btnClear.Click += new System.EventHandler(this.btnClear_Click);
+            this.btnClear.Click += new System.EventHandler(this.btnClearPlaylist_Click);
             // 
             // btnNext
             // 
@@ -453,6 +453,32 @@
             this.tbLibraryNavigator.Size = new System.Drawing.Size(1002, 659);
             this.tbLibraryNavigator.TabIndex = 17;
             // 
+            // tblLibraryContents
+            // 
+            this.tblLibraryContents.ColumnCount = 1;
+            this.tblLibraryContents.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tblLibraryContents.Controls.Add(this.treeFilters, 0, 1);
+            this.tblLibraryContents.Controls.Add(this.txtSearchBox, 0, 0);
+            this.tblLibraryContents.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tblLibraryContents.Location = new System.Drawing.Point(3, 3);
+            this.tblLibraryContents.Name = "tblLibraryContents";
+            this.tblLibraryContents.RowCount = 2;
+            this.tblLibraryContents.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 4F));
+            this.tblLibraryContents.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 96F));
+            this.tblLibraryContents.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tblLibraryContents.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tblLibraryContents.Size = new System.Drawing.Size(221, 653);
+            this.tblLibraryContents.TabIndex = 17;
+            // 
+            // txtSearchBox
+            // 
+            this.txtSearchBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.txtSearchBox.Location = new System.Drawing.Point(3, 3);
+            this.txtSearchBox.Name = "txtSearchBox";
+            this.txtSearchBox.Size = new System.Drawing.Size(215, 22);
+            this.txtSearchBox.TabIndex = 11;
+            this.txtSearchBox.TextChanged += new System.EventHandler(this.txtSearchBox_TextChanged);
+            // 
             // tblLibraryBrowserAndPlaylist
             // 
             this.tblLibraryBrowserAndPlaylist.AutoSize = true;
@@ -494,6 +520,18 @@
             this.pnlPlaylist.Name = "pnlPlaylist";
             this.pnlPlaylist.Size = new System.Drawing.Size(763, 331);
             this.pnlPlaylist.TabIndex = 18;
+            // 
+            // lstPlaylist
+            // 
+            this.lstPlaylist.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lstPlaylist.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this.lstPlaylist.FormattingEnabled = true;
+            this.lstPlaylist.Location = new System.Drawing.Point(0, 0);
+            this.lstPlaylist.Name = "lstPlaylist";
+            this.lstPlaylist.Size = new System.Drawing.Size(763, 331);
+            this.lstPlaylist.TabIndex = 2;
+            this.lstPlaylist.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.lstPlaylist_DrawItem);
+            this.lstPlaylist.DoubleClick += new System.EventHandler(this.lstPlaylist_DoubleClick);
             // 
             // pnlPlaybackControls
             // 
@@ -545,44 +583,6 @@
             this.lblPlaybackTime.Size = new System.Drawing.Size(0, 17);
             this.lblPlaybackTime.TabIndex = 19;
             // 
-            // tblLibraryContents
-            // 
-            this.tblLibraryContents.ColumnCount = 1;
-            this.tblLibraryContents.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tblLibraryContents.Controls.Add(this.treeFilters, 0, 1);
-            this.tblLibraryContents.Controls.Add(this.txtSearchBox, 0, 0);
-            this.tblLibraryContents.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tblLibraryContents.Location = new System.Drawing.Point(3, 3);
-            this.tblLibraryContents.Name = "tblLibraryContents";
-            this.tblLibraryContents.RowCount = 2;
-            this.tblLibraryContents.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 4F));
-            this.tblLibraryContents.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 96F));
-            this.tblLibraryContents.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tblLibraryContents.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tblLibraryContents.Size = new System.Drawing.Size(221, 653);
-            this.tblLibraryContents.TabIndex = 17;
-            // 
-            // txtSearchBox
-            // 
-            this.txtSearchBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txtSearchBox.Location = new System.Drawing.Point(3, 3);
-            this.txtSearchBox.Name = "txtSearchBox";
-            this.txtSearchBox.Size = new System.Drawing.Size(215, 22);
-            this.txtSearchBox.TabIndex = 11;
-            this.txtSearchBox.TextChanged += new System.EventHandler(this.txtSearchBox_TextChanged);
-            // 
-            // lstPlaylist
-            // 
-            this.lstPlaylist.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lstPlaylist.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
-            this.lstPlaylist.FormattingEnabled = true;
-            this.lstPlaylist.Location = new System.Drawing.Point(0, 0);
-            this.lstPlaylist.Name = "lstPlaylist";
-            this.lstPlaylist.Size = new System.Drawing.Size(763, 331);
-            this.lstPlaylist.TabIndex = 2;
-            this.lstPlaylist.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.lstPlaylist_DrawItem);
-            this.lstPlaylist.DoubleClick += new System.EventHandler(this.lstFiles_DoubleClick);
-            // 
             // MainView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -605,6 +605,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.picAlbumArt)).EndInit();
             this.tbLibraryNavigator.ResumeLayout(false);
             this.tbLibraryNavigator.PerformLayout();
+            this.tblLibraryContents.ResumeLayout(false);
+            this.tblLibraryContents.PerformLayout();
             this.tblLibraryBrowserAndPlaylist.ResumeLayout(false);
             this.tblLibraryBrowserAndPlaylist.PerformLayout();
             this.pnlLibrary.ResumeLayout(false);
@@ -615,8 +617,6 @@
             this.pnlOverview.PerformLayout();
             this.tblMain.ResumeLayout(false);
             this.tblMain.PerformLayout();
-            this.tblLibraryContents.ResumeLayout(false);
-            this.tblLibraryContents.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 

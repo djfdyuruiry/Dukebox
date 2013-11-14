@@ -403,9 +403,11 @@ namespace Dukebox.Library
         /// the search term specified. All text returned by
         /// a call to 'ToString' on any given track object is
         /// searched for the the term provided.
+        /// 
+        /// This search is not case sensitive.
         /// </summary>
         /// <param name="searchTerm">The term to search for in track descriptions.</param>
-        /// <returns>A list of tracks</returns>
+        /// <returns>A list of tracks that match the given search criteria.</returns>
         public List<Track> SearchForTracks(string searchTerm, SearchAreas searchArea)
         {
             List<Track> results = null;
@@ -431,6 +433,44 @@ namespace Dukebox.Library
                 default:
                 {
                     results = Tracks.Where(t => t.ToString().ToLower().Contains(searchTerm)).ToList();
+                    break;
+                }
+            }
+
+            return results == null ? new List<Track>() : results;
+        }
+
+        /// <summary>
+        /// Get a list of tracks who's attribute type equals the string specified 
+        /// as their name, or in the case of songs title. This search is case sensitive.
+        /// </summary>
+        /// <param name="attribute">The attribute type to select.</param>
+        /// <param name="nameOrTitle">The value or the attributes name/title.</param>
+        /// <returns>A list of tracks that match the given attribute keypair.</returns>
+        public List<Track> GetTracksByAttribute(SearchAreas attribute, string nameOrTitle)
+        {
+            List<Track> results = null;
+
+            switch (attribute)
+            {
+                case SearchAreas.Album:
+                {
+                    results = Tracks.Where(t => t.Album != null ? t.Album.name == nameOrTitle : false).ToList();
+                    break;
+                }
+                case SearchAreas.Artist:
+                {
+                    results = Tracks.Where(t => t.Artist != null ? t.Artist.name== nameOrTitle : false).ToList();
+                    break;
+                }
+                case SearchAreas.Song:
+                {
+                    results = Tracks.Where(t => t.Song != null ? t.Song.title == nameOrTitle : false).ToList();
+                    break;
+                }
+                default:
+                {
+                    results = Tracks.Where(t => t.ToString().Contains(nameOrTitle)).ToList();
                     break;
                 }
             }
