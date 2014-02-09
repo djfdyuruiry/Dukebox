@@ -333,39 +333,47 @@ namespace Dukebox.Audio
 
         public static bool WriteCdaToWavFile(string inCdaFile, string outWavFile, BaseEncoder.ENCODEFILEPROC progressCallback)
         {
-            int stream = BassCd.BASS_CD_StreamCreateFile(inCdaFile, BASSFlag.BASS_STREAM_DECODE);
-                
-            if (stream != 0)
+            int measuringStream = BassCd.BASS_CD_StreamCreateFile(inCdaFile, BASSFlag.BASS_DEFAULT);
+            long totalLength = 0;
+
+            if(measuringStream != 0)
             {
-                try
+                totalLength = Bass.BASS_ChannelGetLength(measuringStream, BASSMode.BASS_POS_BYTES);
+                Bass.BASS_StreamFree(measuringStream);
+
+                int stream = BassCd.BASS_CD_StreamCreateFile(inCdaFile, BASSFlag.BASS_STREAM_DECODE);
+                
+                if (stream != 0)
                 {
-                    WaveWriter ww = new WaveWriter(outWavFile, stream, true);
-                    short[] data = new short[32768];
-
-                    int bytesSoFar = 0;
-                    long totalLength = 1000000;
-
-                    while (Bass.BASS_ChannelIsActive(stream) == BASSActive.BASS_ACTIVE_PLAYING)
+                    try
                     {
-                        int length = Bass.BASS_ChannelGetData(stream, data, 32768);
+                        WaveWriter ww = new WaveWriter(outWavFile, stream, true);
+                        short[] data = new short[32768];
 
-                        if (length > 0)
+                        long bytesSoFar = 0;
+
+                        while (Bass.BASS_ChannelIsActive(stream) == BASSActive.BASS_ACTIVE_PLAYING)
                         {
-                            ww.Write(data, length);
+                            int length = Bass.BASS_ChannelGetData(stream, data, 32768);
 
-                            bytesSoFar += length;
+                            if (length > 0)
+                            {
+                                ww.Write(data, length);
 
-                            progressCallback.Invoke(totalLength, bytesSoFar);
+                                bytesSoFar += length;
+
+                                progressCallback.Invoke(totalLength, bytesSoFar);
+                            }
                         }
-                    }
 
-                    // finilize the wave file!
-                    ww.Close();
-                    return Bass.BASS_StreamFree(stream);
-                }
-                catch (Exception ex)
-                {
-                    Logger.log("Error copying cda file '" + inCdaFile + "' to wav file '" + outWavFile + "': " + ex.Message);
+                        // finilize the wave file!
+                        ww.Close();
+                        return Bass.BASS_StreamFree(stream);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.log("Error copying cda file '" + inCdaFile + "' to wav file '" + outWavFile + "': " + ex.Message);
+                    }
                 }
             }
 
