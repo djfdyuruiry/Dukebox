@@ -62,13 +62,16 @@ namespace Dukebox.Library.CdRipping
                         Thread.Sleep(10);
                     }
                        
-                    // Save the track metadata details to the MP3 file.2
+                    // Save the track metadata details to the MP3 file.
+                    /*
                     Track mp3Track = MusicLibrary.GetInstance().GetTrackFromFile(outFile);
                     mp3Track.Metadata.Album = t.Metadata.Album;
                     mp3Track.Metadata.Artist = t.Metadata.Artist;
                     mp3Track.Metadata.Title = t.Metadata.Title;
 
-                    mp3Track.Metadata.CommitChangesToFile();
+                    mp3Track.Metadata.CommitChangesToFile();*/
+
+                    progressWindow.ResetProgressBar();
                 }
 
                 progressWindow.Invoke(new ValueUpdateDelegate(()=>progressWindow.Hide()));
@@ -92,10 +95,10 @@ namespace Dukebox.Library.CdRipping
         /// <param name="track"></param>
         private void CdRippingProgressMonitor(ProgressMonitorBox progressWindow, long totalBytesToEncode, long bytesEncodedSoFar, Track track, int totalTracksToRip, int currentTrackIndex)
         {
-            if (progressWindow.ProgressBarMaximum != totalBytesToEncode)
+            if (progressWindow.ProgressBarMaximum != 100)
             {
                 progressWindow.ResetProgressBar();
-                progressWindow.ProgressBarMaximum = (int)totalBytesToEncode;
+                progressWindow.ProgressBarMaximum = 100;
             }
 
             int percentComplete = (int)(bytesEncodedSoFar / (totalBytesToEncode / 100));

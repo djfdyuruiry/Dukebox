@@ -46,9 +46,9 @@ namespace Dukebox.Model
             { 
                 try 
                 { 
-                    return Tracks[CurrentTrackIndex]; 
+                    return Tracks[GetCurrentTrackIndex()]; 
                 } 
-                catch (ArgumentOutOfRangeException ex) 
+                catch (ArgumentOutOfRangeException) 
                 { 
                     return null; 
                 } 
@@ -56,31 +56,34 @@ namespace Dukebox.Model
         }
 
         /// <summary>
-        /// The current index in the playlist that is loaded into memory for playback.
+        /// Get the current index in the playlist that is loaded into memory for playback.
         /// </summary>
-        public int CurrentTrackIndex 
+        public int GetCurrentTrackIndex()
         { 
-            get 
-            { 
-                _currentTrackIndexMutex.WaitOne(); 
+            _currentTrackIndexMutex.WaitOne(); 
 
-                var v = _currentTrackIndex;
+            var v = _currentTrackIndex;
 
-                _currentTrackIndexMutex.ReleaseMutex(); 
+            _currentTrackIndexMutex.ReleaseMutex(); 
 
-                CallNewTrackEventHandlers();  
-                return v; 
-            } 
-            set 
-            { 
-                _currentTrackIndexMutex.WaitOne();
-
-                _currentTrackIndex = value; 
-
-                _currentTrackIndexMutex.ReleaseMutex(); 
-            } 
-        
+            return v; 
         }
+
+        /// <summary>
+        /// Get the current index in the playlist that is loaded into memory for playback.
+        /// </summary>
+        /// <param name="value">The new value to assign</param>
+        private void SetCurrentTrackIndex(int value, bool skippingTrack = false)
+        { 
+            _currentTrackIndexMutex.WaitOne();
+
+            _currentTrackIndex = value; 
+
+            _currentTrackIndexMutex.ReleaseMutex();
+
+            CallNewTrackEventHandlers(skippingTrack);  
+        } 
+
         /// <summary>
         /// Is the playlist currently loaded in memory for playback?
         /// </summary>
@@ -151,9 +154,9 @@ namespace Dukebox.Model
         /// <summary>
         /// 
         /// </summary>
-        private void CallNewTrackEventHandlers()
+        private void CallNewTrackEventHandlers(bool skippingTrack)
         {
-            if (_tracks.Count > 0 && (_currentTrackIndex > -1 && _currentTrackIndex < _tracks.Count))
+            if (!skippingTrack && _tracks.Count > 0 && (_currentTrackIndex > -1 && _currentTrackIndex < _tracks.Count))
             {
                 NewTrackLoadedHandlers.ForEach(a => a.Invoke(this, new NewTrackLoadedEventArgs() { Track = _tracks[_currentTrackIndex], TrackIndex = _currentTrackIndex }));
             }
@@ -183,7 +186,7 @@ namespace Dukebox.Model
             Tracks = new List<Track>();
             _currentTrackIndexMutex = new Mutex();
 
-            CurrentTrackIndex = -1;
+            SetCurrentTrackIndex(-1);
             _forward = false;
             _back = false;
 
@@ -293,7 +296,7 @@ namespace Dukebox.Model
                     return;
                 }
 
-                while (CurrentTrackIndex != 0)
+                while (GetCurrentTrackIndex() != 0)
                 {
                     Thread.Sleep(10);
                 }
@@ -304,15 +307,15 @@ namespace Dukebox.Model
                 StopPlaylistPlayback();
                 StartPlaylistPlayback();
             }
-            else if (trackIndex == CurrentTrackIndex)
+            else if (trackIndex == GetCurrentTrackIndex())
             {
+                SetCurrentTrackIndex(GetCurrentTrackIndex() - 1);
                 _forward = true;
-                CurrentTrackIndex--;
             }
             else
             {
+                SetCurrentTrackIndex(trackIndex - 1);
                 _forward = true;
-                CurrentTrackIndex = trackIndex - 1;
             }
             
         }
@@ -346,9 +349,9 @@ namespace Dukebox.Model
             // Set playback flow controls to default values.            
             _back = false;
             _forward = false;
-            CurrentTrackIndex = 0;
+            SetCurrentTrackIndex(0);
 
-            while (CurrentTrackIndex < Tracks.Count)
+            while (GetCurrentTrackIndex() < Tracks.Count)
             {
                 if(!_forward && !_back)
                 {
@@ -371,38 +374,45 @@ namespace Dukebox.Model
                 // Keep rolling over to start of playlist if repeat all is on.
                 if (RepeatAll && !_back)
                 {
-                    if (CurrentTrackIndex + 1 == _tracks.Count) 
+                    if (GetCurrentTrackIndex() + 1 == _tracks.Count) 
                     {
                         if (!Repeat)
                         {
                             // Roll on to start of playlist if repeat is off.
-                            CurrentTrackIndex = -1;
+                            SetCurrentTrackIndex(-1);
                         }
                     }
                 }
 
                 // Move forward if repeat is off or forward
                 // motion has been indicated.
-                if (!Repeat || _forward)
+                if (!Repeat && _forward && !Shuffle)
                 {
-                    CurrentTrackIndex++;
+                    SetCurrentTrackIndex(GetCurrentTrackIndex() + 1);
                 }
 
                 // Move back one song.
-                if (_back)
+                if (_back && !Repeat && !Shuffle)
                 {
-                    CurrentTrackIndex -= 2;
+                    SetCurrentTrackIndex(GetCurrentTrackIndex() - 2);
 
                     if (_currentTrackIndex < 0) // Roll off to end of playlist.
                     {
-                        CurrentTrackIndex = Tracks.Count - 1;
+                        SetCurrentTrackIndex(Tracks.Count - 1);
                     }
 
                     _back = false;
                 }
-                else if (Shuffle) // Pick random track for playback.
+                else if (Shuffle && !Repeat) // Pick random track for playback.
                 {
-                    CurrentTrackIndex = random.Next(_tracks.Count);
+                    int nextTrack = random.Next(_tracks.Count);
+                    
+                    while(nextTrack == GetCurrentTrackIndex())
+                    {
+                        nextTrack = random.Next(_tracks.Count);
+                    }
+
+                    SetCurrentTrackIndex(nextTrack);
                 }
 
                 // Reset flags for next iteration.
@@ -410,7 +420,7 @@ namespace Dukebox.Model
                 _forward = false;               
             }
 
-            CurrentTrackIndex = -1;
+            SetCurrentTrackIndex(-1);
             Stop();
         }
 

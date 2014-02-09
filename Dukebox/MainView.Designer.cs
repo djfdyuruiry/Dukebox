@@ -397,8 +397,9 @@
             // lblLibraryList
             // 
             this.lblLibraryList.AutoSize = true;
+            this.lblLibraryList.Dock = System.Windows.Forms.DockStyle.Right;
             this.lblLibraryList.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblLibraryList.Location = new System.Drawing.Point(3, 0);
+            this.lblLibraryList.Location = new System.Drawing.Point(715, 0);
             this.lblLibraryList.Name = "lblLibraryList";
             this.lblLibraryList.Size = new System.Drawing.Size(48, 17);
             this.lblLibraryList.TabIndex = 13;
@@ -420,8 +421,9 @@
             this.lblCurrentlyPlaying.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Italic);
             this.lblCurrentlyPlaying.Location = new System.Drawing.Point(346, 18);
             this.lblCurrentlyPlaying.Name = "lblCurrentlyPlaying";
-            this.lblCurrentlyPlaying.Size = new System.Drawing.Size(0, 17);
+            this.lblCurrentlyPlaying.Size = new System.Drawing.Size(71, 17);
             this.lblCurrentlyPlaying.TabIndex = 15;
+            this.lblCurrentlyPlaying.Text = "123456798";
             // 
             // picAlbumArt
             // 
@@ -548,9 +550,9 @@
             // 
             // pnlOverview
             // 
+            this.pnlOverview.Controls.Add(this.lblCurrentlyPlaying);
             this.pnlOverview.Controls.Add(this.lblFilters);
             this.pnlOverview.Controls.Add(this.lblPlaylist);
-            this.pnlOverview.Controls.Add(this.lblCurrentlyPlaying);
             this.pnlOverview.Controls.Add(this.pnlPlaybackControls);
             this.pnlOverview.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pnlOverview.Location = new System.Drawing.Point(3, 3);
@@ -570,6 +572,7 @@
             this.tblMain.RowCount = 2;
             this.tblMain.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 5.847953F));
             this.tblMain.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 94.15205F));
+            this.tblMain.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tblMain.Size = new System.Drawing.Size(1008, 706);
             this.tblMain.TabIndex = 20;
             // 

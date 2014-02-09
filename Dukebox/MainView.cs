@@ -82,7 +82,6 @@ namespace Dukebox
         /// Dispose of hotkey manager, current playlist, playback monitor
         /// thread and the progress window if present.
         /// </summary>
-        //[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1063:ImplementIDisposableCorrectly")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1063:ImplementIDisposableCorrectly")]
         public new void Dispose()
         {
@@ -114,15 +113,14 @@ namespace Dukebox
         }
         
         /// <summary>
-        /// Reposition the currently playing and playlist
-        /// labels.
+        /// Reposition the currently playing and playlist labels.
         /// </summary>
         private void MainView_Resize(object sender, EventArgs e)
         {
-            Point locationOnForm = lstPlaylist.FindForm().PointToClient(lstPlaylist.Parent.PointToScreen(lstPlaylist.Location));
+            Point locationOnForm = this.PointToClient(lstPlaylist.Parent.PointToScreen(lstPlaylist.Location));
 
             lblPlaylist.Location = new Point(locationOnForm.X, lblPlaylist.Location.Y);
-            lblCurrentlyPlaying.Location = new Point(locationOnForm.X + lstPlaylist.Width, lblCurrentlyPlaying.Location.Y);
+            lblCurrentlyPlaying.Location = new Point(locationOnForm.X + lblPlaylist.Width, lblCurrentlyPlaying.Location.Y);
         } 
         
         /// <summary>
@@ -253,6 +251,7 @@ namespace Dukebox
         private void btnPausePlay_Click(object sender, EventArgs e)
         {
             _currentPlaylist.PausePlay();
+            UpdatePausePlayGraphic();
         }
 
         private void btnStop_Click(object sender, EventArgs e)
@@ -263,16 +262,19 @@ namespace Dukebox
         private void btnNext_Click(object sender, EventArgs e)
         {
             _currentPlaylist.Forward();
+            UpdatePausePlayGraphic();
         }
 
         private void btnPrevious_Click(object sender, EventArgs e)
         {
             _currentPlaylist.Back();
+            UpdatePausePlayGraphic();
         }
 
         private void lstPlaylist_DoubleClick(object sender, EventArgs e)
         {
             _currentPlaylist.SkipToTrack(lstPlaylist.SelectedIndex);
+            UpdatePausePlayGraphic();
         }
 
         #endregion
@@ -572,7 +574,7 @@ namespace Dukebox
             e.DrawBackground();
             Graphics g = e.Graphics;
             
-            if (e.Index == _currentPlaylist.CurrentTrackIndex)
+            if (e.Index == _currentPlaylist.GetCurrentTrackIndex())
             {
                 g.FillRectangle(new SolidBrush(Color.PowderBlue), e.Bounds);
             }
