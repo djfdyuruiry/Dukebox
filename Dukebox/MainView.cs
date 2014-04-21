@@ -73,9 +73,9 @@ namespace Dukebox
 
         private void LoadPlaybackControlMenuFromSettings()
         {
-            mnuShuffle.Checked = Dukebox.Properties.Settings.Default.shuffle;
-            mnuRepeat.Checked = Dukebox.Properties.Settings.Default.repeat;
-            mnuRepeatAll.Checked = Dukebox.Properties.Settings.Default.repeatAll;
+            mnuShuffle.Checked = _currentPlaylist.Shuffle = Dukebox.Properties.Settings.Default.shuffle;
+            mnuRepeat.Checked = _currentPlaylist.Repeat = Dukebox.Properties.Settings.Default.repeat;
+            mnuRepeatAll.Checked = _currentPlaylist.RepeatAll = Dukebox.Properties.Settings.Default.repeatAll;
         }
 
         /// <summary>
@@ -135,12 +135,14 @@ namespace Dukebox
 
         /// <summary>
         /// Stop playback monitor and current playlist
-        /// playback, then exit the application.
+        /// playback, save user settings then exit the application.
         /// </summary>
         private void frmMainView_FormClosed(object sender, FormClosedEventArgs e)
         {
             _currentPlaylist.StopPlaylistPlayback();
             _playbackMonitorTimer.Stop();
+
+            Dukebox.Properties.Settings.Default.Save();
 
             Application.Exit();
         }
