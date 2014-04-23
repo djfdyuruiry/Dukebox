@@ -26,7 +26,7 @@ namespace Dukebox.Library
                 return title == string.Empty ? "Unknown" : title;
             }
 
-            return MusicLibrary.GetInstance().Artists.Where(a => a.id == artistId).FirstOrDefault() + " - " + title;
+            return MusicLibrary.GetInstance().Artists.First(a => a.id == artistId) + " - " + title;
         }
     }
 

@@ -81,7 +81,7 @@ namespace Dukebox
             bassPluginsLoaded = Bass.BASS_PluginLoadDirectory(Dukebox.Properties.Settings.Default.bassAddOnsPath);
 
             // Make sure the BASS library initalised correctly and all available plugins where loaded successfully.
-            if (!bassInit || bassPluginsLoaded == null || bassPluginsLoaded.Count != Dukebox.Properties.Settings.Default.bassPluginCount)
+            if (!bassInit || bassPluginsLoaded == null || bassPluginsLoaded.Count < Dukebox.Properties.Settings.Default.bassPluginCount)
             {
                 string msg = "Error loading 'bass.dll' or a BASS Plug-In library! [BASS error code: " + Bass.BASS_ErrorGetCode().ToString() + "]";
 

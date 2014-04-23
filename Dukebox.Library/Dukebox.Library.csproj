@@ -81,6 +81,7 @@
       <DependentUpon>Library.tt</DependentUpon>
     </Compile>
     <Compile Include="CdRipping\CdRipHelper.cs" />
+    <Compile Include="DukeboxSettings.cs" />
     <Compile Include="Library.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
