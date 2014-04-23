@@ -27,7 +27,7 @@ namespace Dukebox.Model
         {
             get
             {
-                if (Song.artistId.HasValue && _artist == null)
+                if (Song.artistId.HasValue && Song.artistId != -1 && _artist == null)
                 {
                     _artist = MusicLibrary.GetInstance().Artists.OrderBy(a => a.id).ToArray()[Song.artistId.Value - 1]; 
                 }
@@ -55,7 +55,7 @@ namespace Dukebox.Model
         {
             get
             {
-                if (Song.albumId.HasValue && _album == null)
+                if (Song.albumId.HasValue && Song.albumId != -1 && _album == null)
                 {
                     _album = MusicLibrary.GetInstance().Albums.OrderBy(a => a.id).ToArray()[Song.albumId.Value - 1];
                 }
@@ -109,12 +109,30 @@ namespace Dukebox.Model
         /// <returns>A string describing this audio track.</returns>
         public override string ToString()
         {
-            if (Song.artistId != null && Song.artistId == -1)
+            var trackFormat = DukeboxAssemblyLoader.Settings["trackDisplayFromat"].ToString().ToLower();
+
+            if (Artist == null)
             {
-                return (Artist.name == string.Empty ? "Unknown Artist" : Artist.name) + " - " + Song.ToString();
+                trackFormat = trackFormat.Replace("{artist}", "Unknown Artist");
+            }
+            else
+            {
+                trackFormat = trackFormat.Replace("{artist}", Artist.name);
             }
 
-            return Song.ToString();
+            if (Album == null)
+            {
+                trackFormat = trackFormat.Replace("{album}", "Unknown Album");
+            }
+            else
+            {
+                trackFormat = trackFormat.Replace("{album}", Album.name);
+            }
+
+            trackFormat = trackFormat.Replace("{filename}", Song.filename);
+            trackFormat = trackFormat.Replace("{title}", Song.title);
+
+            return trackFormat;
         }
 
         /// <summary>
@@ -123,7 +141,7 @@ namespace Dukebox.Model
         /// <param name="x">Track one.</param>
         /// <param name="y">Track two.</param>
         /// <returns>Are the two parameter tracks equal?</returns>
-        public bool Equals(object x, object y)
+        bool IEqualityComparer.Equals(object x, object y)
         {
             Track a = (Track)x;
             Track b = (Track)y;
