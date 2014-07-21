@@ -1,6 +1,6 @@
 ﻿using Dukebox.Audio;
-using Dukebox.Logging;
 using Dukebox.Model;
+using log4net;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -19,6 +19,7 @@ namespace Dukebox.Library
     /// </summary>
     public class MusicLibrary
     {
+        private static readonly ILog Logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         /// <summary>
         /// The ADO entities model for the SQL music database.
         /// </summary>
@@ -45,7 +46,7 @@ namespace Dukebox.Library
 
                     if (_allTrackCache.Count > 0)
                     {
-                        Logger.log(_allTrackCache.Count + " tracks stored in memory cache from DB!");
+                        Logger.Info(_allTrackCache.Count + " tracks stored in memory cache from DB!");
                     }
                 }
 
@@ -87,7 +88,10 @@ namespace Dukebox.Library
             }
         }
 
+        public List<Track> RecentlyPlayed { get; set; }
+
         #endregion
+        
 
         /// <summary>
         /// Singleton pattern private constructor. Open connection to
@@ -97,7 +101,8 @@ namespace Dukebox.Library
         {
             DukeboxData = new DukeboxEntities();
             DukeboxData.Database.Connection.Open();
-            var loadTheTracks = Tracks;
+
+            RecentlyPlayed = new List<Track>();
         }
 
         #region Folder/Playlist/File playback methods
@@ -281,7 +286,7 @@ namespace Dukebox.Library
 
             if (tracksToAdd.Count > 0)
             {
-                Logger.log("Added " + tracksToAdd + " from the playlist file '" + filename + "'");
+                Logger.Info("Added " + tracksToAdd + " from the playlist file '" + filename + "'");
             }
         }
 
@@ -371,11 +376,11 @@ namespace Dukebox.Library
                     }
                     catch (Exception ex)
                     {
-                        Logger.log("Error extracting image for caching [" + track.Key + "]: " + ex.Message);
+                        Logger.Info("Error extracting image for caching [" + track.Key + "]: " + ex.Message);
                     }
                 }
 
-                Logger.log("Added the file '" + track.Key + "' to the library [Track => {" + (artistObj != null ? artistObj.name : "Unkown Artist") + " - " + track.Value.Title + "}");
+                Logger.Info("Added the file '" + track.Key + "' to the library [Track => {" + (artistObj != null ? artistObj.name : "Unkown Artist") + " - " + track.Value.Title + "}");
             }
         }
 
@@ -391,7 +396,7 @@ namespace Dukebox.Library
 
             var getTheTracks = Tracks;
 
-            Logger.log("Music library track cache was cleared! (This happens after a DB update routine prompts a refresh)");
+            Logger.Info("Music library track cache was cleared! (This happens after a DB update routine prompts a refresh)");
         }
 
         #endregion

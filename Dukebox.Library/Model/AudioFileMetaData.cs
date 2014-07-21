@@ -1,6 +1,6 @@
 ﻿using Dukebox.Audio;
 using Dukebox.Library.Model;
-using Dukebox.Logging;
+using log4net;
 using org.jaudiotagger.audio;
 using org.jaudiotagger.tag;
 using System;
@@ -22,6 +22,9 @@ namespace Dukebox.Model
     /// </summary>
     public class AudioFileMetaData
     {
+
+        private static readonly ILog Logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        
         #region Metadata properties
 
         private string _title = string.Empty;
@@ -150,11 +153,11 @@ namespace Dukebox.Model
                 if (File.Exists(@".\albumArtCache\" + _dbAlbumId))
                 {
                     // Fetch artwork from cache instead of file.
-                    Logger.log("Fetching album artwork for " + _title + " from cache...");
+                    Logger.Info("Fetching album artwork for " + _title + " from cache...");
                     return Image.FromFile(".\\albumArtCache\\" + _dbAlbumId);
                 }
 
-                Logger.log("Fetching album artwork from " + _title + "...");
+                Logger.Info("Fetching album artwork from " + _title + "...");
                 return Image.FromStream(new MemoryStream(_tag.getFirstArtwork().getBinaryData()));
             }
         }
@@ -209,7 +212,7 @@ namespace Dukebox.Model
             }
             catch (Exception ex)
             {
-                Logger.log("Error occured while parsing metadata from '" + fileName + "': " + ex.Message);
+                Logger.Info("Error occured while parsing metadata from '" + fileName + "': " + ex.Message);
                 
                 _tag = null;
                 GetTrackDetailsFromUnsupportedFormat(fileName);
@@ -250,7 +253,7 @@ namespace Dukebox.Model
                 }
             }
 
-            Logger.log("Parsed '" + fileName + "' as " + artist + " - " + title);
+            Logger.Info("Parsed '" + fileName + "' as " + artist + " - " + title);
                         
             _title = title;
             _artist = artist;

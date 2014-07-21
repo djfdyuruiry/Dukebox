@@ -397,3 +397,9 @@ Dukebox.Audio/obj/Debug/build.force
 Dukebox.Library/obj/Debug/build.force
 Dukebox/obj/Debug/build.force
 Dukebox.Library/obj/Debug/DesignTimeResolveAssemblyReferences.cache
+Dukebox.Desktop/obj/*
+Dukebox.Desktop/bin/*
+Dukebox.Assets/obj/*
+Dukebox.Assets/bin/*
+Dukebox.Library/bin/*
+Dukebox.Audio/bin/*
