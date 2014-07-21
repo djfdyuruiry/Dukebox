@@ -1,4 +1,4 @@
-﻿using Dukebox.Logging;
+﻿using log4net;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -19,6 +19,7 @@ namespace Dukebox.Audio
     /// </summary>
     public class MediaPlayer
     {
+        private static readonly ILog Logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         public static readonly string MINUTE_FORMAT = "{0}:{1}";
 
         #region Playback control properties
@@ -80,9 +81,17 @@ namespace Dukebox.Audio
         /// <param name="fileName"></param>
         public void LoadFile(string fileName)
         {
-            if (fileName == string.Empty)
+            if (string.IsNullOrEmpty(fileName))
             {
-                throw new ArgumentException("File name can't be empty!");
+                throw new ArgumentException("File name string specified has no value or is empty.");
+            }
+            else if(File.Exists(fileName))
+            {
+                throw new ArgumentException(string.Format("File '{0}' does not exist.", fileName));
+            }
+            else if(File.ReadAllBytes(fileName).Count() == 0)
+            {
+                throw new ArgumentException(string.Format("File '{0}' contains no data!", fileName));
             }
 
             Bass.BASS_StreamFree(_stream);
@@ -98,7 +107,7 @@ namespace Dukebox.Audio
             _playbackThread = new Thread(PlayAudioFile);
             _playbackThread.Start();
 
-            Logger.log(fileName + " loaded for playback by the media player");
+            Logger.Info(fileName + " loaded for playback by the media player");
         }
 
         /// <summary>
@@ -164,7 +173,7 @@ namespace Dukebox.Audio
             else // Error.
             {
                 string msg = "Error playing file '" + _fileName.Split('\\').LastOrDefault() + "'!" + " [BASS error code: " + Bass.BASS_ErrorGetCode().ToString() + "]";
-                Logger.log(msg);
+                Logger.Error(msg);
 
                 MessageBox.Show(msg, "Dukebox: Error Playing File", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
@@ -318,7 +327,7 @@ namespace Dukebox.Audio
                 {
                     string msg = "Encoder result: " + conversionResult + "\nLast BASS error: " + Bass.BASS_ErrorGetCode().ToString();
 
-                    Logger.log(msg);
+                    Logger.Info(msg);
                     return;
                 }
 
@@ -372,7 +381,7 @@ namespace Dukebox.Audio
                     }
                     catch (Exception ex)
                     {
-                        Logger.log("Error copying cda file '" + inCdaFile + "' to wav file '" + outWavFile + "': " + ex.Message);
+                        Logger.Info("Error copying cda file '" + inCdaFile + "' to wav file '" + outWavFile + "': " + ex.Message);
                     }
                 }
             }
@@ -399,7 +408,7 @@ namespace Dukebox.Audio
 
             //Get program output
             string strOutput = pProcess.StandardOutput.ReadToEnd();
-            Logger.log("Output from lame encoding: " + strOutput);
+            Logger.Info("Output from lame encoding: " + strOutput);
 
             pProcess.WaitForExit();
         }

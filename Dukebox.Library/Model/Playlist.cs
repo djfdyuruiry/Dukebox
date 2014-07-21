@@ -158,6 +158,12 @@ namespace Dukebox.Model
         {
             if (!skippingTrack && _tracks.Count > 0 && (_currentTrackIndex > -1 && _currentTrackIndex < _tracks.Count))
             {
+                // Register track as recently played with music library and
+                // load current track into media player.
+                var currentTrack = _tracks[_currentTrackIndex];
+
+                MusicLibrary.GetInstance().RecentlyPlayed.Add(currentTrack);
+                
                 NewTrackLoadedHandlers.ForEach(a => a.Invoke(this, new NewTrackLoadedEventArgs() { Track = _tracks[_currentTrackIndex], TrackIndex = _currentTrackIndex }));
             }
         }
@@ -344,7 +350,7 @@ namespace Dukebox.Model
         /// </summary>
         private void PlayAllTracks()
         {
-            Random random = new Random();
+            var random = new Random();
 
             // Set playback flow controls to default values.            
             _back = false;
@@ -356,7 +362,8 @@ namespace Dukebox.Model
                 if(!_forward && !_back)
                 {
                     // Load current track into media player.
-                    MediaPlayer.GetInstance().LoadFile(_tracks[_currentTrackIndex].Song.filename);
+                    var currentTrack = _tracks[_currentTrackIndex];
+                    MediaPlayer.GetInstance().LoadFile(currentTrack.Song.filename);
 
                     // Wait until media player thread has started playback.
                     while (!MediaPlayer.GetInstance().Playing)
