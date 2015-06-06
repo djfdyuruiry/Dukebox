@@ -85,7 +85,7 @@ namespace Dukebox.Audio
             {
                 throw new ArgumentException("File name string specified has no value or is empty.");
             }
-            else if(File.Exists(fileName))
+            else if(!File.Exists(fileName))
             {
                 throw new ArgumentException(string.Format("File '{0}' does not exist.", fileName));
             }
