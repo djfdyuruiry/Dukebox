@@ -18,7 +18,7 @@ namespace Dukebox.Audio
         public static List<string> SupportedFormats = new List<string>();
 
         /// <summary>
-        /// A file filter string for use with the file dialog
+        /// A file filter string for use with a file dialog
         /// class which represents all supported formats.
         /// </summary>
         public static string FileDialogFilter
