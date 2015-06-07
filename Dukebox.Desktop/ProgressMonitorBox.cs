@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Dukebox.Library.CdRipping;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -10,11 +11,13 @@ using System.Windows.Forms;
 
 namespace Dukebox.Desktop
 {
-    public partial class ProgressMonitorBox : Form
+    public partial class ProgressMonitorBox : Form, ICdRipViewUpdater
     {
         public ProgressMonitorBox()
         {
             InitializeComponent();
         }
+
+        
     }
 }

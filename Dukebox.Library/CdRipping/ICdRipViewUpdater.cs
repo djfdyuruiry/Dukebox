@@ -15,10 +15,10 @@ namespace Dukebox.Library.CdRipping
 
         void ResetProgressBar();
         
-        void Invoke(Delegate _delegate);
+        object Invoke(Delegate _delegate);
 
         void Show();
-        object Hide();
-        object Dispose();
+        void Hide();
+        void Dispose();
     }
 }
