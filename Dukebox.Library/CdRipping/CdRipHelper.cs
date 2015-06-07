@@ -17,7 +17,8 @@ namespace Dukebox.Library.CdRipping
     /// </summary>
     public class CdRipHelper
     {
-        private static readonly ILog Logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Logger = 
+            LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         
         /// <summary>
         /// Rips an audio CD to a folder as a collection of MP3 files
@@ -58,14 +59,15 @@ namespace Dukebox.Library.CdRipping
                         Thread.Sleep(10);
                     }
                        
-                    // Save the track metadata details to the MP3 file.
-                    /*
+                    // Save the track metadata details to the MP3 file. BROKEN as of rev. 25   
+                    /*                 
                     Track mp3Track = MusicLibrary.GetInstance().GetTrackFromFile(outFile);
                     mp3Track.Metadata.Album = t.Metadata.Album;
                     mp3Track.Metadata.Artist = t.Metadata.Artist;
                     mp3Track.Metadata.Title = t.Metadata.Title;
 
-                    mp3Track.Metadata.CommitChangesToFile();*/
+                    mp3Track.Metadata.CommitChangesToFile();
+                     */
 
                     viewUpdater.ResetProgressBar();
                 }
@@ -88,7 +90,8 @@ namespace Dukebox.Library.CdRipping
         /// <param name="totalBytesToEncode"></param>
         /// <param name="bytesEncodedSoFar"></param>
         /// <param name="track"></param>
-        private void CdRippingProgressMonitor(ICdRipViewUpdater cdRipViewUpdater, long totalBytesToEncode, long bytesEncodedSoFar, Track track, int totalTracksToRip, int currentTrackIndex)
+        private void CdRippingProgressMonitor(ICdRipViewUpdater cdRipViewUpdater, long totalBytesToEncode, long bytesEncodedSoFar, 
+                                              Track track, int totalTracksToRip, int currentTrackIndex)
         {
             if (cdRipViewUpdater.ProgressBarMaximum != 100)
             {
@@ -97,9 +100,10 @@ namespace Dukebox.Library.CdRipping
             }
 
             int percentComplete = (int)(bytesEncodedSoFar / (totalBytesToEncode / 100));
+            int currentTrackNumber = currentTrackIndex + 1;
 
             cdRipViewUpdater.ProgressBarValue = percentComplete;
-            cdRipViewUpdater.NotifcationLabelUpdate("[" + currentTrackIndex + 1 + "/" + totalTracksToRip + "] Converting " + track + " to MP3 - " + percentComplete + "%");
+            cdRipViewUpdater.NotifcationLabelUpdate(string.Format("[{0}/{1}] Converting {2} to MP3 - {3}%", currentTrackNumber, totalTracksToRip, track, percentComplete));
         }
 
         /// <summary>
