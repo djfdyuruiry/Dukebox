@@ -35,6 +35,9 @@ namespace Dukebox.Model
             } 
         }
 
+        private Stack<int> _previousTracks;
+        private int _lastTrack;
+
         #region Playback state properties
 
         /// <summary>
@@ -190,6 +193,7 @@ namespace Dukebox.Model
         public Playlist()
         {
             Tracks = new List<Track>();
+            _previousTracks = new Stack<int>();
             _currentTrackIndexMutex = new Mutex();
 
             SetCurrentTrackIndex(-1);
@@ -344,6 +348,95 @@ namespace Dukebox.Model
         }
 
         /// <summary>
+        /// Preform an iteration of the play all tracks loop.
+        /// </summary>
+        /// <param name="random">Random number generator to be used if shuffle is on.</param>
+        private void PlayAllTracksIteration(Random random)
+        {
+            if (!_forward && !_back)
+            {
+                // Load current track into media player.
+                var currentTrack = _tracks[GetCurrentTrackIndex()];
+                MediaPlayer.GetInstance().LoadFile(currentTrack.Song.filename);
+
+                // Wait until media player thread has started playback.
+                while (!MediaPlayer.GetInstance().Playing)
+                {
+                    Thread.Sleep(10);
+                }
+
+                if (GetCurrentTrackIndex() != _lastTrack)
+                {
+                    _previousTracks.Push(GetCurrentTrackIndex());
+                }
+
+                _lastTrack = GetCurrentTrackIndex();
+            }
+
+            // While next and back are not pressed and the user is not finished with the song.
+            while (!_forward && !_back && !MediaPlayer.GetInstance().Finished)
+            {
+                Thread.Sleep(10);
+            }
+
+            // Move forward if forward motion has been indicated and shuffle is off.
+            if (_forward && !Shuffle)
+            {
+                SetCurrentTrackIndex(GetCurrentTrackIndex() + 1);
+
+                _forward = false;
+            }
+            else if (_back && !Shuffle) // Move back one song if indicated and shuffle is off.
+            {
+                SetCurrentTrackIndex(GetCurrentTrackIndex() - 1);
+
+                _back = false;
+            }
+            else if (Shuffle && (!_back || _previousTracks.Count < 2)) // Pick random track for playback.
+            {
+                int nextTrack = random.Next(_tracks.Count);
+
+                while (nextTrack == GetCurrentTrackIndex())
+                {
+                    nextTrack = random.Next(_tracks.Count);
+                }
+
+                SetCurrentTrackIndex(nextTrack);
+
+                _forward = false;
+                _back = false;
+            }
+            else if (Shuffle && _back) // Play last played track.
+            {
+                int nextTrack = _previousTracks.Pop();
+                nextTrack = _previousTracks.Pop();
+
+                SetCurrentTrackIndex(nextTrack);
+
+                _back = false;
+            }
+            else if (!Repeat) // Go forward if no actions have been indicated and repeat is off.
+            {
+                SetCurrentTrackIndex(GetCurrentTrackIndex() + 1);
+            }
+
+            // Keep rolling over to start of playlist if repeat all is on.
+            if (RepeatAll)
+            {
+                if (GetCurrentTrackIndex() >= _tracks.Count)
+                {
+                    // Roll on to start of playlist.
+                    SetCurrentTrackIndex(0);
+                }
+                else if (GetCurrentTrackIndex() < 0) // Roll off to end of playlist.
+                {
+                    SetCurrentTrackIndex(Tracks.Count - 1);
+                }
+            }
+        }
+
+
+        /// <summary>
         /// Start playlist playback of all tracks, following
         /// the boolean flags for shuffle, repeat and repeat
         /// all while traversing the Tracks collection.
@@ -355,80 +448,14 @@ namespace Dukebox.Model
             // Set playback flow controls to default values.            
             _back = false;
             _forward = false;
-            SetCurrentTrackIndex(0);
+            SetCurrentTrackIndex(0);            
 
             while (GetCurrentTrackIndex() < Tracks.Count)
             {
-                if(!_forward && !_back)
-                {
-                    // Load current track into media player.
-                    var currentTrack = _tracks[_currentTrackIndex];
-                    MediaPlayer.GetInstance().LoadFile(currentTrack.Song.filename);
-
-                    // Wait until media player thread has started playback.
-                    while (!MediaPlayer.GetInstance().Playing)
-                    {
-                        Thread.Sleep(10);
-                    }
-                }
-                
-                // While next and back are not pressed and the user is not finished with the song.
-                while (!_forward && !_back && !MediaPlayer.GetInstance().Finished)
-                {
-                    Thread.Sleep(10);
-                }
-
-                // Keep rolling over to start of playlist if repeat all is on.
-                if (RepeatAll && !_back)
-                {
-                    if (GetCurrentTrackIndex() + 1 == _tracks.Count) 
-                    {
-                        if (!Repeat)
-                        {
-                            // Roll on to start of playlist if repeat is off.
-                            SetCurrentTrackIndex(-1);
-                        }
-                    }
-                }
-
-                // Move forward if repeat is off or forward
-                // motion has been indicated.
-                if (!Repeat && _forward && !Shuffle)
-                {
-                    SetCurrentTrackIndex(GetCurrentTrackIndex() + 1);
-                }
-
-                // Move back one song.
-                if (_back && !Repeat && !Shuffle)
-                {
-                    SetCurrentTrackIndex(GetCurrentTrackIndex() - 2);
-
-                    if (_currentTrackIndex < 0) // Roll off to end of playlist.
-                    {
-                        SetCurrentTrackIndex(Tracks.Count - 1);
-                    }
-
-                    _back = false;
-                }
-                else if (Shuffle && !Repeat) // Pick random track for playback.
-                {
-                    int nextTrack = random.Next(_tracks.Count);
-                    
-                    while(nextTrack == GetCurrentTrackIndex())
-                    {
-                        nextTrack = random.Next(_tracks.Count);
-                    }
-
-                    SetCurrentTrackIndex(nextTrack);
-                }
-
-                // Reset flags for next iteration.
-                _back = false;
-                _forward = false;               
+                PlayAllTracksIteration(random);    
             }
 
-            SetCurrentTrackIndex(-1);
-            Stop();
+            SetCurrentTrackIndex(0);
         }
 
         /// <summary>
