@@ -26,6 +26,7 @@ namespace Dukebox.Library.CdRipping
         /// </summary>
         /// <param name="inPath">The CD drive root folder.</param>
         /// <param name="outPath">The folder to save MP3 files to.</param>
+        /// <param name="viewUpdater">A ICdRipViewUpdater implementation object that will recieve messages on ripping progress.</param>
         public void RipCdToFolder(string inPath, string outPath, ICdRipViewUpdater viewUpdater)
         {
             try
@@ -33,7 +34,7 @@ namespace Dukebox.Library.CdRipping
                 string[] inFiles = Directory.GetFiles(inPath);
                 string outFileFormat = outPath + "\\{0}.mp3";
                 List<AudioFileMetaData> cdMetadata = CdMetadata.GetAudioFileMetaDataForCd(inPath[0]);
-                int maxIdx = inFiles.Length;
+                int numTracks = inFiles.Length;
 
                 Thread viewerThread = new Thread(delegate()
                 {
@@ -46,30 +47,40 @@ namespace Dukebox.Library.CdRipping
                 viewerThread.Start();
 
                 // Rip each track.
-                for (int i = 0; i < maxIdx; i++)
+                for (int trackIdx = 0; trackIdx < numTracks; trackIdx++)
                 {
-                    Track t = MusicLibrary.GetInstance().GetTrackFromFile(inFiles[i], cdMetadata[i]);
-                    string outFile = string.Format(outFileFormat, t.ToString());
-
-                    MediaPlayer.ConvertCdaFileToMp3(inFiles[i], outFile, new BaseEncoder.ENCODEFILEPROC((a, b) => CdRippingProgressMonitor(viewUpdater, a, b, t, maxIdx, i)), true);
-
-                    // Wait until track has been ripped.
-                    while (viewUpdater.ProgressBarValue != viewUpdater.ProgressBarMaximum)
+                    try
                     {
-                        Thread.Sleep(10);
+                        Track t = MusicLibrary.GetInstance().GetTrackFromFile(inFiles[trackIdx], cdMetadata[trackIdx]);
+                        string outFile = string.Format(outFileFormat, t.ToString());
+
+                        MediaPlayer.ConvertCdaFileToMp3(inFiles[trackIdx], outFile, new BaseEncoder.ENCODEFILEPROC((a, b) => CdRippingProgressMonitor(viewUpdater, a, b, t, numTracks, trackIdx)), true);
+
+                        // Wait until track has been ripped.
+                        while (viewUpdater.ProgressBarValue != viewUpdater.ProgressBarMaximum)
+                        {
+                            Thread.Sleep(10);
+                        }
+
+                        // Save the track metadata details to the MP3 file. BROKEN as of rev. 25   
+                        /*                 
+                        Track mp3Track = MusicLibrary.GetInstance().GetTrackFromFile(outFile);
+                        mp3Track.Metadata.Album = t.Metadata.Album;
+                        mp3Track.Metadata.Artist = t.Metadata.Artist;
+                        mp3Track.Metadata.Title = t.Metadata.Title;
+
+                        mp3Track.Metadata.CommitChangesToFile();
+                         */
+
+                        viewUpdater.ResetProgressBar();
                     }
-                       
-                    // Save the track metadata details to the MP3 file. BROKEN as of rev. 25   
-                    /*                 
-                    Track mp3Track = MusicLibrary.GetInstance().GetTrackFromFile(outFile);
-                    mp3Track.Metadata.Album = t.Metadata.Album;
-                    mp3Track.Metadata.Artist = t.Metadata.Artist;
-                    mp3Track.Metadata.Title = t.Metadata.Title;
+                    catch (Exception ex)
+                    {
+                        string msg = string.Format("Error ripping music track #{0} from Audio CD: {1}", trackIdx + 1, ex.Message);
 
-                    mp3Track.Metadata.CommitChangesToFile();
-                     */
-
-                    viewUpdater.ResetProgressBar();
+                        Logger.Error(msg);
+                        MessageBox.Show(msg, "Dukebox - Error Ripping from CD", MessageBoxButtons.OK, MessageBoxIcon.Error);          
+                    }
                 }
 
                 viewUpdater.Invoke(new ValueUpdateDelegate(() => viewUpdater.Hide()));
@@ -79,7 +90,7 @@ namespace Dukebox.Library.CdRipping
             {
                 string msg = "Error ripping music from Audio CD: " + ex.Message;
 
-                Logger.Info(msg);
+                Logger.Error(msg);
                 MessageBox.Show(msg, "Dukebox - Error Ripping from CD", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
