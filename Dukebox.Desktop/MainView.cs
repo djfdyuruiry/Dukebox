@@ -695,7 +695,7 @@ namespace Dukebox.Desktop
             var getMusicLibrary = e.Node.Text == "Music Library";
             var getRecentlyPlayed = e.Node.Text == "Recently Played";
 
-            if (e.Node.Parent != null || getRecentlyPlayed)
+            if (e.Node.Parent != null || getMusicLibrary || getRecentlyPlayed)
             {
                 lstLibraryBrowser.Items.Clear();
 
