@@ -32,7 +32,8 @@
         {
             System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Artists");
             System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Albums");
-            System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Recently Played");
+            System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Music Library");
+            System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("Recently Played");
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainView));
             this.btnPlay = new System.Windows.Forms.Button();
             this.mnuMain = new System.Windows.Forms.MenuStrip();
@@ -365,12 +366,15 @@
             treeNode1.Text = "Artists";
             treeNode2.Name = "AlbumsNode";
             treeNode2.Text = "Albums";
-            treeNode3.Name = "RecentlyPlayedNode";
-            treeNode3.Text = "Recently Played";
+            treeNode3.Name = "MusicLibraryNode";
+            treeNode3.Text = "Music Library";
+            treeNode4.Name = "RecentlyPlayedNode";
+            treeNode4.Text = "Recently Played";
             this.treeFilters.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
             treeNode1,
             treeNode2,
-            treeNode3});
+            treeNode3,
+            treeNode4});
             this.treeFilters.Size = new System.Drawing.Size(215, 621);
             this.treeFilters.TabIndex = 10;
             this.treeFilters.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeFilters_NodeMouseClick);

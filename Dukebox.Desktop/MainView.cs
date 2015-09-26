@@ -692,14 +692,26 @@ namespace Dukebox.Desktop
         /// </summary>
         private void treeFilters_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
         {
-            if (e.Node.Parent != null || (e.Node.Text == "Recently Played"))
+            var getMusicLibrary = e.Node.Text == "Music Library";
+            var getRecentlyPlayed = e.Node.Text == "Recently Played";
+
+            if (e.Node.Parent != null || getRecentlyPlayed)
             {
                 lstLibraryBrowser.Items.Clear();
 
                 TreeNode node = treeFilters.GetNodeAt(e.Location);
                 treeFilters.SelectedNode = node;
 
-                if (node.Parent.Text == "Artists" || node.Parent.Text == "Recently Played")
+                if (getMusicLibrary)
+                {
+                    txtSearchBox.Text = "";
+                    txtSearchBox_TextChanged(this, null);
+                }
+                else if (getRecentlyPlayed)
+                {
+                    MusicLibrary.GetInstance().RecentlyPlayed.ForEach(t => lstLibraryBrowser.Items.Add(t));
+                }   
+                else if (node.Parent.Text == "Artists" || node.Parent.Text == "Recently Played")
                 {
                     MusicLibrary.GetInstance().GetTracksByAttribute(SearchAreas.Artist, e.Node.Text).ForEach(t => lstLibraryBrowser.Items.Add(t));
                 }
@@ -707,10 +719,6 @@ namespace Dukebox.Desktop
                 {
                     MusicLibrary.GetInstance().GetTracksByAttribute(SearchAreas.Album, e.Node.Text).ForEach(t => lstLibraryBrowser.Items.Add(t));
                 }
-                else if (e.Node.Text == "Recently Played")
-                {
-                    MusicLibrary.GetInstance().RecentlyPlayed.ForEach(t => lstLibraryBrowser.Items.Add(t));
-                }   
 
                 RefreshUI();
             }
