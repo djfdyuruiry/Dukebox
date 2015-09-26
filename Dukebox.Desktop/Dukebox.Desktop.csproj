@@ -40,12 +40,13 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>x86</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
+    <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>Dukebox.Desktop.Program</StartupObject>
@@ -220,6 +221,22 @@
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>del /F /Q "$(ProjectDir)$(OutDir)IKVM.AWT.WinForms.dll"
+del /F /Q "$(ProjectDir)$(OutDir)IKVM.OpenJDK.Beans.dll"
+del /F /Q "$(ProjectDir)$(OutDir)IKVM.OpenJDK.Charsets.dll"
+del /F /Q "$(ProjectDir)$(OutDir)IKVM.OpenJDK.Corba.dll"
+del /F /Q "$(ProjectDir)$(OutDir)IKVM.OpenJDK.Management.dll"
+del /F /Q "$(ProjectDir)$(OutDir)IKVM.OpenJDK.Media.dll"
+del /F /Q "$(ProjectDir)$(OutDir)IKVM.OpenJDK.Misc.dll"
+del /F /Q "$(ProjectDir)$(OutDir)IKVM.OpenJDK.Naming.dll"
+del /F /Q "$(ProjectDir)$(OutDir)IKVM.OpenJDK.Remoting.dll"
+del /F /Q "$(ProjectDir)$(OutDir)IKVM.OpenJDK.Security.dll"
+del /F /Q "$(ProjectDir)$(OutDir)IKVM.OpenJDK.SwingAWT.dll"
+del /F /Q "$(ProjectDir)$(OutDir)IKVM.OpenJDK.XML.API.dll"
+del /F /Q "$(ProjectDir)$(OutDir)IKVM.Runtime.JNI.dll"
+</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
