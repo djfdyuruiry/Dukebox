@@ -15,7 +15,7 @@ namespace Dukebox.Library
     public static class DukeboxAssemblyLoader
     {
         // Fetch the settings object from foreign assembly.
-        private static SettingsBase _settings = Assembly.Load("Dukebox.Desktop").GetTypes()
+        private static SettingsBase _settings = Assembly.Load("Dukebox").GetTypes()
                                                     .Where((t) => t.Name == "Settings" && typeof(SettingsBase).IsAssignableFrom(t))
                                                     .Select((t) => (SettingsBase)t.GetProperty("Default").GetValue( null, null ))
                                                     .FirstOrDefault();
