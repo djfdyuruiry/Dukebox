@@ -19,46 +19,19 @@ namespace Dukebox.Library
     /// </summary>
     public class MusicLibrary
     {
-        private static readonly ILog Logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(MusicLibrary));
         /// <summary>
         /// The ADO entities model for the SQL music database.
         /// </summary>
         private DukeboxEntities DukeboxData { get; set; }
 
         #region Views on music library data
-
-        /// <summary>
-        /// All tracks currently stored in the database. Cached.
-        /// </summary>
-        private List<Track> _allTrackCache;
-        public List<Track> Tracks 
-        {
-            get
-            {
-                if (_allTrackCache == null)
-                {
-                    _allTrackCache = new List<Track>();
-
-                    foreach (song s in DukeboxData.songs)
-                    { 
-                        _allTrackCache.Add(new Track() { Song = s });
-                    }
-
-                    if (_allTrackCache.Count > 0)
-                    {
-                        Logger.Info(_allTrackCache.Count + " tracks stored in memory cache from DB!");
-                    }
-                }
-
-                return _allTrackCache;
-            }
-        }
-
+        
         /// <summary>
         /// All artists currently stored in the database. Cached.
         /// </summary>
         private List<artist> _allArtistsCache;
-        public List<artist> Artists
+        public IList<artist> OrderedArtists
         {
             get
             {
@@ -75,7 +48,7 @@ namespace Dukebox.Library
         /// All albums currently stored in the database. Cached.
         /// </summary>
         private List<album> _allAlbumsCache;
-        public List<album> Albums
+        public IList<album> OrderedAlbums
         {
             get
             {
@@ -116,26 +89,13 @@ namespace Dukebox.Library
         /// <exception cref="Exception">If the directory lookup operation fails.</exception>
         public List<Track> GetTracksForDirectory(string directory, bool subDirectories)
         {
-            List<string> allfiles;
-            List<string> supportedFiles;
-            List<string> existingFiles;
-            List<string> validFiles;
+            var searchOption = subDirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
+            var supportedFormats = AudioFileFormats.SupportedFormats;
 
-            List<Track> tracksToReturn = new List<Track>();
+            var validFiles = Directory.EnumerateFiles(directory, "*.*", searchOption).Where((f) => supportedFormats.Any(sf => f.EndsWith(sf))).ToList();
+            validFiles = validFiles.Except(DukeboxData.songs.Select((s) => s.filename)).ToList();
 
-            allfiles = Directory.GetFiles(@directory, "*.*", subDirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly).ToList();
-            supportedFiles = allfiles.Where(f => AudioFileFormats.SupportedFormats.Contains(GetFileExtension(f))).ToList();
-            existingFiles = Tracks.Select(t => t.Song.filename).ToList();
-
-            var otherFile = allfiles.Where(f => !supportedFiles.Contains(f)).ToList();
-
-            validFiles = supportedFiles.Where(sf => !existingFiles.Contains(sf)).ToList();
-
-            foreach (string file in validFiles)
-            {
-                tracksToReturn.Add(GetTrackFromFile(file));
-            }
-
+            var tracksToReturn = validFiles.Select((f) => GetTrackFromFile(f)).ToList();
             return tracksToReturn;
         }
 
@@ -208,8 +168,7 @@ namespace Dukebox.Library
         
             List<string> allfiles = Directory.GetFiles(@directory, "*.*", subDirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly).ToList();
             List<string> supportedFiles = allfiles.Where(f => AudioFileFormats.SupportedFormats.Contains(GetFileExtension(f))).ToList();
-            List<string> existingFiles = Tracks.Select(t => t.Song.filename).ToList();
-            Queue<string> filesToAdd = new Queue<string>(supportedFiles.Where(sf => !existingFiles.Contains(sf)));
+            Queue<string> filesToAdd = new Queue<string>(supportedFiles.Except(DukeboxData.songs.Select((s) => s.filename)));
 
             int numFilesToAdd = filesToAdd.Count;
 
@@ -229,7 +188,7 @@ namespace Dukebox.Library
                 progressHandler.Invoke(this, new AudioFileImportedEventArgs() { JustProcessing = false, FileAdded = kvp.Key, TotalFilesThisImport = numFilesToAdd });
             }
           
-            ClearTrackCache();
+            ClearCaches();
             completeHandler.Invoke(this, numFilesToAdd);
         }
 
@@ -270,13 +229,11 @@ namespace Dukebox.Library
         /// <param name="filename"></param>
         public void AddPlaylistFileToLibrary(string filename)
         {
-            List<string> playlistFiles = GetTracksFromPlaylistFile(filename).Select(t => t.Song.filename).ToList();
-            Dictionary<string, AudioFileMetaData> tracksToAdd = new Dictionary<string, AudioFileMetaData>();
-            List<string> existingFiles;
-            List<string> filesToAdd;
+            var playlistFiles = GetTracksFromPlaylistFile(filename).Select(t => t.Song.filename).ToList();
+            var tracksToAdd = new Dictionary<string, AudioFileMetaData>();
+            var existingFiles = DukeboxData.songs.Select(s => s.filename);
 
-            existingFiles = Tracks.Select(t => t.Song.filename).ToList();
-            filesToAdd = playlistFiles.Where(t => !existingFiles.Contains(t)).ToList();
+            var filesToAdd = playlistFiles.Except(DukeboxData.songs.Select(s => s.filename)).ToList();
             filesToAdd.ForEach(f => tracksToAdd.Add(f, new AudioFileMetaData(f)));
 
             foreach (KeyValuePair<string, AudioFileMetaData> kvp in tracksToAdd)
@@ -300,7 +257,7 @@ namespace Dukebox.Library
             {
                 artist newArtist = new artist() { id = DukeboxData.artists.Count(), name = tag.Artist };
 
-                if (!Artists.Select(a => a.name).Contains(newArtist.name))
+                if (!DukeboxData.artists.Any(a => a.name.Equals(newArtist.name, StringComparison.CurrentCulture)))
                 {
                     DukeboxData.artists.Add(newArtist);
                     DukeboxData.SaveChanges();
@@ -319,7 +276,7 @@ namespace Dukebox.Library
             {
                 album newAlbum = new album() { id = DukeboxData.albums.Count(), name = tag.Album };
 
-                if (!Albums.Select(a => a.name).Contains(newAlbum.name))
+                if (!DukeboxData.albums.Any(a => a.name.Equals(newAlbum.name, StringComparison.CurrentCulture)))
                 {
                     DukeboxData.albums.Add(newAlbum);
                     DukeboxData.SaveChanges();
@@ -385,23 +342,35 @@ namespace Dukebox.Library
         }
 
         /// <summary>
-        /// Clear the cache of tracks, artists and albums. The cache
+        /// Clear the cache of artists and albums. The cache
         /// is automatically refilled at the end of this method.
         /// </summary>
-        private void ClearTrackCache()
+        private void ClearCaches()
         {
-            _allTrackCache = null;
             _allArtistsCache = null;
             _allAlbumsCache = null;
 
-            var getTheTracks = Tracks;
+            var albums = OrderedAlbums;
+            var artists = OrderedArtists;
 
-            Logger.Info("Music library track cache was cleared! (This happens after a DB update routine prompts a refresh)");
+            Logger.Info("Music library artist and album caches were cleared! (This happens after a DB update routine prompts a refresh)");
         }
 
         #endregion
 
         #region Library search
+
+        /// <summary>
+        /// Get all search areas and add them to a given list.
+        /// </summary>
+        /// <param name="searchAreas">List to add search areas to.</param>
+        private void AddSearchAreasToList(List<SearchAreas> searchAreas)
+        {
+            foreach (var area in Enum.GetValues(typeof(SearchAreas)))
+            {
+                searchAreas.Add((SearchAreas)area);
+            }
+        }
 
         /// <summary>
         /// Search the library database for tracks matching
@@ -413,36 +382,40 @@ namespace Dukebox.Library
         /// </summary>
         /// <param name="searchTerm">The term to search for in track descriptions.</param>
         /// <returns>A list of tracks that match the given search criteria.</returns>
-        public List<Track> SearchForTracks(string searchTerm, SearchAreas searchArea)
+        public List<Track> SearchForTracks(string searchTerm, List<SearchAreas> searchAreas)
         {
-            List<Track> results = null;
-            searchTerm = searchTerm.ToLower();
+            var songs = DukeboxData.songs;
+            var matchingSongs = Enumerable.Empty<song>();
 
-            switch (searchArea)
+            if (string.IsNullOrWhiteSpace(searchTerm))
             {
-                case SearchAreas.Album:
-                {
-                    results = Tracks.Where(t => t.Album != null ? t.Album.ToString().ToLower().Contains(searchTerm) : false).ToList();
-                    break;
-                }
-                case SearchAreas.Artist:
-                {
-                    results = Tracks.Where(t => t.Artist != null ? t.Artist.ToString().ToLower().Contains(searchTerm) : false).ToList();
-                    break;
-                }
-                case SearchAreas.Song:
-                {
-                    results = Tracks.Where(t => t.Song != null ? t.Song.ToString().ToLower().Contains(searchTerm) : false).ToList();
-                    break;
-                }
-                default:
-                {
-                    results = Tracks.Where(t => t.ToString().ToLower().Contains(searchTerm)).ToList();
-                    break;
-                }
+                return songs.Select(s => new Track() { Song = s }).ToList();
+            }
+                        
+            searchTerm = searchTerm.ToLower();
+            searchAreas = searchAreas ?? new List<SearchAreas>();
+
+            if (searchAreas.Contains(SearchAreas.All))
+            {
+                AddSearchAreasToList(searchAreas);
             }
 
-            return results == null ? new List<Track>() : results;
+            if (searchAreas.Contains(SearchAreas.Album))
+            {
+                matchingSongs = matchingSongs.Concat(songs.Where(s => s.albumId != null ? instance.GetAlbumById(s.albumId).ToString().ToLower().Contains(searchTerm) : false));
+            }
+
+            if (searchAreas.Contains(SearchAreas.Artist))
+            {
+                matchingSongs = matchingSongs.Concat(songs.Where(t => t.artistId != null ? instance.GetArtistById(t.artistId).ToString().ToLower().Contains(searchTerm) : false));
+            }
+
+            if (searchAreas.Contains(SearchAreas.Song))
+            {
+                matchingSongs = matchingSongs.Concat(songs.Where(s => s.ToString().ToLower().Contains(searchTerm)));
+            }
+
+            return matchingSongs == null ? new List<Track>() : matchingSongs.Select(s => new Track() { Song = s }).ToList();
         }
 
         /// <summary>
@@ -454,33 +427,75 @@ namespace Dukebox.Library
         /// <returns>A list of tracks that match the given attribute keypair.</returns>
         public List<Track> GetTracksByAttribute(SearchAreas attribute, string nameOrTitle)
         {
-            List<Track> results = null;
+            var searchAreas = new List<SearchAreas>();
+            var songs = DukeboxData.songs;
+            var matchingSongs = Enumerable.Empty<song>();
 
-            switch (attribute)
+            if (attribute == null || attribute == SearchAreas.All)
             {
-                case SearchAreas.Album:
-                {
-                    results = Tracks.Where(t => t.Album != null ? t.Album.name == nameOrTitle : false).ToList();
-                    break;
-                }
-                case SearchAreas.Artist:
-                {
-                    results = Tracks.Where(t => t.Artist != null ? t.Artist.name== nameOrTitle : false).ToList();
-                    break;
-                }
-                case SearchAreas.Song:
-                {
-                    results = Tracks.Where(t => t.Song != null ? t.Song.title == nameOrTitle : false).ToList();
-                    break;
-                }
-                default:
-                {
-                    results = Tracks.Where(t => t.ToString().Contains(nameOrTitle)).ToList();
-                    break;
-                }
+                AddSearchAreasToList(searchAreas);
+            }
+            else
+            {
+                searchAreas.Add(attribute);
             }
 
-            return results == null ? new List<Track>() : results;
+            if (searchAreas.Contains(SearchAreas.Album))
+            {
+                matchingSongs = matchingSongs.Concat(songs.Where(s => s.albumId != null ? instance.GetAlbumById(s.albumId).Equals(nameOrTitle) : false));
+            }
+
+            if (searchAreas.Contains(SearchAreas.Artist))
+            {
+                matchingSongs = matchingSongs.Concat(songs.Where(t => t.artistId != null ? instance.GetArtistById(t.artistId).Equals(nameOrTitle) : false));
+            }
+
+            if (searchAreas.Contains(SearchAreas.Song))
+            {
+                matchingSongs = matchingSongs.Concat(songs.Where(s => s.Equals(nameOrTitle)));
+            }
+
+            return matchingSongs == null ? new List<Track>() : matchingSongs.Select(s => new Track() { Song = s }).ToList();
+        }
+
+
+        /// <summary>
+        /// Get a list of tracks who's attribute type equals the id specified.
+        /// </summary>
+        /// <param name="attribute">The attribute type to select.</param>
+        /// <param name="attributeId">The id of the attribute.</param>
+        /// <returns>A list of tracks that match the given attribute keypair.</returns>
+        public List<Track> GetTracksByAttribute(SearchAreas attribute, long attributeId)
+        {
+            var searchAreas = new List<SearchAreas>();
+            var songs = DukeboxData.songs;
+            var matchingSongs = Enumerable.Empty<song>();
+
+            if (attribute == null || attribute == SearchAreas.All)
+            {
+                AddSearchAreasToList(searchAreas);
+            }
+            else
+            {
+                searchAreas.Add(attribute);
+            }
+
+            if (searchAreas.Contains(SearchAreas.Album))
+            {
+                matchingSongs = matchingSongs.Concat(songs.Where(s => s.albumId != null ? s.albumId == attributeId : false));
+            }
+
+            if (searchAreas.Contains(SearchAreas.Artist))
+            {
+                matchingSongs = matchingSongs.Concat(songs.Where(s => s.artistId != null ? s.artistId == attributeId : false));
+            }
+
+            if (searchAreas.Contains(SearchAreas.Song))
+            {
+                matchingSongs = matchingSongs.Concat(songs.Where(s => s.id == attributeId));
+            }
+
+            return matchingSongs == null ? new List<Track>() : matchingSongs.Select(s => new Track() { Song = s }).ToList();
         }
 
         #endregion
@@ -515,6 +530,26 @@ namespace Dukebox.Library
         }
 
         #endregion
+
+        public artist GetArtistById(long? artistId)
+        {
+            return DukeboxData.artists.Where(a => a.id == artistId).FirstOrDefault();
+        }
+
+        public int GetArtistCount()
+        {
+            return DukeboxData.artists.Count();
+        }
+
+        public album GetAlbumById(long? albumId)
+        {
+            return DukeboxData.albums.Where(a => a.id == albumId).FirstOrDefault();
+        }
+
+        public int GetAlbumCount()
+        {
+            return DukeboxData.albums.Count();
+        }
     }
     
     /// <summary>

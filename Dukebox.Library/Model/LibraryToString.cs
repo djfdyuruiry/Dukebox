@@ -26,7 +26,17 @@ namespace Dukebox.Library
                 return title == string.Empty ? "Unknown" : title;
             }
 
-            return MusicLibrary.GetInstance().Artists.First(a => a.id == artistId) + " - " + title;
+            return MusicLibrary.GetInstance().GetArtistById((long)artistId) + " - " + title;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj.GetType() == typeof(string))
+            {
+                return (string)obj == ToString();
+            }
+
+            return base.Equals(obj);
         }
     }
 
@@ -43,6 +53,16 @@ namespace Dukebox.Library
         {
             return name;
         }
+
+        public override bool Equals(object obj)
+        {
+            if (obj.GetType() == typeof(string))
+            {
+                return (string)obj == ToString();
+            }
+
+            return base.Equals(obj);
+        }
     }
 
     /// <summary>
@@ -57,6 +77,16 @@ namespace Dukebox.Library
         public override string ToString()
         {
             return name;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj.GetType() == typeof(string))
+            {
+                return (string)obj == ToString();
+            }
+
+            return base.Equals(obj);
         }
     }
 }

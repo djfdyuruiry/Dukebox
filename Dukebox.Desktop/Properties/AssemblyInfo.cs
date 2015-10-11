@@ -36,3 +36,5 @@ using System.Resources;
 [assembly: AssemblyVersion("0.8.6.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
 [assembly: NeutralResourcesLanguageAttribute("en-GB")]
+
+[assembly: log4net.Config.XmlConfigurator(Watch = true)]
