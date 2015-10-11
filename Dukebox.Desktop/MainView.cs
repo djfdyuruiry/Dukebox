@@ -1,6 +1,7 @@
 ﻿using Dukebox.Audio;
 using Dukebox.Library;
 using Dukebox.Library.CdRipping;
+using Dukebox.Library.Model;
 using Dukebox.Model;
 using GlobalHotKey;
 using log4net;
