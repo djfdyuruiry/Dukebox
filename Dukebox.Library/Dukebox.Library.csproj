@@ -115,6 +115,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Library.edmx</DependentUpon>
     </Compile>
+    <Compile Include="Model\AudioFileImportedEventArgs.cs" />
     <Compile Include="Model\CdMetadata.cs" />
     <Compile Include="Model\AudioFileMetaData.cs" />
     <Compile Include="Model\Playlist.cs" />
