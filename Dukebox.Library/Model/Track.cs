@@ -29,14 +29,14 @@ namespace Dukebox.Model
             {
                 if (Song.artistId.HasValue && Song.artistId != -1 && _artist == null)
                 {
-                    _artist = MusicLibrary.GetInstance().Artists.OrderBy(a => a.id).ToArray()[Song.artistId.Value - 1]; 
+                    _artist = MusicLibrary.GetInstance().GetArtistById(Song.artistId.Value); 
                 }
 
                 return _artist;
             }
             set
             {
-                if (value.id < 1 || value.id > MusicLibrary.GetInstance().Artists.Count())
+                if (value.id < 1 || value.id > MusicLibrary.GetInstance().GetArtistCount())
                 {
                     _artist = value;
                 }
@@ -57,14 +57,14 @@ namespace Dukebox.Model
             {
                 if (Song.albumId.HasValue && Song.albumId != -1 && _album == null)
                 {
-                    _album = MusicLibrary.GetInstance().Albums.OrderBy(a => a.id).ToArray()[Song.albumId.Value - 1];
+                    _album = MusicLibrary.GetInstance().GetAlbumById(Song.albumId.Value);
                 }
 
                 return _album;
             }
             set
             {
-                if (value.id < 1 || value.id > MusicLibrary.GetInstance().Albums.Count())
+                if (value.id < 1 || value.id > MusicLibrary.GetInstance().GetAlbumCount())
                 {
                     _album = value;
                 }

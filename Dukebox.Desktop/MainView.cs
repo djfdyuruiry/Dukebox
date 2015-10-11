@@ -395,7 +395,7 @@ namespace Dukebox.Desktop
             recentlyPlayedFilter.Collapse();
             recentlyPlayedFilter.Nodes.Clear();
 
-            MusicLibrary.GetInstance().RecentlyPlayed.Where(t => !string.IsNullOrEmpty(t.Artist.name)).Select(t => recentlyPlayedFilter.Nodes.Add(t.Artist.name));
+            MusicLibrary.GetInstance().RecentlyPlayed.Where(t => t.Artist != null).Select(t => recentlyPlayedFilter.Nodes.Add(t.Artist.name));
         }
 
         private void DrawAlbumArt(Track track)
@@ -511,33 +511,38 @@ namespace Dukebox.Desktop
             _progressWindow.NotifcationLabelUpdate("Refreshing the library cache, this may take a few seconds!");
             Cursor.Current = Cursors.WaitCursor;
 
-            List<artist> artistsInLibrary = MusicLibrary.GetInstance().Artists;
+            var artistsInLibrary = MusicLibrary.GetInstance().OrderedArtists;
             int artistCount = artistsInLibrary.Count();
 
-            List<album> albumsInLibrary = MusicLibrary.GetInstance().Albums;
+            var albumsInLibrary = MusicLibrary.GetInstance().OrderedAlbums;
             int albumCount = albumsInLibrary.Count();
 
             Cursor.Current = Cursors.Default;
             
             // Set progress window maximum value to reflect articles to be imported.
             _progressWindow.ProgressBarMaximum = artistCount + albumCount;
+            var progress = 1;
 
             // Artists
-            for (int i = 0; i < artistCount; i++)
+            foreach (var artist in artistsInLibrary)
             {
                 _progressWindow.ImportProgressBarStep();
-                _progressWindow.NotifcationLabelUpdate("Loading artist '" + artistsInLibrary[i].name + "' from library" + "' [" + i + "/" + artistCount + "]");
+                _progressWindow.NotifcationLabelUpdate("Loading artist '" + artist.name + "' from library" + "' [" + progress + "/" + artistCount + "]");
 
-                Invoke(new ValueUpdateDelegate(() => artists.Nodes.Add(artistsInLibrary[i].name)));
+                Invoke(new ValueUpdateDelegate(() => artists.Nodes.Add(artist.id.ToString(), artist.name)));
+                progress++;
             }
 
+            progress = 1;
+
             // Albums
-            for (int i = 0; i < albumCount; i++)
+            foreach(var album in albumsInLibrary)
             {
                 _progressWindow.ImportProgressBarStep();
-                _progressWindow.NotifcationLabelUpdate("Loading album '" + albumsInLibrary[i].name + "' from library" + "' [" + i + "/" + albumCount + "]");
+                _progressWindow.NotifcationLabelUpdate("Loading album '" + album.name + "' from library" + "' [" + progress + "/" + albumCount + "]");
 
-                Invoke(new ValueUpdateDelegate(() => albums.Nodes.Add(albumsInLibrary[i].name)));
+                Invoke(new ValueUpdateDelegate(() => albums.Nodes.Add(album.id.ToString(), album.name)));
+                progress++;
             }
 
             // Dispose of progress window.
@@ -651,8 +656,11 @@ namespace Dukebox.Desktop
         /// <param name="e"></param>
         private void txtSearchBox_TextChanged(object sender, EventArgs e)
         {
+            var searchAreas = new List<SearchAreas>(){SearchAreas.All};
+
             lstLibraryBrowser.Items.Clear();
-            MusicLibrary.GetInstance().SearchForTracks(txtSearchBox.Text, SearchAreas.All).ForEach(t => lstLibraryBrowser.Items.Add(t));
+            var results = MusicLibrary.GetInstance().SearchForTracks(txtSearchBox.Text, searchAreas);            
+            results.ForEach(t => lstLibraryBrowser.Items.Add(t));
         }
 
         /// <summary>
@@ -670,11 +678,11 @@ namespace Dukebox.Desktop
                 
                 if (node.Parent.Text == "Artists")
                 {
-                    _currentPlaylist.Tracks = MusicLibrary.GetInstance().GetTracksByAttribute(SearchAreas.Artist, e.Node.Text).ToList();
+                    _currentPlaylist.Tracks = MusicLibrary.GetInstance().GetTracksByAttribute(SearchAreas.Artist, long.Parse(e.Node.Name)).ToList();
                 }
                 else if (node.Parent.Text == "Albums")
                 {
-                    _currentPlaylist.Tracks = MusicLibrary.GetInstance().GetTracksByAttribute(SearchAreas.Album, e.Node.Text).ToList();
+                    _currentPlaylist.Tracks = MusicLibrary.GetInstance().GetTracksByAttribute(SearchAreas.Album, long.Parse(e.Node.Name)).ToList();
                 }
                 else if (e.Node.Text == "Recently Played")
                 {
@@ -713,11 +721,11 @@ namespace Dukebox.Desktop
                 }   
                 else if (node.Parent.Text == "Artists" || node.Parent.Text == "Recently Played")
                 {
-                    MusicLibrary.GetInstance().GetTracksByAttribute(SearchAreas.Artist, e.Node.Text).ForEach(t => lstLibraryBrowser.Items.Add(t));
+                    MusicLibrary.GetInstance().GetTracksByAttribute(SearchAreas.Artist, long.Parse(e.Node.Name)).ForEach(t => lstLibraryBrowser.Items.Add(t));
                 }
                 else if (node.Parent.Text == "Albums")
                 {
-                    MusicLibrary.GetInstance().GetTracksByAttribute(SearchAreas.Album, e.Node.Text).ForEach(t => lstLibraryBrowser.Items.Add(t));
+                    MusicLibrary.GetInstance().GetTracksByAttribute(SearchAreas.Album, long.Parse(e.Node.Name)).ForEach(t => lstLibraryBrowser.Items.Add(t));
                 }
 
                 RefreshUI();
