@@ -106,5 +106,14 @@ namespace Dukebox.Desktop.Properties {
                 this["trackDisplayFromat"] = value;
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("./albumArtCache")]
+        public string albumArtCachePath {
+            get {
+                return ((string)(this["albumArtCachePath"]));
+            }
+        }
     }
 }

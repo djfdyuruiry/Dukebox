@@ -44,16 +44,18 @@
     <Reference Include="EntityFramework.SqlServer">
       <HintPath>..\packages\EntityFramework.6.1.0\lib\net40\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
-    <Reference Include="IKVM.OpenJDK.Core">
-      <HintPath>C:\Program Files\ikvm-7.2.4630.5\bin\IKVM.OpenJDK.Core.dll</HintPath>
+    <Reference Include="IKVM.OpenJDK.Core, Version=7.2.4630.5, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
+      <HintPath>..\packages\IKVM.OpenJDK.Core.7.2.4630.5\lib\IKVM.OpenJDK.Core.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="IKVM.OpenJDK.Util, Version=7.2.4630.5, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files\ikvm-7.2.4630.5\bin\IKVM.OpenJDK.Util.dll</HintPath>
+    <Reference Include="IKVM.OpenJDK.Text">
+      <HintPath>..\packages\IKVM.OpenJDK.Text.7.2.4630.5\lib\IKVM.OpenJDK.Text.dll</HintPath>
     </Reference>
-    <Reference Include="IKVM.Runtime, Version=7.2.4630.5, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files\ikvm-7.2.4630.5\bin\IKVM.Runtime.dll</HintPath>
+    <Reference Include="IKVM.OpenJDK.Util">
+      <HintPath>..\packages\IKVM.OpenJDK.Util.7.2.4630.5\lib\IKVM.OpenJDK.Util.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.Runtime">
+      <HintPath>..\packages\IKVM.Runtime.7.2.4630.5\lib\IKVM.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="jaudiotagger-2.2.0">
       <HintPath>..\packages\Jaudiotagger-2.2.0\jaudiotagger-2.2.0.dll</HintPath>
@@ -99,7 +101,7 @@
     </Compile>
     <Compile Include="CdRipping\CdRipHelper.cs" />
     <Compile Include="CdRipping\ICdRipViewUpdater.cs" />
-    <Compile Include="DukeboxSettings.cs" />
+    <Compile Include="Config\DukeboxSettings.cs" />
     <Compile Include="Library.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -116,17 +118,18 @@
       <DependentUpon>Library.edmx</DependentUpon>
     </Compile>
     <Compile Include="Model\AudioFileImportedEventArgs.cs" />
-    <Compile Include="Model\CdMetadata.cs" />
-    <Compile Include="Model\AudioFileMetaData.cs" />
-    <Compile Include="Model\Playlist.cs" />
-    <Compile Include="Model\LibraryToString.cs" />
-    <Compile Include="MusicLibrary.cs" />
+    <Compile Include="Services\AlbumArtCacheService.cs" />
+    <Compile Include="Services\CdMetadata.cs" />
+    <Compile Include="Services\AudioFileMetaData.cs" />
+    <Compile Include="Services\Playlist.cs" />
+    <Compile Include="LibraryToString.cs" />
+    <Compile Include="Repositories\MusicLibrary.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SearchAreas.cs" />
+    <Compile Include="Model\SearchAreas.cs" />
     <Compile Include="song.cs">
       <DependentUpon>Library.tt</DependentUpon>
     </Compile>
-    <Compile Include="Model\Track.cs" />
+    <Compile Include="Services\Track.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.Config" />

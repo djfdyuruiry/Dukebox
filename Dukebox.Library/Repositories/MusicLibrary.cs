@@ -1,16 +1,19 @@
 ﻿using Dukebox.Audio;
 using Dukebox.Library.Model;
+using Dukebox.Library.Services;
 using Dukebox.Model;
+using Dukebox.Model.Services;
 using log4net;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading;
 
-namespace Dukebox.Library
+namespace Dukebox.Library.Repositories
 {
     /// <summary>
     /// Handles the SQL music library ADO entities model. Preforms
@@ -20,7 +23,7 @@ namespace Dukebox.Library
     /// </summary>
     public class MusicLibrary
     {
-        private static readonly ILog Logger = LogManager.GetLogger(typeof(MusicLibrary));
+        private static readonly ILog _logger = LogManager.GetLogger(typeof(MusicLibrary));
         /// <summary>
         /// The ADO entities model for the SQL music database.
         /// </summary>
@@ -66,7 +69,6 @@ namespace Dukebox.Library
 
         #endregion
         
-
         /// <summary>
         /// Singleton pattern private constructor. Open connection to
         /// SQL lite database file and populate track cache
@@ -164,21 +166,20 @@ namespace Dukebox.Library
         /// <exception cref="Exception">If the library import operation fails.</exception>
         public void AddDirectoryToLibrary(string directory, bool subDirectories, Action<object, AudioFileImportedEventArgs> progressHandler, Action<object, int> completeHandler)
         {
-            Dictionary<string, AudioFileMetaData> tracks = new Dictionary<string, AudioFileMetaData>();
-            Mutex filesToAddMutex = new Mutex();
+            var stopwatch = Stopwatch.StartNew();
+            var tracks = new Dictionary<string, AudioFileMetaData>();
+            var filesToAddMutex = new Mutex();
         
-            List<string> allfiles = Directory.GetFiles(@directory, "*.*", subDirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly).ToList();
-            List<string> supportedFiles = allfiles.Where(f => AudioFileFormats.SupportedFormats.Contains(GetFileExtension(f))).ToList();
-            Queue<string> filesToAdd = new Queue<string>(supportedFiles.Except(DukeboxData.songs.Select((s) => s.filename)));
+            var allfiles = Directory.GetFiles(@directory, "*.*", subDirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly).ToList();
+            var supportedFiles = allfiles.Where(f => AudioFileFormats.SupportedFormats.Contains(GetFileExtension(f)));
+            var filesToAdd = supportedFiles.Where(sf => !DukeboxData.songs.Any((s) => s.filename.Equals(sf, StringComparison.CurrentCulture)));
 
-            int numFilesToAdd = filesToAdd.Count;
+            int numFilesToAdd = filesToAdd.Count();
 
             // For each set of 5 files, create a new thread
             // which processes the metadata of those 
-            while(filesToAdd.Count != 0)
+            foreach (var file in filesToAdd)
             {
-                string file = filesToAdd.Dequeue();
-
                 progressHandler.Invoke(this, new AudioFileImportedEventArgs() { JustProcessing = true, FileAdded = file, TotalFilesThisImport = numFilesToAdd });
                 tracks.Add(file, new AudioFileMetaData(file));
             }
@@ -191,6 +192,14 @@ namespace Dukebox.Library
           
             ClearCaches();
             completeHandler.Invoke(this, numFilesToAdd);
+
+            if (numFilesToAdd > 0)
+            {
+                stopwatch.Stop();
+                _logger.InfoFormat("Added {0} tracks from directory: {1}", numFilesToAdd, directory);
+                _logger.DebugFormat("Adding {0} tracks to library from a directory took {1}ms. Directory path: {2} (Sub-directories searched: {3})",
+                    numFilesToAdd, stopwatch.ElapsedMilliseconds, directory, subDirectories);
+            }
         }
 
         /// <summary>
@@ -200,6 +209,8 @@ namespace Dukebox.Library
         /// <param name="kvp"></param>
         public void AddFileToLibrary(KeyValuePair<string, AudioFileMetaData> kvp)
         {
+            var stopwatch = Stopwatch.StartNew();
+
             // Find artist and album information from the library.
             artist artistObj = DukeboxData.artists.Where(a => a.name == kvp.Value.Artist).FirstOrDefault();
             album albumObj = DukeboxData.albums.Where(a => a.name == kvp.Value.Album).FirstOrDefault();
@@ -220,6 +231,10 @@ namespace Dukebox.Library
             if (kvp.Value.Title != string.Empty || albumObj != null || artistObj != null)
             {
                 AddSongToLibrary(kvp, artistObj, albumObj);
+                
+                stopwatch.Stop();
+                _logger.InfoFormat("Added file to library: {0}", kvp.Key);
+                _logger.DebugFormat("Adding file to library took {0}ms. File path: {1}", stopwatch.ElapsedMilliseconds, kvp.Key);
             }
         }
 
@@ -230,6 +245,8 @@ namespace Dukebox.Library
         /// <param name="filename"></param>
         public void AddPlaylistFileToLibrary(string filename)
         {
+            var stopwatch = Stopwatch.StartNew();
+
             var playlistFiles = GetTracksFromPlaylistFile(filename).Select(t => t.Song.filename).ToList();
             var tracksToAdd = new Dictionary<string, AudioFileMetaData>();
             var existingFiles = DukeboxData.songs.Select(s => s.filename);
@@ -244,7 +261,10 @@ namespace Dukebox.Library
 
             if (tracksToAdd.Count > 0)
             {
-                Logger.Info("Added " + tracksToAdd + " from the playlist file '" + filename + "'");
+                stopwatch.Stop();
+                _logger.InfoFormat("Added {0} from playlist file: {1}", tracksToAdd.Count, filename);
+                _logger.DebugFormat("Adding {0} tracks to library from a playlist took {1}ms. Playlist path: {2}",
+                    tracksToAdd.Count, stopwatch.ElapsedMilliseconds, filename);
             }
         }
 
@@ -254,6 +274,8 @@ namespace Dukebox.Library
         /// </summary>
         private void AddArtistToLibrary(AudioFileMetaData tag)
         {
+            var stopwatch = Stopwatch.StartNew();
+
             if(tag.Artist != null)
             {
                 artist newArtist = new artist() { id = DukeboxData.artists.Count(), name = tag.Artist };
@@ -262,7 +284,13 @@ namespace Dukebox.Library
                 {
                     DukeboxData.artists.Add(newArtist);
                     DukeboxData.SaveChanges();
+
+                    // Invalidate artist cache.
                     _allArtistsCache = null;
+                    
+                    stopwatch.Stop();
+                    _logger.InfoFormat("Added artist to library: {0}", newArtist.name);
+                    _logger.DebugFormat("Adding artist to library took {0}ms. Artist name: {1}", stopwatch.ElapsedMilliseconds, newArtist.name);
                 }
             }
         }
@@ -273,6 +301,8 @@ namespace Dukebox.Library
         /// </summary>
         private void AddAlbumToLibrary(AudioFileMetaData tag)
         {
+            var stopwatch = Stopwatch.StartNew();
+
             if(tag.Album != null)
             {
                 album newAlbum = new album() { id = DukeboxData.albums.Count(), name = tag.Album };
@@ -281,7 +311,13 @@ namespace Dukebox.Library
                 {
                     DukeboxData.albums.Add(newAlbum);
                     DukeboxData.SaveChanges();
+
+                    // Invalidate album cache.
                     _allAlbumsCache = null;
+
+                    stopwatch.Stop();
+                    _logger.InfoFormat("Added album to library: {0}", newAlbum.name);
+                    _logger.DebugFormat("Adding album to library took {0}ms. Album name: {1}", stopwatch.ElapsedMilliseconds, newAlbum.name);
                 }
             }
         }
@@ -292,54 +328,42 @@ namespace Dukebox.Library
         /// </summary>
         private void AddSongToLibrary(KeyValuePair<string, AudioFileMetaData> track, artist artistObj, album albumObj)
         {
-            if (!DukeboxData.songs.Select(a => a.filename).Contains(track.Key))
+            if (DukeboxData.songs.Any(a => a.filename.Equals(track.Key, StringComparison.CurrentCulture)))
             {
-                int songId = DukeboxData.songs.Count() + 1;
-
-                // Insert the song will all available information.
-                if (albumObj != null && artistObj != null)
-                {
-                    DukeboxData.songs.Add(new song() { id = songId, filename = track.Key, title = track.Value.Title, albumId = albumObj.id, artistId = artistObj.id });
-                }
-                else if (albumObj != null && artistObj == null)
-                {
-                    DukeboxData.songs.Add(new song() { id = songId, filename = track.Key, title = track.Value.Title, albumId = albumObj.id, artistId = null });
-                }
-                else if (albumObj == null && artistObj != null)
-                {
-                    DukeboxData.songs.Add(new song() { id = songId, filename = track.Key, title = track.Value.Title, albumId = null, artistId = artistObj.id });
-                }
-                else if (albumObj == null && artistObj == null)
-                {
-                    DukeboxData.songs.Add(new song() { id = songId, filename = track.Key, title = track.Value.Title, albumId = null, artistId = null });
-                }
-
-                DukeboxData.SaveChanges();
-
-                if(albumObj !=  null && track.Value.HasFutherMetadataTag && track.Value.HasAlbumArt)
-                {
-                    if (!Directory.Exists("./albumArtCache"))
-                    {
-                        Directory.CreateDirectory("./albumArtCache");
-                    }
-
-                    try
-                    {
-                        Image img = track.Value.AlbumArt;
-
-                        if (img != null && !File.Exists("./albumArtCache/" + albumObj.id))
-                        {
-                            img.Save("./albumArtCache/" + albumObj.id);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.Info("Error extracting image for caching [" + track.Key + "]: " + ex.Message);
-                    }
-                }
-
-                Logger.Info("Added the file '" + track.Key + "' to the library [Track => {" + (artistObj != null ? artistObj.name : "Unkown Artist") + " - " + track.Value.Title + "}");
+                return;
             }
+
+            var stopwatch = Stopwatch.StartNew();
+            song newSong = null;
+
+            int songId = DukeboxData.songs.Count() + 1;
+
+            // Build new song with all available information.
+            if (albumObj != null && artistObj != null)
+            {
+                newSong = new song() { id = songId, filename = track.Key, title = track.Value.Title, albumId = albumObj.id, artistId = artistObj.id };
+            }
+            else if (albumObj != null && artistObj == null)
+            {
+                newSong = new song() { id = songId, filename = track.Key, title = track.Value.Title, albumId = albumObj.id, artistId = null };
+            }
+            else if (albumObj == null && artistObj != null)
+            {
+                newSong = new song() { id = songId, filename = track.Key, title = track.Value.Title, albumId = null, artistId = artistObj.id };
+            }
+            else if (albumObj == null && artistObj == null)
+            {
+                newSong = new song() { id = songId, filename = track.Key, title = track.Value.Title, albumId = null, artistId = null };
+            }
+
+            DukeboxData.songs.Add(newSong);
+            DukeboxData.SaveChanges();
+
+            stopwatch.Stop();
+            _logger.InfoFormat("Added song with id {0} to library.", songId);
+            _logger.DebugFormat("Adding song to library took {0}ms. Song id: {1}", stopwatch.ElapsedMilliseconds, songId);
+
+            AlbumArtCacheService.GetInstance().AddSongToCache(newSong, track.Value, albumObj);            
         }
 
         /// <summary>
@@ -348,13 +372,17 @@ namespace Dukebox.Library
         /// </summary>
         private void ClearCaches()
         {
+            var stopwatch = Stopwatch.StartNew();
+
             _allArtistsCache = null;
             _allAlbumsCache = null;
 
             var albums = OrderedAlbums;
             var artists = OrderedArtists;
 
-            Logger.Info("Music library artist and album caches were cleared! (This happens after a DB update routine prompts a refresh)");
+            stopwatch.Stop();
+            _logger.Info("Music library artist and album caches refreshed! (This happens after a DB update routine)");
+            _logger.DebugFormat("Refreshing library artist and album caches took {0}ms.", stopwatch.ElapsedMilliseconds);
         }
 
         #endregion
@@ -385,6 +413,8 @@ namespace Dukebox.Library
         /// <returns>A list of tracks that match the given search criteria.</returns>
         public List<Track> SearchForTracks(string searchTerm, List<SearchAreas> searchAreas)
         {
+            var stopwatch = Stopwatch.StartNew();
+
             var songs = DukeboxData.songs;
             var matchingSongs = Enumerable.Empty<song>();
 
@@ -416,7 +446,13 @@ namespace Dukebox.Library
                 matchingSongs = matchingSongs.Concat(songs.Where(s => s.ToString().ToLower().Contains(searchTerm)));
             }
 
-            return matchingSongs == null ? new List<Track>() : matchingSongs.Select(s => new Track() { Song = s }).ToList();
+
+            stopwatch.Stop();
+            var searchAreasString = searchAreas.Select(sa => Enum.GetName(typeof(SearchAreas), sa)).Aggregate((c, n) => c + ", " + n);
+            _logger.DebugFormat("Getting tracks by attribute(s) '{0}' where name or title equal '{1}' took {2}ms and returned {3} results.",
+                searchAreasString, searchTerm, stopwatch.ElapsedMilliseconds, matchingSongs.Count());
+
+            return matchingSongs.Count() < 1 ? new List<Track>() : matchingSongs.Select(s => new Track() { Song = s }).ToList();
         }
 
         /// <summary>
@@ -428,6 +464,8 @@ namespace Dukebox.Library
         /// <returns>A list of tracks that match the given attribute keypair.</returns>
         public List<Track> GetTracksByAttribute(SearchAreas attribute, string nameOrTitle)
         {
+            var stopwatch = Stopwatch.StartNew();
+
             var searchAreas = new List<SearchAreas>();
             var songs = DukeboxData.songs;
             var matchingSongs = Enumerable.Empty<song>();
@@ -456,7 +494,11 @@ namespace Dukebox.Library
                 matchingSongs = matchingSongs.Concat(songs.Where(s => s.Equals(nameOrTitle)));
             }
 
-            return matchingSongs == null ? new List<Track>() : matchingSongs.Select(s => new Track() { Song = s }).ToList();
+            stopwatch.Stop();
+            _logger.DebugFormat("Getting tracks by attribute {0} where name or title equal '{1}' took {2}ms and returned {3} results.",
+                Enum.GetName(typeof(SearchAreas), attribute), nameOrTitle, stopwatch.ElapsedMilliseconds, matchingSongs.Count());
+
+            return matchingSongs.Count() < 1 ? new List<Track>() : matchingSongs.Select(s => new Track() { Song = s }).ToList();
         }
 
 
@@ -468,6 +510,8 @@ namespace Dukebox.Library
         /// <returns>A list of tracks that match the given attribute keypair.</returns>
         public List<Track> GetTracksByAttribute(SearchAreas attribute, long attributeId)
         {
+            var stopwatch = Stopwatch.StartNew();
+
             var searchAreas = new List<SearchAreas>();
             var songs = DukeboxData.songs;
             var matchingSongs = Enumerable.Empty<song>();
@@ -496,7 +540,11 @@ namespace Dukebox.Library
                 matchingSongs = matchingSongs.Concat(songs.Where(s => s.id == attributeId));
             }
 
-            return matchingSongs == null ? new List<Track>() : matchingSongs.Select(s => new Track() { Song = s }).ToList();
+            stopwatch.Stop();
+            _logger.DebugFormat("Getting tracks by attribute {0} and value {1} took {2}ms and returned {3} results.", 
+                Enum.GetName(typeof(SearchAreas), attribute), attributeId, stopwatch.ElapsedMilliseconds, matchingSongs.Count());
+
+            return  matchingSongs.Count() < 1 ? new List<Track>() : matchingSongs.Select(s => new Track() { Song = s }).ToList();
         }
 
         #endregion
@@ -534,7 +582,12 @@ namespace Dukebox.Library
 
         public artist GetArtistById(long? artistId)
         {
-            return DukeboxData.artists.Where(a => a.id == artistId).FirstOrDefault();
+            var stopwatch = Stopwatch.StartNew();
+            var result = DukeboxData.artists.Where(a => a.id == artistId).FirstOrDefault();
+
+            stopwatch.Stop();
+            _logger.DebugFormat("Look up for artist with id {0} took {1}ms.", artistId, stopwatch.ElapsedMilliseconds);
+            return result;
         }
 
         public int GetArtistCount()
@@ -544,7 +597,12 @@ namespace Dukebox.Library
 
         public album GetAlbumById(long? albumId)
         {
-            return DukeboxData.albums.Where(a => a.id == albumId).FirstOrDefault();
+            var stopwatch = Stopwatch.StartNew();
+            var result = DukeboxData.albums.Where(a => a.id == albumId).FirstOrDefault();
+
+            stopwatch.Stop();
+            _logger.DebugFormat("Look up for album with id {0} took {1}ms.", albumId, stopwatch.ElapsedMilliseconds);
+            return result;
         }
 
         public int GetAlbumCount()
