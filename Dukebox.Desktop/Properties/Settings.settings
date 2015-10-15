@@ -26,5 +26,8 @@
     <Setting Name="trackDisplayFromat" Type="System.String" Scope="User">
       <Value Profile="(Default)">{Artist} - {TITLE}</Value>
     </Setting>
+    <Setting Name="albumArtCachePath" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">./albumArtCache</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

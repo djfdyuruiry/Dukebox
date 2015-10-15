@@ -1,5 +1,7 @@
 ﻿using Dukebox.Audio;
 using Dukebox.Library.Model;
+using Dukebox.Library.Model.Services;
+using Dukebox.Library.Services;
 using log4net;
 using org.jaudiotagger.audio;
 using org.jaudiotagger.tag;
@@ -14,7 +16,7 @@ using Un4seen.Bass;
 using Un4seen.Bass.AddOn.Cd;
 using Un4seen.Bass.AddOn.Tags;
 
-namespace Dukebox.Model
+namespace Dukebox.Model.Services
 {
     /// <summary>
     /// Holds metadata on a single audio file, including track information
@@ -150,14 +152,12 @@ namespace Dukebox.Model
                     throw new InvalidOperationException("There is no metadata tag available for this audio file!");
                 }
 
-                if (File.Exists(@".\albumArtCache\" + _dbAlbumId))
+                if (AlbumArtCacheService.GetInstance().CheckCacheForAlbum(_dbAlbumId))
                 {
-                    // Fetch artwork from cache instead of file.
-                    Logger.Info("Fetching album artwork for " + _title + " from cache...");
-                    return Image.FromFile(".\\albumArtCache\\" + _dbAlbumId);
+                    return AlbumArtCacheService.GetInstance().GetAlbumArtFromCache(_dbAlbumId);
                 }
 
-                Logger.Info("Fetching album artwork from " + _title + "...");
+                Logger.InfoFormat("Fetching album artwork from file: {0}", _audioFile.getFile().getPath());
                 return Image.FromStream(new MemoryStream(_tag.getFirstArtwork().getBinaryData()));
             }
         }

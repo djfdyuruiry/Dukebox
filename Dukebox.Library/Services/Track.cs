@@ -1,4 +1,6 @@
 ﻿using Dukebox.Library;
+using Dukebox.Library.Config;
+using Dukebox.Library.Repositories;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -6,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Dukebox.Model
+namespace Dukebox.Model.Services
 {
     /// <summary>
     /// An audio track, with source information and
@@ -109,7 +111,7 @@ namespace Dukebox.Model
         /// <returns>A string describing this audio track.</returns>
         public override string ToString()
         {
-            var trackFormat = DukeboxAssemblyLoader.Settings["trackDisplayFromat"].ToString().ToLower();
+            var trackFormat = DukeboxSettings.Settings["trackDisplayFromat"].ToString().ToLower();
 
             if (Artist == null)
             {

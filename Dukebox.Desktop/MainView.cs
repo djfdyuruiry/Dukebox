@@ -2,7 +2,9 @@
 using Dukebox.Library;
 using Dukebox.Library.CdRipping;
 using Dukebox.Library.Model;
+using Dukebox.Library.Repositories;
 using Dukebox.Model;
+using Dukebox.Model.Services;
 using GlobalHotKey;
 using log4net;
 using System;
@@ -21,7 +23,7 @@ namespace Dukebox.Desktop
     /// </summary>
     public partial class MainView : Form
     {
-        private static readonly ILog Logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog _logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         
         // Playlist properties.
         private int _lastPlayedTrackIndex;
@@ -44,19 +46,21 @@ namespace Dukebox.Desktop
 
         public MainView()
         {
+            InitializeComponent();
+        }
+
+        public void Init(Action callbackWhenDone = null)
+        {
             InitaliseFileSelectorDialogs();
             InitalisePlaylistAndPlaybackMonitor();
 
-            InitializeComponent();
-
             this.DoubleBuffered = true;
-            this.SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.ResizeRedraw | 
-                          ControlStyles.ContainerControl |  ControlStyles.OptimizedDoubleBuffer |  ControlStyles.SupportsTransparentBackColor
+            this.SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.ResizeRedraw |
+                          ControlStyles.ContainerControl | ControlStyles.OptimizedDoubleBuffer | ControlStyles.SupportsTransparentBackColor
                           , true);
 
             LoadPlaybackControlMenuFromSettings();
-            RegisterMultimediaHotKeys();
-            UpdateFilters();
+            UpdateFilters(false, callbackWhenDone);
         }
         
         private void InitalisePlaylistAndPlaybackMonitor()
@@ -108,6 +112,7 @@ namespace Dukebox.Desktop
         /// </summary>
         private void MainView_Load(object sender, EventArgs e)
         {
+            RegisterMultimediaHotKeys();
             _playbackMonitorTimer.Start();
             txtSearchBox_TextChanged(this, null);
         }
@@ -239,7 +244,7 @@ namespace Dukebox.Desktop
             }
             catch (Win32Exception ex)
             {
-                Logger.Info("Error registering global multimedia hot keys: " + ex.Message + "");
+                _logger.Info("Error registering global multimedia hot keys: " + ex.Message + "");
                 DialogResult msgBoxResult = MessageBox.Show("Error registering global multimedia hot keys! This usually happens when another media player is open.", "Dukebox - Error Registering Hot Keys", MessageBoxButtons.RetryCancel, MessageBoxIcon.Warning);
 
                 // Retry registering hot keys.
@@ -410,7 +415,7 @@ namespace Dukebox.Desktop
                 }
                 catch (Exception ex)
                 {
-                    Logger.Info("Error fetching album art for display [" + track.Song.filename + "]: " + ex.Message);
+                    _logger.Info("Error fetching album art for display [" + track.Song.filename + "]: " + ex.Message);
                     picAlbumArt.Image = null;
                     picAlbumArt.Visible = false;
                 }
@@ -438,7 +443,7 @@ namespace Dukebox.Desktop
             }
             catch (Exception ex)
             {
-                Logger.Info("Failed to switch background image for btnPlay on frmMainView [" + ex.Message + "]");
+                _logger.Info("Failed to switch background image for btnPlay on frmMainView [" + ex.Message + "]");
             }
         }
 
@@ -483,7 +488,7 @@ namespace Dukebox.Desktop
             }
             catch(InvalidOperationException ex)
             {
-                Logger.Info(ex);
+                _logger.Info(ex);
             }
         }
 
@@ -491,7 +496,7 @@ namespace Dukebox.Desktop
         /// Clear tree node filters and call refresh library cache in
         /// new thread with progress monitor window.
         /// </summary>
-        private void UpdateFilters()
+        private void UpdateFilters(bool showProgressWindow = true, Action callbackWhenDone = null)
         {
             TreeNode artists = treeFilters.Nodes[0];
             TreeNode albums = treeFilters.Nodes[1];
@@ -499,18 +504,32 @@ namespace Dukebox.Desktop
             artists.Nodes.Clear();
             albums.Nodes.Clear();
 
-            _progressWindow = new ProgressMonitorBox();
-            _progressWindow.TopMost = true;
-            _progressWindow.Show();
+            if (showProgressWindow)
+            {
+                _progressWindow = new ProgressMonitorBox();
+                _progressWindow.TopMost = true;
+                _progressWindow.Show();
+            }
 
-            (new Thread(() => RefreshLibraryCache(artists, albums))).Start();
+            (new Thread(() =>
+            {
+                RefreshLibraryCache(artists, albums, showProgressWindow);
+
+                if (callbackWhenDone != null)
+                {
+                    callbackWhenDone();
+                }
+            })).Start();
         }
 
-        private void RefreshLibraryCache(TreeNode artists, TreeNode albums)
+        private void RefreshLibraryCache(TreeNode artists, TreeNode albums, bool showProgressWindow = true)
         {
-            // Show busy cursor and display notification.
-            _progressWindow.NotifcationLabelUpdate("Refreshing the library cache, this may take a few seconds!");
-            Cursor.Current = Cursors.WaitCursor;
+            if (showProgressWindow)
+            {   
+                // Show busy cursor and display notification.         
+                _progressWindow.NotifcationLabelUpdate("Refreshing the library cache, this may take a few seconds!");
+                Cursor.Current = Cursors.WaitCursor;
+            }
 
             var artistsInLibrary = MusicLibrary.GetInstance().OrderedArtists;
             int artistCount = artistsInLibrary.Count();
@@ -518,17 +537,27 @@ namespace Dukebox.Desktop
             var albumsInLibrary = MusicLibrary.GetInstance().OrderedAlbums;
             int albumCount = albumsInLibrary.Count();
 
-            Cursor.Current = Cursors.Default;
-            
-            // Set progress window maximum value to reflect articles to be imported.
-            _progressWindow.ProgressBarMaximum = artistCount + albumCount;
+            if (showProgressWindow)
+            {
+                Cursor.Current = Cursors.Default;
+            }
+
+            if (showProgressWindow)
+            {
+                // Set progress window maximum value to reflect articles to be imported.
+                _progressWindow.ProgressBarMaximum = artistCount + albumCount;
+            }
+
             var progress = 1;
 
             // Artists
             foreach (var artist in artistsInLibrary)
             {
-                _progressWindow.ImportProgressBarStep();
-                _progressWindow.NotifcationLabelUpdate("Loading artist '" + artist.name + "' from library" + "' [" + progress + "/" + artistCount + "]");
+                if (showProgressWindow)
+                {
+                    _progressWindow.ImportProgressBarStep();
+                    _progressWindow.NotifcationLabelUpdate("Loading artist '" + artist.name + "' from library" + "' [" + progress + "/" + artistCount + "]");
+                }
 
                 Invoke(new ValueUpdateDelegate(() => artists.Nodes.Add(artist.id.ToString(), artist.name)));
                 progress++;
@@ -539,20 +568,26 @@ namespace Dukebox.Desktop
             // Albums
             foreach(var album in albumsInLibrary)
             {
-                _progressWindow.ImportProgressBarStep();
-                _progressWindow.NotifcationLabelUpdate("Loading album '" + album.name + "' from library" + "' [" + progress + "/" + albumCount + "]");
+                if (showProgressWindow)
+                {
+                    _progressWindow.ImportProgressBarStep();
+                    _progressWindow.NotifcationLabelUpdate("Loading album '" + album.name + "' from library" + "' [" + progress + "/" + albumCount + "]");
+                }
 
                 Invoke(new ValueUpdateDelegate(() => albums.Nodes.Add(album.id.ToString(), album.name)));
                 progress++;
             }
 
-            // Dispose of progress window.
-            Invoke(new ValueUpdateDelegate(() =>
+            if (showProgressWindow)
             {
-                _progressWindow.Hide();
-                _progressWindow.Dispose();
-                _progressWindow = null;
-            }));
+                // Dispose of progress window.
+                Invoke(new ValueUpdateDelegate(() =>
+                {
+                    _progressWindow.Hide();
+                    _progressWindow.Dispose();
+                    _progressWindow = null;
+                }));
+            }
         }
 
         /// <summary>
@@ -789,7 +824,7 @@ namespace Dukebox.Desktop
                 catch (Exception ex)
                 {
                     string msg = "Error saving playlist from the file '" + _playlistExportBrowser.FileName.Split('\\').LastOrDefault() + "' [" + ex.Message + "]";
-                    Logger.Info(msg);
+                    _logger.Info(msg);
 
                     MessageBox.Show(msg, "Dukebox - Error Saving Playlist File", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
@@ -815,7 +850,7 @@ namespace Dukebox.Desktop
                     _currentPlaylist.Tracks.Clear();
 
                     string msg = "Error loading playlist from the file '" + _playlistImportBrowser.FileName.Split('\\').LastOrDefault() + "' [" + ex.Message +"]";
-                    Logger.Info(msg);
+                    _logger.Info(msg);
 
                     MessageBox.Show(msg, "Dukebox - Error Loading Playlist File", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }

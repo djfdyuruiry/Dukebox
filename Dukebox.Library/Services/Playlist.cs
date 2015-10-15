@@ -1,5 +1,6 @@
 ﻿using Dukebox.Audio;
 using Dukebox.Library;
+using Dukebox.Library.Repositories;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 
-namespace Dukebox.Model
+namespace Dukebox.Model.Services
 {
     /// <summary>
     /// Provides facilities to create a playlist of
