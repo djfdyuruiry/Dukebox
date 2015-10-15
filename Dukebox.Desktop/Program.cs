@@ -16,7 +16,7 @@ namespace Dukebox.Desktop
     /// </summary>
     static class Program
     {
-        private static readonly ILog Logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog _logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         
         /// <summary>
         /// The main entry point for the Dukebox application.
@@ -64,7 +64,7 @@ namespace Dukebox.Desktop
 
             // Failed to load the bass library or one it's plug-ins.
             var msg = "Unable to initalise Dukebox";
-            Logger.Info(msg, ex);
+            _logger.Info(msg, ex);
 
             MessageBox.Show(string.Format("{0}: ", msg, ex.Message), "Dukebox: Fatal Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             Application.Exit();
@@ -137,31 +137,38 @@ namespace Dukebox.Desktop
                 logData += string.Format("{{{0},{1}}} ", kvp.Key, kvp.Value);
             }
 
-            Logger.Info(logData);
+            _logger.Info(logData);
         }
 
         public static void PreloadAssemblies()
         {
             try
             {
-                // Preload IKVM Java runtime & jaudiotagger
-                Assembly.Load("IKVM.Runtime");
-                Assembly.Load("IKVM.OpenJDK.Core");
-                Assembly.Load("IKVM.OpenJDK.Text");
-                Assembly.Load("IKVM.OpenJDK.Util");
-                Assembly.Load("jaudiotagger-2.2.0");
+                // Preload IKVM Java runtime & jaudiotagger.
+                var ikvmAssemblies = new String[]{"IKVM.Runtime", "IKVM.OpenJDK.Core", "IKVM.OpenJDK.Text", "IKVM.OpenJDK.Util", "jaudiotagger-2.2.0"};
+                ikvmAssemblies.Select(asm => Assembly.Load(asm));
 
                 // Load other referenced assemblies next.
                 var loadedAssemblies = AppDomain.CurrentDomain.GetAssemblies().ToList();
                 var loadedPaths = loadedAssemblies.Select(a => a.Location).ToArray();
 
+                // Ignore these DLLs.
+                var forbiddenDlls = new String[]{"Bass.dll", "OptimFROG.dll"};
+
                 var referencedPaths = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory, "*.dll");
-                var toLoad = referencedPaths.Where(r => !loadedPaths.Contains(r, StringComparer.InvariantCultureIgnoreCase)).ToList();
-                toLoad.ForEach(path => loadedAssemblies.Add(AppDomain.CurrentDomain.Load(AssemblyName.GetAssemblyName(path))));
+                var notLoadedPaths = referencedPaths.Where(r => !loadedPaths.Contains(r, StringComparer.InvariantCultureIgnoreCase));
+
+                foreach (var path in notLoadedPaths)
+                {
+                    if (!forbiddenDlls.Any(fdll => path.EndsWith(fdll, StringComparison.CurrentCultureIgnoreCase)))
+                    {
+                        loadedAssemblies.Add(AppDomain.CurrentDomain.Load(AssemblyName.GetAssemblyName(path)));
+                    }
+                }
             }
             catch (Exception ex)
             {
-                Logger.Warn("Could not preload Dukebox assemblies.", ex);
+                _logger.Warn("Could not preload Dukebox assemblies.", ex);
             }
         }
     }
