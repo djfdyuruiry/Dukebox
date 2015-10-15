@@ -1,7 +1,9 @@
-﻿using System;
+﻿using log4net;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -13,11 +15,14 @@ namespace Dukebox.Desktop
 {
     public partial class SplashScreenView : Form
     {
+        private static readonly ILog _logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         private MainView _mainView;
+        private Stopwatch _programLoadStopwatch;
         private delegate void ActionDelegate();
 
         public SplashScreenView()
-        {
+        {            
             InitializeComponent();
         }
         
@@ -30,6 +35,8 @@ namespace Dukebox.Desktop
         {
             new Thread(() =>
             {
+                _programLoadStopwatch = Stopwatch.StartNew();
+
                 // Warm up dependencies and register available audio formats.
                 Program.InitaliseBassLibrary();
                 Program.PreloadAssemblies();
@@ -52,6 +59,10 @@ namespace Dukebox.Desktop
             Invoke(new ActionDelegate(() =>
             {
                 Hide();
+
+                _programLoadStopwatch.Stop();
+                _logger.InfoFormat("Loading Dukebox took {0}ms.", _programLoadStopwatch.ElapsedMilliseconds);
+
                 _mainView.Show();
             }));
         }
