@@ -115,5 +115,14 @@ namespace Dukebox.Desktop.Properties {
                 return ((string)(this["albumArtCachePath"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("10")]
+        public int addDirectoryConcurrencyLimit {
+            get {
+                return ((int)(this["addDirectoryConcurrencyLimit"]));
+            }
+        }
     }
 }

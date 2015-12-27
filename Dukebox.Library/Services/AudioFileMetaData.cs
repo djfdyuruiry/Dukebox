@@ -193,7 +193,9 @@ namespace Dukebox.Model.Services
         {
             try
             {
-                if ((new FileInfo(fileName)).Extension != ".cda")
+                var fileInfo = new FileInfo(fileName);
+
+                if (fileInfo.Extension != ".cda")
                 {
                     _audioFile = AudioFileIO.read(new java.io.File(fileName));
                     _tag = _audioFile.getTag();
@@ -205,7 +207,7 @@ namespace Dukebox.Model.Services
             }
             catch (Exception ex)
             {
-                Logger.Info("Error occured while parsing metadata from '" + fileName + "': " + ex.Message);
+                Logger.Error(string.Format("Error occured while parsing metadata from audio file '{0}'", fileName), ex);
                 
                 _tag = null;
                 GetTrackDetailsFromUnsupportedFormat(fileName);
