@@ -1,20 +1,13 @@
 ﻿using Dukebox.Audio;
-using Dukebox.Library.Model;
 using Dukebox.Library.Model.Services;
 using Dukebox.Library.Services;
 using log4net;
 using org.jaudiotagger.audio;
 using org.jaudiotagger.tag;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Text.RegularExpressions;
-using Un4seen.Bass;
-using Un4seen.Bass.AddOn.Cd;
-using Un4seen.Bass.AddOn.Tags;
 
 namespace Dukebox.Model.Services
 {

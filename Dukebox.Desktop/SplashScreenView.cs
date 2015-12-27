@@ -17,9 +17,10 @@ namespace Dukebox.Desktop
     {
         private static readonly ILog _logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        private MainView _mainView;
         private Stopwatch _programLoadStopwatch;
         private delegate void ActionDelegate();
+
+        public MainView MainView { get; private set; }
 
         public SplashScreenView()
         {            
@@ -38,17 +39,35 @@ namespace Dukebox.Desktop
                 _programLoadStopwatch = Stopwatch.StartNew();
 
                 // Warm up dependencies and register available audio formats.
+                ShowNotification("Loading BASS audio...");
                 Program.InitaliseBassLibrary();
+
+                ShowNotification("Loading .NET libraries...");
                 Program.PreloadAssemblies();
+
+                ShowNotification("Registering supported audio formats...");
                 Program.RegisterSupportedAudioFileFormats();
 
                 // Create main view, run CloseAndShowMainView as callback when main view is ready.
                 Invoke(new ActionDelegate(() =>
                 {
-                    _mainView = new MainView();
-                    _mainView.Init(CloseAndShowMainView);
+                    MainView = new MainView();
+
+                    ShowNotification("Scanning media library...");
+                    MainView.Init(CloseAndShowMainView);
                 }));
             }).Start();
+        }
+
+        public void ShowNotification(string notification)
+        {
+            Invoke(new ActionDelegate(() =>
+            {
+                if (!string.IsNullOrEmpty(notification))
+                {
+                    lblNotification.Text = notification;
+                }
+             }));
         }
 
         /// <summary>
@@ -63,7 +82,7 @@ namespace Dukebox.Desktop
                 _programLoadStopwatch.Stop();
                 _logger.InfoFormat("Loading Dukebox took {0}ms.", _programLoadStopwatch.ElapsedMilliseconds);
 
-                _mainView.Show();
+                MainView.Show();
             }));
         }
     }

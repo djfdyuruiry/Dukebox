@@ -93,63 +93,29 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="album.cs">
-      <DependentUpon>Library.tt</DependentUpon>
-    </Compile>
-    <Compile Include="artist.cs">
-      <DependentUpon>Library.tt</DependentUpon>
-    </Compile>
+    <Compile Include="album.cs" />
+    <Compile Include="artist.cs" />
     <Compile Include="CdRipping\CdRipHelper.cs" />
     <Compile Include="CdRipping\ICdRipViewUpdater.cs" />
     <Compile Include="Config\DukeboxSettings.cs" />
-    <Compile Include="Library.Context.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Library.Context.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Library.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Library.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Library.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Library.edmx</DependentUpon>
-    </Compile>
+    <Compile Include="Library.cs" />
+    <Compile Include="Model\AlbumArtCacheOperations.cs" />
     <Compile Include="Model\AudioFileImportedEventArgs.cs" />
+    <Compile Include="Model\AudioFileImportedStatus.cs" />
+    <Compile Include="playlist.cs" />
     <Compile Include="Services\AlbumArtCacheService.cs" />
     <Compile Include="Services\CdMetadata.cs" />
     <Compile Include="Services\AudioFileMetaData.cs" />
     <Compile Include="Services\Playlist.cs" />
-    <Compile Include="LibraryToString.cs" />
+    <Compile Include="Library.CustomExtensions.cs" />
     <Compile Include="Repositories\MusicLibrary.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Model\SearchAreas.cs" />
-    <Compile Include="song.cs">
-      <DependentUpon>Library.tt</DependentUpon>
-    </Compile>
     <Compile Include="Services\Track.cs" />
+    <Compile Include="song.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.Config" />
-    <EntityDeploy Include="Library.edmx">
-      <Generator>EntityModelCodeGenerator</Generator>
-      <LastGenOutput>Library.Designer.cs</LastGenOutput>
-    </EntityDeploy>
-    <None Include="Library.Context.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>Library.edmx</DependentUpon>
-      <LastGenOutput>Library.Context.cs</LastGenOutput>
-    </None>
-    <None Include="Library.edmx.diagram">
-      <DependentUpon>Library.edmx</DependentUpon>
-    </None>
-    <None Include="Library.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>Library.edmx</DependentUpon>
-      <LastGenOutput>Library.cs</LastGenOutput>
-    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

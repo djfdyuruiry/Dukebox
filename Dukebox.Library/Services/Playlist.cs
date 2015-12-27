@@ -465,12 +465,12 @@ namespace Dukebox.Model.Services
         /// </summary>
         public int LoadPlaylistFromFile(string filename)
         {
-            List<Track> tracksToAdd = MusicLibrary.GetInstance().GetTracksFromPlaylistFile(filename);
+            var playlist = MusicLibrary.GetInstance().GetPlaylistFromFile(filename);
 
             StopPlaylistPlayback();
-            Tracks = tracksToAdd;
+            Tracks = playlist.GetTracksForPlaylist();
 
-            return tracksToAdd.Count;
+            return Tracks.Count;
         }
 
         /// <summary>

@@ -1,11 +1,9 @@
 ﻿using Dukebox.Audio;
-using Dukebox.Model;
 using Dukebox.Model.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Text.RegularExpressions;
 using Un4seen.Bass.AddOn.Cd;
 

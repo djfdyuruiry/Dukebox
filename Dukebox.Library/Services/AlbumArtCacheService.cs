@@ -1,4 +1,5 @@
 ﻿using Dukebox.Library.Config;
+using Dukebox.Library.Model;
 using Dukebox.Model.Services;
 using log4net;
 using System;
@@ -70,25 +71,25 @@ namespace Dukebox.Library.Services
 
             if (albumObj == null)
             {
-                _logger.WarnFormat("Not processing song with id {0} into album art cache as it has no associated album.", songToProcess.id);
+                _logger.InfoFormat("Not processing song with id {0} into album art cache as it has no associated album.", songToProcess.id);
                 return;
             }
             else if (!metadata.HasFutherMetadataTag || !metadata.HasAlbumArt)
             {
-                _logger.WarnFormat("Not processing song with id {0} into album art cache as the song does not contain album art data.", songToProcess.id);
+                _logger.InfoFormat("Not processing song with id {0} into album art cache as the song does not contain album art data.", songToProcess.id);
                 return;
             }
 
             var albumId = albumObj.id;
 
-            if (!LoggedCachePathCheck(albumId, "add to cache"))
+            if (!LoggedCachePathCheck(albumId, AlbumArtCacheOperations.Add))
             {
                 return;
             }
 
             if (CheckCacheForAlbum(albumId))
             {
-                _logger.WarnFormat("Not processing song with id {0} into album art cache as it is already in the album art cache.", songToProcess.id);
+                _logger.InfoFormat("Not processing song with id {0} into album art cache as it is already in the album art cache.", songToProcess.id);
                 return;
             }
                                        
@@ -115,7 +116,7 @@ namespace Dukebox.Library.Services
 
         public bool CheckCacheForAlbum(long albumId)
         {
-            if (!LoggedCachePathCheck(albumId, "check cache for album"))
+            if (!LoggedCachePathCheck(albumId, AlbumArtCacheOperations.Check))
             {
                 return false;
             }
@@ -136,7 +137,7 @@ namespace Dukebox.Library.Services
         {
             try
             {
-                if (!LoggedCachePathCheck(albumId, "get album art"))
+                if (!LoggedCachePathCheck(albumId, AlbumArtCacheOperations.Get))
                 {
                     throw new Exception("Failed to build path to cache.");
                 }
