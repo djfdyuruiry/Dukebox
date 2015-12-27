@@ -8,7 +8,6 @@ namespace Dukebox.Library
 
     public partial class song
     {
-        [Key]
         public long id { get; set; }
 
         [Required]

@@ -11,7 +11,7 @@ using System.Resources;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Dukebox")]
-[assembly: AssemblyCopyright("©Matthew Snoddy  2015")]
+[assembly: AssemblyCopyright("©Matthew Snoddy 2013-2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

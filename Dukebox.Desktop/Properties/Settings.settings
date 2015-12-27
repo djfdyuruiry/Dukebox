@@ -29,5 +29,8 @@
     <Setting Name="albumArtCachePath" Type="System.String" Scope="Application">
       <Value Profile="(Default)">./albumArtCache</Value>
     </Setting>
+    <Setting Name="addDirectoryConcurrencyLimit" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">10</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

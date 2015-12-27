@@ -13,7 +13,6 @@ namespace Dukebox.Library
             songs = new HashSet<song>();
         }
 
-        [Key]
         public long id { get; set; }
 
         [Required]

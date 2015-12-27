@@ -44,6 +44,17 @@ namespace Dukebox.Desktop
             catch (Exception ex)
             {
                 HandleNonFatalException(string.Format("Error while adding path '{0}' to the library", selectedPath), ex);
+
+                Invoke(new ValueUpdateDelegate(() =>
+                {
+                    _progressWindow.Hide();
+                    _progressWindow.Close();
+
+                    if (!_progressWindow.IsDisposed)
+                    {
+                        _progressWindow.Dispose();
+                    }
+                }));
             }
         }
 
