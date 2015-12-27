@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
 using System.Windows.Forms;
 using Un4seen.Bass;
 
@@ -25,31 +24,33 @@ namespace Dukebox.Desktop
         [STAThread]
         static void Main()
         {
-            MainView view = null;
+            SplashScreenView splashView = null;
 
             try
             {   
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
-                Application.Run(new SplashScreenView());
+
+                splashView = new SplashScreenView();
+                Application.Run(splashView);
             }
             catch (ObjectDisposedException ex)
             {
-                Error(ex, ref view);
+                HandleFatalException(ex, splashView == null ? null : splashView.MainView);
             }
             catch (Exception ex)
             {
-                Error(ex, ref view);
+                HandleFatalException(ex, splashView == null ? null : splashView.MainView);
             }
             
         }
 
         /// <summary>
-        /// 
+        /// Report an exception, clean up the main program window and exit.
         /// </summary>
-        /// <param name="ex"></param>
-        /// <param name="view"></param>
-        static void Error(Exception ex, ref MainView view)
+        /// <param name="ex">The exception raised.</param>
+        /// <param name="view">Main program window.</param>
+        private static void HandleFatalException(Exception ex, Form view)
         {
             if (view != null)
             {
@@ -62,12 +63,18 @@ namespace Dukebox.Desktop
                 }
             }
 
-            // Failed to load the bass library or one it's plug-ins.
-            var msg = "Unable to initalise Dukebox";
+            if (MediaPlayer.GetInstance().Playing)
+            {
+                MediaPlayer.GetInstance().StopAudio();
+            }
+
+            var msg = "An error has forced Dukebox to stop";
             _logger.Info(msg, ex);
 
-            MessageBox.Show(string.Format("{0}: ", msg, ex.Message), "Dukebox: Fatal Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show(string.Format("{0}: {1}", msg, ex.Message), "Dukebox: Fatal Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            
             Application.Exit();
+            Environment.Exit(-1);
         }
 
         /// <summary>
@@ -84,7 +91,7 @@ namespace Dukebox.Desktop
             // Register freeware license details.
             BassNet.Registration(Dukebox.Desktop.Properties.Settings.Default.bassLicenseEmail, Dukebox.Desktop.Properties.Settings.Default.bassLicenseKey);
 
-            // Load BASS library with default output device and add-on DLLs.
+            // Load BASS library with default output device and add-on DLLs.           
             bool bassInit = Bass.BASS_Init(-1, 44100, BASSInit.BASS_DEVICE_DEFAULT, IntPtr.Zero);
             bassPluginsLoaded = Bass.BASS_PluginLoadDirectory(Dukebox.Desktop.Properties.Settings.Default.bassAddOnsPath);
 
@@ -127,7 +134,7 @@ namespace Dukebox.Desktop
         /// 'Bass.BASS_PluginLoadDirectory' method.
         /// </summary>
         /// <param name="bassPluginsLoaded">A dictionary containing the handle for each plugin and it's name.</param>
-        public static void LogBassPluginsLoaded(Dictionary<int, string> bassPluginsLoaded)
+        private static void LogBassPluginsLoaded(Dictionary<int, string> bassPluginsLoaded)
         {
             // Log bass add-ons found.
             string logData = bassPluginsLoaded.Count() + "Bass add-on DLLs found (Format => {$handle, $name}): ";
@@ -140,6 +147,9 @@ namespace Dukebox.Desktop
             _logger.Info(logData);
         }
 
+        /// <summary>
+        /// Pre-load all required .NET assemblies.
+        /// </summary>
         public static void PreloadAssemblies()
         {
             try

@@ -6,13 +6,8 @@ namespace Dukebox.Library
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Data.Entity.Spatial;
 
-    public partial class artist
+    public partial class playlist
     {
-        public artist()
-        {
-            songs = new HashSet<song>();
-        }
-
         [Key]
         public long id { get; set; }
 
@@ -20,6 +15,8 @@ namespace Dukebox.Library
         [StringLength(2147483647)]
         public string name { get; set; }
 
-        public virtual ICollection<song> songs { get; set; }
+        [Required]
+        [StringLength(2147483647)]
+        public string filenamesCsv { get; set; }
     }
 }

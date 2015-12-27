@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Dukebox.Library.Model
 {
@@ -26,5 +22,13 @@ namespace Dukebox.Library.Model
         /// Total files that are scheduled for this events parent operation.
         /// </summary>
         public int TotalFilesThisImport { get; set; }
+
+        public string Status
+        {
+            get
+            {
+                return JustProcessing ? AudioFileImportedStatus.Processing : AudioFileImportedStatus.Added;
+            }
+        }
     }
 }

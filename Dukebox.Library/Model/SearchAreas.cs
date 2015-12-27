@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Dukebox.Library.Model
+﻿namespace Dukebox.Library.Model
 {
     /// <summary>
     /// Areas of the music library which can be
@@ -12,5 +6,5 @@ namespace Dukebox.Library.Model
     /// 
     /// Used in 'MusicLibrary.SearchForTracks(..)'.
     /// </summary>
-    public enum SearchAreas { All, Song, Artist, Album }
+    public enum SearchAreas { All, Song, Artist, Album, Filename }
 }

@@ -32,8 +32,9 @@
         {
             System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Artists");
             System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Albums");
-            System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Music Library");
-            System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("Recently Played");
+            System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Playlists");
+            System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("Music Library");
+            System.Windows.Forms.TreeNode treeNode5 = new System.Windows.Forms.TreeNode("Recently Played");
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainView));
             this.btnPlay = new System.Windows.Forms.Button();
             this.mnuMain = new System.Windows.Forms.MenuStrip();
@@ -59,6 +60,8 @@
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.loadFromFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveToFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
+            this.saveToDbToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.mnuImportPlaylist = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuHelp = new System.Windows.Forms.ToolStripMenuItem();
@@ -67,8 +70,8 @@
             this.btnClear = new System.Windows.Forms.Button();
             this.btnNext = new System.Windows.Forms.Button();
             this.btnPrevious = new System.Windows.Forms.Button();
-            this.treeFilters = new System.Windows.Forms.TreeView();
-            this.lstLibraryBrowser = new System.Windows.Forms.ListBox();
+            this.treeLibraryBrowser = new System.Windows.Forms.TreeView();
+            this.lstTrackBrowser = new System.Windows.Forms.ListBox();
             this.lblFilters = new System.Windows.Forms.Label();
             this.lblLibraryList = new System.Windows.Forms.Label();
             this.lblPlaylist = new System.Windows.Forms.Label();
@@ -258,6 +261,8 @@
             this.toolStripSeparator3,
             this.loadFromFileToolStripMenuItem,
             this.saveToFileToolStripMenuItem,
+            this.toolStripSeparator6,
+            this.saveToDbToolStripMenuItem,
             this.toolStripSeparator5,
             this.mnuImportPlaylist});
             this.mnuPlaylist.Name = "mnuPlaylist";
@@ -281,7 +286,7 @@
             this.loadFromFileToolStripMenuItem.Name = "loadFromFileToolStripMenuItem";
             this.loadFromFileToolStripMenuItem.Size = new System.Drawing.Size(215, 22);
             this.loadFromFileToolStripMenuItem.Text = "Load From File...";
-            this.loadFromFileToolStripMenuItem.Click += new System.EventHandler(this.loadFromFileToolStripMenuItem_Click);
+            this.loadFromFileToolStripMenuItem.Click += new System.EventHandler(this.loadPlaylistFromFileToolStripMenuItem_Click);
             // 
             // saveToFileToolStripMenuItem
             // 
@@ -289,7 +294,20 @@
             this.saveToFileToolStripMenuItem.Name = "saveToFileToolStripMenuItem";
             this.saveToFileToolStripMenuItem.Size = new System.Drawing.Size(215, 22);
             this.saveToFileToolStripMenuItem.Text = "Save To File...";
-            this.saveToFileToolStripMenuItem.Click += new System.EventHandler(this.saveToFileToolStripMenuItem_Click);
+            this.saveToFileToolStripMenuItem.Click += new System.EventHandler(this.saveCurrentPlaylistToFileToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator6
+            // 
+            this.toolStripSeparator6.Name = "toolStripSeparator6";
+            this.toolStripSeparator6.Size = new System.Drawing.Size(212, 6);
+            // 
+            // saveToDbToolStripMenuItem
+            // 
+            this.saveToDbToolStripMenuItem.Enabled = false;
+            this.saveToDbToolStripMenuItem.Name = "saveToDbToolStripMenuItem";
+            this.saveToDbToolStripMenuItem.Size = new System.Drawing.Size(215, 22);
+            this.saveToDbToolStripMenuItem.Text = "Save To Library...";
+            this.saveToDbToolStripMenuItem.Click += new System.EventHandler(this.saveToDbToolStripMenuItem_Click);
             // 
             // toolStripSeparator5
             // 
@@ -301,6 +319,7 @@
             this.mnuImportPlaylist.Name = "mnuImportPlaylist";
             this.mnuImportPlaylist.Size = new System.Drawing.Size(215, 22);
             this.mnuImportPlaylist.Text = "Import Playlist To Library...";
+            this.mnuImportPlaylist.Click += new System.EventHandler(this.importPlaylistFileToLibraryToolStripMenuItem_Click);
             // 
             // mnuHelp
             // 
@@ -357,67 +376,74 @@
             this.btnPrevious.UseVisualStyleBackColor = true;
             this.btnPrevious.Click += new System.EventHandler(this.btnPrevious_Click);
             // 
-            // treeFilters
+            // treeLibraryBrowser
             // 
-            this.treeFilters.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.treeFilters.Location = new System.Drawing.Point(3, 29);
-            this.treeFilters.Name = "treeFilters";
+            this.treeLibraryBrowser.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.treeLibraryBrowser.Location = new System.Drawing.Point(3, 29);
+            this.treeLibraryBrowser.Name = "treeLibraryBrowser";
             treeNode1.Name = "ArtistNode";
             treeNode1.Text = "Artists";
             treeNode2.Name = "AlbumsNode";
             treeNode2.Text = "Albums";
-            treeNode3.Name = "MusicLibraryNode";
-            treeNode3.Text = "Music Library";
-            treeNode4.Name = "RecentlyPlayedNode";
-            treeNode4.Text = "Recently Played";
-            this.treeFilters.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
+            treeNode3.Name = "PlaylistsNode";
+            treeNode3.Text = "Playlists";
+            treeNode4.Name = "MusicLibraryNode";
+            treeNode4.Text = "Music Library";
+            treeNode5.Name = "RecentlyPlayedNode";
+            treeNode5.Text = "Recently Played";
+            this.treeLibraryBrowser.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
             treeNode1,
             treeNode2,
             treeNode3,
-            treeNode4});
-            this.treeFilters.Size = new System.Drawing.Size(215, 621);
-            this.treeFilters.TabIndex = 10;
-            this.treeFilters.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeFilters_NodeMouseClick);
-            this.treeFilters.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeFilters_NodeMouseDoubleClick);
+            treeNode4,
+            treeNode5});
+            this.treeLibraryBrowser.Size = new System.Drawing.Size(215, 621);
+            this.treeLibraryBrowser.TabIndex = 10;
+            this.treeLibraryBrowser.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeFilters_NodeMouseClick);
+            this.treeLibraryBrowser.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeFilters_NodeMouseDoubleClick);
             // 
-            // lstLibraryBrowser
+            // lstTrackBrowser
             // 
-            this.lstLibraryBrowser.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lstLibraryBrowser.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
-            this.lstLibraryBrowser.FormattingEnabled = true;
-            this.lstLibraryBrowser.Location = new System.Drawing.Point(0, 0);
-            this.lstLibraryBrowser.Name = "lstLibraryBrowser";
-            this.lstLibraryBrowser.Size = new System.Drawing.Size(763, 289);
-            this.lstLibraryBrowser.TabIndex = 11;
-            this.lstLibraryBrowser.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.lstLibraryBrowser_DrawItem);
-            this.lstLibraryBrowser.DoubleClick += new System.EventHandler(this.lstLibraryBrowser_DoubleClick);
+            this.lstTrackBrowser.AllowDrop = true;
+            this.lstTrackBrowser.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lstTrackBrowser.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this.lstTrackBrowser.FormattingEnabled = true;
+            this.lstTrackBrowser.Location = new System.Drawing.Point(0, 0);
+            this.lstTrackBrowser.Name = "lstTrackBrowser";
+            this.lstTrackBrowser.Size = new System.Drawing.Size(763, 289);
+            this.lstTrackBrowser.TabIndex = 11;
+            this.lstTrackBrowser.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.lstTrackBrowser_DrawItem);
+            this.lstTrackBrowser.DragDrop += new System.Windows.Forms.DragEventHandler(this.lstBox_DragDrop);
+            this.lstTrackBrowser.DragLeave += new System.EventHandler(this.lstTrackBrowser_DragLeave);
+            this.lstTrackBrowser.DoubleClick += new System.EventHandler(this.lstTrackBrowser_DoubleClick);
+            this.lstTrackBrowser.MouseDown += new System.Windows.Forms.MouseEventHandler(this.lstTrackBrowser_MouseDown);
             // 
             // lblFilters
             // 
             this.lblFilters.AutoSize = true;
             this.lblFilters.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblFilters.Location = new System.Drawing.Point(3, 18);
+            this.lblFilters.Location = new System.Drawing.Point(3, 10);
             this.lblFilters.Name = "lblFilters";
-            this.lblFilters.Size = new System.Drawing.Size(103, 17);
+            this.lblFilters.Size = new System.Drawing.Size(99, 17);
             this.lblFilters.TabIndex = 12;
-            this.lblFilters.Text = "Library Contents";
+            this.lblFilters.Text = "Library Browser";
             // 
             // lblLibraryList
             // 
             this.lblLibraryList.AutoSize = true;
             this.lblLibraryList.Dock = System.Windows.Forms.DockStyle.Right;
             this.lblLibraryList.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblLibraryList.Location = new System.Drawing.Point(715, 0);
+            this.lblLibraryList.Location = new System.Drawing.Point(673, 0);
             this.lblLibraryList.Name = "lblLibraryList";
-            this.lblLibraryList.Size = new System.Drawing.Size(48, 17);
+            this.lblLibraryList.Size = new System.Drawing.Size(90, 17);
             this.lblLibraryList.TabIndex = 13;
-            this.lblLibraryList.Text = "Library";
+            this.lblLibraryList.Text = "Track Browser";
             // 
             // lblPlaylist
             // 
             this.lblPlaylist.AutoSize = true;
             this.lblPlaylist.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblPlaylist.Location = new System.Drawing.Point(235, 18);
+            this.lblPlaylist.Location = new System.Drawing.Point(235, 10);
             this.lblPlaylist.Name = "lblPlaylist";
             this.lblPlaylist.Size = new System.Drawing.Size(105, 17);
             this.lblPlaylist.TabIndex = 14;
@@ -427,7 +453,7 @@
             // 
             this.lblCurrentlyPlaying.AutoSize = true;
             this.lblCurrentlyPlaying.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Italic);
-            this.lblCurrentlyPlaying.Location = new System.Drawing.Point(346, 18);
+            this.lblCurrentlyPlaying.Location = new System.Drawing.Point(346, 10);
             this.lblCurrentlyPlaying.Name = "lblCurrentlyPlaying";
             this.lblCurrentlyPlaying.Size = new System.Drawing.Size(71, 17);
             this.lblCurrentlyPlaying.TabIndex = 15;
@@ -467,7 +493,7 @@
             // 
             this.tblLibraryContents.ColumnCount = 1;
             this.tblLibraryContents.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tblLibraryContents.Controls.Add(this.treeFilters, 0, 1);
+            this.tblLibraryContents.Controls.Add(this.treeLibraryBrowser, 0, 1);
             this.tblLibraryContents.Controls.Add(this.txtSearchBox, 0, 0);
             this.tblLibraryContents.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tblLibraryContents.Location = new System.Drawing.Point(3, 3);
@@ -512,7 +538,7 @@
             this.pnlLibrary.AutoSize = true;
             this.pnlLibrary.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.pnlLibrary.Controls.Add(this.lblLibraryList);
-            this.pnlLibrary.Controls.Add(this.lstLibraryBrowser);
+            this.pnlLibrary.Controls.Add(this.lstTrackBrowser);
             this.pnlLibrary.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pnlLibrary.Location = new System.Drawing.Point(3, 340);
             this.pnlLibrary.Name = "pnlLibrary";
@@ -533,6 +559,7 @@
             // 
             // lstPlaylist
             // 
+            this.lstPlaylist.AllowDrop = true;
             this.lstPlaylist.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lstPlaylist.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.lstPlaylist.FormattingEnabled = true;
@@ -541,6 +568,8 @@
             this.lstPlaylist.Size = new System.Drawing.Size(763, 331);
             this.lstPlaylist.TabIndex = 2;
             this.lstPlaylist.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.lstPlaylist_DrawItem);
+            this.lstPlaylist.DragDrop += new System.Windows.Forms.DragEventHandler(this.lstBox_DragDrop);
+            this.lstPlaylist.DragEnter += new System.Windows.Forms.DragEventHandler(this.lstPlaylist_DragEnter);
             this.lstPlaylist.DoubleClick += new System.EventHandler(this.lstPlaylist_DoubleClick);
             // 
             // pnlPlaybackControls
@@ -659,8 +688,8 @@
         private System.Windows.Forms.ToolStripMenuItem mnuShuffle;
         private System.Windows.Forms.ToolStripMenuItem mnuRepeat;
         private System.Windows.Forms.ToolStripMenuItem mnuRepeatAll;
-        private System.Windows.Forms.TreeView treeFilters;
-        private System.Windows.Forms.ListBox lstLibraryBrowser;
+        private System.Windows.Forms.TreeView treeLibraryBrowser;
+        private System.Windows.Forms.ListBox lstTrackBrowser;
         private System.Windows.Forms.Label lblFilters;
         private System.Windows.Forms.Label lblLibraryList;
         private System.Windows.Forms.Label lblPlaylist;
@@ -685,6 +714,8 @@
         private System.Windows.Forms.TableLayoutPanel tblLibraryContents;
         private System.Windows.Forms.TextBox txtSearchBox;
         private BufferedListBox lstPlaylist;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
+        private System.Windows.Forms.ToolStripMenuItem saveToDbToolStripMenuItem;
     }
 }
 
