@@ -30,6 +30,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Artists");
             System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Albums");
             System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Playlists");
@@ -86,8 +87,14 @@
             this.lstPlaylist = new Dukebox.Desktop.BufferedListBox();
             this.pnlPlaybackControls = new System.Windows.Forms.Panel();
             this.pnlOverview = new System.Windows.Forms.Panel();
+            this.pnlCurrentlyPlaying = new System.Windows.Forms.Panel();
             this.tblMain = new System.Windows.Forms.TableLayoutPanel();
+            this.pnlAudioControls = new System.Windows.Forms.Panel();
+            this.pnlFiltersLabel = new System.Windows.Forms.Panel();
+            this.pnlTimeTracking = new System.Windows.Forms.Panel();
             this.lblPlaybackTime = new System.Windows.Forms.Label();
+            this.trackAudioSeek = new System.Windows.Forms.TrackBar();
+            this.toolTipMain = new System.Windows.Forms.ToolTip(this.components);
             this.mnuMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picAlbumArt)).BeginInit();
             this.tbLibraryNavigator.SuspendLayout();
@@ -97,7 +104,12 @@
             this.pnlPlaylist.SuspendLayout();
             this.pnlPlaybackControls.SuspendLayout();
             this.pnlOverview.SuspendLayout();
+            this.pnlCurrentlyPlaying.SuspendLayout();
             this.tblMain.SuspendLayout();
+            this.pnlAudioControls.SuspendLayout();
+            this.pnlFiltersLabel.SuspendLayout();
+            this.pnlTimeTracking.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trackAudioSeek)).BeginInit();
             this.SuspendLayout();
             // 
             // btnPlay
@@ -379,7 +391,7 @@
             // treeLibraryBrowser
             // 
             this.treeLibraryBrowser.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.treeLibraryBrowser.Location = new System.Drawing.Point(3, 29);
+            this.treeLibraryBrowser.Location = new System.Drawing.Point(3, 27);
             this.treeLibraryBrowser.Name = "treeLibraryBrowser";
             treeNode1.Name = "ArtistNode";
             treeNode1.Text = "Artists";
@@ -397,7 +409,7 @@
             treeNode3,
             treeNode4,
             treeNode5});
-            this.treeLibraryBrowser.Size = new System.Drawing.Size(215, 621);
+            this.treeLibraryBrowser.Size = new System.Drawing.Size(215, 580);
             this.treeLibraryBrowser.TabIndex = 10;
             this.treeLibraryBrowser.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeFilters_NodeMouseClick);
             this.treeLibraryBrowser.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeFilters_NodeMouseDoubleClick);
@@ -410,7 +422,7 @@
             this.lstTrackBrowser.FormattingEnabled = true;
             this.lstTrackBrowser.Location = new System.Drawing.Point(0, 0);
             this.lstTrackBrowser.Name = "lstTrackBrowser";
-            this.lstTrackBrowser.Size = new System.Drawing.Size(763, 289);
+            this.lstTrackBrowser.Size = new System.Drawing.Size(763, 269);
             this.lstTrackBrowser.TabIndex = 11;
             this.lstTrackBrowser.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.lstTrackBrowser_DrawItem);
             this.lstTrackBrowser.DragDrop += new System.Windows.Forms.DragEventHandler(this.lstBox_DragDrop);
@@ -421,8 +433,9 @@
             // lblFilters
             // 
             this.lblFilters.AutoSize = true;
+            this.lblFilters.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.lblFilters.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblFilters.Location = new System.Drawing.Point(3, 10);
+            this.lblFilters.Location = new System.Drawing.Point(0, 19);
             this.lblFilters.Name = "lblFilters";
             this.lblFilters.Size = new System.Drawing.Size(99, 17);
             this.lblFilters.TabIndex = 12;
@@ -443,7 +456,7 @@
             // 
             this.lblPlaylist.AutoSize = true;
             this.lblPlaylist.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblPlaylist.Location = new System.Drawing.Point(235, 10);
+            this.lblPlaylist.Location = new System.Drawing.Point(3, 6);
             this.lblPlaylist.Name = "lblPlaylist";
             this.lblPlaylist.Size = new System.Drawing.Size(105, 17);
             this.lblPlaylist.TabIndex = 14;
@@ -453,7 +466,7 @@
             // 
             this.lblCurrentlyPlaying.AutoSize = true;
             this.lblCurrentlyPlaying.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Italic);
-            this.lblCurrentlyPlaying.Location = new System.Drawing.Point(346, 10);
+            this.lblCurrentlyPlaying.Location = new System.Drawing.Point(114, 6);
             this.lblCurrentlyPlaying.Name = "lblCurrentlyPlaying";
             this.lblCurrentlyPlaying.Size = new System.Drawing.Size(71, 17);
             this.lblCurrentlyPlaying.TabIndex = 15;
@@ -481,12 +494,12 @@
             this.tbLibraryNavigator.Controls.Add(this.tblLibraryContents, 0, 0);
             this.tbLibraryNavigator.Controls.Add(this.tblLibraryBrowserAndPlaylist, 1, 0);
             this.tbLibraryNavigator.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tbLibraryNavigator.Location = new System.Drawing.Point(3, 44);
+            this.tbLibraryNavigator.Location = new System.Drawing.Point(3, 87);
             this.tbLibraryNavigator.Name = "tbLibraryNavigator";
             this.tbLibraryNavigator.RowCount = 1;
             this.tbLibraryNavigator.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tbLibraryNavigator.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 659F));
-            this.tbLibraryNavigator.Size = new System.Drawing.Size(1002, 659);
+            this.tbLibraryNavigator.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 616F));
+            this.tbLibraryNavigator.Size = new System.Drawing.Size(1002, 616);
             this.tbLibraryNavigator.TabIndex = 17;
             // 
             // tblLibraryContents
@@ -503,7 +516,7 @@
             this.tblLibraryContents.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 96F));
             this.tblLibraryContents.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tblLibraryContents.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tblLibraryContents.Size = new System.Drawing.Size(221, 653);
+            this.tblLibraryContents.Size = new System.Drawing.Size(221, 610);
             this.tblLibraryContents.TabIndex = 17;
             // 
             // txtSearchBox
@@ -530,7 +543,7 @@
             this.tblLibraryBrowserAndPlaylist.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 53.30033F));
             this.tblLibraryBrowserAndPlaylist.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 46.69967F));
             this.tblLibraryBrowserAndPlaylist.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tblLibraryBrowserAndPlaylist.Size = new System.Drawing.Size(769, 653);
+            this.tblLibraryBrowserAndPlaylist.Size = new System.Drawing.Size(769, 610);
             this.tblLibraryBrowserAndPlaylist.TabIndex = 0;
             // 
             // pnlLibrary
@@ -540,9 +553,9 @@
             this.pnlLibrary.Controls.Add(this.lblLibraryList);
             this.pnlLibrary.Controls.Add(this.lstTrackBrowser);
             this.pnlLibrary.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pnlLibrary.Location = new System.Drawing.Point(3, 340);
+            this.pnlLibrary.Location = new System.Drawing.Point(3, 317);
             this.pnlLibrary.Name = "pnlLibrary";
-            this.pnlLibrary.Size = new System.Drawing.Size(763, 289);
+            this.pnlLibrary.Size = new System.Drawing.Size(763, 269);
             this.pnlLibrary.TabIndex = 19;
             // 
             // pnlPlaylist
@@ -554,7 +567,7 @@
             this.pnlPlaylist.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pnlPlaylist.Location = new System.Drawing.Point(3, 3);
             this.pnlPlaylist.Name = "pnlPlaylist";
-            this.pnlPlaylist.Size = new System.Drawing.Size(763, 331);
+            this.pnlPlaylist.Size = new System.Drawing.Size(763, 308);
             this.pnlPlaylist.TabIndex = 18;
             // 
             // lstPlaylist
@@ -565,7 +578,7 @@
             this.lstPlaylist.FormattingEnabled = true;
             this.lstPlaylist.Location = new System.Drawing.Point(0, 0);
             this.lstPlaylist.Name = "lstPlaylist";
-            this.lstPlaylist.Size = new System.Drawing.Size(763, 331);
+            this.lstPlaylist.Size = new System.Drawing.Size(763, 308);
             this.lstPlaylist.TabIndex = 2;
             this.lstPlaylist.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.lstPlaylist_DrawItem);
             this.lstPlaylist.DragDrop += new System.Windows.Forms.DragEventHandler(this.lstBox_DragDrop);
@@ -582,53 +595,105 @@
             this.pnlPlaybackControls.Dock = System.Windows.Forms.DockStyle.Right;
             this.pnlPlaybackControls.Location = new System.Drawing.Point(766, 0);
             this.pnlPlaybackControls.Name = "pnlPlaybackControls";
-            this.pnlPlaybackControls.Size = new System.Drawing.Size(236, 35);
+            this.pnlPlaybackControls.Size = new System.Drawing.Size(236, 36);
             this.pnlPlaybackControls.TabIndex = 18;
             // 
             // pnlOverview
             // 
-            this.pnlOverview.Controls.Add(this.lblCurrentlyPlaying);
-            this.pnlOverview.Controls.Add(this.lblFilters);
-            this.pnlOverview.Controls.Add(this.lblPlaylist);
+            this.pnlOverview.Controls.Add(this.pnlCurrentlyPlaying);
             this.pnlOverview.Controls.Add(this.pnlPlaybackControls);
             this.pnlOverview.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pnlOverview.Location = new System.Drawing.Point(3, 3);
             this.pnlOverview.Name = "pnlOverview";
-            this.pnlOverview.Size = new System.Drawing.Size(1002, 35);
+            this.pnlOverview.Size = new System.Drawing.Size(1002, 36);
             this.pnlOverview.TabIndex = 19;
+            // 
+            // pnlCurrentlyPlaying
+            // 
+            this.pnlCurrentlyPlaying.Controls.Add(this.lblPlaylist);
+            this.pnlCurrentlyPlaying.Controls.Add(this.lblCurrentlyPlaying);
+            this.pnlCurrentlyPlaying.Dock = System.Windows.Forms.DockStyle.Left;
+            this.pnlCurrentlyPlaying.Location = new System.Drawing.Point(0, 0);
+            this.pnlCurrentlyPlaying.Name = "pnlCurrentlyPlaying";
+            this.pnlCurrentlyPlaying.Size = new System.Drawing.Size(768, 36);
+            this.pnlCurrentlyPlaying.TabIndex = 19;
             // 
             // tblMain
             // 
             this.tblMain.ColumnCount = 1;
-            this.tblMain.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tblMain.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tblMain.Controls.Add(this.pnlOverview, 0, 0);
-            this.tblMain.Controls.Add(this.tbLibraryNavigator, 0, 1);
+            this.tblMain.Controls.Add(this.tbLibraryNavigator, 0, 2);
+            this.tblMain.Controls.Add(this.pnlAudioControls, 0, 1);
             this.tblMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tblMain.Location = new System.Drawing.Point(0, 24);
             this.tblMain.Name = "tblMain";
-            this.tblMain.RowCount = 2;
-            this.tblMain.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 5.847953F));
-            this.tblMain.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 94.15205F));
-            this.tblMain.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tblMain.RowCount = 3;
+            this.tblMain.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 6.0006F));
+            this.tblMain.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 5.990399F));
+            this.tblMain.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 88.009F));
             this.tblMain.Size = new System.Drawing.Size(1008, 706);
             this.tblMain.TabIndex = 20;
             // 
+            // pnlAudioControls
+            // 
+            this.pnlAudioControls.Controls.Add(this.pnlFiltersLabel);
+            this.pnlAudioControls.Controls.Add(this.pnlTimeTracking);
+            this.pnlAudioControls.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pnlAudioControls.Location = new System.Drawing.Point(3, 45);
+            this.pnlAudioControls.Name = "pnlAudioControls";
+            this.pnlAudioControls.Size = new System.Drawing.Size(1002, 36);
+            this.pnlAudioControls.TabIndex = 20;
+            // 
+            // pnlFiltersLabel
+            // 
+            this.pnlFiltersLabel.Controls.Add(this.lblFilters);
+            this.pnlFiltersLabel.Dock = System.Windows.Forms.DockStyle.Left;
+            this.pnlFiltersLabel.Location = new System.Drawing.Point(0, 0);
+            this.pnlFiltersLabel.Name = "pnlFiltersLabel";
+            this.pnlFiltersLabel.Size = new System.Drawing.Size(125, 36);
+            this.pnlFiltersLabel.TabIndex = 21;
+            // 
+            // pnlTimeTracking
+            // 
+            this.pnlTimeTracking.Controls.Add(this.lblPlaybackTime);
+            this.pnlTimeTracking.Controls.Add(this.trackAudioSeek);
+            this.pnlTimeTracking.Dock = System.Windows.Forms.DockStyle.Right;
+            this.pnlTimeTracking.Location = new System.Drawing.Point(558, 0);
+            this.pnlTimeTracking.Name = "pnlTimeTracking";
+            this.pnlTimeTracking.Size = new System.Drawing.Size(444, 36);
+            this.pnlTimeTracking.TabIndex = 20;
+            // 
             // lblPlaybackTime
             // 
-            this.lblPlaybackTime.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.lblPlaybackTime.AutoSize = true;
             this.lblPlaybackTime.Font = new System.Drawing.Font("Segoe UI", 9.75F);
-            this.lblPlaybackTime.Location = new System.Drawing.Point(769, 7);
+            this.lblPlaybackTime.Location = new System.Drawing.Point(5, 8);
             this.lblPlaybackTime.Name = "lblPlaybackTime";
             this.lblPlaybackTime.Size = new System.Drawing.Size(0, 17);
             this.lblPlaybackTime.TabIndex = 19;
+            // 
+            // trackAudioSeek
+            // 
+            this.trackAudioSeek.Dock = System.Windows.Forms.DockStyle.Right;
+            this.trackAudioSeek.LargeChange = 20;
+            this.trackAudioSeek.Location = new System.Drawing.Point(71, 0);
+            this.trackAudioSeek.Maximum = 200;
+            this.trackAudioSeek.Name = "trackAudioSeek";
+            this.trackAudioSeek.Size = new System.Drawing.Size(373, 36);
+            this.trackAudioSeek.SmallChange = 10;
+            this.trackAudioSeek.TabIndex = 13;
+            this.trackAudioSeek.TickFrequency = 10;
+            this.trackAudioSeek.TickStyle = System.Windows.Forms.TickStyle.TopLeft;
+            this.trackAudioSeek.MouseDown += new System.Windows.Forms.MouseEventHandler(this.trackAudioSeek_MouseDown);
+            this.trackAudioSeek.MouseMove += new System.Windows.Forms.MouseEventHandler(this.trackAudioSeek_MouseMove);
+            this.trackAudioSeek.MouseUp += new System.Windows.Forms.MouseEventHandler(this.trackAudioSeek_MouseUp);
             // 
             // MainView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1008, 730);
-            this.Controls.Add(this.lblPlaybackTime);
             this.Controls.Add(this.tblMain);
             this.Controls.Add(this.mnuMain);
             this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -654,9 +719,16 @@
             this.pnlPlaylist.ResumeLayout(false);
             this.pnlPlaybackControls.ResumeLayout(false);
             this.pnlOverview.ResumeLayout(false);
-            this.pnlOverview.PerformLayout();
+            this.pnlCurrentlyPlaying.ResumeLayout(false);
+            this.pnlCurrentlyPlaying.PerformLayout();
             this.tblMain.ResumeLayout(false);
             this.tblMain.PerformLayout();
+            this.pnlAudioControls.ResumeLayout(false);
+            this.pnlFiltersLabel.ResumeLayout(false);
+            this.pnlFiltersLabel.PerformLayout();
+            this.pnlTimeTracking.ResumeLayout(false);
+            this.pnlTimeTracking.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trackAudioSeek)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -716,6 +788,12 @@
         private BufferedListBox lstPlaylist;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
         private System.Windows.Forms.ToolStripMenuItem saveToDbToolStripMenuItem;
+        private System.Windows.Forms.Panel pnlAudioControls;
+        private System.Windows.Forms.TrackBar trackAudioSeek;
+        private System.Windows.Forms.ToolTip toolTipMain;
+        private System.Windows.Forms.Panel pnlCurrentlyPlaying;
+        private System.Windows.Forms.Panel pnlFiltersLabel;
+        private System.Windows.Forms.Panel pnlTimeTracking;
     }
 }
 

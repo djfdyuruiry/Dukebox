@@ -20,6 +20,7 @@ namespace Dukebox.Desktop
         private int _lastPlayedTrackIndex;
         private Playlist _currentPlaylist;
         private System.Timers.Timer _playbackMonitorTimer;
+        private bool _userAlteringTrackBar;
 
         // File and library objects.
         private FolderBrowserDialog _folderBrowserDialog;
@@ -41,6 +42,8 @@ namespace Dukebox.Desktop
         
         public MainView()
         {
+            _userAlteringTrackBar = false;
+
             InitializeComponent();
         }
 
@@ -158,7 +161,7 @@ namespace Dukebox.Desktop
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
            this.Close();
-        }     
+        }
     }
 
     /// <summary>

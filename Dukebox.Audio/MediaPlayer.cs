@@ -31,6 +31,7 @@ namespace Dukebox.Audio
         private Thread _playbackThread;
 
         private string _fileName;
+        private double _newPosition;
 
         public bool AudioLoaded { get { return _stream != 0; } }
 
@@ -62,6 +63,47 @@ namespace Dukebox.Audio
             } 
         }
 
+        public double AudioLengthInSecs
+        {
+            get
+            {
+                if (!AudioLoaded)
+                {
+                    return 0;
+                }
+
+                long position = Bass.BASS_ChannelGetLength(_stream);
+                return GetSecondsFromChannelPosition(_stream, position);
+            }
+        }
+
+        public double SecondsPlayed
+        {
+            get
+            {
+                if (!AudioLoaded)
+                {
+                    return 0;
+                }
+
+                long position = Bass.BASS_ChannelGetPosition(_stream);
+                return GetSecondsFromChannelPosition(_stream, position);
+            }
+        }
+
+        public double PercentagePlayed
+        {
+            get
+            {
+                if (!AudioLoaded)
+                {
+                    return 0;
+                }
+
+                return SecondsPlayed / (AudioLengthInSecs / 100);
+            }
+        }
+
         public bool Playing { get; set; }
         public bool Stopped { get; set; }
         public bool Finished { get; set; }
@@ -73,6 +115,7 @@ namespace Dukebox.Audio
         /// </summary>
         private MediaPlayer()
         {
+            _newPosition = -1;
         }
 
         /// <summary>
@@ -139,6 +182,14 @@ namespace Dukebox.Audio
             }
         }
 
+        public void ChangeAudioPosition(double newPosition)
+        {
+            if (Playing && newPosition >= 0 && newPosition <=  AudioLengthInSecs)
+            {
+                _newPosition = newPosition;
+            }
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -199,6 +250,12 @@ namespace Dukebox.Audio
                     {
                         Bass.BASS_ChannelPlay(_stream, false);
                     }
+                }
+
+                if (_newPosition != -1)
+                {
+                    Bass.BASS_ChannelSetPosition(_stream, _newPosition);
+                    _newPosition = -1;
                 }
 
                 Thread.Sleep(100);
@@ -434,6 +491,18 @@ namespace Dukebox.Audio
             }
 
             return string.Format(MINUTE_FORMAT, minutes.ToString("00"), seconds.ToString("00"));
+        }
+
+
+        /// <summary>
+        /// Gets the total seconds from a channel at the given position.
+        /// </summary>
+        /// <param name="stream">The channel handler.</param>
+        /// <param name="channelPosition">The position in the channel to convert to seconds.</param>
+        /// <returns>Number of seconds equivalent to the current position in the channel.</returns>
+        public static double GetSecondsFromChannelPosition(int stream, long channelPosition)
+        {
+            return Bass.BASS_ChannelBytes2Seconds(stream, channelPosition);
         }
     }
     

@@ -142,6 +142,8 @@ namespace Dukebox.Desktop
 
                 lblCurrentlyPlaying.Text = string.Empty;
                 lblPlaybackTime.Text = string.Format(MediaPlayer.MINUTE_FORMAT, BlankTime, BlankTime);
+
+                trackAudioSeek.Value = 0;
             }
         }
 
@@ -154,11 +156,24 @@ namespace Dukebox.Desktop
             {
                 if (_currentPlaylist.StreamingPlaylist)
                 {
-                    Invoke(new ValueUpdateDelegate(() => lblPlaybackTime.Text = string.Format(TimeDisplayFormat, MediaPlayer.GetInstance().MinutesPlayed, MediaPlayer.GetInstance().AudioLengthInMins)));
+                    var mediaPlayer = MediaPlayer.GetInstance();
+                    var minsPlayed = mediaPlayer.MinutesPlayed;
+                    var audioLengthInMins = mediaPlayer.AudioLengthInMins;
+                    var percentagePlayed = mediaPlayer.PercentagePlayed;
+
+                    Invoke(new ValueUpdateDelegate(() => lblPlaybackTime.Text = string.Format(TimeDisplayFormat, minsPlayed, audioLengthInMins)));
+                    Invoke(new ValueUpdateDelegate(() =>
+                    {
+                        if (!_userAlteringTrackBar)
+                        {
+                            trackAudioSeek.Value = (int)(percentagePlayed * 2);
+                        }
+                    }));
                 }
                 else
                 {
                     Invoke(new ValueUpdateDelegate(() => lblPlaybackTime.Text = string.Format(MediaPlayer.MINUTE_FORMAT, BlankTime, BlankTime)));
+                    Invoke(new ValueUpdateDelegate(() => trackAudioSeek.Value = 0));
                     Invoke(new ValueUpdateDelegate(() => lblCurrentlyPlaying.Text = string.Empty));
                 }
             }
