@@ -1,7 +1,9 @@
-﻿using GlobalHotKey;
+﻿using Dukebox.Audio;
+using GlobalHotKey;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
 using System.Windows.Forms;
 using System.Windows.Input;
 
@@ -66,5 +68,28 @@ namespace Dukebox.Desktop
             _currentPlaylist.SkipToTrack(lstPlaylist.SelectedIndex);
             UpdatePausePlayGraphic();
         }
+
+        private void trackAudioSeek_MouseDown(object sender, MouseEventArgs e)
+        {
+            _userAlteringTrackBar = true;
+        }
+
+        private void trackAudioSeek_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (_userAlteringTrackBar)
+            {
+                var percentValue = ((double)trackAudioSeek.Value) * 0.5;
+                var audioLength = MediaPlayer.GetInstance().AudioLengthInSecs;
+                var currentLocation = new Point(trackAudioSeek.Left + e.X, trackAudioSeek.Top + e.Y + (pnlPlaybackControls.Height * 2));
+
+                MediaPlayer.GetInstance().ChangeAudioPosition((audioLength / 100) * percentValue);
+                toolTipMain.Show(MediaPlayer.GetInstance().MinutesPlayed, this, currentLocation, 200);
+            }
+        }
+        
+        private void trackAudioSeek_MouseUp(object sender, MouseEventArgs e)
+        {
+            _userAlteringTrackBar = false;
+        }  
     }
 }
