@@ -33,10 +33,7 @@ namespace Dukebox.Desktop
 
         // Context menus
         private TrackBrowserContextMenuStrip _trackBrowserContextMenu;
-
-        // Drap and Drop track
-        private Track _currentlyDraggingTrack;
-
+        
         // Global hotkey monitor.
         private HotKeyManager hotKeyManager;
         

@@ -388,15 +388,13 @@ namespace Dukebox.Desktop
 
         private void InitTrackDragDrop(MouseEventArgs e)
         {
-            var selectedListIndex = lstTrackBrowser.IndexFromPoint(e.Location);
-
-            if (selectedListIndex == ListBox.NoMatches)
+            if (lstTrackBrowser.SelectedItem == null)
             {
                 return;
             }
-
-            var track = (Track)lstTrackBrowser.Items[selectedListIndex];
-            DoDragDrop(track.ToString(), DragDropEffects.All);
+            
+            var track = lstTrackBrowser.SelectedItem;
+            DoDragDrop(new Object(), DragDropEffects.All);
         }
 
         private void InitTrackBrowserContextMenu(MouseEventArgs e)
