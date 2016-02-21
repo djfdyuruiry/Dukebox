@@ -416,7 +416,6 @@
             // 
             // lstTrackBrowser
             // 
-            this.lstTrackBrowser.AllowDrop = true;
             this.lstTrackBrowser.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lstTrackBrowser.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.lstTrackBrowser.FormattingEnabled = true;
@@ -425,8 +424,6 @@
             this.lstTrackBrowser.Size = new System.Drawing.Size(763, 269);
             this.lstTrackBrowser.TabIndex = 11;
             this.lstTrackBrowser.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.lstTrackBrowser_DrawItem);
-            this.lstTrackBrowser.DragDrop += new System.Windows.Forms.DragEventHandler(this.lstBox_DragDrop);
-            this.lstTrackBrowser.DragLeave += new System.EventHandler(this.lstTrackBrowser_DragLeave);
             this.lstTrackBrowser.DoubleClick += new System.EventHandler(this.lstTrackBrowser_DoubleClick);
             this.lstTrackBrowser.MouseDown += new System.Windows.Forms.MouseEventHandler(this.lstTrackBrowser_MouseDown);
             // 

@@ -3,6 +3,7 @@ using Dukebox.Library.Repositories;
 using Dukebox.Model.Services;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -165,36 +166,23 @@ namespace Dukebox.Desktop
         }
 
         /*
-         * Track browser drag and drop methods.
+         * Playlist drop methods.
          */
 
         private void lstBox_DragDrop(object sender, DragEventArgs e)
         {
-            if (_currentlyDraggingTrack == null)
+            if (_currentlyDraggingTrack && lstTrackBrowser.Items.Count > 0 && lstTrackBrowser.SelectedItem != null)
             {
-                return;
+                var trackToAdd = (Track)lstTrackBrowser.SelectedItem;
+                AddTrackToPlaylist(trackToAdd);
+
+                _currentlyDraggingTrack = false;
             }
-
-            var listBox = (ListBox)sender;
-
-            if (listBox == lstPlaylist)
-            {
-                AddTrackToPlaylist(_currentlyDraggingTrack);
-            }
-
-            _currentlyDraggingTrack = null;
-        }
-
-        private void lstTrackBrowser_DragLeave(object sender, EventArgs e)
-        {
-            var listBox = (ListBox)sender;
-
-            _currentlyDraggingTrack = (Track)listBox.SelectedItem;
         }
 
         private void lstPlaylist_DragEnter(object sender, DragEventArgs e)
         {
-            return;
+            e.Effect = DragDropEffects.Copy;
         }
     }
 }
