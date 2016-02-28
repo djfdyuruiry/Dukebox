@@ -2,12 +2,9 @@ syntax: glob
 Dukebox.Audio/obj/*
 Dukebox.Audio/bin/*
 Dukebox.Library/bin/*
-
 Dukebox.Library/obj/*
 Dukebox.Logging/bin/*
 Dukebox.Logging/obj/*
-Dukebox/bin/*
-Dukebox/obj/*
 Dukebox.Desktop/obj/*
 Dukebox.Desktop/bin/*
 Dukebox.Assets/obj/*
