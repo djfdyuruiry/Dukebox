@@ -12,6 +12,4 @@ Dukebox.Assets/bin/*
 packages/*
 Dukebox.Desktop.WinForms/obj/*
 Dukebox.Desktop.WinForms/bin/*
-Dukebox/AlbumBrowser.cs
 desktop.ini
-Jukebox.doc
