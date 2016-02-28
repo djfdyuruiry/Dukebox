@@ -1,0 +1,31 @@
+﻿<UserControl x:Class="Dukebox.Desktop.Views.SearchControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d" 
+             d:DesignHeight="30" d:DesignWidth="1016"
+             DataContext="{Binding ISearchControl, Source={StaticResource ViewModelLocator}}">
+    <Grid>
+        <!-- Visibility="{Binding SearchEnabled, Converter={StaticResource ResourceKey=BoolToVisibilityConverter}}"> -->
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="0.03*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <TextBox Grid.Row="0" 
+                     Grid.Column="0" 
+                     Name="SearchText" 
+                     FontSize="18"
+                     Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                     IsEnabled="{Binding SearchEnabled}"></TextBox>
+        <Button Grid.Row="0" 
+                    Grid.Column="1" 
+                    IsEnabled="{Binding SearchEnabled}"
+                    Command="{Binding ClearSearch}">
+            <Image Height="auto" Width="auto" Source="../Graphics/ic_close_48px.png"></Image>
+        </Button>
+    </Grid>
+</UserControl>
