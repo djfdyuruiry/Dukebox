@@ -171,6 +171,7 @@ namespace Dukebox.Desktop
 
         private void lstBox_DragDrop(object sender, DragEventArgs e)
         {
+          /*
             if (_currentlyDraggingTrack && lstTrackBrowser.Items.Count > 0 && lstTrackBrowser.SelectedItem != null)
             {
                 var trackToAdd = (Track)lstTrackBrowser.SelectedItem;
@@ -178,6 +179,7 @@ namespace Dukebox.Desktop
 
                 _currentlyDraggingTrack = false;
             }
+          */
         }
 
         private void lstPlaylist_DragEnter(object sender, DragEventArgs e)

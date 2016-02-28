@@ -403,3 +403,8 @@ Dukebox.Assets/obj/*
 Dukebox.Assets/bin/*
 Dukebox.Library/bin/*
 Dukebox.Audio/bin/*
+packages/*
+Dukebox.Desktop.WinForms/obj/*
+Dukebox.Desktop.WinForms/bin/*
+Dukebox.Desktop/obj/*
+Dukebox.Desktop/bin/*

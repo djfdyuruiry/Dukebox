@@ -1,8 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dukebox.Desktop", "Dukebox.Desktop\Dukebox.Desktop.csproj", "{CBD05FA9-5B3E-491C-953D-7D39A3C5D391}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dukebox.Audio", "Dukebox.Audio\Dukebox.Audio.csproj", "{8EA07179-2C2A-42A3-90C4-C700C4681181}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dukebox.Library", "Dukebox.Library\Dukebox.Library.csproj", "{6C5B8890-79A4-43EE-9734-B5DB714FCF16}"
@@ -16,16 +14,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{663629
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dukebox.Desktop.WinForms", "Dukebox.Desktop.WinForms\Dukebox.Desktop.WinForms.csproj", "{CBD05FA9-5B3E-491C-953D-7D39A3C5D391}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dukebox.Desktop", "Dukebox.Desktop\Dukebox.Desktop.csproj", "{2CE69F0E-15ED-47AE-A285-4197D458443F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{CBD05FA9-5B3E-491C-953D-7D39A3C5D391}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CBD05FA9-5B3E-491C-953D-7D39A3C5D391}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CBD05FA9-5B3E-491C-953D-7D39A3C5D391}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CBD05FA9-5B3E-491C-953D-7D39A3C5D391}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8EA07179-2C2A-42A3-90C4-C700C4681181}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8EA07179-2C2A-42A3-90C4-C700C4681181}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8EA07179-2C2A-42A3-90C4-C700C4681181}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -38,6 +36,14 @@ Global
 		{E69D9EB5-0707-41EE-8537-3FFEA9A8BB99}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E69D9EB5-0707-41EE-8537-3FFEA9A8BB99}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E69D9EB5-0707-41EE-8537-3FFEA9A8BB99}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CBD05FA9-5B3E-491C-953D-7D39A3C5D391}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CBD05FA9-5B3E-491C-953D-7D39A3C5D391}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CBD05FA9-5B3E-491C-953D-7D39A3C5D391}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CBD05FA9-5B3E-491C-953D-7D39A3C5D391}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2CE69F0E-15ED-47AE-A285-4197D458443F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2CE69F0E-15ED-47AE-A285-4197D458443F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2CE69F0E-15ED-47AE-A285-4197D458443F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2CE69F0E-15ED-47AE-A285-4197D458443F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

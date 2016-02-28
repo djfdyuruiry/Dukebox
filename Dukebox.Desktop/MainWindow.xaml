@@ -1,0 +1,252 @@
+﻿<Window x:Class="Dukebox.Desktop.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:DukeboxViews="clr-namespace:Dukebox.Desktop.Views"
+        Title="MainWindow" Height="768" Width="1024"
+             DataContext="{Binding MainWindow, Source={StaticResource ViewModelLocator}}">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Styles/MetroButton.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    <!-- Window container -->
+    <Grid Name="WindowContainer">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <!-- Menu bar -->
+        <ToolBar Grid.Row="0" Grid.Column="0">
+            <Menu Name="MenuBar">
+                <MenuItem Header="File">
+                </MenuItem>
+                <MenuItem Header="Audio CD">
+                </MenuItem>
+                <MenuItem Header="Playback">
+                </MenuItem>
+                <MenuItem Header="Playlist">
+                </MenuItem>
+            </Menu>
+        </ToolBar>
+        <!-- Main Container -->
+        <Grid Name="MainContainer" Grid.Row="1" Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="0.20*"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <!-- Playback controls -->
+            <Grid Name="PlaybackControls" Grid.Row="0" Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"></RowDefinition>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="0.20*"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <!-- Current album art -->
+                <Grid Name="AlbumArtContainer" Grid.Row="0" Grid.Column="0">
+                    <Image Name="CurrentAlbumArt" Height="auto" Width="auto" Source="Graphics/black_7_music_node.png" ></Image>
+                </Grid>
+                <!-- Playing now -->
+                <Grid Name="PlayingNowContainer" Grid.Row="0" Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"></RowDefinition>
+                        <RowDefinition Height="0.65*"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <!-- Currently playing track details -->
+                    <Grid Name="CurrentTrackDetailsContainer" Grid.Row="0" Grid.Column="0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                            <ColumnDefinition Width="0.2*"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <!-- Track details -->
+                        <Grid Name="CurrentlyPlayingTrackDetailsContainer" Grid.Row="0" Grid.Column="0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto"></RowDefinition>
+                                <RowDefinition Height="auto"></RowDefinition>
+                                <RowDefinition Height="auto"></RowDefinition>
+                                <RowDefinition Height="auto"></RowDefinition>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Name="CurrentArtist" Grid.Row="0" Grid.Column="0" Text="Artist">
+                                <TextBlock.RenderTransform>
+                                    <ScaleTransform ScaleX="1.5" ScaleY="1.5" />
+                                </TextBlock.RenderTransform>
+                            </TextBlock>
+                            <TextBlock Name="CurrentTrack" Grid.Row="1" Grid.Column="0" Text="Track">
+                                <TextBlock.RenderTransform>
+                                    <ScaleTransform ScaleX="1.5" ScaleY="1.5" />
+                                </TextBlock.RenderTransform>
+                            </TextBlock>
+                            <TextBlock Name="CurrentAlbum" Grid.Row="2" Grid.Column="0" Text="Album">
+                                <TextBlock.RenderTransform>
+                                    <ScaleTransform ScaleX="1.5" ScaleY="1.5" />
+                                </TextBlock.RenderTransform>
+                            </TextBlock>
+                        </Grid>
+                        <!-- Track progress -->
+                        <Grid Name="TrackProgessContainer" Grid.Row="0" Grid.Column="1">
+                            <TextBlock Name="CurrentTrackProgress" HorizontalAlignment="Center" VerticalAlignment="Top" Text="00:00/00:00">
+                                <TextBlock.RenderTransform>
+                                    <ScaleTransform ScaleX="1.5" ScaleY="1.5" />
+                                </TextBlock.RenderTransform>
+                            </TextBlock>
+                        </Grid>
+                    </Grid>
+                    <!-- Playback controls -->
+                    <Grid Name="PlaybackControlsContainer" Grid.Row="1" Grid.Column="0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                            <ColumnDefinition Width="auto"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <!-- Playback buttons -->
+                        <Grid Name="PlaybackButtonsContainter" Grid.Row="0" Grid.Column="1">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"></RowDefinition>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"></ColumnDefinition>
+                                <ColumnDefinition Width="auto"></ColumnDefinition>
+                                <ColumnDefinition Width="auto"></ColumnDefinition>
+                                <ColumnDefinition Width="auto"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <Button Name="PlayButton" MaxWidth="64" MaxHeight="64" Grid.Row="0" Grid.Column="0" Style="{StaticResource MetroButton}">
+                                <Image Source="Graphics/black_4_audio_play.png" />
+                            </Button>
+                            <Button Name="StopButton" MaxWidth="64" MaxHeight="64" Grid.Row="0" Grid.Column="1" Style="{StaticResource MetroButton}">
+                                <Image Source="Graphics/black_4_audio_stop.png" />
+                            </Button>
+                            <Button Name="BackButton" MaxWidth="64" MaxHeight="64" Grid.Row="0" Grid.Column="2" Style="{StaticResource MetroButton}">
+                                <Image Source="Graphics/black_4_audio_title_back.png" />
+                            </Button>
+                            <Button Name="ForwardButton" MaxWidth="64" MaxHeight="64" Grid.Row="0" Grid.Column="3" Style="{StaticResource MetroButton}">
+                                <Image Source="Graphics/black_4_audio_title_forward.png" />
+                            </Button>
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </Grid>
+            <!-- Library browser -->
+            <Grid Name="LibraryBrowser" Grid.Row="1" Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"></RowDefinition>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="0.13*"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <!-- Nav Icons (Songs/Albums/Artists/Recently Played) -->
+                <Grid Name="NavIconContainer" Grid.Row="0" Grid.Column="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"></RowDefinition>
+                        <RowDefinition Height="*"></RowDefinition>
+                        <RowDefinition Height="*"></RowDefinition>
+                        <RowDefinition Height="*"></RowDefinition>
+                        <RowDefinition Height="*"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Button Name="LibraryNavIcon" 
+                            Grid.Row="0" 
+                            Grid.Column="0" 
+                            HorizontalAlignment="Stretch" 
+                            VerticalAlignment="Stretch"  
+                            Command="{Binding NavBarItemClickCommand}"
+                            CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Name}"
+                            Style="{StaticResource MetroButton}">
+                        <Image Source="Graphics/black_7_music_nodes.png" />
+                    </Button>
+                    <Button Name="AlbumsNavIcon" 
+                            Grid.Row="1" 
+                            Grid.Column="0" 
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch" 
+                            Command="{Binding NavBarItemClickCommand}"
+                            CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Name}"
+                            Style="{StaticResource MetroButton}">
+                        <Image Source="Graphics/ic_album.png" />
+                    </Button>
+                    <Button Name="ArtistsNavIcon" 
+                            Grid.Row="2" 
+                            Grid.Column="0" 
+                            HorizontalAlignment="Stretch" 
+                            VerticalAlignment="Stretch" 
+                            Command="{Binding NavBarItemClickCommand}"
+                            CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Name}"
+                            Style="{StaticResource MetroButton}">
+                        <Image Source="Graphics/icon-ios7-people.png" />
+                    </Button>
+                    <Button Name="RecentlyPlayedNavIcon" 
+                            Grid.Row="3" 
+                            Grid.Column="0" 
+                            HorizontalAlignment="Stretch" 
+                            VerticalAlignment="Stretch" 
+                            Command="{Binding NavBarItemClickCommand}"
+                            CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Name}"
+                            Style="{StaticResource MetroButton}">
+                        <Image Source="Graphics/ic_history.png" />
+                    </Button>
+                    <Button Name="AudioCdNavIcon" 
+                            Grid.Row="4" 
+                            Grid.Column="0" 
+                            HorizontalAlignment="Stretch" 
+                            VerticalAlignment="Stretch" 
+                            Command="{Binding NavBarItemClickCommand}"
+                            CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Name}"
+                            Style="{StaticResource MetroButton}">
+                        <Image Source="Graphics/BT_cd.png" />
+                    </Button>
+                </Grid>
+                <!-- Current View -->
+                <Grid Name="CurrentViewContainer" Grid.Row="0" Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <ContentControl Grid.Row="0" Grid.Column="0" Visibility="{Binding ShowLibraryListing}">
+                        <DukeboxViews:SongListing DataContext="{Binding LibraryListing, Source={StaticResource ViewModelLocator}}">
+                        </DukeboxViews:SongListing>
+                    </ContentControl>
+                    <ContentControl Grid.Row="0" Grid.Column="0" Visibility="{Binding ShowAlbumListing}">
+                        <DukeboxViews:AlbumListing>
+                        </DukeboxViews:AlbumListing>
+                    </ContentControl>
+                    <ContentControl Grid.Row="0" Grid.Column="0" Visibility="{Binding ShowArtistListing}">
+                        <DukeboxViews:ArtistListing>
+                        </DukeboxViews:ArtistListing>
+                    </ContentControl>
+                    <ContentControl Grid.Row="0" Grid.Column="0" Visibility="{Binding ShowRecentlyPlayedListing}">
+                        <DukeboxViews:SongListing DataContext="{Binding RecentlyPlayedListing, Source={StaticResource ViewModelLocator}}">
+                        </DukeboxViews:SongListing>
+                    </ContentControl>
+                    <ContentControl Grid.Row="0" Grid.Column="0" Visibility="{Binding ShowAudioCdListing}">
+                        <DukeboxViews:SongListing DataContext="{Binding AudioCdListing, Source={StaticResource ViewModelLocator}}">
+                        </DukeboxViews:SongListing>
+                    </ContentControl>
+                </Grid>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>
