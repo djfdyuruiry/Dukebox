@@ -1,6 +1,8 @@
 ﻿using Dukebox.Library;
 using Dukebox.Library.Config;
+using Dukebox.Library.Interfaces;
 using Dukebox.Library.Repositories;
+using log4net;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -16,6 +18,14 @@ namespace Dukebox.Model.Services
     /// </summary>
     public class Track : IEqualityComparer
     {
+        private static readonly ILog logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        private IDukeboxSettings _settings;
+        private IMusicLibrary _musicLibrary;
+        private AudioFileMetaData _metadata;
+        private album _album;
+        private artist _artist;
+
         /// <summary>
         /// Details specific to track file.
         /// </summary>
@@ -24,21 +34,20 @@ namespace Dukebox.Model.Services
         /// <summary>
         /// Associated artist information and accessor.
         /// </summary>
-        private artist _artist;
         public artist Artist
         {
             get
             {
                 if (Song.artistId.HasValue && Song.artistId != -1 && _artist == null)
                 {
-                    _artist = MusicLibrary.GetInstance().GetArtistById(Song.artistId.Value); 
+                    _artist = _musicLibrary.GetArtistById(Song.artistId.Value); 
                 }
 
                 return _artist;
             }
             set
             {
-                if (value.id < 1 || value.id > MusicLibrary.GetInstance().GetArtistCount())
+                if (value.id < 1 || value.id > _musicLibrary.GetArtistCount())
                 {
                     _artist = value;
                 }
@@ -52,21 +61,20 @@ namespace Dukebox.Model.Services
         /// <summary>
         /// Associated album information and accessor.
         /// </summary>
-        private album _album;
         public album Album
         {
             get
             {
                 if (Song.albumId.HasValue && Song.albumId != -1 && _album == null)
                 {
-                    _album = MusicLibrary.GetInstance().GetAlbumById(Song.albumId.Value);
+                    _album = _musicLibrary.GetAlbumById(Song.albumId.Value);
                 }
 
                 return _album;
             }
             set
             {
-                if (value.id < 1 || value.id > MusicLibrary.GetInstance().GetAlbumCount())
+                if (value.id < 1 || value.id > _musicLibrary.GetAlbumCount())
                 {
                     _album = value;
                 }
@@ -80,14 +88,13 @@ namespace Dukebox.Model.Services
         /// <summary>
         /// Metadata information and accessor.
         /// </summary>
-        private AudioFileMetaData _metadata;     
         public AudioFileMetaData Metadata 
         {
             get
             {
                 if (_metadata == null)
                 {
-                    _metadata = new AudioFileMetaData(Song.filename, Album.id);
+                    _metadata = AudioFileMetaData.BuildAudioFileMetaData(Song.filename, Album.id);
                 }
 
                 return _metadata;
@@ -105,13 +112,30 @@ namespace Dukebox.Model.Services
             }
         }
 
+        public static Track BuildTrackInstance(album album, artist artist, song song)
+        {
+            var track = LibraryPackage.GetInstance<Track>();
+            
+            track.Album = album;
+            track.Artist = artist;
+            track.Song = song;
+
+            return track;
+        }
+
+        public Track(IDukeboxSettings settings, IMusicLibrary musicLibrary)
+        {
+            _settings = settings;
+            _musicLibrary = musicLibrary;
+        }
+
         /// <summary>
         /// Audio track information in "$artist - $title" format.
         /// </summary>
         /// <returns>A string describing this audio track.</returns>
         public override string ToString()
         {
-            var trackFormat = DukeboxSettings.Settings["trackDisplayFromat"].ToString().ToLower();
+            var trackFormat = _settings.TrackDisplayFormat.ToLower();
 
             if (Artist == null)
             {

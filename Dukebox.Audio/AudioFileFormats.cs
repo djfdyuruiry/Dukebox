@@ -9,19 +9,19 @@ namespace Dukebox.Audio
     /// <summary>
     /// 
     /// </summary>
-    public static class AudioFileFormats
+    public class AudioFileFormats
     {
         /// <summary>
         /// A string list of all supported audio
         /// formats specified by file extension. (e.g. '.mp3')
         /// </summary>
-        public static List<string> SupportedFormats = new List<string>();
+        public List<string> SupportedFormats = new List<string>();
 
         /// <summary>
         /// A file filter string for use with a file dialog
         /// class which represents all supported formats.
         /// </summary>
-        public static string FileDialogFilter
+        public string FileDialogFilter
         {
             get
             {

@@ -1,4 +1,5 @@
 ﻿using Dukebox.Audio;
+using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model.Services;
 using Dukebox.Library.Repositories;
 using Dukebox.Model.Services;
@@ -9,17 +10,28 @@ using System.IO;
 using System.Threading;
 using System.Windows.Forms;
 using System.Windows.Threading;
+using System.Linq;
 using Un4seen.Bass.Misc;
+using Dukebox.Audio.Interfaces;
 
-namespace Dukebox.Library.CdRipping
+namespace Dukebox.Library.Services
 {
     /// <summary>
     /// Contains CD ripping execution and montioring logic.
     /// </summary>
-    public class CdRipHelper
+    public class AudioCdRippingService : IAudioCdRippingService
     {
-        private static readonly ILog Logger = 
-            LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private IMusicLibrary _musicLibrary;
+        private ICdMetadataService _cdMetadataService;
+        private IAudioConverterService _audioConverterService;
+
+        public AudioCdRippingService(IMusicLibrary musicLibrary, ICdMetadataService cdMetadataService, IAudioConverterService audioConverterService)
+        {
+            _musicLibrary = musicLibrary;
+            _cdMetadataService = cdMetadataService;
+            _audioConverterService = audioConverterService;
+        }
         
         /// <summary>
         /// Rips an audio CD to a folder as a collection of MP3 files
@@ -44,7 +56,7 @@ namespace Dukebox.Library.CdRipping
 
                 string[] inFiles = Directory.GetFiles(inPath);
                 string outFileFormat = outPath + "\\{0}.mp3";
-                List<AudioFileMetaData> cdMetadata = CdMetadata.GetAudioFileMetaDataForCd(inPath[0]);
+                List<AudioFileMetaData> cdMetadata = _cdMetadataService.GetAudioFileMetaDataForCd(inPath[0]);
                 int numTracks = inFiles.Length;
 
                 Thread viewerThread = new Thread(delegate()
@@ -62,10 +74,11 @@ namespace Dukebox.Library.CdRipping
                 {
                     try
                     {
-                        Track t = MusicLibrary.GetInstance().GetTrackFromFile(inFiles[trackIdx], cdMetadata[trackIdx]);
+                        Track t = _musicLibrary.GetTrackFromFile(inFiles[trackIdx], cdMetadata[trackIdx]);
                         string outFile = string.Format(outFileFormat, t.ToString());
 
-                        MediaPlayer.ConvertCdaFileToMp3(inFiles[trackIdx], outFile, new BaseEncoder.ENCODEFILEPROC((a, b) => CdRippingProgressMonitor(viewUpdater, a, b, t, numTracks, trackIdx)), true);
+                        _audioConverterService.ConvertCdaFileToMp3(inFiles[trackIdx], outFile, 
+                            new BaseEncoder.ENCODEFILEPROC((a, b) => CdRippingProgressMonitor(viewUpdater, a, b, t, numTracks, trackIdx)), true);
 
                         // Wait until track has been ripped.
                         while (viewUpdater.ProgressBarValue != viewUpdater.ProgressBarMaximum)
@@ -89,7 +102,7 @@ namespace Dukebox.Library.CdRipping
                     {
                         string msg = string.Format("Error ripping music track #{0} from Audio CD: {1}", trackIdx + 1, ex.Message);
 
-                        Logger.Error(msg);
+                        logger.Error(msg);
                         MessageBox.Show(msg, "Dukebox - Error Ripping from CD", MessageBoxButtons.OK, MessageBoxIcon.Error);          
                     }
                 }
@@ -101,7 +114,7 @@ namespace Dukebox.Library.CdRipping
             {
                 string msg = "Error ripping music from Audio CD: " + ex.Message;
 
-                Logger.Error(msg);
+                logger.Error(msg);
                 MessageBox.Show(msg, "Dukebox - Error Ripping from CD", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -137,7 +150,8 @@ namespace Dukebox.Library.CdRipping
             int currentTrackNumber = currentTrackIndex + 1;
 
             cdRipViewUpdater.ProgressBarValue = percentComplete;
-            cdRipViewUpdater.NotifcationLabelUpdate(string.Format("[{0}/{1}] Converting '{2}' to MP3 - {3}%", currentTrackNumber, totalTracksToRip, track, percentComplete));
+            cdRipViewUpdater.NotifcationLabelUpdate(string.Format("[{0}/{1}] Converting '{2}' to MP3 - {3}%", 
+                currentTrackNumber, totalTracksToRip, track, percentComplete));
         }
 
         /// <summary>

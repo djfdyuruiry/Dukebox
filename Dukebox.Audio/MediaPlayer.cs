@@ -1,4 +1,5 @@
-﻿using log4net;
+﻿using Dukebox.Audio.Interfaces;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -17,10 +18,12 @@ namespace Dukebox.Audio
     /// <summary>
     /// 
     /// </summary>
-    public class MediaPlayer
+    public class MediaPlayer : IMediaPlayer
     {
-        private static readonly ILog Logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-        public static readonly string MINUTE_FORMAT = "{0}:{1}";
+        private static readonly ILog logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        public const string MinuteFormat = "{0}:{1}";
+
+        private IAudioCdService _audioCdService;
 
         #region Playback control properties
         
@@ -113,8 +116,9 @@ namespace Dukebox.Audio
         /// <summary>
         /// 
         /// </summary>
-        private MediaPlayer()
+        public MediaPlayer(IAudioCdService audioCdService)
         {
+            _audioCdService = audioCdService;
             _newPosition = -1;
         }
 
@@ -150,7 +154,7 @@ namespace Dukebox.Audio
             _playbackThread = new Thread(PlayAudioFile);
             _playbackThread.Start();
 
-            Logger.Info(fileName + " loaded for playback by the media player");
+            logger.Info(fileName + " loaded for playback by the media player");
         }
 
         /// <summary>
@@ -203,7 +207,7 @@ namespace Dukebox.Audio
             }
             else
             {
-                _stream = BassCd.BASS_CD_StreamCreate(GetCdDriveIndex(_fileName[0]), GetTrackNumberFromCdaFilename(_fileName), BASSFlag.BASS_DEFAULT);
+                _stream = BassCd.BASS_CD_StreamCreate(_audioCdService.GetCdDriveIndex(_fileName[0]), _audioCdService.GetTrackNumberFromCdaFilename(_fileName), BASSFlag.BASS_DEFAULT);
             }
 
             if (_stream != 0)
@@ -224,7 +228,7 @@ namespace Dukebox.Audio
             else // Error.
             {
                 string msg = "Error playing file '" + _fileName.Split('\\').LastOrDefault() + "'!" + " [BASS error code: " + Bass.BASS_ErrorGetCode().ToString() + "]";
-                Logger.Error(msg);
+                logger.Error(msg);
 
                 MessageBox.Show(msg, "Dukebox: Error Playing File", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
@@ -278,197 +282,7 @@ namespace Dukebox.Audio
 
             Playing = false;
             Stopped = false;
-        }
-
-        #region Singleton pattern instance and accessor
-
-        private static MediaPlayer instance;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        public static MediaPlayer GetInstance()
-        {
-            if (instance == null)
-            {
-                instance = new MediaPlayer();
-            }
-
-            return instance;
-        }
-
-        #endregion
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="driveLetter"></param>
-        /// <returns></returns>
-        public static int GetCdDriveIndex(char driveLetter)
-        {
-            driveLetter = Char.ToLower(driveLetter);
-
-            DriveInfo[] drives = DriveInfo.GetDrives().Where(d => d.DriveType == DriveType.CDRom).ToArray();
-            DriveInfo drive = null;
-
-            int driveIndex = 0;
-
-            for (; driveIndex < drives.Length; driveIndex++)
-            {
-                if (drives[driveIndex].Name.ToLower() == driveLetter + @":\")
-                {
-                    drive = drives[driveIndex];
-                    break;
-                }
-            }
-
-            // Drive does not exist or is not a CD drive.
-            if (drive == null)
-            {
-                throw new Exception("Drive '" + driveLetter + "' does not exist or is not a CD drive!");
-            }
-            else if (!IsAudioCd(drive))
-            {
-                throw new Exception("Drive '" + driveLetter + "' does not contain an audio CD!");
-            }
-
-            return driveIndex;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="drive"></param>
-        /// <returns></returns>
-        private static bool IsAudioCd(DriveInfo drive)
-        {
-            bool result = false;
-            string[] driveContents = Directory.GetFiles(drive.RootDirectory.FullName);
-
-            result = (driveContents.Count() == driveContents.Where(f => (new FileInfo(f)).Extension == ".cda").Count());
-
-            return result;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="_fileName"></param>
-        /// <returns></returns>
-        public static int GetTrackNumberFromCdaFilename(string fileName)
-        {
-            return Int32.Parse(fileName.Split('\\').LastOrDefault().Substring(5, 2)) - 1;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="_fileName"></param>
-        /// <returns></returns>
-        public static void ConvertCdaFileToMp3(string cdaFileName, string mp3OutFile, BaseEncoder.ENCODEFILEPROC progressCallback, bool overwriteOuputFile)
-        {
-            EncoderLAME lameEncoder = new EncoderLAME(0);
-            lameEncoder.EncoderDirectory = Dukebox.Audio.Properties.Settings.Default.lameEncoderPath;
-
-            lameEncoder.InputFile = @cdaFileName;
-            lameEncoder.OutputFile = @mp3OutFile;
-
-            (new Thread(() => 
-            {
-                // Extract cda file to wav file on disk.
-                string wavFile = lameEncoder.OutputFile + ".wav";
-                bool conversionResult = WriteCdaToWavFile(lameEncoder.InputFile, wavFile, progressCallback);
-
-                if (!conversionResult && lameEncoder.EncoderExists)
-                {
-                    string msg = "Encoder result: " + conversionResult + "\nLast BASS error: " + Bass.BASS_ErrorGetCode().ToString();
-
-                    Logger.Info(msg);
-                    return;
-                }
-
-                // Call lame encoder with arguments.
-                lameEncoder.InputFile = wavFile;
-                CallLameEncoder(lameEncoder);
-
-                // Clean up.
-                File.Delete(wavFile);
-            })).Start();
-        }
-
-        public static bool WriteCdaToWavFile(string inCdaFile, string outWavFile, BaseEncoder.ENCODEFILEPROC progressCallback)
-        {
-            int measuringStream = BassCd.BASS_CD_StreamCreateFile(inCdaFile, BASSFlag.BASS_DEFAULT);
-            long totalLength = 0;
-
-            if(measuringStream != 0)
-            {
-                totalLength = Bass.BASS_ChannelGetLength(measuringStream, BASSMode.BASS_POS_BYTES);
-                Bass.BASS_StreamFree(measuringStream);
-
-                int stream = BassCd.BASS_CD_StreamCreateFile(inCdaFile, BASSFlag.BASS_STREAM_DECODE);
-                
-                if (stream != 0)
-                {
-                    try
-                    {
-                        WaveWriter ww = new WaveWriter(outWavFile, stream, true);
-                        short[] data = new short[32768];
-
-                        long bytesSoFar = 0;
-
-                        while (Bass.BASS_ChannelIsActive(stream) == BASSActive.BASS_ACTIVE_PLAYING)
-                        {
-                            int length = Bass.BASS_ChannelGetData(stream, data, 32768);
-
-                            if (length > 0)
-                            {
-                                ww.Write(data, length);
-
-                                bytesSoFar += length;
-
-                                progressCallback.Invoke(totalLength, bytesSoFar);
-                            }
-                        }
-
-                        // finilize the wave file!
-                        ww.Close();
-                        return Bass.BASS_StreamFree(stream);
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.Info("Error copying cda file '" + inCdaFile + "' to wav file '" + outWavFile + "': " + ex.Message);
-                    }
-                }
-            }
-
-            return false;
-        }
-
-        public static void CallLameEncoder(EncoderLAME lameEncoder)
-        {
-            Process pProcess = new System.Diagnostics.Process();
-            pProcess.StartInfo.CreateNoWindow = true;
-
-            string lamePath = lameEncoder.EncoderCommandLine.Split(' ')[0];
-            pProcess.StartInfo.FileName = lamePath;
-
-            string commandArguments = lameEncoder.EncoderCommandLine.Replace(lamePath, string.Empty);
-            pProcess.StartInfo.Arguments = commandArguments;
-
-            pProcess.StartInfo.UseShellExecute = false;
-            pProcess.StartInfo.RedirectStandardOutput = true;
-
-            pProcess.StartInfo.WorkingDirectory = Dukebox.Audio.Properties.Settings.Default.lameEncoderPath;
-            pProcess.Start();
-
-            //Get program output
-            string strOutput = pProcess.StandardOutput.ReadToEnd();
-            Logger.Info("Output from lame encoding: " + strOutput);
-
-            pProcess.WaitForExit();
-        }
+        }     
 
         /// <summary>
         /// Gets the total minutes from a channel at the given
@@ -479,7 +293,7 @@ namespace Dukebox.Audio
         /// <param name="stream">The channel handler.</param>
         /// <param name="channelPosition">The position in the channel to convert to mintues.</param>
         /// <returns>A formatted string containing the equivalent minutes and second that the position is in the channel.</returns>
-        public static string GetMinutesFromChannelPosition(int stream, long channelPosition)
+        public string GetMinutesFromChannelPosition(int stream, long channelPosition)
         {
             double lengthInSecs = Bass.BASS_ChannelBytes2Seconds(stream, channelPosition);
             int minutes = (int)(lengthInSecs / 60f);
@@ -487,10 +301,10 @@ namespace Dukebox.Audio
 
             if (minutes > 99)
             {
-                return string.Format(MINUTE_FORMAT, minutes.ToString("000"), seconds.ToString("00"));
+                return string.Format(MinuteFormat, minutes.ToString("000"), seconds.ToString("00"));
             }
 
-            return string.Format(MINUTE_FORMAT, minutes.ToString("00"), seconds.ToString("00"));
+            return string.Format(MinuteFormat, minutes.ToString("00"), seconds.ToString("00"));
         }
 
 
@@ -500,7 +314,7 @@ namespace Dukebox.Audio
         /// <param name="stream">The channel handler.</param>
         /// <param name="channelPosition">The position in the channel to convert to seconds.</param>
         /// <returns>Number of seconds equivalent to the current position in the channel.</returns>
-        public static double GetSecondsFromChannelPosition(int stream, long channelPosition)
+        public double GetSecondsFromChannelPosition(int stream, long channelPosition)
         {
             return Bass.BASS_ChannelBytes2Seconds(stream, channelPosition);
         }
