@@ -1,4 +1,5 @@
-﻿using Dukebox.Library.Model;
+﻿using Dukebox.Library.Interfaces;
+using Dukebox.Library.Model;
 using Dukebox.Library.Repositories;
 using Dukebox.Model.Services;
 using System;
@@ -13,12 +14,13 @@ namespace Dukebox.Library
     {
         public override string ToString()
         {
+            var musicLibrary = LibraryPackage.GetInstance<IMusicLibrary>();
             var displayTitle = title == string.Empty ? "Unknown Title" : title;
             var displayArtist = "Unknown Artist";
 
             if (artistId != null && artistId != -1)
             {
-                displayArtist = MusicLibrary.GetInstance().GetArtistById((long)artistId).ToString();
+                displayArtist = musicLibrary.GetArtistById((long)artistId).ToString();
             }
 
             return string.Format("{0} - {1}", displayArtist, displayTitle);
@@ -101,12 +103,13 @@ namespace Dukebox.Library
 
         public List<Track> GetTracksForPlaylist()
         {
+            var musicLibrary = LibraryPackage.GetInstance<IMusicLibrary>();
             var tracks = Enumerable.Empty<Track>();
             var nonLibraryFiles = new List<string>();
 
             foreach (var file in Files)
             {
-                var foundTracks = MusicLibrary.GetInstance().GetTracksByAttribute(SearchAreas.Filename, file);
+                var foundTracks = musicLibrary.GetTracksByAttribute(SearchAreas.Filename, file);
 
                 if (foundTracks.Count > 0)
                 {
@@ -122,7 +125,7 @@ namespace Dukebox.Library
             {
                 try
                 {
-                    return MusicLibrary.GetInstance().GetTrackFromFile(file);
+                    return musicLibrary.GetTrackFromFile(file);
                 }
                 catch (Exception ex)
                 {

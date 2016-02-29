@@ -1,4 +1,8 @@
 ﻿using Dukebox.Audio;
+using Dukebox.Audio.Interfaces;
+using Dukebox.Library;
+using Dukebox.Library.Interfaces;
+using Dukebox.Library.Model;
 using Dukebox.Library.Model.Services;
 using Dukebox.Library.Services;
 using log4net;
@@ -17,9 +21,12 @@ namespace Dukebox.Model.Services
     /// </summary>
     public class AudioFileMetaData
     {
+        private static readonly ILog logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        private static readonly ILog Logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-        
+        private IAlbumArtCacheService _albumArtCache;
+        private ICdMetadataService _cdMetadataService;
+        private IAudioCdService _audioCdService;
+   
         #region Metadata properties
 
         private string _title = string.Empty;
@@ -50,7 +57,7 @@ namespace Dukebox.Model.Services
                 }
                 else
                 {
-                    _artist = value;
+                    _title = value;
                 }
             }
         }
@@ -98,7 +105,7 @@ namespace Dukebox.Model.Services
                 }
                 else
                 {
-                    _artist = value;
+                    _album = value;
                 }
             }
         }
@@ -145,14 +152,65 @@ namespace Dukebox.Model.Services
                     throw new InvalidOperationException("There is no metadata tag available for this audio file!");
                 }
 
-                if (AlbumArtCacheService.GetInstance().CheckCacheForAlbum(_dbAlbumId))
+                if (_albumArtCache.CheckCacheForAlbum(_dbAlbumId))
                 {
-                    return AlbumArtCacheService.GetInstance().GetAlbumArtFromCache(_dbAlbumId);
+                    return _albumArtCache.GetAlbumArtFromCache(_dbAlbumId);
                 }
 
-                Logger.InfoFormat("Fetching album artwork from file: {0}", _audioFile.getFile().getPath());
+                logger.InfoFormat("Fetching album artwork from file: {0}", _audioFile.getFile().getPath());
                 return Image.FromStream(new MemoryStream(_tag.getFirstArtwork().getBinaryData()));
             }
+        }
+
+        #endregion
+
+        public static AudioFileMetaData BuildAudioFileMetaData(CdMetadata cdMetadata, int trackNumber)
+        {
+            var audioFileMetadata = LibraryPackage.GetInstance<AudioFileMetaData>();
+
+            audioFileMetadata._title = cdMetadata.Tracks[trackNumber];
+            audioFileMetadata._artist = cdMetadata.Artist;
+            audioFileMetadata._album = cdMetadata.Album;
+
+            return audioFileMetadata;
+        }
+
+        public static AudioFileMetaData BuildAudioFileMetaData(string fileName, long albumId = -1)
+        {
+            var audioFileMetadata = LibraryPackage.GetInstance<AudioFileMetaData>();
+
+            try
+            {
+                var fileInfo = new FileInfo(fileName);
+
+                if (fileInfo.Extension != ".cda")
+                {
+                    audioFileMetadata._audioFile = AudioFileIO.read(new java.io.File(fileName));
+                    audioFileMetadata._tag = audioFileMetadata._audioFile.getTag();
+                }
+                else
+                {
+                    audioFileMetadata.GetDetailsFromCddbServer(fileName);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error(string.Format("Error occured while parsing metadata from audio file '{0}'", fileName), ex);
+
+                audioFileMetadata._tag = null;
+                audioFileMetadata.GetTrackDetailsFromUnsupportedFormat(fileName);
+            }
+
+            audioFileMetadata._dbAlbumId = albumId;
+
+            return audioFileMetadata;
+        }
+
+        public AudioFileMetaData(IAlbumArtCacheService albumArtCache, ICdMetadataService cdMetadataService, IAudioCdService audioCdService)
+        {
+            _albumArtCache = albumArtCache;
+            _cdMetadataService = cdMetadataService;
+            _audioCdService = audioCdService;
         }
 
         /// <summary>
@@ -179,43 +237,7 @@ namespace Dukebox.Model.Services
 
             return string.Empty;
         }
-
-        #endregion
-
-        public AudioFileMetaData(CdMetadata cdMetadata, int trackNumber)
-        {
-            _title = cdMetadata.Tracks[trackNumber];
-            _artist = cdMetadata.Artist;
-            _album = cdMetadata.Album;
-        }
-
-        public AudioFileMetaData(string fileName, long albumId = -1)
-        {
-            try
-            {
-                var fileInfo = new FileInfo(fileName);
-
-                if (fileInfo.Extension != ".cda")
-                {
-                    _audioFile = AudioFileIO.read(new java.io.File(fileName));
-                    _tag = _audioFile.getTag();
-                }
-                else
-                {
-                    GetDetailsFromCddbServer(fileName);
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(string.Format("Error occured while parsing metadata from audio file '{0}'", fileName), ex);
-                
-                _tag = null;
-                GetTrackDetailsFromUnsupportedFormat(fileName);
-            }
-
-            _dbAlbumId = albumId;
-        }
-
+        
         private void GetTrackDetailsFromUnsupportedFormat(string fileName)
         {
             string title = string.Empty;
@@ -248,7 +270,7 @@ namespace Dukebox.Model.Services
                 }
             }
 
-            Logger.Info("Parsed '" + fileName + "' as " + artist + " - " + title);
+            logger.InfoFormat("Parsed '{0}' as {1} - {2}", fileName, artist, title);
                         
             _title = title;
             _artist = artist;
@@ -257,8 +279,8 @@ namespace Dukebox.Model.Services
 
         private void GetDetailsFromCddbServer(string fileName)
         {
-            CdMetadata cdData = CdMetadata.GetMetadataForCd(fileName[0]);
-            int trackIdx = MediaPlayer.GetTrackNumberFromCdaFilename(fileName);
+            CdMetadata cdData = _cdMetadataService.GetMetadataForCd(fileName[0]);
+            int trackIdx = _audioCdService.GetTrackNumberFromCdaFilename(fileName);
 
             _artist = cdData.Artist;
             _album = cdData.Album;

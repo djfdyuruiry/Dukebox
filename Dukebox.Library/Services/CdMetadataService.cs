@@ -1,5 +1,8 @@
 ﻿using Dukebox.Audio;
+using Dukebox.Audio.Interfaces;
+using Dukebox.Library.Interfaces;
 using Dukebox.Model.Services;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,35 +16,32 @@ namespace Dukebox.Library.Model.Services
     /// Holds metadata for a single audio CD. Use GetMetatadataFormCd(..) to
     /// generate an instance of this class.
     /// </summary>
-    public class CdMetadata
+    public class CdMetadataService : ICdMetadataService
     {
-        public static readonly Uri CDDB_SERVER = new Uri("http://www.freedb.org/");
+        private static readonly ILog logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        public static readonly Uri cddbServer = new Uri("http://www.freedb.org/");
 
-        public string Artist { get; set; }
-        public string Album { get; set; }
-        public List<string> Tracks { get; set; }
+        private IAudioCdService _audioCdService;
 
-        /// <summary>
-        /// Prevent external instantiation.
-        /// </summary>
-        private CdMetadata()
+        public CdMetadataService(IAudioCdService audioCdService)
         {
+            _audioCdService = audioCdService;
         }
 
-        public static CdMetadata GetMetadataForCd(char driveLetter)
+        public CdMetadata GetMetadataForCd(char driveLetter)
         {
             driveLetter = Char.ToLower(driveLetter);
 
             // Not a valid drive letter.
             if (driveLetter < 'a' || driveLetter > 'z')
             {
-                throw new ArgumentException("'" + driveLetter + "' is not a valid drive letter! Drive letter should be a letter between a-z.");
+                throw new ArgumentException(string.Format("'{0}' is not a valid drive letter! Drive letter should be a letter between a-z.", driveLetter));
             }
 
             CheckForCddbServerConnection();
 
             // Find drive details.
-            int driveIndex = MediaPlayer.GetCdDriveIndex(driveLetter);
+            int driveIndex = _audioCdService.GetCdDriveIndex(driveLetter);
 
             string cddbResponse = BassCd.BASS_CD_GetID(driveIndex, BASSCDId.BASS_CDID_CDDB_QUERY);
             string entries = BassCd.BASS_CD_GetID(driveIndex, BASSCDId.BASS_CDID_CDDB_QUERY + 1);
@@ -83,13 +83,13 @@ namespace Dukebox.Library.Model.Services
         /// This methods throws an exception if there is
         /// no connection to the CDDB_SERVER.
         /// </summary>
-        public static void CheckForCddbServerConnection()
+        public void CheckForCddbServerConnection()
         {
             try
             {
                 using (var client = new WebClient())
                 {
-                    using (var stream = client.OpenRead(CDDB_SERVER))
+                    using (var stream = client.OpenRead(cddbServer))
                     {
 
                     }
@@ -97,18 +97,21 @@ namespace Dukebox.Library.Model.Services
             }
             catch (Exception ex)
             {
-                throw new Exception("Cannot connect to CDDB information server @ '" + CDDB_SERVER + "'! (" + ex.Message + ")");
+                var errMsg = string.Format("Cannot connect to CDDB information server @ '{0}'", cddbServer);
+
+                logger.Error(errMsg, ex);
+                throw new Exception(errMsg, ex);
             }
         }
 
-        public static List<AudioFileMetaData> GetAudioFileMetaDataForCd(char driveLetter)
+        public List<AudioFileMetaData> GetAudioFileMetaDataForCd(char driveLetter)
         {
             CdMetadata metadata = GetMetadataForCd(driveLetter);
             List<AudioFileMetaData> audioMetadata = new List<AudioFileMetaData>();
 
             for (int i = 0; i < metadata.Tracks.Count(); i++)
             {
-                audioMetadata.Add(new AudioFileMetaData(metadata, i));
+                audioMetadata.Add(AudioFileMetaData.BuildAudioFileMetaData(metadata, i));
             }
 
             return audioMetadata;

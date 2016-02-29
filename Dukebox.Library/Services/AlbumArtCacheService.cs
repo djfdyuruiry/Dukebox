@@ -1,4 +1,5 @@
 ﻿using Dukebox.Library.Config;
+using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
 using Dukebox.Model.Services;
 using log4net;
@@ -9,27 +10,18 @@ using System.IO;
 
 namespace Dukebox.Library.Services
 {
-    public class AlbumArtCacheService
+    public class AlbumArtCacheService : IAlbumArtCacheService
     {
-        private static readonly ILog _logger = LogManager.GetLogger(typeof(AlbumArtCacheService));
-        private static AlbumArtCacheService _instance;
+        private static readonly ILog logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        private readonly IDukeboxSettings _settings;
         private bool _errorBuildingCachePath;
         private string _cachePath;
 
-        private AlbumArtCacheService()
+        public AlbumArtCacheService(IDukeboxSettings settings)
         {
+            _settings = settings;
             BuildCachePath();
-        }
-
-        public static AlbumArtCacheService GetInstance()
-        {
-            if (_instance == null)
-            {
-                _instance = new AlbumArtCacheService();
-            }
-
-            return _instance;
         }
 
         private void BuildCachePath()
@@ -38,7 +30,7 @@ namespace Dukebox.Library.Services
 
             try
             {
-                var relativePath = DukeboxSettings.GetSettingAsString("albumArtCachePath");
+                var relativePath = _settings.AlbumArtCachePath;
                 var absolutePath = Path.GetFullPath(relativePath);
 
                 if (!Directory.Exists(absolutePath))

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Dukebox.Library.CdRipping
+namespace Dukebox.Library.Interfaces
 {
     public interface ICdRipViewUpdater
     {

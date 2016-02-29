@@ -72,6 +72,14 @@
       <HintPath>..\packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="SimpleInjector, Version=3.1.2.0, Culture=neutral, PublicKeyToken=984cb50dea722e99, processorArchitecture=MSIL">
+      <HintPath>..\packages\SimpleInjector.3.1.2\lib\net45\SimpleInjector.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="SimpleInjector.Packaging, Version=3.1.2.0, Culture=neutral, PublicKeyToken=984cb50dea722e99, processorArchitecture=MSIL">
+      <HintPath>..\packages\SimpleInjector.Packaging.3.1.2\lib\net40-client\SimpleInjector.Packaging.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
@@ -102,17 +110,26 @@
   <ItemGroup>
     <Compile Include="album.cs" />
     <Compile Include="artist.cs" />
-    <Compile Include="CdRipping\CdRipHelper.cs" />
-    <Compile Include="CdRipping\ICdRipViewUpdater.cs" />
+    <Compile Include="Interfaces\ICdRipViewUpdater.cs" />
     <Compile Include="Config\DukeboxSettings.cs" />
+    <Compile Include="Interfaces\IDukeboxSettings.cs" />
     <Compile Include="Library.cs" />
+    <Compile Include="LibraryPackage.cs" />
     <Compile Include="Model\AlbumArtCacheOperations.cs" />
     <Compile Include="Model\AudioFileImportedEventArgs.cs" />
     <Compile Include="Model\AudioFileImportedStatus.cs" />
+    <Compile Include="Model\CdMetadata.cs" />
+    <Compile Include="Model\NewTrackLoadedEventArgs.cs" />
+    <Compile Include="Model\TrackListAccessEventArgs.cs" />
     <Compile Include="playlist.cs" />
+    <Compile Include="Interfaces\IMusicLibrary.cs" />
     <Compile Include="Services\AlbumArtCacheService.cs" />
-    <Compile Include="Services\CdMetadata.cs" />
+    <Compile Include="Services\AudioCdRippingService.cs" />
+    <Compile Include="Services\CdMetadataService.cs" />
     <Compile Include="Services\AudioFileMetaData.cs" />
+    <Compile Include="Interfaces\IAlbumArtCacheService.cs" />
+    <Compile Include="Interfaces\ICdMetadataService.cs" />
+    <Compile Include="Interfaces\IAudioCdRippingService.cs" />
     <Compile Include="Services\Playlist.cs" />
     <Compile Include="Library.CustomExtensions.cs" />
     <Compile Include="Repositories\MusicLibrary.cs" />

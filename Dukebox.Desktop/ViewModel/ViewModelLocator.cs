@@ -1,9 +1,11 @@
 ﻿using Dukebox.Desktop.Interfaces;
+using Dukebox.Library;
 using GalaSoft.MvvmLight.Ioc;
 using SimpleInjector;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace Dukebox.Desktop.ViewModel
@@ -24,6 +26,13 @@ namespace Dukebox.Desktop.ViewModel
             container.RegisterSingleton<LibraryListingViewModel, LibraryListingViewModel>();
             container.RegisterSingleton<RecentlyPlayedListingViewModel, RecentlyPlayedListingViewModel>();
             container.RegisterSingleton<AudioCdViewModel, AudioCdViewModel>();
+
+            var assemblies = new List<Assembly>
+            {
+                Assembly.GetAssembly(typeof(LibraryPackage))
+            };
+
+            container.RegisterPackages(assemblies);
         }
 
         public IMainWindowViewModel MainWindow
