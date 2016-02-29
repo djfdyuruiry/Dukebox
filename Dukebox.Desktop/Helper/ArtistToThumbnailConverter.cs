@@ -1,4 +1,5 @@
 ﻿using Dukebox.Desktop.Model;
+using Dukebox.Library;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -20,13 +21,13 @@ namespace Dukebox.Desktop.Helper
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var artist = value as Artist;
+            var artist = value as artist;
             // return a blank thumbnail if artist is null
             var artistLetter = string.Empty;
 
             if (artist != null)
             {
-                artistLetter = string.IsNullOrEmpty(artist.Title) ? UnkownArtistLetter : artist.Title.Substring(0, 1).ToUpper(); 
+                artistLetter = string.IsNullOrEmpty(artist.name) ? UnkownArtistLetter : artist.name.Substring(0, 1).ToUpper(); 
             }
 
             var thumbnail = new Bitmap(DefaultThumbnailSize.Width, DefaultThumbnailSize.Height);

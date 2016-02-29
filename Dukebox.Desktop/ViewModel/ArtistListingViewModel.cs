@@ -1,6 +1,7 @@
 ﻿using Dukebox.Desktop.Helper;
 using Dukebox.Desktop.Interfaces;
 using Dukebox.Desktop.Model;
+using Dukebox.Library;
 using GalaSoft.MvvmLight.Command;
 using System;
 using System.Collections.Generic;
@@ -12,8 +13,8 @@ namespace Dukebox.Desktop.ViewModel
 {
     public class ArtistListingViewModel : ViewModelBase, IArtistListingViewModel
     {
-        private List<Artist> _artists;
-        private ListSearchHelper<Artist> _listSearchHelper;
+        private List<artist> _artists;
+        private ListSearchHelper<artist> _listSearchHelper;
         private string _searchText;
 
         public ICommand ClearSearch { get; private set; }
@@ -39,7 +40,7 @@ namespace Dukebox.Desktop.ViewModel
                 return true;
             }
         }
-        public List<Artist> Artists
+        public List<artist> Artists
         {
             get
             {
@@ -51,31 +52,31 @@ namespace Dukebox.Desktop.ViewModel
         {
             ClearSearch = new RelayCommand(() => SearchText = string.Empty);
 
-            _artists = new List<Artist>()
+            _artists = new List<artist>()
             {
-                new Artist(){ Title = "Times" },
-                new Artist(){ Title = "Rave Madness" },
-                new Artist(){ Title = "One" },
-                new Artist(){ Title = "Jolata True" },
-                new Artist(){ Title = "Rave Madness" },
-                new Artist(){ Title = "One" },
-                new Artist(){ Title = "Jolata True" },
-                new Artist(){ Title = "Rave Madness" },
-                new Artist(){ Title = "One" },
-                new Artist(){ Title = "Jolata True" },
-                new Artist(){ Title = "Rave Madness" },
-                new Artist(){ Title = "One" },
-                new Artist(){ Title = "Jolata True" },
-                new Artist(){ Title = "Rave Madness" },
-                new Artist(){ Title = "One" }
+                new artist(){ name = "Times" },
+                new artist(){ name = "Rave Madness" },
+                new artist(){ name = "One" },
+                new artist(){ name = "Jolata True" },
+                new artist(){ name = "Rave Madness" },
+                new artist(){ name = "One" },
+                new artist(){ name = "Jolata True" },
+                new artist(){ name = "Rave Madness" },
+                new artist(){ name = "One" },
+                new artist(){ name = "Jolata True" },
+                new artist(){ name = "Rave Madness" },
+                new artist(){ name = "One" },
+                new artist(){ name = "Jolata True" },
+                new artist(){ name = "Rave Madness" },
+                new artist(){ name = "One" }
             };
 
-            _artists = _artists.OrderBy(a => a.Title).ToList();
+            _artists = _artists.OrderBy(a => a.name).ToList();
 
-            _listSearchHelper = new ListSearchHelper<Artist>
+            _listSearchHelper = new ListSearchHelper<artist>
             {
                 Items = _artists,
-                FilterLambda = Artist.Filter
+                FilterLambda = (a, s) => a.name.ToLower().Contains(s.ToLower())
             };
         }
 

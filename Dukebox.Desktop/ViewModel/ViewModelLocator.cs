@@ -17,7 +17,7 @@ namespace Dukebox.Desktop.ViewModel
             container = new Container();
             
             container.RegisterSingleton<IMainWindowViewModel, MainWindowViewModel>();
-            container.RegisterSingleton<ISongListingViewModel, LibraryListingViewModel>();
+            container.RegisterSingleton<ITrackListingViewModel, LibraryListingViewModel>();
             container.RegisterSingleton<IAlbumListingViewModel, AlbumListingViewModel>();
             container.RegisterSingleton<IArtistListingViewModel, ArtistListingViewModel>();
             container.RegisterSingleton<ISearchControlViewModel, SearchControlViewModelDummy>();
@@ -34,11 +34,11 @@ namespace Dukebox.Desktop.ViewModel
             }
         }
 
-        public ISongListingViewModel ILibraryListing
+        public ITrackListingViewModel ILibraryListing
         {
             get
             {
-                return container.GetInstance<ISongListingViewModel>();
+                return container.GetInstance<ITrackListingViewModel>();
             }
         }
 
@@ -66,7 +66,7 @@ namespace Dukebox.Desktop.ViewModel
             }
         }
 
-        public ISongListingViewModel LibraryListing
+        public ITrackListingViewModel LibraryListing
         {
             get
             {
@@ -74,7 +74,7 @@ namespace Dukebox.Desktop.ViewModel
             }
         }
 
-        public ISongListingViewModel RecentlyPlayedListing
+        public ITrackListingViewModel RecentlyPlayedListing
         {
             get
             {
@@ -82,7 +82,7 @@ namespace Dukebox.Desktop.ViewModel
             }
         }
 
-        public ISongListingViewModel AudioCdListing
+        public ITrackListingViewModel AudioCdListing
         {
             get
             {

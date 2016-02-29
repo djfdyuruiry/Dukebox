@@ -17,9 +17,9 @@ namespace Dukebox.Desktop.Views
     /// <summary>
     /// Interaction logic for LibraryListing.xaml
     /// </summary>
-    public partial class SongListing : UserControl
+    public partial class TrackListing : UserControl
     {
-        public SongListing()
+        public TrackListing()
         {
             InitializeComponent();
         }

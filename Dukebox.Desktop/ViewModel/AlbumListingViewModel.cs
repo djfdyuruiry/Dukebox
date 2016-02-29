@@ -1,6 +1,7 @@
 ﻿using Dukebox.Desktop.Helper;
 using Dukebox.Desktop.Interfaces;
 using Dukebox.Desktop.Model;
+using Dukebox.Library;
 using GalaSoft.MvvmLight.Command;
 using System;
 using System.Collections.Generic;
@@ -12,8 +13,8 @@ namespace Dukebox.Desktop.ViewModel
 {
     public class AlbumListingViewModel : ViewModelBase, IAlbumListingViewModel
     {
-        private List<Album> _albums;
-        private ListSearchHelper<Album> _listSearchHelper;
+        private List<album> _albums;
+        private ListSearchHelper<album> _listSearchHelper;
         private string _searchText;
 
         public ICommand ClearSearch { get; private set; }
@@ -39,7 +40,7 @@ namespace Dukebox.Desktop.ViewModel
                 return true;
             }
         }
-        public List<Album> Albums
+        public List<album> Albums
         {
             get
             {
@@ -51,31 +52,31 @@ namespace Dukebox.Desktop.ViewModel
         {
             ClearSearch = new RelayCommand(() => SearchText = string.Empty);
 
-            _albums = new List<Album>()
+            _albums = new List<album>()
             {
-                new Album(){ Title = "Times" },
-                new Album(){ Title = "Rave Madness" },
-                new Album(){ Title = "One" },
-                new Album(){ Title = "Jolata True" },
-                new Album(){ Title = "Rave Madness" },
-                new Album(){ Title = "One" },
-                new Album(){ Title = "Jolata True" },
-                new Album(){ Title = "Rave Madness" },
-                new Album(){ Title = "One" },
-                new Album(){ Title = "Jolata True" },
-                new Album(){ Title = "Rave Madness" },
-                new Album(){ Title = "One" },
-                new Album(){ Title = "Jolata True" },
-                new Album(){ Title = "Rave Madness" },
-                new Album(){ Title = "One" }
+                new album(){ name = "Times" },
+                new album(){ name = "Rave Madness" },
+                new album(){ name = "One" },
+                new album(){ name = "Jolata True" },
+                new album(){ name = "Rave Madness" },
+                new album(){ name = "One" },
+                new album(){ name = "Jolata True" },
+                new album(){ name = "Rave Madness" },
+                new album(){ name = "One" },
+                new album(){ name = "Jolata True" },
+                new album(){ name = "Rave Madness" },
+                new album(){ name = "One" },
+                new album(){ name = "Jolata True" },
+                new album(){ name = "Rave Madness" },
+                new album(){ name = "One" }
             };
 
-            _albums = _albums.OrderBy(a => a.Title).ToList();
+            _albums = _albums.OrderBy(a => a.name).ToList();
 
-            _listSearchHelper = new ListSearchHelper<Album>
+            _listSearchHelper = new ListSearchHelper<album>
             {
                 Items = _albums,
-                FilterLambda = Album.Filter
+                FilterLambda = (a, s) => a.name.ToLower().Contains(s.ToLower())
             };
         }
 

@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Dukebox.Desktop.Views.SongListing"
+﻿<UserControl x:Class="Dukebox.Desktop.Views.TrackListing"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -7,7 +7,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="592" d:DesignWidth="1016"
              Background="White"
-             Name="SongListingControl"
+             Name="TrackListingControl"
              DataContext="{Binding ILibraryListing, Source={StaticResource ViewModelLocator}}">
     <Grid>
         <Grid.RowDefinitions>
@@ -19,7 +19,7 @@
         </Grid.ColumnDefinitions>
         <DukeboxViews:SearchControl Grid.Row="0" 
                                     Grid.Column="0" 
-                                    DataContext="{Binding ElementName=SongListingControl, Path=DataContext}">
+                                    DataContext="{Binding ElementName=TrackListingControl, Path=DataContext}">
         </DukeboxViews:SearchControl>
         <DataGrid Grid.Row="1" 
                   Grid.Column="0" 
@@ -29,7 +29,7 @@
                   CanUserResizeColumns="True"
                   CanUserReorderColumns="True"
                   CanUserSortColumns="True"
-                  ItemsSource="{Binding Songs}">
+                  ItemsSource="{Binding Tracks}">
             <DataGrid.RowStyle>
                 <Style TargetType="DataGridRow">
                 </Style>
@@ -43,21 +43,21 @@
                 <DataGridTemplateColumn Header="Artist" Width="auto" SortMemberPath="Artist" IsReadOnly="{Binding EditingListingsDisabled}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Artist}" />
+                            <TextBlock Text="{Binding Artist.name}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTemplateColumn Header="Album" Width="auto" SortMemberPath="Album" IsReadOnly="{Binding EditingListingsDisabled}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Album}" />
+                            <TextBlock Text="{Binding Album.name}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="Track" Width="*" SortMemberPath="Title" IsReadOnly="{Binding EditingListingsDisabled}">
+                <DataGridTemplateColumn Header="Title" Width="*" SortMemberPath="Song" IsReadOnly="{Binding EditingListingsDisabled}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Title}" />
+                            <TextBlock Text="{Binding Song.title}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>

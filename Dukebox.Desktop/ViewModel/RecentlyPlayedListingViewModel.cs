@@ -1,6 +1,8 @@
 ﻿using Dukebox.Desktop.Helper;
 using Dukebox.Desktop.Interfaces;
 using Dukebox.Desktop.Model;
+using Dukebox.Library;
+using Dukebox.Model.Services;
 using GalaSoft.MvvmLight.Command;
 using System;
 using System.Collections.Generic;
@@ -10,10 +12,10 @@ using System.Windows.Input;
 
 namespace Dukebox.Desktop.ViewModel
 {
-    public class RecentlyPlayedListingViewModel : ViewModelBase, ISongListingViewModel
+    public class RecentlyPlayedListingViewModel : ViewModelBase, ITrackListingViewModel
     {
-        private List<Song> _songs;
-        private ListSearchHelper<Song> _listSearchHelper;
+        private List<Track> _tracks;
+        private ListSearchHelper<Track> _listSearchHelper;
         private string _searchText;
 
         public ICommand ClearSearch { get; private set; }
@@ -32,7 +34,7 @@ namespace Dukebox.Desktop.ViewModel
                 OnPropertyChanged("SearchText");
             }
         }
-        public List<Song> Songs
+        public List<Track> Tracks
         {
             get
             {
@@ -59,18 +61,18 @@ namespace Dukebox.Desktop.ViewModel
         {
             ClearSearch = new RelayCommand(() => SearchText = string.Empty);
 
-            _songs = new List<Song>()
+            _tracks = new List<Track>()
             {
-                new Song(){ Artist = "Bob Dylan", Album = "Times", Title = "Are a changin'" },
-                new Song(){ Artist = "Marky Mark", Album = "Rave Madness", Title = "Good Vibrations" },
-                new Song(){ Artist = "VNV Nation", Album = "Matter+Form", Title = "Lightwave" },
-                new Song(){ Artist = "Tracy Chapman", Album = "Jolata True", Title = "Fast Car" }
+                new Track(){ Artist = new artist {name= "Bob Dylan"}, Album = new album {name = "Times"}, Song = new song { title = "Are a changin'"} },
+                new Track(){ Artist = new artist {name= "Marky Mark"}, Album = new album {name = "Rave Madness"}, Song = new song { title = "Good Vibrations"} },
+                new Track(){ Artist = new artist {name= "VNV Nation"}, Album = new album {name = "Matter+Form"}, Song = new song { title = "Lightwave"} },
+                new Track(){ Artist = new artist {name= "Tracy Chapman"}, Album = new album {name = "Jolata True"}, Song = new song { title = "Fast Car"} }
             };
 
-            _listSearchHelper = new ListSearchHelper<Song>
+            _listSearchHelper = new ListSearchHelper<Track>
             {
-                Items = _songs,
-                FilterLambda = Song.Filter
+                Items = _tracks,
+                FilterLambda = (t, s) => t.Song.title.ToLower().Contains(s.ToLower())
             };
         }
 
@@ -78,8 +80,8 @@ namespace Dukebox.Desktop.ViewModel
         {
             _listSearchHelper.SearchFilter = SearchText;
 
-            // trigger filtered items call via songs property
-            OnPropertyChanged("Songs");
+            // trigger filtered items call via Tracks property
+            OnPropertyChanged("Tracks");
         }
     }
 }
