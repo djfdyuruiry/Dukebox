@@ -3,17 +3,17 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Dukebox.Desktop.Model"
+             xmlns:local="clr-namespace:Dukebox.Library;assembly=Dukebox.Library"
              xmlns:DukeboxViews="clr-namespace:Dukebox.Desktop.Views" 
              mc:Ignorable="d" 
              d:DesignHeight="592" d:DesignWidth="1016"
              Name="AlbumListingControl"
              DataContext="{Binding IAlbumListing, Source={StaticResource ViewModelLocator}}">
     <UserControl.Resources>
-        <DataTemplate DataType="{x:Type local:Album}">
+        <DataTemplate DataType="{x:Type local:album}">
             <StackPanel>
                 <Image Source="../Graphics/black_7_music_node.png"/>
-                <TextBlock HorizontalAlignment="center" Text="{Binding Title}"/>
+                <TextBlock HorizontalAlignment="center" Text="{Binding name}"/>
             </StackPanel>
         </DataTemplate>
     </UserControl.Resources>

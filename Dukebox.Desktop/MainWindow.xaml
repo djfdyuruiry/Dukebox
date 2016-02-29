@@ -226,8 +226,8 @@
                         <ColumnDefinition Width="*"></ColumnDefinition>
                     </Grid.ColumnDefinitions>
                     <ContentControl Grid.Row="0" Grid.Column="0" Visibility="{Binding ShowLibraryListing}">
-                        <DukeboxViews:SongListing DataContext="{Binding LibraryListing, Source={StaticResource ViewModelLocator}}">
-                        </DukeboxViews:SongListing>
+                        <DukeboxViews:TrackListing DataContext="{Binding LibraryListing, Source={StaticResource ViewModelLocator}}">
+                        </DukeboxViews:TrackListing>
                     </ContentControl>
                     <ContentControl Grid.Row="0" Grid.Column="0" Visibility="{Binding ShowAlbumListing}">
                         <DukeboxViews:AlbumListing>
@@ -238,12 +238,12 @@
                         </DukeboxViews:ArtistListing>
                     </ContentControl>
                     <ContentControl Grid.Row="0" Grid.Column="0" Visibility="{Binding ShowRecentlyPlayedListing}">
-                        <DukeboxViews:SongListing DataContext="{Binding RecentlyPlayedListing, Source={StaticResource ViewModelLocator}}">
-                        </DukeboxViews:SongListing>
+                        <DukeboxViews:TrackListing DataContext="{Binding RecentlyPlayedListing, Source={StaticResource ViewModelLocator}}">
+                        </DukeboxViews:TrackListing>
                     </ContentControl>
                     <ContentControl Grid.Row="0" Grid.Column="0" Visibility="{Binding ShowAudioCdListing}">
-                        <DukeboxViews:SongListing DataContext="{Binding AudioCdListing, Source={StaticResource ViewModelLocator}}">
-                        </DukeboxViews:SongListing>
+                        <DukeboxViews:TrackListing DataContext="{Binding AudioCdListing, Source={StaticResource ViewModelLocator}}">
+                        </DukeboxViews:TrackListing>
                     </ContentControl>
                 </Grid>
             </Grid>
