@@ -62,10 +62,11 @@ namespace Dukebox.Desktop.ViewModel
 
             _tracks = new List<Track>()
             {
-                new Track(){ Artist = new artist {name= "Bob Dylan"}, Album = new album {name = "Times"}, Song = new song { title = "Are a changin'"} },
-                new Track(){ Artist = new artist {name= "Marky Mark"}, Album = new album {name = "Rave Madness"}, Song = new song { title = "Good Vibrations"} },
-                new Track(){ Artist = new artist {name= "VNV Nation"}, Album = new album {name = "Matter+Form"}, Song = new song { title = "Lightwave"} },
-                new Track(){ Artist = new artist {name= "Tracy Chapman"}, Album = new album {name = "Jolata True"}, Song = new song { title = "Fast Car"} }
+                Track.BuildTrackInstance(new album {name = "Times"}, new artist {name= "Bob Dylan"}, new song { title = "Are a changin'"}),
+                Track.BuildTrackInstance(new album {name = "Times"}, new artist {name= "Bob Dylan"}, new song { title = "Are a changin'"}),
+                Track.BuildTrackInstance(new album {name = "Times"}, new artist {name= "Bob Dylan"}, new song { title = "Are a changin'"}),
+                Track.BuildTrackInstance(new album {name = "Times"}, new artist {name= "Bob Dylan"}, new song { title = "Are a changin'"}),
+                Track.BuildTrackInstance(new album {name = "Times"}, new artist {name= "Bob Dylan"}, new song { title = "Are a changin'"})
             };
 
             _listSearchHelper = new ListSearchHelper<Track>

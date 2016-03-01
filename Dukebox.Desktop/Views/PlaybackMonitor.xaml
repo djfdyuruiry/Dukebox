@@ -1,0 +1,160 @@
+﻿<UserControl x:Class="Dukebox.Desktop.Views.PlaybackMonitor"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace;Dukebox.ViewModel"
+             mc:Ignorable="d" 
+             d:DesignHeight="160" d:DesignWidth="1024"
+             DataContext="{Binding IPlaybackMonitor, Source={StaticResource ViewModelLocator}}">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Styles/MetroButton.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid Grid.Row="0" Grid.Column="0" Background="White">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0.20*"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <!-- Current album art -->
+        <Grid Name="AlbumArtContainer" Grid.Row="0" Grid.Column="0">
+            <Image Name="CurrentAlbumArt" Height="auto" Width="auto" Source="../Graphics/black_7_music_node.png" ></Image>
+        </Grid>
+        <!-- Playing now -->
+        <Grid Name="PlayingNowContainer" Grid.Row="0" Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="0.65*"></RowDefinition>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <!-- Currently playing track details -->
+            <Grid Name="CurrentTrackDetailsContainer" Grid.Row="0" Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"></RowDefinition>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="0.2*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <!-- Track details -->
+                <Grid Name="CurrentlyPlayingTrackDetailsContainer" Grid.Row="0" Grid.Column="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"></RowDefinition>
+                        <RowDefinition Height="auto"></RowDefinition>
+                        <RowDefinition Height="auto"></RowDefinition>
+                        <RowDefinition Height="auto"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Name="CurrentArtist" 
+                               Grid.Row="0" 
+                               Grid.Column="0"
+                               Text="{Binding Path=Artist, StringFormat='Artist: {0}'}">
+                        <TextBlock.RenderTransform>
+                            <ScaleTransform ScaleX="1.5" ScaleY="1.5" />
+                        </TextBlock.RenderTransform>
+                    </TextBlock>
+                    <TextBlock Name="CurrentTrack" 
+                               Grid.Row="1" 
+                               Grid.Column="0" 
+                               Text="{Binding Path=Track, StringFormat='Track: {0}'}">
+                        <TextBlock.RenderTransform>
+                            <ScaleTransform ScaleX="1.5" ScaleY="1.5" />
+                        </TextBlock.RenderTransform>
+                    </TextBlock>
+                    <TextBlock Name="CurrentAlbum" 
+                               Grid.Row="2" 
+                               Grid.Column="0"
+                               Text="{Binding Path=Album, StringFormat='Album: {0}'}">
+                        <TextBlock.RenderTransform>
+                            <ScaleTransform ScaleX="1.5" ScaleY="1.5" />
+                        </TextBlock.RenderTransform>
+                    </TextBlock>
+                </Grid>
+                <!-- Track progress -->
+                <Grid Name="TrackProgessContainer" Grid.Row="0" Grid.Column="1">
+                    <TextBlock Name="CurrentTrackProgress" 
+                               HorizontalAlignment="Center" 
+                               VerticalAlignment="Top">
+                        <TextBlock.RenderTransform>
+                            <ScaleTransform ScaleX="1.5" ScaleY="1.5" />
+                        </TextBlock.RenderTransform>
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat="'{0}/{1}'">
+                                <Binding Path="TrackMinutesPassed"/>
+                                <Binding Path="TrackTotalMinutes"/>
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                </Grid>
+            </Grid>
+            <!-- Playback controls -->
+            <Grid Name="PlaybackControlsContainer" Grid.Row="1" Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"></RowDefinition>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="auto"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <!-- Playback buttons -->
+                <Grid Name="PlaybackButtonsContainter" Grid.Row="0" Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto"></ColumnDefinition>
+                        <ColumnDefinition Width="auto"></ColumnDefinition>
+                        <ColumnDefinition Width="auto"></ColumnDefinition>
+                        <ColumnDefinition Width="auto"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Button Name="PlayButton" 
+                            MaxWidth="64" 
+                            MaxHeight="64" 
+                            Grid.Row="0" 
+                            Grid.Column="0" 
+                            Command="{Binding PausePlayCommand}"
+                            Style="{StaticResource MetroButton}">
+                        <Image Source="{Binding PlayPauseImage}" />
+                    </Button>
+                    <Button Name="StopButton" 
+                            MaxWidth="64" 
+                            MaxHeight="64" 
+                            Grid.Row="0" 
+                            Grid.Column="1" 
+                            Command="{Binding StopCommand}"
+                            Style="{StaticResource MetroButton}">
+                        <Image Source="../Graphics/black_4_audio_stop.png" />
+                    </Button>
+                    <Button Name="BackButton" 
+                            MaxWidth="64" 
+                            MaxHeight="64" 
+                            Grid.Row="0" 
+                            Grid.Column="2" 
+                            Command="{Binding BackCommand}"
+                            Style="{StaticResource MetroButton}">
+                        <Image Source="../Graphics/black_4_audio_title_back.png" />
+                    </Button>
+                    <Button Name="ForwardButton" 
+                            MaxWidth="64" 
+                            MaxHeight="64" 
+                            Grid.Row="0" 
+                            Grid.Column="3" 
+                            Command="{Binding ForwardCommand}"
+                            Style="{StaticResource MetroButton}">
+                        <Image Source="../Graphics/black_4_audio_title_forward.png" />
+                    </Button>
+                </Grid>
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

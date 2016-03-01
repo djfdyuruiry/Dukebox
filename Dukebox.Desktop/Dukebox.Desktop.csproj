@@ -111,6 +111,7 @@
     <Compile Include="Helper\ArtistToThumbnailConverter.cs" />
     <Compile Include="Helper\ListSearchHelper.cs" />
     <Compile Include="Interfaces\IArtistListingViewModel.cs" />
+    <Compile Include="Interfaces\IPlaybackMonitorViewModel.cs" />
     <Compile Include="Interfaces\ISearchControlViewModel.cs" />
     <Compile Include="Model\NavIconNames.cs" />
     <Compile Include="ViewModel\AlbumListingViewModel.cs" />
@@ -119,6 +120,7 @@
     <Compile Include="Interfaces\IAlbumListingViewModel.cs" />
     <Compile Include="ViewModel\ArtistListingViewModel.cs" />
     <Compile Include="ViewModel\AudioCdListingViewModel.cs" />
+    <Compile Include="ViewModel\PlaybackMonitorViewModel.cs" />
     <Compile Include="ViewModel\RecentlyPlayedListingViewModel.cs" />
     <Compile Include="ViewModel\LibraryListingViewModel.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />
@@ -130,6 +132,9 @@
     </Compile>
     <Compile Include="Views\ArtistListing.xaml.cs">
       <DependentUpon>ArtistListing.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\PlaybackMonitor.xaml.cs">
+      <DependentUpon>PlaybackMonitor.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\SearchControl.xaml.cs">
       <DependentUpon>SearchControl.xaml</DependentUpon>
@@ -159,6 +164,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\ArtistListing.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\PlaybackMonitor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

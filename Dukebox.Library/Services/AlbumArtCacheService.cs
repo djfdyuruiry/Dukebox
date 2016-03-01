@@ -43,7 +43,7 @@ namespace Dukebox.Library.Services
             catch (Exception ex)
             {
                 _errorBuildingCachePath = true;
-                _logger.Error("Error building album art cache path.", ex);
+                logger.Error("Error building album art cache path.", ex);
             }
         }
 
@@ -51,7 +51,7 @@ namespace Dukebox.Library.Services
         {
             if (_errorBuildingCachePath)
             {
-                _logger.WarnFormat("Aborting cache operation '{0}' for album with id {1} as a previous error occurred when building cache path.", cacheOperation, albumId);
+                logger.WarnFormat("Aborting cache operation '{0}' for album with id {1} as a previous error occurred when building cache path.", cacheOperation, albumId);
             }
 
             return !_errorBuildingCachePath;
@@ -63,12 +63,12 @@ namespace Dukebox.Library.Services
 
             if (albumObj == null)
             {
-                _logger.InfoFormat("Not processing song with id {0} into album art cache as it has no associated album.", songToProcess.id);
+                logger.InfoFormat("Not processing song with id {0} into album art cache as it has no associated album.", songToProcess.id);
                 return;
             }
             else if (!metadata.HasFutherMetadataTag || !metadata.HasAlbumArt)
             {
-                _logger.InfoFormat("Not processing song with id {0} into album art cache as the song does not contain album art data.", songToProcess.id);
+                logger.InfoFormat("Not processing song with id {0} into album art cache as the song does not contain album art data.", songToProcess.id);
                 return;
             }
 
@@ -81,7 +81,7 @@ namespace Dukebox.Library.Services
 
             if (CheckCacheForAlbum(albumId))
             {
-                _logger.InfoFormat("Not processing song with id {0} into album art cache as it is already in the album art cache.", songToProcess.id);
+                logger.InfoFormat("Not processing song with id {0} into album art cache as it is already in the album art cache.", songToProcess.id);
                 return;
             }
                                        
@@ -97,12 +97,12 @@ namespace Dukebox.Library.Services
                 }
 
                 stopwatch.Stop();
-                _logger.InfoFormat("Added album with id {0} into album art cache.", albumIdString);
-                _logger.DebugFormat("Adding album into album art cache took {0}ms. Album id: {1}", stopwatch.ElapsedMilliseconds, albumIdString);
+                logger.InfoFormat("Added album with id {0} into album art cache.", albumIdString);
+                logger.DebugFormat("Adding album into album art cache took {0}ms. Album id: {1}", stopwatch.ElapsedMilliseconds, albumIdString);
             }
             catch (Exception ex)
             {
-                _logger.Error(string.Format("Error adding album with id {0} into album art cache.", albumId), ex);
+                logger.Error(string.Format("Error adding album with id {0} into album art cache.", albumId), ex);
             }
         }
 
@@ -120,7 +120,7 @@ namespace Dukebox.Library.Services
             }
             catch (Exception ex)
             {
-                _logger.Error(string.Format("Error checking if album with id {0} is in album art cache.", albumId), ex);
+                logger.Error(string.Format("Error checking if album with id {0} is in album art cache.", albumId), ex);
                 return false;
             }
         }
@@ -139,7 +139,7 @@ namespace Dukebox.Library.Services
                     throw new Exception(string.Format("Album with id {0} is not in the album art cache.", albumId));
                 }
 
-                _logger.InfoFormat("Fetching album artwork for album with id {0} from ablum art file cache.", albumId);
+                logger.InfoFormat("Fetching album artwork for album with id {0} from ablum art file cache.", albumId);
                 var path = Path.Combine(_cachePath, albumId.ToString());
 
                 return Image.FromFile(path);
@@ -147,7 +147,7 @@ namespace Dukebox.Library.Services
             catch (Exception ex)
             {            
                 var msg = string.Format("Error getting album with id {0} from album art cache.", albumId);
-                _logger.Error(msg, ex);
+                logger.Error(msg, ex);
 
                 throw new Exception(string.Format("{0}: {1}", msg, ex.Message)); 
             }
