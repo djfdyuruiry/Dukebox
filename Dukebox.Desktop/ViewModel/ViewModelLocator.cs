@@ -17,8 +17,9 @@ namespace Dukebox.Desktop.ViewModel
         static ViewModelLocator()
         {
             container = new Container();
-            
+
             container.RegisterSingleton<IMainWindowViewModel, MainWindowViewModel>();
+            container.RegisterSingleton<IPlaybackMonitorViewModel, PlaybackMonitorViewModel>();
             container.RegisterSingleton<ITrackListingViewModel, LibraryListingViewModel>();
             container.RegisterSingleton<IAlbumListingViewModel, AlbumListingViewModel>();
             container.RegisterSingleton<IArtistListingViewModel, ArtistListingViewModel>();
@@ -40,6 +41,14 @@ namespace Dukebox.Desktop.ViewModel
             get
             {
                 return container.GetInstance<IMainWindowViewModel>();
+            }
+        }
+
+        public IPlaybackMonitorViewModel IPlaybackMonitor
+        {
+            get
+            {
+                return container.GetInstance<IPlaybackMonitorViewModel>();
             }
         }
 

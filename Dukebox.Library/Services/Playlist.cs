@@ -139,13 +139,7 @@ namespace Dukebox.Model.Services
         /// 
         /// </summary>
         public List<EventHandler> TrackListAccessHandlers { get; set; }
-
-        public Playlist(IMusicLibrary musicLibrary, IMediaPlayer mediaPlayer)
-        {
-            _musicLibrary = musicLibrary;
-            _mediaPlayer = mediaPlayer;
-        }
-
+        
         /// <summary>
         /// Get the current index in the playlist that is loaded into memory for playback.
         /// </summary>
@@ -206,8 +200,11 @@ namespace Dukebox.Model.Services
         /// Create a new playlist instance. All boolean
         /// playback flow control options default to false.
         /// </summary>
-        public Playlist()
+        public Playlist(IMusicLibrary musicLibrary, IMediaPlayer mediaPlayer)
         {
+            _musicLibrary = musicLibrary;
+            _mediaPlayer = mediaPlayer;
+
             Tracks = new List<Track>();
             _previousTracks = new Stack<int>();
             _currentTrackIndexMutex = new Mutex();
