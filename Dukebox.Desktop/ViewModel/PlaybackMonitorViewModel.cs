@@ -11,16 +11,22 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using GalaSoft.MvvmLight.Command;
+using Dukebox.Library.Interfaces;
+using Dukebox.Library.Model;
+using Dukebox.Desktop.Helper;
+using System.Windows;
 
 namespace Dukebox.Desktop.ViewModel
 {
     public class PlaybackMonitorViewModel : ViewModelBase, IPlaybackMonitorViewModel
     {
-        private const string defaultAlbumArtUri = @"pack://application:,,,/Resources/black_7_music_node.png";
-        private const string pauseImageUri = @"pack://application:,,,/Resources/black_4_audio_play.png";
-        private const string playImageUri = @"pack://application:,,,/Resources//black_4_audio_pause.png";
+        private const string defaultAlbumArtUri = @"pack://application:,,,/Graphics/black_7_music_node.png";
+        private const string pauseImageUri = @"pack://application:,,,/Graphics/black_4_audio_pause.png";
+        private const string playImageUri = @"pack://application:,,,/Graphics/black_4_audio_play.png";
 
-        private IMediaPlayer _mediaPlayer;
+        private readonly IMediaPlayer _mediaPlayer;
+        private readonly IAudioPlaylist _audioPlaylist;
+        private readonly ImageToImageSourceConverter _imageToImageSourceConverter;
 
         private string _artist;
         private string _track;
@@ -129,9 +135,12 @@ namespace Dukebox.Desktop.ViewModel
         public ICommand BackCommand { get; private set; }
         public ICommand ForwardCommand { get; private set; }
 
-        public PlaybackMonitorViewModel(IMediaPlayer mediaPlayer) : base()
+        public PlaybackMonitorViewModel(IMediaPlayer mediaPlayer, IAudioPlaylist audioPlaylist, 
+            ImageToImageSourceConverter imageToImageSourceConverter) : base()
         {
             _mediaPlayer = mediaPlayer;
+            _audioPlaylist = audioPlaylist;
+            _imageToImageSourceConverter = imageToImageSourceConverter;
 
             BuildDefaultAlbumArtImage();
             BuildPlayPauseImages();
@@ -139,17 +148,17 @@ namespace Dukebox.Desktop.ViewModel
             AlbumArt = _defaultAlbumArt;
             PlayPauseImage = _playImage;
 
-            SetupMediaPlayerEventListeners();
+            SetupAudioEventListeners();
             SetupPlaybackControlCommands();
-
-            // TODO: Hook AlbumArtChanged into current playlist
         }
 
         private void BuildDefaultAlbumArtImage()
         {
             var defaultAlbumArtImage = new BitmapImage();
+            var defaultAlbumArtResourceUri = new Uri(pauseImageUri, UriKind.RelativeOrAbsolute);
+
             defaultAlbumArtImage.BeginInit();
-            defaultAlbumArtImage.BaseUri = new Uri(defaultAlbumArtUri, UriKind.RelativeOrAbsolute);
+            defaultAlbumArtImage.StreamSource = Application.GetResourceStream(defaultAlbumArtResourceUri).Stream;
             defaultAlbumArtImage.EndInit();
 
             _defaultAlbumArt = defaultAlbumArtImage;
@@ -158,23 +167,28 @@ namespace Dukebox.Desktop.ViewModel
         private void BuildPlayPauseImages()
         {
             var pauseImage = new BitmapImage();
+            var pauseImageResourceUri = new Uri(pauseImageUri, UriKind.RelativeOrAbsolute);
             pauseImage.BeginInit();
-            pauseImage.BaseUri = new Uri(pauseImageUri, UriKind.RelativeOrAbsolute);
+            pauseImage.StreamSource = Application.GetResourceStream(pauseImageResourceUri).Stream;
             pauseImage.EndInit();
 
             _pauseImage = pauseImage;
             
             var playImage = new BitmapImage();
+            var playImageResourceUri = new Uri(playImageUri, UriKind.RelativeOrAbsolute);
+
             playImage.BeginInit();
-            playImage.BaseUri = new Uri(playImageUri, UriKind.RelativeOrAbsolute);
+            playImage.StreamSource = Application.GetResourceStream(playImageResourceUri).Stream;
             playImage.EndInit();
 
             _playImage = playImage;
         }
 
-        private void SetupMediaPlayerEventListeners()
+        private void SetupAudioEventListeners()
         {
             _mediaPlayer.LoadedTrackFromFile += (o, e) => LoadedTrackFromFile(e);
+            _audioPlaylist.NewTrackLoaded += (o, e) => LoadNewTrackAlbumArtIfPresent(e);
+
             _mediaPlayer.FinishedPlayingTrack += (o, e) => TrackFinishedPlaying();
             _mediaPlayer.AudioPositionChanged += (o, e) => TrackPositionChanged();
 
@@ -186,25 +200,36 @@ namespace Dukebox.Desktop.ViewModel
 
         private void SetupPlaybackControlCommands()
         {
-            PlayPauseCommand = new RelayCommand(() => _mediaPlayer.PausePlayAudio());
-            StopCommand = new RelayCommand(() => _mediaPlayer.StopAudio());
-
-            // TODO: Hook into back/forward methods for current playlist
+            PlayPauseCommand = new RelayCommand(_audioPlaylist.PausePlay);
+            StopCommand = new RelayCommand(_audioPlaylist.Stop);
+            BackCommand = new RelayCommand(_audioPlaylist.Back);
+            ForwardCommand = new RelayCommand(_audioPlaylist.Forward);
         }
 
         private void LoadedTrackFromFile(TrackLoadedFromFileEventArgs trackLoadedArgs)
         {
             TrackMinutesTotal = _mediaPlayer.AudioLengthInMins;
+            AlbumArt = _defaultAlbumArt;
 
             if (trackLoadedArgs.Metadata == null)
             {
-                Artist = Track = Album = string.Empty;
-                return;
+                Album = Artist = Track = string.Empty;
             }
 
             Artist = trackLoadedArgs.Metadata.ArtistName;
             Track = trackLoadedArgs.Metadata.TrackName;
             Album = trackLoadedArgs.Metadata.AlbumName;
+        }
+
+        private void LoadNewTrackAlbumArtIfPresent(NewTrackLoadedEventArgs newTrackArgs)
+        {
+            if (!newTrackArgs.Track.Metadata.HasAlbumArt)
+            {
+                AlbumArt = _defaultAlbumArt;
+                return;
+            }
+
+            AlbumArt = _imageToImageSourceConverter.Convert(newTrackArgs.Track.Metadata.AlbumArt);
         }
 
         private void TrackFinishedPlaying()

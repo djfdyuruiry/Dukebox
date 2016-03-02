@@ -1,5 +1,6 @@
 ﻿using Dukebox.Audio;
 using Dukebox.Audio.Interfaces;
+using Dukebox.Audio.Model;
 using Dukebox.Library;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
@@ -17,16 +18,13 @@ namespace Dukebox.Model.Services
     /// <summary>
     /// Provides facilities to create a playlist of
     /// audio tracks and manipulate it's flow of playback.
-    /// 
-    /// This class acts as an abstraction layer on top of the
-    /// MediaPlayer singleton class.
     /// </summary>
-    sealed public class Playlist : IDisposable
+    public class AudioPlaylist : IAudioPlaylist
     {
         private static readonly ILog logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        private IMusicLibrary _musicLibrary;
-        private IMediaPlayer _mediaPlayer;
+        private readonly IMusicLibrary _musicLibrary;
+        private readonly IMediaPlayer _mediaPlayer;
 
         /// <summary>
         /// The list of tracks in the playlist.
@@ -36,7 +34,11 @@ namespace Dukebox.Model.Services
         {
             get
             {
-                CallTrackListAccessHandlers();
+                if(TrackListAccess != null)
+                {
+                    TrackListAccess(this, new TrackListAccessEventArgs { TrackListSize = _tracks.Count });
+                }
+
                 return _tracks;
             }
             set
@@ -130,15 +132,8 @@ namespace Dukebox.Model.Services
 
         #region Event handlers
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public List<EventHandler> NewTrackLoadedHandlers { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public List<EventHandler> TrackListAccessHandlers { get; set; }
+        public event EventHandler<NewTrackLoadedEventArgs> NewTrackLoaded;
+        public event EventHandler<TrackListAccessEventArgs> TrackListAccess;
         
         /// <summary>
         /// Get the current index in the playlist that is loaded into memory for playback.
@@ -182,16 +177,17 @@ namespace Dukebox.Model.Services
 
                 _musicLibrary.RecentlyPlayed.Add(currentTrack);
 
-                NewTrackLoadedHandlers.ForEach(a => a.Invoke(this, new NewTrackLoadedEventArgs() { Track = _tracks[_currentTrackIndex], TrackIndex = _currentTrackIndex }));
-            }
-        }
+                if (NewTrackLoaded != null)
+                {
+                    var newTrackArgs = new NewTrackLoadedEventArgs
+                    {
+                        Track = _tracks[_currentTrackIndex],
+                        TrackIndex = _currentTrackIndex
+                    };
 
-        /// <summary>
-        /// 
-        /// </summary>
-        private void CallTrackListAccessHandlers()
-        {
-            TrackListAccessHandlers.ForEach(a => a.Invoke(this, new TrackListAccessEventArgs() { TrackListSize = _tracks.Count }));
+                    NewTrackLoaded(this, newTrackArgs);
+                }
+            }
         }
 
         #endregion
@@ -200,7 +196,7 @@ namespace Dukebox.Model.Services
         /// Create a new playlist instance. All boolean
         /// playback flow control options default to false.
         /// </summary>
-        public Playlist(IMusicLibrary musicLibrary, IMediaPlayer mediaPlayer)
+        public AudioPlaylist(IMusicLibrary musicLibrary, IMediaPlayer mediaPlayer)
         {
             _musicLibrary = musicLibrary;
             _mediaPlayer = mediaPlayer;
@@ -216,9 +212,6 @@ namespace Dukebox.Model.Services
             Shuffle = false;
             RepeatAll = false;
             Repeat = false;
-
-            NewTrackLoadedHandlers = new List<EventHandler>();
-            TrackListAccessHandlers = new List<EventHandler>();
         }
 
         /// <summary>
@@ -370,7 +363,14 @@ namespace Dukebox.Model.Services
             {
                 // Load current track into media player.
                 var currentTrack = _tracks[GetCurrentTrackIndex()];
-                _mediaPlayer.LoadFile(currentTrack.Song.filename);
+                var mediaPlayMetadata = new MediaPlayerMetadata
+                {
+                    AlbumName = currentTrack.Album.name,
+                    ArtistName = currentTrack.Artist.name,
+                    TrackName = currentTrack.Song.title
+                };
+
+                _mediaPlayer.LoadFile(currentTrack.Song.filename, mediaPlayMetadata);
 
                 // Wait until media player thread has started playback.
                 while (!_mediaPlayer.Playing)
@@ -505,9 +505,6 @@ namespace Dukebox.Model.Services
         public void Dispose()
         {
             _currentTrackIndexMutex.Dispose();
-
-            TrackListAccessHandlers.Clear();
-            NewTrackLoadedHandlers.Clear();
         }
     }
 }
