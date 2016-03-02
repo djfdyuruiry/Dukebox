@@ -30,11 +30,11 @@ namespace Dukebox.Library
             container.RegisterSingleton<IDukeboxSettings, DukeboxSettings>();
             container.RegisterSingleton<IAlbumArtCacheService, AlbumArtCacheService>();
             container.RegisterSingleton<ICdMetadataService, CdMetadataService>();
-            container.Register<Track>();
-            container.Register<Playlist>();
-            container.Register<AudioFileMetaData>();
             container.RegisterSingleton<IAudioCdRippingService, AudioCdRippingService>();
+            container.RegisterSingleton<IAudioPlaylist, AudioPlaylist>();
             container.RegisterSingleton<IMusicLibrary>(() => GetMusicLibraryInstance(container));
+            container.Register<Track>();
+            container.Register<AudioFileMetaData>();
 
             var assemblies = new List<Assembly> {Assembly.GetAssembly(typeof(AudioPackage))};
 

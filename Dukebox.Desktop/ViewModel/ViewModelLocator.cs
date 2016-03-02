@@ -1,4 +1,5 @@
-﻿using Dukebox.Desktop.Interfaces;
+﻿using Dukebox.Desktop.Helper;
+using Dukebox.Desktop.Interfaces;
 using Dukebox.Library;
 using GalaSoft.MvvmLight.Ioc;
 using SimpleInjector;
@@ -27,6 +28,7 @@ namespace Dukebox.Desktop.ViewModel
             container.RegisterSingleton<LibraryListingViewModel, LibraryListingViewModel>();
             container.RegisterSingleton<RecentlyPlayedListingViewModel, RecentlyPlayedListingViewModel>();
             container.RegisterSingleton<AudioCdViewModel, AudioCdViewModel>();
+            container.RegisterSingleton<ImageToImageSourceConverter>();
 
             var assemblies = new List<Assembly>
             {

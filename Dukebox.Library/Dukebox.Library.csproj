@@ -130,7 +130,8 @@
     <Compile Include="Interfaces\IAlbumArtCacheService.cs" />
     <Compile Include="Interfaces\ICdMetadataService.cs" />
     <Compile Include="Interfaces\IAudioCdRippingService.cs" />
-    <Compile Include="Services\Playlist.cs" />
+    <Compile Include="Interfaces\IAudioPlaylist.cs" />
+    <Compile Include="Services\AudioPlaylist.cs" />
     <Compile Include="Library.CustomExtensions.cs" />
     <Compile Include="Repositories\MusicLibrary.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
