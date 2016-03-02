@@ -1,4 +1,5 @@
 ﻿using Dukebox.Audio.Interfaces;
+using Dukebox.Audio.Model;
 using log4net;
 using System;
 using System.Collections.Generic;
@@ -25,8 +26,6 @@ namespace Dukebox.Audio
 
         private IAudioCdService _audioCdService;
 
-        #region Playback control properties
-        
         /// <summary>
         /// 
         /// </summary>
@@ -111,7 +110,12 @@ namespace Dukebox.Audio
         public bool Stopped { get; set; }
         public bool Finished { get; set; }
 
-        #endregion
+        public event EventHandler StartPlayingTrack;
+        public event EventHandler TrackPaused;
+        public event EventHandler TrackResumed;
+        public event EventHandler FinishedPlayingTrack;
+        public event EventHandler<TrackLoadedFromFileEventArgs> LoadedTrackFromFile;
+        public event EventHandler AudioPositionChanged;
 
         /// <summary>
         /// 
@@ -126,7 +130,7 @@ namespace Dukebox.Audio
         /// 
         /// </summary>
         /// <param name="fileName"></param>
-        public void LoadFile(string fileName)
+        public void LoadFile(string fileName, MediaPlayerMetadata mediaPlayerMetadata = null)
         {
             if (string.IsNullOrEmpty(fileName))
             {
@@ -151,6 +155,17 @@ namespace Dukebox.Audio
                 _playbackThread.Abort();
             }
 
+            if (LoadedTrackFromFile != null)
+            {
+                var eventArgs = new TrackLoadedFromFileEventArgs 
+                { 
+                    FileName = _fileName, 
+                    Metadata = mediaPlayerMetadata 
+                };
+
+                LoadedTrackFromFile(this, eventArgs);
+            }
+
             _playbackThread = new Thread(PlayAudioFile);
             _playbackThread.Start();
 
@@ -165,10 +180,20 @@ namespace Dukebox.Audio
             if (!Stopped)
             {
                 Playing = !Playing;
+
+                if (TrackPaused != null)
+                {
+                    TrackPaused(this, EventArgs.Empty);
+                }
             }
             else if (_fileName != string.Empty)
             {
                 LoadFile(_fileName);
+
+                if (StartPlayingTrack != null)
+                {
+                    StartPlayingTrack(this, EventArgs.Empty);
+                }
             }
         }
 
@@ -183,14 +208,19 @@ namespace Dukebox.Audio
             {
                 Bass.BASS_ChannelStop(_stream);
                 _playbackThread.Abort();
+
+                if (FinishedPlayingTrack != null)
+                {
+                    FinishedPlayingTrack(this, EventArgs.Empty);
+                }
             }
         }
 
-        public void ChangeAudioPosition(double newPosition)
+        public void ChangeAudioPosition(double newPositionInSeconds)
         {
-            if (Playing && newPosition >= 0 && newPosition <=  AudioLengthInSecs)
+            if (Playing && newPositionInSeconds >= 0 && newPositionInSeconds <=  AudioLengthInSecs)
             {
-                _newPosition = newPosition;
+                _newPosition = newPositionInSeconds;
             }
         }
 
@@ -207,7 +237,10 @@ namespace Dukebox.Audio
             }
             else
             {
-                _stream = BassCd.BASS_CD_StreamCreate(_audioCdService.GetCdDriveIndex(_fileName[0]), _audioCdService.GetTrackNumberFromCdaFilename(_fileName), BASSFlag.BASS_DEFAULT);
+                var driveIndex = _audioCdService.GetCdDriveIndex(_fileName[0]);
+                var trackNumber = _audioCdService.GetTrackNumberFromCdaFilename(_fileName);
+
+                _stream = BassCd.BASS_CD_StreamCreate(driveIndex, trackNumber, BASSFlag.BASS_DEFAULT);
             }
 
             if (_stream != 0)
@@ -224,10 +257,15 @@ namespace Dukebox.Audio
 
                 Playing = true;
                 Stopped = false;
+
+                if (StartPlayingTrack != null)
+                {
+                    StartPlayingTrack(this, EventArgs.Empty);
+                }
             }
             else // Error.
             {
-                string msg = "Error playing file '" + _fileName.Split('\\').LastOrDefault() + "'!" + " [BASS error code: " + Bass.BASS_ErrorGetCode().ToString() + "]";
+                string msg = string.Format("Error playing file '{0}' [BASS error code: {1}]", _fileName.Split('\\').LastOrDefault(), Bass.BASS_ErrorGetCode().ToString());
                 logger.Error(msg);
 
                 MessageBox.Show(msg, "Dukebox: Error Playing File", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -243,6 +281,11 @@ namespace Dukebox.Audio
                 {
                     Bass.BASS_ChannelPause(_stream);
 
+                    if (TrackPaused != null)
+                    {
+                        TrackPaused(this, EventArgs.Empty);
+                    }
+
                     // Wait while audio is paused.
                     while (!Playing && !Stopped)
                     {
@@ -253,6 +296,11 @@ namespace Dukebox.Audio
                     if (!Stopped)
                     {
                         Bass.BASS_ChannelPlay(_stream, false);
+
+                        if (TrackResumed != null)
+                        {
+                            TrackResumed(this, EventArgs.Empty);
+                        }
                     }
                 }
 
@@ -263,6 +311,11 @@ namespace Dukebox.Audio
                 }
 
                 Thread.Sleep(100);
+
+                if (AudioPositionChanged != null)
+                {
+                    AudioPositionChanged(this, EventArgs.Empty);
+                }
             }
 
             if (Stopped)
@@ -282,6 +335,11 @@ namespace Dukebox.Audio
 
             Playing = false;
             Stopped = false;
+
+            if (FinishedPlayingTrack != null)
+            {
+                FinishedPlayingTrack(this, EventArgs.Empty);
+            }
         }     
 
         /// <summary>
@@ -293,7 +351,7 @@ namespace Dukebox.Audio
         /// <param name="stream">The channel handler.</param>
         /// <param name="channelPosition">The position in the channel to convert to mintues.</param>
         /// <returns>A formatted string containing the equivalent minutes and second that the position is in the channel.</returns>
-        public string GetMinutesFromChannelPosition(int stream, long channelPosition)
+        private string GetMinutesFromChannelPosition(int stream, long channelPosition)
         {
             double lengthInSecs = Bass.BASS_ChannelBytes2Seconds(stream, channelPosition);
             int minutes = (int)(lengthInSecs / 60f);
@@ -314,7 +372,7 @@ namespace Dukebox.Audio
         /// <param name="stream">The channel handler.</param>
         /// <param name="channelPosition">The position in the channel to convert to seconds.</param>
         /// <returns>Number of seconds equivalent to the current position in the channel.</returns>
-        public double GetSecondsFromChannelPosition(int stream, long channelPosition)
+        private double GetSecondsFromChannelPosition(int stream, long channelPosition)
         {
             return Bass.BASS_ChannelBytes2Seconds(stream, channelPosition);
         }

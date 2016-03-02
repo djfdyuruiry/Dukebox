@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Dukebox.Audio.Model;
+using System;
 using Un4seen.Bass.Misc;
 
 namespace Dukebox.Audio.Interfaces
@@ -14,11 +15,15 @@ namespace Dukebox.Audio.Interfaces
         double SecondsPlayed { get; }
         bool Stopped { get; set; }
         bool Finished { get; set; }
-        void LoadFile(string fileName);
+        event EventHandler StartPlayingTrack;
+        event EventHandler TrackPaused;
+        event EventHandler TrackResumed;
+        event EventHandler FinishedPlayingTrack;
+        event EventHandler<TrackLoadedFromFileEventArgs> LoadedTrackFromFile;
+        event EventHandler AudioPositionChanged;
+        void LoadFile(string fileName, MediaPlayerMetadata metadata = null);
         void PausePlayAudio();
         void StopAudio();
-        void ChangeAudioPosition(double newPosition);
-        string GetMinutesFromChannelPosition(int stream, long channelPosition);
-        double GetSecondsFromChannelPosition(int stream, long channelPosition);
+        void ChangeAudioPosition(double newPositionInSeconds);
     }
 }
