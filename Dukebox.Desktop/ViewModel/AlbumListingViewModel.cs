@@ -52,8 +52,9 @@ namespace Dukebox.Desktop.ViewModel
             }
             private set
             {
-                _listSearchHelper.Items = value;
                 _albums = value;
+                _listSearchHelper.Items = _albums;
+                SearchText = string.Empty;
 
                 OnPropertyChanged("Albums");
             }
@@ -79,9 +80,6 @@ namespace Dukebox.Desktop.ViewModel
                 .Where(a => a.HasAlbumArt)
                 .Select(a => Album.BuildAlbumInstance(a))
                 .ToList();
-            _listSearchHelper.Items = Albums;
-
-            SearchText = string.Empty;
         }
 
         private void DoSearch()

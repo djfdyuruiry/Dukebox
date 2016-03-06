@@ -11,9 +11,13 @@ namespace Dukebox.Library.Interfaces
         event EventHandler ArtistAdded;
         event EventHandler AlbumAdded;
         event EventHandler PlaylistAdded;
-        IList<album> OrderedAlbums { get; }
-        IList<artist> OrderedArtists { get; }
-        IList<playlist> OrderedPlaylists { get; }
+        event EventHandler AlbumCacheRefreshed;
+        event EventHandler ArtistCacheRefreshed;
+        event EventHandler PlaylistCacheRefreshed;
+        event EventHandler CachesRefreshed;
+        List<album> OrderedAlbums { get; }
+        List<artist> OrderedArtists { get; }
+        List<playlist> OrderedPlaylists { get; }
         List<Track> RecentlyPlayed { get; set; }
         album GetAlbumById(long? albumId);
         int GetAlbumCount();

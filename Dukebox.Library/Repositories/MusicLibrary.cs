@@ -46,19 +46,28 @@ namespace Dukebox.Library.Repositories
         public event EventHandler ArtistAdded;
         public event EventHandler AlbumAdded;
         public event EventHandler PlaylistAdded;
+        public event EventHandler AlbumCacheRefreshed;
+        public event EventHandler ArtistCacheRefreshed;
+        public event EventHandler PlaylistCacheRefreshed;
+        public event EventHandler CachesRefreshed;
 
         #region Views on music library data
         
         /// <summary>
         /// All artists currently stored in the database. Cached.
         /// </summary>
-        public IList<artist> OrderedArtists
+        public List<artist> OrderedArtists
         {
             get
             {
                 if (_allArtistsCache == null)
                 {
                     _allArtistsCache = _dukeboxData.artists.OrderBy(a => a.name).ToList();
+
+                    if (ArtistCacheRefreshed != null)
+                    {
+                        ArtistCacheRefreshed(this, EventArgs.Empty);
+                    }
                 }
 
                 return _allArtistsCache;
@@ -68,26 +77,36 @@ namespace Dukebox.Library.Repositories
         /// <summary>
         /// All albums currently stored in the database. Cached.
         /// </summary>
-        public IList<album> OrderedAlbums
+        public List<album> OrderedAlbums
         {
             get
             {
                 if (_allAlbumsCache == null)
                 {
                     _allAlbumsCache = _dukeboxData.albums.OrderBy(a => a.name).ToList();
+
+                    if (AlbumCacheRefreshed != null)
+                    {
+                        AlbumCacheRefreshed(this, EventArgs.Empty);
+                    }
                 }
 
                 return _allAlbumsCache;
             }
         }
 
-        public IList<playlist> OrderedPlaylists        
+        public List<playlist> OrderedPlaylists        
         {
             get
             {
                 if (_allPlaylistsCache == null)
                 {
                     _allPlaylistsCache = _dukeboxData.playlists.OrderBy(a => a.name).ToList();
+
+                    if (PlaylistCacheRefreshed != null)
+                    {
+                        PlaylistCacheRefreshed(this, EventArgs.Empty);
+                    }
                 }
 
                 return _allPlaylistsCache;
@@ -547,6 +566,11 @@ namespace Dukebox.Library.Repositories
             stopwatch.Stop();
             logger.Info("Music library artist and album caches refreshed! (This happens after a DB update routine)");
             logger.DebugFormat("Refreshing library artist and album caches took {0}ms.", stopwatch.ElapsedMilliseconds);
+
+            if (CachesRefreshed != null)
+            {
+                CachesRefreshed(this, EventArgs.Empty);
+            }
         }
 
         #endregion
