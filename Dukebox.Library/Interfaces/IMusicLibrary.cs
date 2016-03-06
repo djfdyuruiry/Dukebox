@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using Dukebox.Library.Model;
 using Dukebox.Model.Services;
+using System.Collections.Specialized;
+using System.Collections.ObjectModel;
 
 namespace Dukebox.Library.Interfaces
 {
@@ -15,10 +17,12 @@ namespace Dukebox.Library.Interfaces
         event EventHandler ArtistCacheRefreshed;
         event EventHandler PlaylistCacheRefreshed;
         event EventHandler CachesRefreshed;
+        event EventHandler<NotifyCollectionChangedEventArgs> RecentlyPlayedListModified;
         List<album> OrderedAlbums { get; }
         List<artist> OrderedArtists { get; }
         List<playlist> OrderedPlaylists { get; }
-        List<Track> RecentlyPlayed { get; set; }
+        ObservableCollection<Track> RecentlyPlayed { get; }
+        List<Track> RecentlyPlayedAsList { get; }
         album GetAlbumById(long? albumId);
         int GetAlbumCount();
         artist GetArtistById(long? artistId);

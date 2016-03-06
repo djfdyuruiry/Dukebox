@@ -8,6 +8,8 @@ using log4net;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -41,6 +43,7 @@ namespace Dukebox.Library.Repositories
         private List<artist> _allArtistsCache;
         private List<album> _allAlbumsCache;
         private List<playlist> _allPlaylistsCache;
+        private ObservableCollection<Track> _recentlyPlayed;
 
         public event EventHandler SongAdded;
         public event EventHandler ArtistAdded;
@@ -50,6 +53,7 @@ namespace Dukebox.Library.Repositories
         public event EventHandler ArtistCacheRefreshed;
         public event EventHandler PlaylistCacheRefreshed;
         public event EventHandler CachesRefreshed;
+        public event EventHandler<NotifyCollectionChangedEventArgs> RecentlyPlayedListModified;
 
         #region Views on music library data
         
@@ -112,8 +116,16 @@ namespace Dukebox.Library.Repositories
                 return _allPlaylistsCache;
             }
         }
+        
+        public ObservableCollection<Track> RecentlyPlayed { get; private set; }
 
-        public List<Track> RecentlyPlayed { get; set; }
+        public List<Track> RecentlyPlayedAsList
+        {
+            get
+            {
+                return RecentlyPlayed.ToList();
+            }
+        }
 
         #endregion
         
@@ -129,10 +141,19 @@ namespace Dukebox.Library.Repositories
             _audioFormats = audioFormats;
             _albumArtCache = albumArtCache;
 
-            RecentlyPlayed = new List<Track>();
+            RecentlyPlayed = new ObservableCollection<Track>();
+            RecentlyPlayed.CollectionChanged += RecentlyPlayedChangedHander;
 
             _addAlbumMutex = new Mutex();
             _addArtistMutex = new Mutex();
+        }
+
+        private void RecentlyPlayedChangedHander(object source, NotifyCollectionChangedEventArgs eventData)
+        {
+            if (RecentlyPlayedListModified != null)
+            {
+                RecentlyPlayedListModified(this, eventData);
+            }
         }
 
         #region Folder/Playlist/File playback methods
@@ -587,6 +608,69 @@ namespace Dukebox.Library.Repositories
             return album.songs.Select(s => GetTrackFromFile(s.filename)).ToList();
         }
 
+        public artist GetArtistById(long? artistId)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            var artist = _dukeboxData.artists.Where(a => a.id == artistId).FirstOrDefault();
+
+            stopwatch.Stop();
+
+            if (artist == null)
+            {
+                throw new Exception(string.Format("No artist with the id '{0}' was found in the database.", artistId));
+            }
+
+            logger.DebugFormat("Look up for artist with id '{0}' took {1}ms.", artistId, stopwatch.ElapsedMilliseconds);
+            return artist;
+        }
+
+        public int GetArtistCount()
+        {
+            return _dukeboxData.artists.Count();
+        }
+
+        public album GetAlbumById(long? albumId)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            var album = _dukeboxData.albums.Where(a => a.id == albumId).FirstOrDefault();
+
+            stopwatch.Stop();
+
+            if (album == null)
+            {
+                throw new Exception(string.Format("No album with the id '{0}' was found in the database.", albumId));
+            }
+
+            logger.DebugFormat("Look up for album with id '{0}' took {1}ms.", albumId, stopwatch.ElapsedMilliseconds);
+            return album;
+        }
+
+        public int GetAlbumCount()
+        {
+            return _dukeboxData.albums.Count();
+        }
+
+        public playlist GetPlaylistById(long? playlistId)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            var playlist = _dukeboxData.playlists.Where(p => p.id == playlistId).FirstOrDefault();
+
+            stopwatch.Stop();
+
+            if (playlist == null)
+            {
+                throw new Exception(string.Format("No playlist with the id '{0}' was found in the database.", playlistId));
+            }
+
+            logger.DebugFormat("Look up for artist with id '{0}' took {1}ms.", playlistId, stopwatch.ElapsedMilliseconds);
+            return playlist;
+        }
+
+        public int GetPlaylistCount()
+        {
+            return _dukeboxData.playlists.Count();
+        }
+
         #endregion
 
         #region Library search
@@ -776,69 +860,6 @@ namespace Dukebox.Library.Repositories
         public static string GetFileExtension(string fileName)
         {
             return (new FileInfo(fileName)).Extension.ToLower();
-        }
-        
-        public artist GetArtistById(long? artistId)
-        {
-            var stopwatch = Stopwatch.StartNew();
-            var artist = _dukeboxData.artists.Where(a => a.id == artistId).FirstOrDefault();
-
-            stopwatch.Stop();
-
-            if (artist == null)
-            {
-                throw new Exception(string.Format("No artist with the id '{0}' was found in the database.", artistId));
-            }
-
-            logger.DebugFormat("Look up for artist with id '{0}' took {1}ms.", artistId, stopwatch.ElapsedMilliseconds);
-            return artist;
-        }
-
-        public int GetArtistCount()
-        {
-            return _dukeboxData.artists.Count();
-        }
-
-        public album GetAlbumById(long? albumId)
-        {
-            var stopwatch = Stopwatch.StartNew();
-            var album = _dukeboxData.albums.Where(a => a.id == albumId).FirstOrDefault();
-
-            stopwatch.Stop();
-
-            if (album == null)
-            {
-                throw new Exception(string.Format("No album with the id '{0}' was found in the database.", albumId));
-            }
-
-            logger.DebugFormat("Look up for album with id '{0}' took {1}ms.", albumId, stopwatch.ElapsedMilliseconds);
-            return album;
-        }
-
-        public int GetAlbumCount()
-        {
-            return _dukeboxData.albums.Count();
-        }
-
-        public playlist GetPlaylistById(long? playlistId)
-        {
-            var stopwatch = Stopwatch.StartNew();
-            var playlist = _dukeboxData.playlists.Where(p => p.id == playlistId).FirstOrDefault();
-
-            stopwatch.Stop();
-
-            if (playlist == null)
-            {
-                throw new Exception(string.Format("No playlist with the id '{0}' was found in the database.", playlistId));
-            }
-
-            logger.DebugFormat("Look up for artist with id '{0}' took {1}ms.", playlistId, stopwatch.ElapsedMilliseconds);
-            return playlist;
-        }
-
-        public int GetPlaylistCount()
-        {
-            return _dukeboxData.playlists.Count();
         }
     }
 }
