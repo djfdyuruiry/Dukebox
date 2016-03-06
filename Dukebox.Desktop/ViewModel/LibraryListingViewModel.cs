@@ -19,7 +19,6 @@ namespace Dukebox.Desktop.ViewModel
         private readonly IMusicLibrary _musicLibrary;
 
         private List<Track> _tracks;
-        private ListSearchHelper<Track> _listSearchHelper;
         private string _searchText;
 
         public ICommand ClearSearch { get; private set; }
@@ -42,7 +41,7 @@ namespace Dukebox.Desktop.ViewModel
         { 
             get 
             {
-                return _listSearchHelper.FilteredItems;
+                return _tracks;
             }
             private set
             {
@@ -54,7 +53,7 @@ namespace Dukebox.Desktop.ViewModel
         {
             get
             { 
-                return true; 
+                return false; 
             }
         }
         public bool SearchEnabled
@@ -68,12 +67,6 @@ namespace Dukebox.Desktop.ViewModel
         public LibraryListingViewModel(IMusicLibrary musicLibrary) : base()
         {
             _musicLibrary = musicLibrary;
-            _listSearchHelper = new ListSearchHelper<Track>
-            {
-                Items = _tracks,
-                FilterLambda = (t, s) => t.Song.title.ToLower().Contains(s.ToLower())
-            };
-
             _musicLibrary.SongAdded += (o, e) => RefreshTrackListing();
 
             ClearSearch = new RelayCommand(() => SearchText = string.Empty);
@@ -82,18 +75,13 @@ namespace Dukebox.Desktop.ViewModel
 
         private void RefreshTrackListing()
         {
-            Tracks = _musicLibrary.SearchForTracks(string.Empty, new List<SearchAreas> { SearchAreas.All });
-            _listSearchHelper.Items = _tracks;
-
             SearchText = string.Empty;
+            DoSearch();
         }
 
         private void DoSearch()
         {
-            _listSearchHelper.SearchFilter = SearchText;
-
-            // trigger filtered items call via songs property
-            OnPropertyChanged("Tracks");
+            Tracks = _musicLibrary.SearchForTracksInArea(SearchAreas.All, SearchText);
         }
     }
 }
