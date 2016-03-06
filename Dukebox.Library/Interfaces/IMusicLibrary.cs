@@ -33,9 +33,10 @@ namespace Dukebox.Library.Interfaces
         Track GetTrackFromFile(string fileName, AudioFileMetaData metadata = null);
         List<Track> GetTracksForArtist(album album);
         List<Track> GetTracksForAlbum(album album);
-        List<Track> SearchForTracks(string searchTerm, List<SearchAreas> searchAreas); 
-        List<Track> GetTracksByAttribute(SearchAreas attribute, long attributeId);
-        List<Track> GetTracksByAttribute(SearchAreas attribute, string nameOrTitle);
+        List<Track> SearchForTracks(string searchTerm, List<SearchAreas> searchAreas);
+        List<Track> SearchForTracksInArea(SearchAreas attribute, string nameOrTitle);
+        List<Track> GetTracksByAttributeValue(SearchAreas attribute, string nameOrTitle);
+        List<Track> GetTracksByAttributeId(SearchAreas attribute, long attributeId);
         List<Track> GetTracksForDirectory(string directory, bool subDirectories);
         void AddDirectory(string directory, bool subDirectories, Action<object, AudioFileImportedEventArgs> progressHandler, Action<object, int> completeHandler);
         void AddFile(string filename, AudioFileMetaData metadata);

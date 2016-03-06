@@ -719,17 +719,19 @@ namespace Dukebox.Library.Repositories
 
             if (searchAreas.Contains(SearchAreas.Album))
             {
-                matchingSongs = matchingSongs.Concat(songs.Where(s => s.albumId != null ? GetAlbumById(s.albumId).ToString().ToLower().Contains(searchTerm) : false));
+                var matchingAlbums = GetMatchingAttributeIds(SearchAreas.Album, searchTerm);
+                matchingSongs = matchingSongs.Concat(songs.Where(s => s.albumId.HasValue ? matchingAlbums.Contains(s.albumId.Value) : false));
             }
 
             if (searchAreas.Contains(SearchAreas.Artist))
             {
-                matchingSongs = matchingSongs.Concat(songs.Where(t => t.artistId != null ? GetArtistById(t.artistId).ToString().ToLower().Contains(searchTerm) : false));
+                var matchingArtists = GetMatchingAttributeIds(SearchAreas.Artist, searchTerm);
+                matchingSongs = matchingSongs.Concat(songs.Where(t => t.artistId.HasValue ? matchingArtists.Contains(t.artistId.Value) : false));
             }
 
             if (searchAreas.Contains(SearchAreas.Song))
             {
-                matchingSongs = matchingSongs.Concat(songs.Where(s => s.ToString().ToLower().Contains(searchTerm)));
+                matchingSongs = matchingSongs.Concat(songs.Where(s => s.title.ToLower().Contains(searchTerm)));
             }
 
             if (searchAreas.Contains(SearchAreas.Filename))
@@ -740,63 +742,53 @@ namespace Dukebox.Library.Repositories
 
             stopwatch.Stop();
             var searchAreasString = searchAreas.Select(sa => Enum.GetName(typeof(SearchAreas), sa)).Aggregate((c, n) => c + ", " + n);
-            logger.DebugFormat("Getting tracks by attribute(s) '{0}' where name or title equal '{1}' took {2}ms and returned {3} results.",
+            logger.DebugFormat("Getting tracks by attribute(s) '{0}' where name or title contain '{1}' took {2}ms and returned {3} results.",
                 searchAreasString, searchTerm, stopwatch.ElapsedMilliseconds, matchingSongs.Count());
 
-            return matchingSongs.Count() < 1 ? new List<Track>() : matchingSongs.Select(Track.BuildTrackInstance).ToList();
+            return matchingSongs.Count() < 1 ? new List<Track>() : matchingSongs.ToList().Select(Track.BuildTrackInstance).ToList();
         }
 
-        /// <summary>
-        /// Get a list of tracks who's attribute type equals the string specified 
-        /// as their name, or in the case of songs title. This search is case sensitive.
-        /// </summary>
-        /// <param name="attribute">The attribute type to select.</param>
-        /// <param name="nameOrTitle">The value or the attributes name/title.</param>
-        /// <returns>A list of tracks that match the given attribute keypair.</returns>
-        public List<Track> GetTracksByAttribute(SearchAreas attribute, string nameOrTitle)
+        public List<Track> SearchForTracksInArea(SearchAreas attribute, string nameOrTitle)
+        {
+            return SearchForTracks(nameOrTitle, new List<SearchAreas> { attribute });
+        }
+
+        public List<Track> GetTracksByAttributeValue(SearchAreas attribute, string nameOrTitle)
         {
             var stopwatch = Stopwatch.StartNew();
 
-            var searchAreas = new List<SearchAreas>();
             var songs = _dukeboxData.songs;
             var matchingSongs = Enumerable.Empty<song>();
 
-            if (attribute == SearchAreas.All)
+            if (attribute == SearchAreas.Album)
             {
-                AddSearchAreasToList(searchAreas);
-            }
-            else
-            {
-                searchAreas.Add(attribute);
+                var matchingAlbums = GetMatchingAttributeIds(SearchAreas.Album, nameOrTitle, true);
+                matchingSongs = matchingSongs.Concat(songs.Where(s => s.albumId.HasValue ? matchingAlbums.Contains(s.albumId.Value) : false));
             }
 
-            if (searchAreas.Contains(SearchAreas.Album))
+            if (attribute == SearchAreas.Artist)
             {
-                matchingSongs = matchingSongs.Concat(songs.Where(s => s.albumId != null ? GetAlbumById(s.albumId).Equals(nameOrTitle) : false));
+                var matchingArtists = GetMatchingAttributeIds(SearchAreas.Artist, nameOrTitle, true);
+                matchingSongs = matchingSongs.Concat(songs.Where(t => t.artistId.HasValue ? matchingArtists.Contains(t.artistId.Value) : false));
             }
 
-            if (searchAreas.Contains(SearchAreas.Artist))
+            if (attribute == SearchAreas.Song)
             {
-                matchingSongs = matchingSongs.Concat(songs.Where(t => t.artistId != null ? GetArtistById(t.artistId).Equals(nameOrTitle) : false));
+                matchingSongs = matchingSongs.Concat(songs.Where(s => s.title.ToLower().Equals(nameOrTitle)));
             }
 
-            if (searchAreas.Contains(SearchAreas.Song))
+            if (attribute == SearchAreas.Filename)
             {
-                matchingSongs = matchingSongs.Concat(songs.Where(s => s.Equals(nameOrTitle)));
+                matchingSongs = matchingSongs.Concat(songs.Where(s => s.filename.ToLower().Equals(nameOrTitle)));
             }
 
-            if (searchAreas.Contains(SearchAreas.Filename))
-            {
-                matchingSongs = matchingSongs.Concat(songs.Where(s => s.filename.Equals(nameOrTitle)));
-            }
 
             stopwatch.Stop();
-            logger.DebugFormat("Getting tracks by attribute {0} where name or title equal '{1}' took {2}ms and returned {3} results.",
-                Enum.GetName(typeof(SearchAreas), attribute), nameOrTitle, stopwatch.ElapsedMilliseconds, matchingSongs.Count());
+            logger.DebugFormat("Getting tracks by attribute(s) '{0}' where name or title equal '{1}' took {2}ms and returned {3} results.",
+                attribute, nameOrTitle, stopwatch.ElapsedMilliseconds, matchingSongs.Count());
 
-            return matchingSongs.Count() < 1 ? new List<Track>() : matchingSongs.Select(Track.BuildTrackInstance).ToList();
+            return matchingSongs.Count() < 1 ? new List<Track>() : matchingSongs.ToList().Select(Track.BuildTrackInstance).ToList();
         }
-
 
         /// <summary>
         /// Get a list of tracks who's attribute type equals the id specified. Filename 
@@ -805,7 +797,7 @@ namespace Dukebox.Library.Repositories
         /// <param name="attribute">The attribute type to select.</param>
         /// <param name="attributeId">The id of the attribute.</param>
         /// <returns>A list of tracks that match the given attribute keypair.</returns>
-        public List<Track> GetTracksByAttribute(SearchAreas attribute, long attributeId)
+        public List<Track> GetTracksByAttributeId(SearchAreas attribute, long attributeId)
         {
             var stopwatch = Stopwatch.StartNew();
 
@@ -847,6 +839,34 @@ namespace Dukebox.Library.Repositories
                 Enum.GetName(typeof(SearchAreas), attribute), attributeId, stopwatch.ElapsedMilliseconds, matchingSongs.Count());
 
             return matchingSongs.Count() < 1 ? new List<Track>() : matchingSongs.Select(Track.BuildTrackInstance).ToList();
+        }
+
+        private IEnumerable<long> GetMatchingAttributeIds(SearchAreas attribute, string searchTerm, bool exactMatch = false)
+        {
+            if (attribute == SearchAreas.Album)
+            {
+                if (exactMatch)
+                {
+                    return OrderedAlbums.Where(a => a.ToString().ToLower().Equals(searchTerm)).Select(a => a.id);
+                }
+                else
+                {
+                    return OrderedAlbums.Where(a => a.ToString().ToLower().Contains(searchTerm)).Select(a => a.id);
+                }
+            }
+            else if (attribute == SearchAreas.Artist)
+            {
+                if (exactMatch)
+                {
+                    return OrderedArtists.Where(a => a.ToString().ToLower().Equals(searchTerm)).Select(a => a.id);
+                }
+                else
+                {
+                    return OrderedArtists.Where(a => a.ToString().ToLower().Contains(searchTerm)).Select(a => a.id);
+                }
+            }
+
+            return Enumerable.Empty<long>();
         }
 
         #endregion

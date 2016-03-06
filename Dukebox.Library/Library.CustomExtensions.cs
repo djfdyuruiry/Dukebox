@@ -118,7 +118,7 @@ namespace Dukebox.Library
 
             foreach (var file in Files)
             {
-                var foundTracks = musicLibrary.GetTracksByAttribute(SearchAreas.Filename, file);
+                var foundTracks = musicLibrary.GetTracksByAttributeValue(SearchAreas.Filename, file);
 
                 if (foundTracks.Count > 0)
                 {
