@@ -7,6 +7,10 @@ namespace Dukebox.Library.Interfaces
 {
     public interface IMusicLibrary
     {
+        event EventHandler SongAdded;
+        event EventHandler ArtistAdded;
+        event EventHandler AlbumAdded;
+        event EventHandler PlaylistAdded;
         IList<album> OrderedAlbums { get; }
         IList<artist> OrderedArtists { get; }
         IList<playlist> OrderedPlaylists { get; }
@@ -19,6 +23,8 @@ namespace Dukebox.Library.Interfaces
         int GetPlaylistCount();
         playlist GetPlaylistFromFile(string playlistFile);
         Track GetTrackFromFile(string fileName, AudioFileMetaData metadata = null);
+        List<Track> GetTracksForArtist(album album);
+        List<Track> GetTracksForAlbum(album album);
         List<Track> SearchForTracks(string searchTerm, List<SearchAreas> searchAreas); 
         List<Track> GetTracksByAttribute(SearchAreas attribute, long attributeId);
         List<Track> GetTracksByAttribute(SearchAreas attribute, string nameOrTitle);

@@ -4,6 +4,7 @@ using Dukebox.Library.Repositories;
 using Dukebox.Model.Services;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -57,6 +58,14 @@ namespace Dukebox.Library
 
     public partial class album
     {
+        public bool HasAlbumArt 
+        {
+            get
+            {
+                return hasAlbumArt == 0 ? false : true;
+            }
+        }
+
         public override string ToString()
         {
             return name;

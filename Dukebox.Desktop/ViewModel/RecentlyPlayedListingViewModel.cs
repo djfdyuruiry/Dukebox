@@ -61,14 +61,7 @@ namespace Dukebox.Desktop.ViewModel
         {
             ClearSearch = new RelayCommand(() => SearchText = string.Empty);
 
-            _tracks = new List<Track>()
-            {
-                Track.BuildTrackInstance(new album {name = "Times"}, new artist {name= "Bob Dylan"}, new song { title = "Are a changin'"}),
-                Track.BuildTrackInstance(new album {name = "Times"}, new artist {name= "Bob Dylan"}, new song { title = "Are a changin'"}),
-                Track.BuildTrackInstance(new album {name = "Times"}, new artist {name= "Bob Dylan"}, new song { title = "Are a changin'"}),
-                Track.BuildTrackInstance(new album {name = "Times"}, new artist {name= "Bob Dylan"}, new song { title = "Are a changin'"}),
-                Track.BuildTrackInstance(new album {name = "Times"}, new artist {name= "Bob Dylan"}, new song { title = "Are a changin'"})
-            };
+            _tracks = new List<Track>();
 
             _listSearchHelper = new ListSearchHelper<Track>
             {

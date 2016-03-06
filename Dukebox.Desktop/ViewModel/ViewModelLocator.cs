@@ -13,36 +13,11 @@ namespace Dukebox.Desktop.ViewModel
 {
     public class ViewModelLocator
     {
-        private static Container container;
-
-        static ViewModelLocator()
-        {
-            container = new Container();
-
-            container.RegisterSingleton<IMainWindowViewModel, MainWindowViewModel>();
-            container.RegisterSingleton<IPlaybackMonitorViewModel, PlaybackMonitorViewModel>();
-            container.RegisterSingleton<ITrackListingViewModel, LibraryListingViewModel>();
-            container.RegisterSingleton<IAlbumListingViewModel, AlbumListingViewModel>();
-            container.RegisterSingleton<IArtistListingViewModel, ArtistListingViewModel>();
-            container.RegisterSingleton<ISearchControlViewModel, SearchControlViewModelDummy>();
-            container.RegisterSingleton<LibraryListingViewModel, LibraryListingViewModel>();
-            container.RegisterSingleton<RecentlyPlayedListingViewModel, RecentlyPlayedListingViewModel>();
-            container.RegisterSingleton<AudioCdViewModel, AudioCdViewModel>();
-            container.RegisterSingleton<ImageToImageSourceConverter>();
-
-            var assemblies = new List<Assembly>
-            {
-                Assembly.GetAssembly(typeof(LibraryPackage))
-            };
-
-            container.RegisterPackages(assemblies);
-        }
-
         public IMainWindowViewModel MainWindow
         {
             get
             {
-                return container.GetInstance<IMainWindowViewModel>();
+                return DesktopContainer.GetInstance<IMainWindowViewModel>();
             }
         }
 
@@ -50,7 +25,7 @@ namespace Dukebox.Desktop.ViewModel
         {
             get
             {
-                return container.GetInstance<IPlaybackMonitorViewModel>();
+                return DesktopContainer.GetInstance<IPlaybackMonitorViewModel>();
             }
         }
 
@@ -58,7 +33,7 @@ namespace Dukebox.Desktop.ViewModel
         {
             get
             {
-                return container.GetInstance<ITrackListingViewModel>();
+                return DesktopContainer.GetInstance<ITrackListingViewModel>();
             }
         }
 
@@ -66,7 +41,7 @@ namespace Dukebox.Desktop.ViewModel
         {
             get
             {
-                return container.GetInstance<IAlbumListingViewModel>();
+                return DesktopContainer.GetInstance<IAlbumListingViewModel>();
             }
         }
 
@@ -74,7 +49,7 @@ namespace Dukebox.Desktop.ViewModel
         {
             get
             {
-                return container.GetInstance<IArtistListingViewModel>();
+                return DesktopContainer.GetInstance<IArtistListingViewModel>();
             }
         }
 
@@ -82,7 +57,7 @@ namespace Dukebox.Desktop.ViewModel
         {
             get
             {
-                return container.GetInstance<ISearchControlViewModel>();
+                return DesktopContainer.GetInstance<ISearchControlViewModel>();
             }
         }
 
@@ -90,7 +65,7 @@ namespace Dukebox.Desktop.ViewModel
         {
             get
             {
-                return container.GetInstance<LibraryListingViewModel>();
+                return DesktopContainer.GetInstance<LibraryListingViewModel>();
             }
         }
 
@@ -98,7 +73,7 @@ namespace Dukebox.Desktop.ViewModel
         {
             get
             {
-                return container.GetInstance<RecentlyPlayedListingViewModel>();
+                return DesktopContainer.GetInstance<RecentlyPlayedListingViewModel>();
             }
         }
 
@@ -106,7 +81,7 @@ namespace Dukebox.Desktop.ViewModel
         {
             get
             {
-                return container.GetInstance<AudioCdViewModel>();
+                return DesktopContainer.GetInstance<AudioCdViewModel>();
             }
         }        
     }

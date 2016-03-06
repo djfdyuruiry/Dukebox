@@ -28,7 +28,7 @@ namespace Dukebox.Library
         private static void Configure(Container container)
         {
             container.RegisterSingleton<IDukeboxSettings, DukeboxSettings>();
-            container.RegisterSingleton<IAlbumArtCacheService, AlbumArtCacheService>();
+            container.RegisterSingleton<IAlbumArtCacheService>(() => GetAlbumArtCacheServiceInstance(container));
             container.RegisterSingleton<ICdMetadataService, CdMetadataService>();
             container.RegisterSingleton<IAudioCdRippingService, AudioCdRippingService>();
             container.RegisterSingleton<IAudioPlaylist, AudioPlaylist>();
@@ -44,6 +44,22 @@ namespace Dukebox.Library
         public static TService GetInstance<TService>() where TService : class
         {
             return container.GetInstance<TService>();
+        }
+
+        private static IAlbumArtCacheService GetAlbumArtCacheServiceInstance(Container container)
+        {
+            try
+            {
+                var albumArtCacheService = new AlbumArtCacheService(container.GetInstance<IDukeboxSettings>());
+                return albumArtCacheService;
+            }
+            catch (Exception ex)
+            {
+                var errMsg = "Error opening the album art cache";
+
+                logger.Error(errMsg, ex);
+                throw new Exception(errMsg, ex);
+            }
         }
 
         private static IMusicLibrary GetMusicLibraryInstance(Container container)

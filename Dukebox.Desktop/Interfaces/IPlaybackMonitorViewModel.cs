@@ -7,15 +7,15 @@ namespace Dukebox.Desktop.Interfaces
     public interface IPlaybackMonitorViewModel
     {
         string Album { get; }
-        ImageSource AlbumArt { get; }
         string Artist { get; }
-        ICommand BackCommand { get; }
-        ICommand ForwardCommand { get; }
-        ICommand PlayPauseCommand { get; }
-        ImageSource PlayPauseImage { get; }
-        ICommand StopCommand { get; }
         string Track { get; }
         string TrackMinutesPassed { get; }
         string TrackMinutesTotal { get; }
+        ImageSource AlbumArt { get; }
+        ImageSource PlayPauseImage { get; }
+        ICommand BackCommand { get; }
+        ICommand ForwardCommand { get; }
+        ICommand PlayPauseCommand { get; }
+        ICommand StopCommand { get; }
     }
 }

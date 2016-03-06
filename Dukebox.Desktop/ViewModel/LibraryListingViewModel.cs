@@ -2,6 +2,8 @@
 using Dukebox.Desktop.Interfaces;
 using Dukebox.Desktop.Model;
 using Dukebox.Library;
+using Dukebox.Library.Interfaces;
+using Dukebox.Library.Model;
 using Dukebox.Model.Services;
 using GalaSoft.MvvmLight.Command;
 using System;
@@ -14,6 +16,8 @@ namespace Dukebox.Desktop.ViewModel
 {
     public class LibraryListingViewModel : ViewModelBase, ITrackListingViewModel
     {
+        private readonly IMusicLibrary _musicLibrary;
+
         private List<Track> _tracks;
         private ListSearchHelper<Track> _listSearchHelper;
         private string _searchText;
@@ -39,7 +43,12 @@ namespace Dukebox.Desktop.ViewModel
             get 
             {
                 return _listSearchHelper.FilteredItems;
-            } 
+            }
+            private set
+            {
+                _tracks = value;
+                OnPropertyChanged("Tracks");
+            }
         }
         public bool EditingListingsDisabled
         {
@@ -56,24 +65,27 @@ namespace Dukebox.Desktop.ViewModel
             }
         }
 
-        public LibraryListingViewModel() : base()
+        public LibraryListingViewModel(IMusicLibrary musicLibrary) : base()
         {
-            ClearSearch = new RelayCommand(() => SearchText = string.Empty);
-
-            _tracks = new List<Track>()
-            {
-                Track.BuildTrackInstance(new album {name = "Times"}, new artist {name= "Bob Dylan"}, new song { title = "Are a changin'"}),
-                Track.BuildTrackInstance(new album {name = "Times"}, new artist {name= "Bob Dylan"}, new song { title = "Are a changin'"}),
-                Track.BuildTrackInstance(new album {name = "Times"}, new artist {name= "Bob Dylan"}, new song { title = "Are a changin'"}),
-                Track.BuildTrackInstance(new album {name = "Times"}, new artist {name= "Bob Dylan"}, new song { title = "Are a changin'"}),
-                Track.BuildTrackInstance(new album {name = "Times"}, new artist {name= "Bob Dylan"}, new song { title = "Are a changin'"})
-            };
-
+            _musicLibrary = musicLibrary;
             _listSearchHelper = new ListSearchHelper<Track>
             {
                 Items = _tracks,
                 FilterLambda = (t, s) => t.Song.title.ToLower().Contains(s.ToLower())
             };
+
+            _musicLibrary.SongAdded += (o, e) => RefreshTrackListing();
+
+            ClearSearch = new RelayCommand(() => SearchText = string.Empty);
+            RefreshTrackListing();
+        }
+
+        private void RefreshTrackListing()
+        {
+            Tracks = _musicLibrary.SearchForTracks(string.Empty, new List<SearchAreas> { SearchAreas.All });
+            _listSearchHelper.Items = _tracks;
+
+            SearchText = string.Empty;
         }
 
         private void DoSearch()

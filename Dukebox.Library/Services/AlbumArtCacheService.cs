@@ -4,9 +4,11 @@ using Dukebox.Library.Model;
 using Dukebox.Model.Services;
 using log4net;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 
 namespace Dukebox.Library.Services
 {
@@ -15,8 +17,9 @@ namespace Dukebox.Library.Services
         private static readonly ILog logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         private readonly IDukeboxSettings _settings;
-        private bool _errorBuildingCachePath;
         private string _cachePath;
+
+        public event EventHandler AlbumAdded;
 
         public AlbumArtCacheService(IDukeboxSettings settings)
         {
@@ -26,8 +29,6 @@ namespace Dukebox.Library.Services
 
         private void BuildCachePath()
         {
-            _errorBuildingCachePath = false;
-
             try
             {
                 var relativePath = _settings.AlbumArtCachePath;
@@ -42,19 +43,9 @@ namespace Dukebox.Library.Services
             }
             catch (Exception ex)
             {
-                _errorBuildingCachePath = true;
                 logger.Error("Error building album art cache path.", ex);
+                throw ex;
             }
-        }
-
-        private bool LoggedCachePathCheck(long albumId, string cacheOperation)
-        {
-            if (_errorBuildingCachePath)
-            {
-                logger.WarnFormat("Aborting cache operation '{0}' for album with id {1} as a previous error occurred when building cache path.", cacheOperation, albumId);
-            }
-
-            return !_errorBuildingCachePath;
         }
 
         public void AddSongToCache(song songToProcess, AudioFileMetaData metadata, album albumObj)
@@ -73,11 +64,6 @@ namespace Dukebox.Library.Services
             }
 
             var albumId = albumObj.id;
-
-            if (!LoggedCachePathCheck(albumId, AlbumArtCacheOperations.Add))
-            {
-                return;
-            }
 
             if (CheckCacheForAlbum(albumId))
             {
@@ -99,6 +85,11 @@ namespace Dukebox.Library.Services
                 stopwatch.Stop();
                 logger.InfoFormat("Added album with id {0} into album art cache.", albumIdString);
                 logger.DebugFormat("Adding album into album art cache took {0}ms. Album id: {1}", stopwatch.ElapsedMilliseconds, albumIdString);
+
+                if (AlbumAdded != null)
+                {
+                    AlbumAdded(this, EventArgs.Empty);
+                }
             }
             catch (Exception ex)
             {
@@ -108,11 +99,6 @@ namespace Dukebox.Library.Services
 
         public bool CheckCacheForAlbum(long albumId)
         {
-            if (!LoggedCachePathCheck(albumId, AlbumArtCacheOperations.Check))
-            {
-                return false;
-            }
-
             try
             {
                 var path = Path.Combine(_cachePath, albumId.ToString());
@@ -129,11 +115,6 @@ namespace Dukebox.Library.Services
         {
             try
             {
-                if (!LoggedCachePathCheck(albumId, AlbumArtCacheOperations.Get))
-                {
-                    throw new Exception("Failed to build path to cache.");
-                }
-
                 if (!CheckCacheForAlbum(albumId))
                 {
                     throw new Exception(string.Format("Album with id {0} is not in the album art cache.", albumId));
@@ -151,6 +132,15 @@ namespace Dukebox.Library.Services
 
                 throw new Exception(string.Format("{0}: {1}", msg, ex.Message)); 
             }
+        }
+
+        public List<long> GetAlbumIdsFromCache()
+        {
+            var ids = Directory.EnumerateFiles(_cachePath)
+                .Select(f => Path.GetFileNameWithoutExtension(f))
+                .Cast<long>().ToList();
+
+            return ids;
         }
     }
 }

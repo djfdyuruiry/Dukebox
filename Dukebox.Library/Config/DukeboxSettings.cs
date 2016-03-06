@@ -12,16 +12,22 @@ namespace Dukebox.Library.Config
     public class DukeboxSettings : IDukeboxSettings
     {
         // Fetch the settings object from foreign assembly.
-        private static SettingsBase settings = Assembly.Load("Dukebox.Desktop").GetTypes()
-                                                    .Where((t) => t.Name == "Settings" && typeof(SettingsBase).IsAssignableFrom(t))
-                                                    .Select((t) => (SettingsBase)t.GetProperty("Default").GetValue( null, null ))
-                                                    .FirstOrDefault();
+        private KeyValueConfigurationCollection _settings;
+
+        public DukeboxSettings()
+        {
+            var configMap = new ExeConfigurationFileMap();
+            configMap.ExeConfigFilename = @"Dukebox.Desktop.exe.Config";
+
+            var config = ConfigurationManager.OpenMappedExeConfiguration(configMap, ConfigurationUserLevel.None);
+            _settings = config.AppSettings.Settings;
+        }
 
         public int AddDirectoryConcurrencyLimit
         {
             get
             {
-                return int.Parse(settings["addDirectoryConcurrencyLimit"].ToString());
+                return int.Parse(_settings["addDirectoryConcurrencyLimit"].Value);
             }
         }
 
@@ -29,14 +35,14 @@ namespace Dukebox.Library.Config
         {
             get
             {
-                return settings["albumArtCachePath"].ToString();
+                return _settings["albumArtCachePath"].Value;
             }
         }
         public string TrackDisplayFormat
         {
             get
             {
-                return settings["trackDisplayFormat"].ToString();
+                return _settings["trackDisplayFormat"].Value;
             }
         }
     }
