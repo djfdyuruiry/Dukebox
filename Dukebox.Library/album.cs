@@ -18,6 +18,7 @@ namespace Dukebox.Library
         [Required]
         [StringLength(2147483647)]
         public string name { get; set; }
+        public int hasAlbumArt { get; set; }
 
         public virtual ICollection<song> songs { get; set; }
     }

@@ -5,5 +5,6 @@
         public const string Add = "add album art";
         public const string Check = "check for album";
         public const string Get = "get album art";
+        public const string ScanForIds = "scan ids in cache";
     }
 }

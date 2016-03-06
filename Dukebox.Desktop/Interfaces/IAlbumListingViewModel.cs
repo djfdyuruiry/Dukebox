@@ -1,4 +1,5 @@
 ﻿using Dukebox.Desktop.Model;
+using Dukebox.Desktop.Services;
 using Dukebox.Library;
 using System;
 using System.Collections.Generic;
@@ -8,6 +9,6 @@ namespace Dukebox.Desktop.Interfaces
 {
     public interface IAlbumListingViewModel : ISearchControlViewModel
     {
-        List<album> Albums { get; }
+        List<Album> Albums { get; }
     }
 }

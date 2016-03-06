@@ -19,14 +19,7 @@ using System.Windows;
 namespace Dukebox.Desktop.ViewModel
 {
     public class PlaybackMonitorViewModel : ViewModelBase, IPlaybackMonitorViewModel
-    {
-        private const string defaultAlbumArtUri = @"pack://application:,,,/Graphics/black_7_music_node.png";
-        private const string pauseImageUri = @"pack://application:,,,/Graphics/black_4_audio_pause.png";
-        private const string playImageUri = @"pack://application:,,,/Graphics/black_4_audio_play.png";
-        private static readonly ImageSource defaultAlbumArtImage = ImageResourceLoader.LoadImageFromResourceUri(defaultAlbumArtUri);
-        private static readonly ImageSource playImage = ImageResourceLoader.LoadImageFromResourceUri(playImageUri);
-        private static readonly ImageSource pauseImage = ImageResourceLoader.LoadImageFromResourceUri(pauseImageUri);          
-
+    {     
         private readonly IMediaPlayer _mediaPlayer;
         private readonly IAudioPlaylist _audioPlaylist;
         private readonly ImageToImageSourceConverter _imageToImageSourceConverter;
@@ -142,8 +135,8 @@ namespace Dukebox.Desktop.ViewModel
             _audioPlaylist = audioPlaylist;
             _imageToImageSourceConverter = imageToImageSourceConverter;
 
-            AlbumArt = defaultAlbumArtImage;
-            PlayPauseImage = playImage;
+            AlbumArt = ImageResources.DefaultAlbumArtImage;
+            PlayPauseImage = ImageResources.PlayImage;
 
             SetupAudioEventListeners();
             SetupPlaybackControlCommands();
@@ -158,9 +151,9 @@ namespace Dukebox.Desktop.ViewModel
             _mediaPlayer.AudioPositionChanged += (o, e) => TrackPositionChanged();
 
             // pause\play image toggles
-            _mediaPlayer.StartPlayingTrack += (o, e) => PlayPauseImage = pauseImage;
-            _mediaPlayer.TrackPaused += (o, e) => PlayPauseImage = playImage;
-            _mediaPlayer.TrackResumed += (o, e) => PlayPauseImage = pauseImage;
+            _mediaPlayer.StartPlayingTrack += (o, e) => PlayPauseImage = ImageResources.PauseImage;
+            _mediaPlayer.TrackPaused += (o, e) => PlayPauseImage = ImageResources.PlayImage;
+            _mediaPlayer.TrackResumed += (o, e) => PlayPauseImage = ImageResources.PauseImage;
         }
 
         private void SetupPlaybackControlCommands()
@@ -174,7 +167,7 @@ namespace Dukebox.Desktop.ViewModel
         private void LoadedTrackFromFile(TrackLoadedFromFileEventArgs trackLoadedArgs)
         {
             TrackMinutesTotal = _mediaPlayer.AudioLengthInMins;
-            AlbumArt = defaultAlbumArtImage;
+            AlbumArt = ImageResources.DefaultAlbumArtImage;
 
             if (trackLoadedArgs.Metadata == null)
             {
@@ -190,7 +183,7 @@ namespace Dukebox.Desktop.ViewModel
         {
             if (!newTrackArgs.Track.Metadata.HasAlbumArt)
             {
-                AlbumArt = defaultAlbumArtImage;
+                AlbumArt = ImageResources.DefaultAlbumArtImage;
                 return;
             }
 
@@ -199,7 +192,7 @@ namespace Dukebox.Desktop.ViewModel
 
         private void TrackFinishedPlaying()
         {
-            PlayPauseImage = playImage;
+            PlayPauseImage = ImageResources.PlayImage;
             TrackMinutesPassed = string.Format(MediaPlayer.MinuteFormat, "00", "00");
         }
 

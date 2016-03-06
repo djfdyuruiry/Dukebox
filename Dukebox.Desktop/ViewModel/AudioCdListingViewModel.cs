@@ -33,14 +33,7 @@ namespace Dukebox.Desktop.ViewModel
 
         public AudioCdViewModel() : base()
         {
-            Tracks = new List<Track>()
-            {
-                Track.BuildTrackInstance(new album {name = "Times"}, new artist {name= "Bob Dylan"}, new song { title = "Are a changin'"}),
-                Track.BuildTrackInstance(new album {name = "Times"}, new artist {name= "Bob Dylan"}, new song { title = "Are a changin'"}),
-                Track.BuildTrackInstance(new album {name = "Times"}, new artist {name= "Bob Dylan"}, new song { title = "Are a changin'"}),
-                Track.BuildTrackInstance(new album {name = "Times"}, new artist {name= "Bob Dylan"}, new song { title = "Are a changin'"}),
-                Track.BuildTrackInstance(new album {name = "Times"}, new artist {name= "Bob Dylan"}, new song { title = "Are a changin'"})
-            };
+            Tracks = new List<Track>();
         }
     }
 }

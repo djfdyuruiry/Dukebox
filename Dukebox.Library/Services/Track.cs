@@ -7,6 +7,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -18,7 +19,7 @@ namespace Dukebox.Model.Services
     /// </summary>
     public class Track : IEqualityComparer
     {
-        private static readonly ILog logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private IDukeboxSettings _settings;
         private IMusicLibrary _musicLibrary;
@@ -47,13 +48,13 @@ namespace Dukebox.Model.Services
             }
             set
             {
-                if (value.id < 1 || value.id > _musicLibrary.GetArtistCount())
+                if (value.id <= _musicLibrary.GetArtistCount())
                 {
                     _artist = value;
                 }
                 else if (value.id != -1)
                 {
-                    throw new ArgumentOutOfRangeException("The artist id '" + value.id + "' is invalid!");
+                    throw new ArgumentOutOfRangeException(string.Format("The artist id '{0}' is invalid!", value));
                 }
             }
         }
@@ -74,13 +75,13 @@ namespace Dukebox.Model.Services
             }
             set
             {
-                if (value.id < 1 || value.id > _musicLibrary.GetAlbumCount())
+                if (value.id <= _musicLibrary.GetAlbumCount())
                 {
                     _album = value;
                 }
                 else if (value.id != -1)
                 {
-                    throw new ArgumentOutOfRangeException("The album id '" + value.id + "' is invalid!");
+                    throw new ArgumentOutOfRangeException(string.Format("The album id '{0}' is invalid!", value.id));
                 }
             }
         }
@@ -112,12 +113,17 @@ namespace Dukebox.Model.Services
             }
         }
 
-        public static Track BuildTrackInstance(album album, artist artist, song song)
+        public static Track BuildTrackInstance(song song)
         {
+            if (song == null)
+            {
+                throw new ArgumentException("Cannot build track instance with a null song instance");
+            }
+
             var track = LibraryPackage.GetInstance<Track>();
-            
-            track.Album = album;
-            track.Artist = artist;
+
+            track.Album = song.album ?? new album { id = -1 };
+            track.Artist = song.artist ?? new artist { id = -1 };
             track.Song = song;
 
             return track;
