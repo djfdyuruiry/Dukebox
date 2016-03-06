@@ -2,6 +2,7 @@
 using Dukebox.Desktop.Interfaces;
 using Dukebox.Desktop.Model;
 using Dukebox.Library;
+using Dukebox.Library.Interfaces;
 using GalaSoft.MvvmLight.Command;
 using System;
 using System.Collections.Generic;
@@ -13,6 +14,8 @@ namespace Dukebox.Desktop.ViewModel
 {
     public class ArtistListingViewModel : ViewModelBase, IArtistListingViewModel
     {
+        private readonly IMusicLibrary _musicLibrary;
+
         private List<artist> _artists;
         private ListSearchHelper<artist> _listSearchHelper;
         private string _searchText;
@@ -46,38 +49,34 @@ namespace Dukebox.Desktop.ViewModel
             {
                 return _listSearchHelper.FilteredItems;
             }
+            private set
+            {
+                _artists = value;
+                _listSearchHelper.Items = _artists;
+                SearchText = string.Empty;
+
+                OnPropertyChanged("Artists");
+            }
         }
 
-        public ArtistListingViewModel() : base()
+        public ArtistListingViewModel(IMusicLibrary musicLibrary) : base()
         {
-            ClearSearch = new RelayCommand(() => SearchText = string.Empty);
-
-            _artists = new List<artist>()
-            {
-                new artist(){ name = "Times" },
-                new artist(){ name = "Rave Madness" },
-                new artist(){ name = "One" },
-                new artist(){ name = "Jolata True" },
-                new artist(){ name = "Rave Madness" },
-                new artist(){ name = "One" },
-                new artist(){ name = "Jolata True" },
-                new artist(){ name = "Rave Madness" },
-                new artist(){ name = "One" },
-                new artist(){ name = "Jolata True" },
-                new artist(){ name = "Rave Madness" },
-                new artist(){ name = "One" },
-                new artist(){ name = "Jolata True" },
-                new artist(){ name = "Rave Madness" },
-                new artist(){ name = "One" }
-            };
-
-            _artists = _artists.OrderBy(a => a.name).ToList();
+            _musicLibrary = musicLibrary;
 
             _listSearchHelper = new ListSearchHelper<artist>
             {
-                Items = _artists,
                 FilterLambda = (a, s) => a.name.ToLower().Contains(s.ToLower())
             };
+
+            _musicLibrary.ArtistAdded += (o, e) => RefreshArtistsFromLibrary();
+
+            ClearSearch = new RelayCommand(() => SearchText = string.Empty);
+            RefreshArtistsFromLibrary();
+        }
+
+        public void RefreshArtistsFromLibrary()
+        {
+            Artists = _musicLibrary.OrderedArtists;
         }
 
         private void DoSearch()
