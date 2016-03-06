@@ -9,6 +9,7 @@ using log4net;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -25,33 +26,49 @@ namespace Dukebox.Model.Services
 
         private readonly IMusicLibrary _musicLibrary;
         private readonly IMediaPlayer _mediaPlayer;
+        
+        #region Playback management fields
 
         /// <summary>
-        /// The list of tracks in the playlist.
+        /// Main thread for playlist playback.
         /// </summary>
-        private List<Track> _tracks;
-        public List<Track> Tracks
-        {
-            get
-            {
-                if(TrackListAccess != null)
-                {
-                    TrackListAccess(this, new TrackListAccessEventArgs { TrackListSize = _tracks.Count });
-                }
+        private Thread _playlistManagerThread;
+        /// <summary>
+        /// The current index from the Tracks collection loaded into memory.
+        /// </summary>
+        private int _currentTrackIndex;
+        /// <summary>
+        /// Go back to the track immediately after current
+        /// index in Tracks collection?
+        /// </summary>
+        private bool _forward;
+        /// <summary>
+        /// Go back to the track immediately before current
+        /// index in Tracks collection?
+        /// </summary>
+        private bool _back;
+        /// <summary>
+        /// Mutex that controls access to the current track
+        /// index.
+        /// </summary>
+        private Mutex _currentTrackIndexMutex;
 
-                return _tracks;
-            }
-            set
-            {
-                _tracks = value;
-            }
-        }
+        #endregion
+
+        #region Playback management fields
 
         private Stack<int> _previousTracks;
         private int _lastTrack;
 
+        #endregion
+
         #region Playback state properties
 
+        /// <summary>
+        /// The list of tracks in the playlist.
+        /// </summary>
+        public ObservableCollection<Track> Tracks { get; private set; }
+        
         /// <summary>
         /// The track currently loaded into memory for playback.
         /// </summary>
@@ -102,38 +119,10 @@ namespace Dukebox.Model.Services
 
         #endregion
 
-        #region Playback management properties
-
-        /// <summary>
-        /// Main thread for playlist playback.
-        /// </summary>
-        private Thread _playlistManagerThread;
-        /// <summary>
-        /// The current index from the Tracks collection loaded into memory.
-        /// </summary>
-        private int _currentTrackIndex;
-        /// <summary>
-        /// Go back to the track immediately after current
-        /// index in Tracks collection?
-        /// </summary>
-        private bool _forward;
-        /// <summary>
-        /// Go back to the track immediately before current
-        /// index in Tracks collection?
-        /// </summary>
-        private bool _back;
-        /// <summary>
-        /// Mutex that controls access to the current track
-        /// index.
-        /// </summary>
-        private Mutex _currentTrackIndexMutex;
-
-        #endregion
-
         #region Event handlers
 
         public event EventHandler<NewTrackLoadedEventArgs> NewTrackLoaded;
-        public event EventHandler<TrackListAccessEventArgs> TrackListAccess;
+        public event EventHandler<TrackListAccessEventArgs> TrackListModified;
         
         /// <summary>
         /// Get the current index in the playlist that is loaded into memory for playback.
@@ -169,11 +158,11 @@ namespace Dukebox.Model.Services
         /// </summary>
         private void CallNewTrackEventHandlers(bool skippingTrack)
         {
-            if (!skippingTrack && _tracks.Count > 0 && (_currentTrackIndex > -1 && _currentTrackIndex < _tracks.Count))
+            if (!skippingTrack && Tracks.Count > 0 && (_currentTrackIndex > -1 && _currentTrackIndex < Tracks.Count))
             {
                 // Register track as recently played with music library and
                 // load current track into media player.
-                var currentTrack = _tracks[_currentTrackIndex];
+                var currentTrack = Tracks[_currentTrackIndex];
 
                 _musicLibrary.RecentlyPlayed.Add(currentTrack);
 
@@ -181,7 +170,7 @@ namespace Dukebox.Model.Services
                 {
                     var newTrackArgs = new NewTrackLoadedEventArgs
                     {
-                        Track = _tracks[_currentTrackIndex],
+                        Track = Tracks[_currentTrackIndex],
                         TrackIndex = _currentTrackIndex
                     };
 
@@ -201,7 +190,9 @@ namespace Dukebox.Model.Services
             _musicLibrary = musicLibrary;
             _mediaPlayer = mediaPlayer;
 
-            Tracks = new List<Track>();
+            Tracks = new ObservableCollection<Track>();
+            Tracks.CollectionChanged += (o, e) => CallTrackModifiedHandler();
+
             _previousTracks = new Stack<int>();
             _currentTrackIndexMutex = new Mutex();
 
@@ -212,6 +203,14 @@ namespace Dukebox.Model.Services
             Shuffle = false;
             RepeatAll = false;
             Repeat = false;
+        }
+
+        private void CallTrackModifiedHandler()
+        {
+            if (TrackListModified != null)
+            {
+                TrackListModified(this, new TrackListAccessEventArgs { TrackListSize = Tracks.Count });
+            }
         }
 
         /// <summary>
@@ -362,7 +361,7 @@ namespace Dukebox.Model.Services
             if (!_forward && !_back)
             {
                 // Load current track into media player.
-                var currentTrack = _tracks[GetCurrentTrackIndex()];
+                var currentTrack = Tracks[GetCurrentTrackIndex()];
                 var mediaPlayMetadata = new MediaPlayerMetadata
                 {
                     AlbumName = currentTrack.Album.name,
@@ -407,11 +406,11 @@ namespace Dukebox.Model.Services
             }
             else if (Shuffle && (!_back || _previousTracks.Count < 2)) // Pick random track for playback.
             {
-                int nextTrack = random.Next(_tracks.Count);
+                int nextTrack = random.Next(Tracks.Count);
 
                 while (nextTrack == GetCurrentTrackIndex())
                 {
-                    nextTrack = random.Next(_tracks.Count);
+                    nextTrack = random.Next(Tracks.Count);
                 }
 
                 SetCurrentTrackIndex(nextTrack);
@@ -436,7 +435,7 @@ namespace Dukebox.Model.Services
             // Keep rolling over to start of playlist if repeat all is on.
             if (RepeatAll)
             {
-                if (GetCurrentTrackIndex() >= _tracks.Count)
+                if (GetCurrentTrackIndex() >= Tracks.Count)
                 {
                     // Roll on to start of playlist.
                     SetCurrentTrackIndex(0);
@@ -480,7 +479,15 @@ namespace Dukebox.Model.Services
             var playlist = _musicLibrary.GetPlaylistFromFile(filename);
 
             StopPlaylistPlayback();
-            Tracks = playlist.GetTracksForPlaylist();
+            var tracks = playlist.GetTracksForPlaylist();
+
+            return LoadPlaylistFromList(tracks);
+        }
+
+        public int LoadPlaylistFromList(List<Track> tracks)
+        {
+            Tracks.Clear();
+            tracks.ForEach(t => Tracks.Add(t));
 
             return Tracks.Count;
         }

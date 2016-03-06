@@ -2,23 +2,25 @@
 using Dukebox.Model.Services;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace Dukebox.Library.Interfaces
 {
     public interface IAudioPlaylist : IDisposable
     {
+        event EventHandler<NewTrackLoadedEventArgs> NewTrackLoaded;
+        event EventHandler<TrackListAccessEventArgs> TrackListModified;
         bool PlayingAudio { get; }
         bool Repeat { get; set; }
         bool RepeatAll { get; set; }
         bool Shuffle { get; set; }
-        List<Track> Tracks { get; set; }
         bool StreamingPlaylist { get; }
-        Track CurrentlyLoadedTrack { get; }
         bool TrackLoaded { get; }
-        event EventHandler<NewTrackLoadedEventArgs> NewTrackLoaded;
-        event EventHandler<TrackListAccessEventArgs> TrackListAccess;
-        void SavePlaylistToFile(string filename);
+        ObservableCollection<Track> Tracks { get; }
+        Track CurrentlyLoadedTrack { get; }
         int LoadPlaylistFromFile(string filename);
+        int LoadPlaylistFromList(List<Track> tracks);
+        void SavePlaylistToFile(string filename);
         void SkipToTrack(Track trackToPlay);
         void SkipToTrack(int trackIndex);
         void StartPlaylistPlayback();

@@ -2,6 +2,7 @@
 using Dukebox.Desktop.Interfaces;
 using Dukebox.Desktop.Model;
 using Dukebox.Library;
+using Dukebox.Library.Interfaces;
 using Dukebox.Model.Services;
 using GalaSoft.MvvmLight.Command;
 using System;
@@ -14,6 +15,8 @@ namespace Dukebox.Desktop.ViewModel
 {
     public class RecentlyPlayedListingViewModel : ViewModelBase, ITrackListingViewModel
     {
+        private readonly IMusicLibrary _musicLibrary;
+
         private List<Track> _tracks;
         private ListSearchHelper<Track> _listSearchHelper;
         private string _searchText;
@@ -40,6 +43,13 @@ namespace Dukebox.Desktop.ViewModel
             {
                 return _listSearchHelper.FilteredItems;
             }
+            private set
+            {
+                _tracks = value;
+
+                _listSearchHelper.Items = _tracks;
+                OnPropertyChanged("Tracks");
+            }
         }
 
         public bool EditingListingsDisabled
@@ -57,10 +67,9 @@ namespace Dukebox.Desktop.ViewModel
             }
         }
 
-        public RecentlyPlayedListingViewModel() : base()
+        public RecentlyPlayedListingViewModel(IMusicLibrary musicLibrary) : base()
         {
-            ClearSearch = new RelayCommand(() => SearchText = string.Empty);
-
+            _musicLibrary = musicLibrary;
             _tracks = new List<Track>();
 
             _listSearchHelper = new ListSearchHelper<Track>
@@ -68,6 +77,16 @@ namespace Dukebox.Desktop.ViewModel
                 Items = _tracks,
                 FilterLambda = (t, s) => t.Song.title.ToLower().Contains(s.ToLower())
             };
+
+            ClearSearch = new RelayCommand(() => SearchText = string.Empty);
+
+            _musicLibrary.RecentlyPlayedListModified += (o, e) => RefreshRecentlyPlayedFromLibrary();
+            RefreshRecentlyPlayedFromLibrary();
+        }
+
+        public void RefreshRecentlyPlayedFromLibrary()
+        {
+            Tracks = _musicLibrary.RecentlyPlayedAsList;
         }
 
         private void DoSearch()
