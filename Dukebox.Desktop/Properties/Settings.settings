@@ -11,8 +11,5 @@
     <Setting Name="repeatAll" Type="System.String" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="trackDisplayFormat" Type="System.String" Scope="User">
-      <Value Profile="(Default)">{Artist} - {TITLE}</Value>
-    </Setting>
   </Settings>
 </SettingsFile>

@@ -1,20 +1,13 @@
-﻿using MediaPlayer = Dukebox.Audio.MediaPlayer;
-using Dukebox.Audio.Interfaces;
-using Dukebox.Audio.Model;
-using Dukebox.Desktop.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using GalaSoft.MvvmLight.Command;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using GalaSoft.MvvmLight.Command;
+using MediaPlayer = Dukebox.Audio.MediaPlayer;
+using Dukebox.Audio.Interfaces;
+using Dukebox.Audio.Model;
+using Dukebox.Desktop.Helper;
+using Dukebox.Desktop.Interfaces;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
-using Dukebox.Desktop.Helper;
-using System.Windows;
 
 namespace Dukebox.Desktop.ViewModel
 {
