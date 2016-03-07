@@ -477,8 +477,6 @@ namespace Dukebox.Model.Services
         public int LoadPlaylistFromFile(string filename)
         {
             var playlist = _musicLibrary.GetPlaylistFromFile(filename);
-
-            StopPlaylistPlayback();
             var tracks = playlist.GetTracksForPlaylist();
 
             return LoadPlaylistFromList(tracks);
@@ -486,10 +484,20 @@ namespace Dukebox.Model.Services
 
         public int LoadPlaylistFromList(List<Track> tracks)
         {
+            StopPlaylistPlayback();
+
             Tracks.Clear();
             tracks.ForEach(t => Tracks.Add(t));
 
+            StartPlaylistPlayback();
+
             return Tracks.Count;
+        }
+
+        public void ClearPlaylist()
+        {
+            StopPlaylistPlayback();
+            Tracks.Clear();
         }
 
         /// <summary>

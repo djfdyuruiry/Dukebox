@@ -13,6 +13,7 @@ namespace Dukebox.Desktop.ViewModel
 {
     public class ViewModelLocator
     {
+        // window view model
         public IMainWindowViewModel MainWindow
         {
             get
@@ -20,12 +21,62 @@ namespace Dukebox.Desktop.ViewModel
                 return DesktopContainer.GetInstance<IMainWindowViewModel>();
             }
         }
+        
+        // menu view models
+        public IFileMenuViewModel FileMenuViewModel
+        {
+            get
+            {
+                return DesktopContainer.GetInstance<IFileMenuViewModel>();
+            }
+        }
 
+        public IAudioCdMenuViewModel AudioCdMenuViewModel
+        {
+            get
+            {
+                return DesktopContainer.GetInstance<IAudioCdMenuViewModel>();
+            }
+        }
+
+        public IPlaybackMenuViewModel PlaybackMenuViewModel
+        {
+            get
+            {
+                return DesktopContainer.GetInstance<IPlaybackMenuViewModel>();
+            }
+        }
+
+        public IPlaylistMenuViewModel PlaylistMenuViewModel
+        {
+            get
+            {
+                return DesktopContainer.GetInstance<IPlaylistMenuViewModel>();
+            }
+        }
+
+        public IHelpMenuViewModel HelpMenuViewModel
+        {
+            get
+            {
+                return DesktopContainer.GetInstance<IHelpMenuViewModel>();
+            }
+        }
+
+        // screen view models
         public IPlaybackMonitorViewModel IPlaybackMonitor
         {
             get
             {
                 return DesktopContainer.GetInstance<IPlaybackMonitorViewModel>();
+            }
+        }
+
+        public ISearchControlViewModel ISearchControl
+        {
+            get
+            {
+                return DesktopContainer.GetInstance<ISearchControlViewModel>();
             }
         }
 
@@ -50,14 +101,6 @@ namespace Dukebox.Desktop.ViewModel
             get
             {
                 return DesktopContainer.GetInstance<IArtistListingViewModel>();
-            }
-        }
-
-        public ISearchControlViewModel ISearchControl
-        {
-            get
-            {
-                return DesktopContainer.GetInstance<ISearchControlViewModel>();
             }
         }
 

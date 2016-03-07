@@ -43,7 +43,6 @@ namespace Dukebox.Library.Repositories
         private List<artist> _allArtistsCache;
         private List<album> _allAlbumsCache;
         private List<playlist> _allPlaylistsCache;
-        private ObservableCollection<Track> _recentlyPlayed;
 
         public event EventHandler SongAdded;
         public event EventHandler ArtistAdded;

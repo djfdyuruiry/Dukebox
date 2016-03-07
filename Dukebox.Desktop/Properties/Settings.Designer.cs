@@ -22,5 +22,53 @@ namespace Dukebox.Desktop.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public string shuffle {
+            get {
+                return ((string)(this["shuffle"]));
+            }
+            set {
+                this["shuffle"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public string repeat {
+            get {
+                return ((string)(this["repeat"]));
+            }
+            set {
+                this["repeat"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public string repeatAll {
+            get {
+                return ((string)(this["repeatAll"]));
+            }
+            set {
+                this["repeatAll"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("{Artist} - {TITLE}")]
+        public string trackDisplayFormat {
+            get {
+                return ((string)(this["trackDisplayFormat"]));
+            }
+            set {
+                this["trackDisplayFormat"] = value;
+            }
+        }
     }
 }

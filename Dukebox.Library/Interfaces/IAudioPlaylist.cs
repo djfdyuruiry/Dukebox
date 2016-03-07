@@ -20,6 +20,7 @@ namespace Dukebox.Library.Interfaces
         Track CurrentlyLoadedTrack { get; }
         int LoadPlaylistFromFile(string filename);
         int LoadPlaylistFromList(List<Track> tracks);
+        void ClearPlaylist();
         void SavePlaylistToFile(string filename);
         void SkipToTrack(Track trackToPlay);
         void SkipToTrack(int trackIndex);
