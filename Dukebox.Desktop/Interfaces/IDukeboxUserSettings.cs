@@ -5,6 +5,5 @@
         bool Repeat { get; set; }
         bool RepeatAll { get; set; }
         bool Shuffle { get; set; }
-        string TrackDisplayFormat { get; set; }
     }
 }

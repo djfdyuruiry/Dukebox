@@ -58,17 +58,5 @@ namespace Dukebox.Desktop.Properties {
                 this["repeatAll"] = value;
             }
         }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("{Artist} - {TITLE}")]
-        public string trackDisplayFormat {
-            get {
-                return ((string)(this["trackDisplayFormat"]));
-            }
-            set {
-                this["trackDisplayFormat"] = value;
-            }
-        }
     }
 }
