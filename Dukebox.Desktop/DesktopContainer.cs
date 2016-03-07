@@ -25,20 +25,37 @@ namespace Dukebox.Desktop
         }
 
         private static void Configure(Container container)
-        {         
+        {
+            // user settings
+            container.RegisterSingleton<IDukeboxUserSettings, DukeboxUserSettings>();
+
+            // window view model
             container.RegisterSingleton<IMainWindowViewModel, MainWindowViewModel>();
+
+            // menu view models
+            container.RegisterSingleton<IFileMenuViewModel, FileMenuViewModel>();
+            container.RegisterSingleton<IAudioCdMenuViewModel, AudioCdMenuViewModel>();
+            container.RegisterSingleton<IPlaybackMenuViewModel, PlaybackMenuViewModel>();
+            container.RegisterSingleton<IPlaylistMenuViewModel, PlaylistMenuViewModel>();
+            container.RegisterSingleton<IHelpMenuViewModel, HelpMenuViewModel>();
+
+            // screen view models
             container.RegisterSingleton<IPlaybackMonitorViewModel, PlaybackMonitorViewModel>();
+            container.RegisterSingleton<ISearchControlViewModel, SearchControlViewModelDummy>();
             container.RegisterSingleton<ITrackListingViewModel, LibraryListingViewModel>();
             container.RegisterSingleton<IAlbumListingViewModel, AlbumListingViewModel>();
             container.RegisterSingleton<IArtistListingViewModel, ArtistListingViewModel>();
-            container.RegisterSingleton<ISearchControlViewModel, SearchControlViewModelDummy>();
             container.RegisterSingleton<LibraryListingViewModel, LibraryListingViewModel>();
             container.RegisterSingleton<RecentlyPlayedListingViewModel, RecentlyPlayedListingViewModel>();
             container.RegisterSingleton<AudioCdViewModel, AudioCdViewModel>();
+
+            // helpers
             container.RegisterSingleton<ImageToImageSourceConverter>();
+
+            // services
             container.Register<Album>();
 
-            // Register external packages
+            // register external packages
             var assemblies = new List<Assembly>
             {
                 Assembly.GetAssembly(typeof(LibraryPackage))

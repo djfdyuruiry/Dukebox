@@ -86,6 +86,7 @@
       <HintPath>..\packages\System.Data.SQLite.Linq.1.0.92.0\lib\net45\System.Data.SQLite.Linq.dll</HintPath>
     </Reference>
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Interactivity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\MvvmLightLibs.5.2.0.0\lib\net40\System.Windows.Interactivity.dll</HintPath>
       <Private>True</Private>
@@ -108,12 +109,14 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="DesktopContainer.cs" />
+    <Compile Include="DukeboxUserSettings.cs" />
     <Compile Include="Helper\BoolToVisibilityConverter.cs" />
     <Compile Include="Helper\ArtistToThumbnailConverter.cs" />
     <Compile Include="Helper\ImageResourceLoader.cs" />
     <Compile Include="Helper\ImageResources.cs" />
     <Compile Include="Helper\ImageToImageSourceConverter.cs" />
     <Compile Include="Helper\ListSearchHelper.cs" />
+    <Compile Include="Interfaces\IDukeboxUserSettings.cs" />
     <Compile Include="Interfaces\IArtistListingViewModel.cs" />
     <Compile Include="Interfaces\IPlaybackMonitorViewModel.cs" />
     <Compile Include="Interfaces\ISearchControlViewModel.cs" />
@@ -125,7 +128,17 @@
     <Compile Include="Interfaces\IAlbumListingViewModel.cs" />
     <Compile Include="ViewModel\ArtistListingViewModel.cs" />
     <Compile Include="ViewModel\AudioCdListingViewModel.cs" />
+    <Compile Include="ViewModel\AudioCdMenuViewModel.cs" />
+    <Compile Include="ViewModel\FileMenuViewModel.cs" />
+    <Compile Include="ViewModel\HelpMenuViewModel.cs" />
+    <Compile Include="Interfaces\IAudioCdMenuViewModel.cs" />
+    <Compile Include="Interfaces\IFileMenuViewModel.cs" />
+    <Compile Include="Interfaces\IHelpMenuViewModel.cs" />
+    <Compile Include="Interfaces\IPlaybackMenuViewModel.cs" />
+    <Compile Include="Interfaces\IPlaylistMenuViewModel.cs" />
+    <Compile Include="ViewModel\PlaybackMenuViewModel.cs" />
     <Compile Include="ViewModel\PlaybackMonitorViewModel.cs" />
+    <Compile Include="ViewModel\PlaylistMenuViewModel.cs" />
     <Compile Include="ViewModel\RecentlyPlayedListingViewModel.cs" />
     <Compile Include="ViewModel\LibraryListingViewModel.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />
