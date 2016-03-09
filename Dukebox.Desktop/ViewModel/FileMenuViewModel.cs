@@ -101,7 +101,7 @@ namespace Dukebox.Desktop.ViewModel
             {
                 _musicLibrary.AddDirectory(_selectFolderDialog.SelectedPath, true,
                     (o, a) => ImportStep(progressViewModel, a),
-                    async (o, i) => progressWindow.Dispatcher.InvokeAsync(() => progressWindow.Close()));
+                    (o, i) => progressWindow.Dispatcher.InvokeAsync(() => progressWindow.Close()));
             });
 
             progressWindow.Show();

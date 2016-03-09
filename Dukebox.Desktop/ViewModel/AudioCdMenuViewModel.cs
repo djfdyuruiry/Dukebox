@@ -1,7 +1,10 @@
-﻿using GalaSoft.MvvmLight.Command;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.Windows.Input;
+using MessageBox = System.Windows.MessageBox;
+using MessageBoxButton = System.Windows.MessageBoxButton;
+using MessageBoxImage = System.Windows.MessageBoxImage;
+using GalaSoft.MvvmLight.Command;
 using Dukebox.Desktop.Interfaces;
 using Dukebox.Library.Interfaces;
 
@@ -11,7 +14,7 @@ namespace Dukebox.Desktop.ViewModel
     {
         public const string AudioCdBrowserPrompt = "Select Audio CD Drive";
         public const string Mp3OutputBrowserPrompt = "Select Output Folder for MP3 Files";
-        public const string DriveRootRegex = @"[a-zA-Z]:\\";
+        public const string DriveRootRegex = @"^[a-zA-Z]:\\$";
 
         private readonly IMusicLibrary _musicLibrary;
         private readonly IAudioPlaylist _audioPlaylist;
@@ -87,7 +90,8 @@ namespace Dukebox.Desktop.ViewModel
 
             if (!pathIsDriveRoot)
             {
-                // todo: notify user that path selected is not a drive root
+                MessageBox.Show("Selected path is not a drive root.", "Error Selecting Audio CD", 
+                    MessageBoxButton.OK, MessageBoxImage.Error);
                 return string.Empty;
             }
 
