@@ -13,7 +13,7 @@ using System.Windows.Input;
 
 namespace Dukebox.Desktop.ViewModel
 {
-    public class RecentlyPlayedListingViewModel : ViewModelBase, ITrackListingViewModel
+    public class RecentlyPlayedListingViewModel : ViewModelBase, ITrackListingViewModel, ISearchControlViewModel
     {
         private readonly IMusicLibrary _musicLibrary;
 

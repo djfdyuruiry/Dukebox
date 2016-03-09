@@ -59,6 +59,10 @@
       <HintPath>..\packages\MvvmLightLibs.5.2.0.0\lib\net40\GalaSoft.MvvmLight.Extras.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="log4net, Version=1.2.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.5\lib\net45-full\log4net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\CommonServiceLocator.1.3\lib\portable-net4+sl5+netcore45+wpa81+wp8\Microsoft.Practices.ServiceLocation.dll</HintPath>
       <Private>True</Private>
@@ -119,6 +123,7 @@
     <Compile Include="Interfaces\IDukeboxUserSettings.cs" />
     <Compile Include="Interfaces\IArtistListingViewModel.cs" />
     <Compile Include="Interfaces\IPlaybackMonitorViewModel.cs" />
+    <Compile Include="Interfaces\IProgressMonitorViewModel.cs" />
     <Compile Include="Interfaces\ISearchControlViewModel.cs" />
     <Compile Include="Services\Album.cs" />
     <Compile Include="Model\NavIconNames.cs" />
@@ -139,10 +144,10 @@
     <Compile Include="ViewModel\PlaybackMenuViewModel.cs" />
     <Compile Include="ViewModel\PlaybackMonitorViewModel.cs" />
     <Compile Include="ViewModel\PlaylistMenuViewModel.cs" />
+    <Compile Include="ViewModel\ProgressMonitorViewModel.cs" />
     <Compile Include="ViewModel\RecentlyPlayedListingViewModel.cs" />
     <Compile Include="ViewModel\LibraryListingViewModel.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />
-    <Compile Include="ViewModel\SearchControlViewModelDummy.cs" />
     <Compile Include="ViewModel\ViewModelBase.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
     <Compile Include="Views\AlbumListing.xaml.cs">
@@ -153,6 +158,9 @@
     </Compile>
     <Compile Include="Views\PlaybackMonitor.xaml.cs">
       <DependentUpon>PlaybackMonitor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ProgressMonitor.xaml.cs">
+      <DependentUpon>ProgressMonitor.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\SearchControl.xaml.cs">
       <DependentUpon>SearchControl.xaml</DependentUpon>
@@ -186,6 +194,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\PlaybackMonitor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ProgressMonitor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

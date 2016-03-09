@@ -91,7 +91,7 @@
                         <TextBlock.Text>
                             <MultiBinding StringFormat="'{0}/{1}'">
                                 <Binding Path="TrackMinutesPassed"/>
-                                <Binding Path="TrackTotalMinutes"/>
+                                <Binding Path="TrackMinutesTotal"/>
                             </MultiBinding>
                         </TextBlock.Text>
                     </TextBlock>
@@ -122,7 +122,7 @@
                             MaxHeight="64" 
                             Grid.Row="0" 
                             Grid.Column="0" 
-                            Command="{Binding PausePlayCommand}"
+                            Command="{Binding PlayPauseCommand}"
                             Style="{StaticResource MetroButton}">
                         <Image Source="{Binding PlayPauseImage}" />
                     </Button>

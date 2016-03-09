@@ -13,7 +13,7 @@ using System.Windows.Input;
 
 namespace Dukebox.Desktop.ViewModel
 {
-    public class AlbumListingViewModel : ViewModelBase, IAlbumListingViewModel
+    public class AlbumListingViewModel : ViewModelBase, IAlbumListingViewModel, ISearchControlViewModel
     {
         private readonly IMusicLibrary _mediaLibrary;
 
@@ -77,7 +77,6 @@ namespace Dukebox.Desktop.ViewModel
         private void LoadAlbumsFromLibrary()
         {
             Albums = _mediaLibrary.OrderedAlbums
-                .Where(a => a.HasAlbumArt)
                 .Select(a => Album.BuildAlbumInstance(a))
                 .ToList();
         }

@@ -12,7 +12,7 @@ using System.Windows.Input;
 
 namespace Dukebox.Desktop.ViewModel
 {
-    public class ArtistListingViewModel : ViewModelBase, IArtistListingViewModel
+    public class ArtistListingViewModel : ViewModelBase, IArtistListingViewModel, ISearchControlViewModel
     {
         private readonly IMusicLibrary _musicLibrary;
 

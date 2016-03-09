@@ -71,23 +71,7 @@ namespace Dukebox.Desktop.ViewModel
                 return DesktopContainer.GetInstance<IPlaybackMonitorViewModel>();
             }
         }
-
-        public ISearchControlViewModel ISearchControl
-        {
-            get
-            {
-                return DesktopContainer.GetInstance<ISearchControlViewModel>();
-            }
-        }
-
-        public ITrackListingViewModel ILibraryListing
-        {
-            get
-            {
-                return DesktopContainer.GetInstance<ITrackListingViewModel>();
-            }
-        }
-
+        
         public IAlbumListingViewModel IAlbumListing
         {
             get

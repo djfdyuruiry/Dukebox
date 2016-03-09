@@ -7,6 +7,7 @@ using Dukebox.Model.Services;
 using log4net;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -249,7 +250,7 @@ namespace Dukebox.Library.Repositories
             }
 
             var stopwatch = Stopwatch.StartNew();
-            var tracks = new Dictionary<string, AudioFileMetaData>();
+            var tracks = new ConcurrentDictionary<string, AudioFileMetaData>();
             var filesToAddMutex = new Mutex();
         
             var allfiles = Directory.GetFiles(@directory, "*.*", subDirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
@@ -270,8 +271,8 @@ namespace Dukebox.Library.Repositories
                     {
                         progressHandler.Invoke(this, new AudioFileImportedEventArgs() { JustProcessing = true, FileAdded = file, TotalFilesThisImport = numFilesToAdd });
                     }
-
-                    tracks.Add(file, AudioFileMetaData.BuildAudioFileMetaData(file));
+                    
+                    tracks[file] = AudioFileMetaData.BuildAudioFileMetaData(file);
                 }
                 catch (Exception ex)
                 {

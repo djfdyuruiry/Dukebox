@@ -7,8 +7,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="592" d:DesignWidth="1016"
              Background="White"
-             Name="TrackListingControl"
-             DataContext="{Binding ILibraryListing, Source={StaticResource ViewModelLocator}}">
+             Name="TrackListingControl">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="0.04*"></RowDefinition>
