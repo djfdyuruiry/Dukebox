@@ -145,7 +145,11 @@ namespace Dukebox.Audio
                 throw new ArgumentException(string.Format("File '{0}' contains no data!", fileName));
             }
 
-            Bass.BASS_StreamFree(_stream);
+            if (_stream != 0)
+            {
+                Bass.BASS_StreamFree(_stream);
+            }
+           
             _stream = 0;
 
             _fileName = fileName;

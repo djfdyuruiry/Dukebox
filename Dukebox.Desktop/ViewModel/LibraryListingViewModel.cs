@@ -14,7 +14,7 @@ using System.Windows.Input;
 
 namespace Dukebox.Desktop.ViewModel
 {
-    public class LibraryListingViewModel : ViewModelBase, ITrackListingViewModel
+    public class LibraryListingViewModel : ViewModelBase, ITrackListingViewModel, ISearchControlViewModel
     {
         private readonly IMusicLibrary _musicLibrary;
 

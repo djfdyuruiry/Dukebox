@@ -11,11 +11,13 @@ namespace Dukebox.Audio
     /// </summary>
     public class AudioFileFormats
     {
+        public const string FileFilterPrefixFormat = "Audio Files |{0}";
+
         /// <summary>
         /// A string list of all supported audio
         /// formats specified by file extension. (e.g. '.mp3')
         /// </summary>
-        public List<string> SupportedFormats = new List<string>();
+        public List<string> SupportedFormats { get; private set; }
 
         /// <summary>
         /// A file filter string for use with a file dialog
@@ -25,11 +27,21 @@ namespace Dukebox.Audio
         {
             get
             {
+                if (!SupportedFormats.Any())
+                {
+                    return string.Format(FileFilterPrefixFormat, "*.*");
+                }
+
                 string formatList = SupportedFormats.Aggregate((a, b) => a + b).Replace(".", ";*.");
-                string filter = "Audio Files |" + formatList.Substring(1);
+                string filter = string.Format(FileFilterPrefixFormat, formatList.Substring(1));
 
                 return filter;
             }
+        }
+
+        public AudioFileFormats()
+        {
+            SupportedFormats = new List<string>();
         }
     } 
 }

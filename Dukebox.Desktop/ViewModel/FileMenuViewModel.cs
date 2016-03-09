@@ -8,12 +8,17 @@ using Dukebox.Desktop.Interfaces;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
 using Dukebox.Model.Services;
+using System.Threading.Tasks;
+using Dukebox.Desktop.Views;
+using System.IO;
 
 namespace Dukebox.Desktop.ViewModel
 {
     public class FileMenuViewModel : ViewModelBase, IFileMenuViewModel
     {
         public const string FolderBrowserPrompt = "Select folder to load music files from";
+        public const string AddToLibraryHeader = "Importing audio files into the library...";
+        public const string AddToLibraryTitle = "Library Import";
 
         private readonly IMusicLibrary _musicLibrary;
         private readonly IAudioPlaylist _audioPlaylist;
@@ -85,18 +90,33 @@ namespace Dukebox.Desktop.ViewModel
                 return;
             }
 
-            _musicLibrary.AddDirectory(_selectFolderDialog.SelectedPath, true, 
-                (o, a) => ImportStep(a), 
-                (o, i) => ImportComplete(i));
+            var progressWindow = new ProgressMonitor();
+            var progressViewModel = new ProgressMonitorViewModel();
+
+            progressWindow.DataContext = progressViewModel;
+            progressViewModel.Title = AddToLibraryTitle;
+            progressViewModel.HeaderText = AddToLibraryHeader;
+
+            Task.Run(() =>
+            {
+                _musicLibrary.AddDirectory(_selectFolderDialog.SelectedPath, true,
+                    (o, a) => ImportStep(progressViewModel, a),
+                    async (o, i) => progressWindow.Dispatcher.InvokeAsync(() => progressWindow.Close()));
+            });
+
+            progressWindow.Show();
         }
 
-        private void ImportStep(AudioFileImportedEventArgs a)
+        private void ImportStep(ProgressMonitorViewModel viewModel, AudioFileImportedEventArgs fileImportedArgs)
         {
+            if (viewModel.MaximumProgressValue != fileImportedArgs.TotalFilesThisImport)
+            {
+                viewModel.MaximumProgressValue = fileImportedArgs.TotalFilesThisImport;
+            }
 
-        }
-
-        private void ImportComplete(int tracksAdded)
-        {
+            viewModel.CurrentProgressValue++;
+            viewModel.StatusText = string.Format(@"{0} '...\{1}\{2}'", fileImportedArgs.Status, 
+                Path.GetDirectoryName(fileImportedArgs.FileAdded), Path.GetFileName(fileImportedArgs.FileAdded));
         }
     }
 }

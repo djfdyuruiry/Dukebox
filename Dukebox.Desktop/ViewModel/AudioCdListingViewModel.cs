@@ -10,7 +10,7 @@ using System.Windows.Input;
 
 namespace Dukebox.Desktop.ViewModel
 {
-    public class AudioCdViewModel : ViewModelBase, ITrackListingViewModel
+    public class AudioCdViewModel : ViewModelBase, ITrackListingViewModel, ISearchControlViewModel
     {
         public ICommand ClearSearch { get; private set; }
         public string SearchText { get; set; }

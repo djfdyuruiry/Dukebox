@@ -9,6 +9,7 @@ using log4net;
 using org.jaudiotagger.audio;
 using org.jaudiotagger.tag;
 using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -185,7 +186,9 @@ namespace Dukebox.Model.Services
 
                 if (fileInfo.Extension != ".cda")
                 {
-                    audioFileMetadata._audioFile = AudioFileIO.read(new java.io.File(fileName));
+                    var javaFile = new java.io.File(fileInfo.FullName);
+
+                    audioFileMetadata._audioFile = AudioFileIO.read(javaFile);
                     audioFileMetadata._tag = audioFileMetadata._audioFile.getTag();
                 }
                 else
@@ -196,7 +199,7 @@ namespace Dukebox.Model.Services
             catch (Exception ex)
             {
                 logger.Error(string.Format("Error occured while parsing metadata from audio file '{0}'", fileName), ex);
-
+                
                 audioFileMetadata._tag = null;
                 audioFileMetadata.GetTrackDetailsFromUnsupportedFormat(fileName);
             }
