@@ -17,7 +17,7 @@ namespace Dukebox.Library.Config
         public DukeboxSettings()
         {
             var configMap = new ExeConfigurationFileMap();
-            configMap.ExeConfigFilename = @"Dukebox.Desktop.exe.Config";
+            configMap.ExeConfigFilename = @"Dukebox.exe.Config";
 
             var config = ConfigurationManager.OpenMappedExeConfiguration(configMap, ConfigurationUserLevel.None);
             _settings = config.AppSettings.Settings;

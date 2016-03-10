@@ -5,17 +5,15 @@ namespace Dukebox.Library.Interfaces
     public interface ICdRipViewUpdater
     {
         string Text { get; set; }
-        void NotifcationLabelUpdate(string text);
-
         int ProgressBarMaximum { get; set; }
         int ProgressBarValue { get; set; }
 
-        void ResetProgressBar();
-        
-        object Invoke(Delegate _delegate);
+        event EventHandler OnResetProgressBar;
+        event EventHandler<string> OnNotificationUpdate;
+        event EventHandler OnComplete;
 
-        void Show();
-        void Hide();
-        void Dispose();
+        void ResetProgressBar();
+        void NotificationUpdate(string notification);
+        void Complete();
     }
 }

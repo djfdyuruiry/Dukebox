@@ -59,15 +59,7 @@ namespace Dukebox.Library.Services
                 List<AudioFileMetaData> cdMetadata = _cdMetadataService.GetAudioFileMetaDataForCd(inPath[0]);
                 int numTracks = inFiles.Length;
 
-                Thread viewerThread = new Thread(delegate()
-                {
-                    viewUpdater.Text = "Dukebox - MP3 Ripping Progress";
-                    viewUpdater.Show();
-                    Dispatcher.Run();
-                });
-
-                viewerThread.SetApartmentState(ApartmentState.STA); // needs to be STA or throws exception
-                viewerThread.Start();
+                viewUpdater.Text = "Dukebox - MP3 Ripping Progress";
 
                 // Rip each track.
                 for (int trackIdx = 0; trackIdx < numTracks; trackIdx++)
@@ -77,7 +69,7 @@ namespace Dukebox.Library.Services
                         Track t = _musicLibrary.GetTrackFromFile(inFiles[trackIdx], cdMetadata[trackIdx]);
                         string outFile = string.Format(outFileFormat, t.ToString());
 
-                        _audioConverterService.ConvertCdaFileToMp3(inFiles[trackIdx], outFile, 
+                        _audioConverterService.ConvertCdaFileToMp3(inFiles[trackIdx], outFile,
                             new BaseEncoder.ENCODEFILEPROC((a, b) => CdRippingProgressMonitor(viewUpdater, a, b, t, numTracks, trackIdx)), true);
 
                         // Wait until track has been ripped.
@@ -103,12 +95,11 @@ namespace Dukebox.Library.Services
                         string msg = string.Format("Error ripping music track #{0} from Audio CD: {1}", trackIdx + 1, ex.Message);
 
                         logger.Error(msg);
-                        MessageBox.Show(msg, "Dukebox - Error Ripping from CD", MessageBoxButtons.OK, MessageBoxIcon.Error);          
+                        MessageBox.Show(msg, "Dukebox - Error Ripping from CD", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
 
-                viewUpdater.Invoke(new ValueUpdateDelegate(() => viewUpdater.Hide()));
-                viewUpdater.Invoke(new ValueUpdateDelegate(() => viewUpdater.Dispose()));
+                viewUpdater.Complete();
             }
             catch (Exception ex)
             {
@@ -150,7 +141,7 @@ namespace Dukebox.Library.Services
             int currentTrackNumber = currentTrackIndex + 1;
 
             cdRipViewUpdater.ProgressBarValue = percentComplete;
-            cdRipViewUpdater.NotifcationLabelUpdate(string.Format("[{0}/{1}] Converting '{2}' to MP3 - {3}%", 
+            cdRipViewUpdater.NotificationUpdate(string.Format("[{0}/{1}] Converting '{2}' to MP3 - {3}%", 
                 currentTrackNumber, totalTracksToRip, track, percentComplete));
         }
 
