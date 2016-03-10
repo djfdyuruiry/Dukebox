@@ -7,6 +7,9 @@ using MessageBoxImage = System.Windows.MessageBoxImage;
 using GalaSoft.MvvmLight.Command;
 using Dukebox.Desktop.Interfaces;
 using Dukebox.Library.Interfaces;
+using Dukebox.Desktop.Views;
+using Dukebox.Desktop.Services;
+using System.Threading.Tasks;
 
 namespace Dukebox.Desktop.ViewModel
 {
@@ -14,8 +17,9 @@ namespace Dukebox.Desktop.ViewModel
     {
         public const string AudioCdBrowserPrompt = "Select Audio CD Drive";
         public const string Mp3OutputBrowserPrompt = "Select Output Folder for MP3 Files";
+        public const string RipCdTitle = "Ripping Audio CD";
         public const string DriveRootRegex = @"^[a-zA-Z]:\\$";
-
+        
         private readonly IMusicLibrary _musicLibrary;
         private readonly IAudioPlaylist _audioPlaylist;
         private readonly IAudioCdRippingService _cdRippingService;
@@ -73,8 +77,17 @@ namespace Dukebox.Desktop.ViewModel
                 return;
             }
 
-            // todo: create ICdRipViewUpdater implementation and use
-            _cdRippingService.RipCdToFolder(audioCdDrive, _selectMp3OutputDialog.SelectedPath, null); 
+            var progressWindow = new ProgressMonitor();
+            var progressViewModel = new CdRippingProgressMonitorViewModel();
+
+            progressWindow.DataContext = progressViewModel;
+            progressViewModel.Title = RipCdTitle;
+
+            progressViewModel.OnComplete += (o, e) => progressWindow.Dispatcher.InvokeAsync(progressWindow.Hide);
+
+            Task.Run(() => _cdRippingService.RipCdToFolder(audioCdDrive, _selectMp3OutputDialog.SelectedPath, progressViewModel));
+
+            progressWindow.Show();
         }
 
         private string BrowseForAudioCdDrive()

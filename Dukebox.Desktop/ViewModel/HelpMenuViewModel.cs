@@ -6,21 +6,34 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Dukebox.Desktop.Interfaces;
 using GalaSoft.MvvmLight.Command;
+using System.Reflection;
+using System.Windows;
 
 namespace Dukebox.Desktop.ViewModel
 {
     public class HelpMenuViewModel : ViewModelBase, IHelpMenuViewModel
     {
+        private string _assemblyName;
+        private string _assemblyVersion;
+        private string _copyright;
+
         public ICommand About { get; private set; }
 
         public HelpMenuViewModel() : base()
         {
-            // todo: create about screen and present on command
             About = new RelayCommand(ShowAboutScreen);
+
+            var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            
+            _assemblyName = assembly.GetName().FullName;
+            _assemblyVersion = assembly.GetName().Version.ToString();
+            _copyright = ((AssemblyCopyrightAttribute)Attribute.GetCustomAttribute(assembly, typeof(AssemblyCopyrightAttribute), false)).Copyright;
         }
 
         private void ShowAboutScreen()
         {
+            MessageBox.Show(string.Format("{0} {1} \n\n {2}", _assemblyName, _assemblyVersion, _copyright), string.Format("About {0}", _assemblyName),
+                MessageBoxButton.OK, MessageBoxImage.Information);
         }
     }
 }
