@@ -22,6 +22,7 @@ namespace Dukebox.Desktop.ViewModel
 
         private readonly IMusicLibrary _musicLibrary;
         private readonly IAudioPlaylist _audioPlaylist;
+        private readonly AudioFileFormats _audioFileFormats;
 
         private OpenFileDialog _selectFileDialog;
         private FolderBrowserDialog _selectFolderDialog;
@@ -37,11 +38,11 @@ namespace Dukebox.Desktop.ViewModel
         {
             _musicLibrary = musicLibrary;
             _audioPlaylist = audioPlaylist;
+            _audioFileFormats = audioFileFormats;
 
             _selectFileDialog = new OpenFileDialog();
             _selectFolderDialog = new FolderBrowserDialog();
 
-            _selectFileDialog.Filter = audioFileFormats.FileDialogFilter;
             _selectFolderDialog.Description = FolderBrowserPrompt;
 
             PlayFile = new RelayCommand(DoPlayFile);
@@ -55,6 +56,8 @@ namespace Dukebox.Desktop.ViewModel
 
         private void DoPlayFile()
         {
+            _selectFileDialog.Filter = _audioFileFormats.FileDialogFilter;
+
             var dialogResult = _selectFileDialog.ShowDialog();
 
             if (dialogResult != DialogResult.OK)

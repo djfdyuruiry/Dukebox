@@ -5,6 +5,10 @@ namespace Dukebox.Library.Interfaces
     {
         int AddDirectoryConcurrencyLimit { get; }
         string AlbumArtCachePath { get; }
+        int BassPluginCount { get; }
+        string BassLicenseEmail { get; }
+        string BassLicenseKey { get; }
+        string BassAddOnsPath { get; }
         string TrackDisplayFormat { get; }
     }
 }

@@ -4,12 +4,13 @@ using log4net;
 using SimpleInjector;
 using SimpleInjector.Packaging;
 using System;
+using System.Reflection;
 
 namespace Dukebox.Audio
 {
     public class AudioPackage : IPackage
     {
-        private static readonly ILog logger = LogManager.GetLogger(typeof(AudioPackage));
+        private static readonly ILog logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static Container container;
 
         static AudioPackage()
