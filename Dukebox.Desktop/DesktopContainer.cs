@@ -5,12 +5,8 @@ using Dukebox.Desktop.ViewModel;
 using Dukebox.Library;
 using SimpleInjector;
 using SimpleInjector.Packaging;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Dukebox.Desktop
 {
@@ -30,6 +26,7 @@ namespace Dukebox.Desktop
             container.RegisterSingleton<IDukeboxUserSettings, DukeboxUserSettings>();
 
             // window view model
+            container.RegisterSingleton<ILoadingScreenViewModel, LoadingScreenViewModel>();
             container.RegisterSingleton<IMainWindowViewModel, MainWindowViewModel>();
 
             // menu view models
@@ -49,6 +46,7 @@ namespace Dukebox.Desktop
 
             // helpers
             container.RegisterSingleton<ImageToImageSourceConverter>();
+            container.RegisterSingleton<DukeboxInitialisationHelper>();
 
             // services
             container.Register<Album>();

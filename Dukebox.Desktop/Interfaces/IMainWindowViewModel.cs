@@ -6,7 +6,9 @@ namespace Dukebox.Desktop.Interfaces
 {
     public interface IMainWindowViewModel
     {
+        ICommand ShowLoadingScreen { get; }
         ICommand NavBarItemClickCommand { get; }
+        ICommand StopAudio { get; }
         Visibility ShowAlbumListing { get; }
         Visibility ShowLibraryListing { get; }
         Visibility ShowArtistListing { get; }

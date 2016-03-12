@@ -11,5 +11,6 @@ namespace Dukebox.Desktop.Interfaces
     {
         List<Track> Tracks { get; }
         bool EditingListingsDisabled { get; }
+        ICommand LoadTrack { get; }
     }
 }

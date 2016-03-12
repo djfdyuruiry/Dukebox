@@ -16,6 +16,7 @@ namespace Dukebox.Desktop.ViewModel
     public class RecentlyPlayedListingViewModel : ViewModelBase, ITrackListingViewModel, ISearchControlViewModel
     {
         private readonly IMusicLibrary _musicLibrary;
+        private readonly IAudioPlaylist _audioPlaylist;
 
         private List<Track> _tracks;
         private ListSearchHelper<Track> _listSearchHelper;
@@ -67,9 +68,12 @@ namespace Dukebox.Desktop.ViewModel
             }
         }
 
-        public RecentlyPlayedListingViewModel(IMusicLibrary musicLibrary) : base()
+        public ICommand LoadTrack { get; private set; }
+
+        public RecentlyPlayedListingViewModel(IMusicLibrary musicLibrary, IAudioPlaylist audioPlaylist) : base()
         {
             _musicLibrary = musicLibrary;
+            _audioPlaylist = audioPlaylist;
             _tracks = new List<Track>();
 
             _listSearchHelper = new ListSearchHelper<Track>
@@ -79,9 +83,16 @@ namespace Dukebox.Desktop.ViewModel
             };
 
             ClearSearch = new RelayCommand(() => SearchText = string.Empty);
+            LoadTrack = new RelayCommand<Track>(DoLoadTrack);
 
             _musicLibrary.RecentlyPlayedListModified += (o, e) => RefreshRecentlyPlayedFromLibrary();
             RefreshRecentlyPlayedFromLibrary();
+        }
+
+        private void DoLoadTrack(Track track)
+        {
+            _audioPlaylist.LoadPlaylistFromList(_tracks);
+            _audioPlaylist.SkipToTrack(track);
         }
 
         public void RefreshRecentlyPlayedFromLibrary()

@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:DukeboxViews="clr-namespace:Dukebox.Desktop.Views" 
+             xmlns:cmd="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras" 
              mc:Ignorable="d" 
              d:DesignHeight="592" d:DesignWidth="1016"
              Background="White"
@@ -28,35 +29,57 @@
                   CanUserResizeColumns="True"
                   CanUserReorderColumns="True"
                   CanUserSortColumns="True"
+                  SelectionMode="Single"
+                  SelectionUnit="FullRow"
+                  Name="TrackListingsGrid"
                   ItemsSource="{Binding Tracks}">
             <DataGrid.RowStyle>
                 <Style TargetType="DataGridRow">
+                    <Setter Property="Margin" Value="5"></Setter>
                 </Style>
             </DataGrid.RowStyle>
             <DataGrid.CellStyle>
                 <Style TargetType="DataGridCell">
-                    <Setter Property="BorderThickness" Value="10"></Setter>
+                    <Setter Property="BorderThickness" Value="1"></Setter>
                 </Style>
             </DataGrid.CellStyle>
             <DataGrid.Columns>
                 <DataGridTemplateColumn Header="Artist" Width="auto" SortMemberPath="Artist" IsReadOnly="{Binding EditingListingsDisabled}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Artist.name}" />
+                            <TextBlock Text="{Binding Artist.name}">
+                                <TextBlock.InputBindings>
+                                    <MouseBinding MouseAction="LeftDoubleClick"
+                                                  Command="{Binding LoadTrack}"
+                                                  CommandParameter="{Binding ElementName=TrackListingsGrid, Path=SelectedItem}"/>
+                                </TextBlock.InputBindings>
+                            </TextBlock> 
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTemplateColumn Header="Album" Width="auto" SortMemberPath="Album" IsReadOnly="{Binding EditingListingsDisabled}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Album.name}" />
+                            <TextBlock Text="{Binding Album.name}">
+                                <TextBlock.InputBindings>
+                                    <MouseBinding MouseAction="LeftDoubleClick"
+                                                  Command="{Binding LoadTrack}"
+                                                  CommandParameter="{Binding ElementName=TrackListingsGrid, Path=SelectedItem}"/>
+                                </TextBlock.InputBindings>
+                            </TextBlock>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTemplateColumn Header="Title" Width="*" SortMemberPath="Song" IsReadOnly="{Binding EditingListingsDisabled}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Song.title}" />
+                            <TextBlock Text="{Binding Song.title}">
+                                <TextBlock.InputBindings>
+                                    <MouseBinding MouseAction="LeftDoubleClick"
+                                                  Command="{Binding LoadTrack}"
+                                                  CommandParameter="{Binding ElementName=TrackListingsGrid, Path=SelectedItem}"/>
+                                </TextBlock.InputBindings>
+                            </TextBlock>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>

@@ -4,18 +4,24 @@ using System.Windows.Input;
 using GalaSoft.MvvmLight.Command;
 using Dukebox.Desktop.Interfaces;
 using Dukebox.Desktop.Model;
+using System;
+using Dukebox.Library.Interfaces;
+using log4net;
+using System.Reflection;
 
 namespace Dukebox.Desktop.ViewModel
 {
     public class MainWindowViewModel : ViewModelBase, IMainWindowViewModel
     {
+        private static readonly ILog logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private readonly IAudioPlaylist _audioPlaylist;
+        
         private Visibility _showLibraryListing;
         private Visibility _showAlbumListing;
         private Visibility _showArtistListing;
         private Visibility _showRecentlyPlayedListing;
         private Visibility _showAudioCdListing;
 
-        public ICommand NavBarItemClickCommand { get; private set; }
         public Visibility ShowLibraryListing 
         { 
             get 
@@ -76,16 +82,43 @@ namespace Dukebox.Desktop.ViewModel
                 OnPropertyChanged("ShowAudioCdListing");
             }
         }
-        
-        public MainWindowViewModel() : base()
+        public ICommand ShowLoadingScreen { get; private set; }
+        public ICommand NavBarItemClickCommand { get; private set; }
+        public ICommand StopAudio { get; private set; }
+
+        public MainWindowViewModel(IAudioPlaylist audioPlaylist) : base()
         {
-            NavBarItemClickCommand = new RelayCommand<string>(NavBarItemClicked);
+            _audioPlaylist = audioPlaylist;
 
             ShowLibraryListing = Visibility.Visible;
             ShowAlbumListing = Visibility.Hidden;
             ShowArtistListing = Visibility.Hidden;
             ShowRecentlyPlayedListing = Visibility.Hidden;
             ShowAudioCdListing = Visibility.Hidden;
+
+            ShowLoadingScreen = new RelayCommand(DoShowSplashScreen);
+            NavBarItemClickCommand = new RelayCommand<string>(NavBarItemClicked);
+            StopAudio = new RelayCommand(DoStopAudio);
+        }
+
+        private void DoShowSplashScreen()
+        {
+            var splashScreen = new LoadingScreen();
+            splashScreen.DataContext = DesktopContainer.GetInstance<ILoadingScreenViewModel>();
+
+            splashScreen.Show();
+        }
+
+        private void DoStopAudio()
+        {
+            try
+            {
+                _audioPlaylist.StopPlaylistPlayback();
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Error when stopping audio on window close", ex);
+            }
         }
 
         private void NavBarItemClicked(string navIconName)

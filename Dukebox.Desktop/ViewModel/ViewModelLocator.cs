@@ -13,6 +13,14 @@ namespace Dukebox.Desktop.ViewModel
 {
     public class ViewModelLocator
     {
+        public ILoadingScreenViewModel LoadingScreenViewModel
+        {
+            get
+            {
+                return DesktopContainer.GetInstance<ILoadingScreenViewModel>();
+            }
+        }
+
         // window view model
         public IMainWindowViewModel MainWindow
         {

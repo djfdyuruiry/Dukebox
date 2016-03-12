@@ -2,6 +2,7 @@
 using System.Configuration;
 using System.Linq;
 using System.Reflection;
+using System;
 
 namespace Dukebox.Library.Config
 {
@@ -38,6 +39,39 @@ namespace Dukebox.Library.Config
                 return _settings["albumArtCachePath"].Value;
             }
         }
+
+        public string BassAddOnsPath
+        {
+            get
+            {
+                return _settings["bassAddOnsPath"].Value;
+            }
+        }
+
+        public string BassLicenseEmail
+        {
+            get
+            {
+                return _settings["bassLicenseEmail"].Value;
+            }
+        }
+
+        public string BassLicenseKey
+        {
+            get
+            {
+                return _settings["bassLicenseKey"].Value;
+            }
+        }
+
+        public int BassPluginCount
+        {
+            get
+            {
+                return int.Parse(_settings["bassPluginCount"].Value);
+            }
+        }
+
         public string TrackDisplayFormat
         {
             get

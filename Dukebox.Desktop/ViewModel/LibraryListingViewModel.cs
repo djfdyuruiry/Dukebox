@@ -17,6 +17,7 @@ namespace Dukebox.Desktop.ViewModel
     public class LibraryListingViewModel : ViewModelBase, ITrackListingViewModel, ISearchControlViewModel
     {
         private readonly IMusicLibrary _musicLibrary;
+        private readonly IAudioPlaylist _audioPlaylist;
 
         private List<Track> _tracks;
         private string _searchText;
@@ -64,13 +65,26 @@ namespace Dukebox.Desktop.ViewModel
             }
         }
 
-        public LibraryListingViewModel(IMusicLibrary musicLibrary) : base()
+        public ICommand LoadTrack { get; private set; }
+
+
+        public LibraryListingViewModel(IMusicLibrary musicLibrary, IAudioPlaylist audioPlaylist) : base()
         {
             _musicLibrary = musicLibrary;
             _musicLibrary.SongAdded += (o, e) => RefreshTrackListing();
 
+            _audioPlaylist = audioPlaylist;
+
             ClearSearch = new RelayCommand(() => SearchText = string.Empty);
+            LoadTrack = new RelayCommand<Track>(DoLoadTrack);
+
             RefreshTrackListing();
+        }
+
+        private void DoLoadTrack(Track track)
+        {
+            _audioPlaylist.LoadPlaylistFromList(_tracks);
+            _audioPlaylist.SkipToTrack(track);
         }
 
         private void RefreshTrackListing()
