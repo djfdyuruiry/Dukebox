@@ -4,12 +4,11 @@ using System.Windows.Input;
 using MessageBox = System.Windows.MessageBox;
 using MessageBoxButton = System.Windows.MessageBoxButton;
 using MessageBoxImage = System.Windows.MessageBoxImage;
+using System.Threading.Tasks;
 using GalaSoft.MvvmLight.Command;
 using Dukebox.Desktop.Interfaces;
 using Dukebox.Library.Interfaces;
 using Dukebox.Desktop.Views;
-using Dukebox.Desktop.Services;
-using System.Threading.Tasks;
 
 namespace Dukebox.Desktop.ViewModel
 {

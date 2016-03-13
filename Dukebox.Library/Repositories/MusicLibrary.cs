@@ -137,6 +137,8 @@ namespace Dukebox.Library.Repositories
         {
             _dukeboxData = new Library();
 
+            _dukeboxData.Database.Log = (s) => Debug.Write(s);
+
             _settings = settings;
             _audioFormats = audioFormats;
             _albumArtCache = albumArtCache;

@@ -33,6 +33,7 @@ namespace Dukebox.Library
             container.RegisterSingleton<IAudioCdRippingService, AudioCdRippingService>();
             container.RegisterSingleton<IAudioPlaylist, AudioPlaylist>();
             container.RegisterSingleton<IMusicLibrary>(() => GetMusicLibraryInstance(container));
+            container.RegisterSingleton<IAudioCdDriveMonitoringService, AudioCdDriveMonitoringService>();
             container.Register<Track>();
             container.Register<AudioFileMetaData>();
 

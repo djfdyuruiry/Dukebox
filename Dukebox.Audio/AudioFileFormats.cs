@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -36,6 +37,16 @@ namespace Dukebox.Audio
                 string filter = string.Format(FileFilterPrefixFormat, formatList.Substring(1));
 
                 return filter;
+            }
+        }
+
+        public event EventHandler FormatsLoaded;
+
+        public void SignalFormatsHaveBeenLoaded()
+        {
+            if (FormatsLoaded != null)
+            {
+                FormatsLoaded(this, EventArgs.Empty);
             }
         }
 
