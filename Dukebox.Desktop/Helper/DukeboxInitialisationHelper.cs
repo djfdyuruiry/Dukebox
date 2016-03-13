@@ -121,6 +121,8 @@ namespace Dukebox.Desktop.Helper
                 string supportedStreamExtensions = ((string)addon.GetField("SupportedStreamExtensions").GetValue(null));
                 _audioFormats.SupportedFormats.AddRange(supportedStreamExtensions.Replace("*", string.Empty).Split(';').ToList());
             }
+
+            _audioFormats.SignalFormatsHaveBeenLoaded();
         }
     }
 }
