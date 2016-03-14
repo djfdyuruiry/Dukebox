@@ -12,6 +12,7 @@ using Dukebox.Desktop.Interfaces;
 using Dukebox.Library.Interfaces;
 using Dukebox.Model.Services;
 using Dukebox.Audio;
+using Dukebox.Desktop.Model;
 
 namespace Dukebox.Desktop.ViewModel
 {
@@ -68,10 +69,11 @@ namespace Dukebox.Desktop.ViewModel
                 OfferToLoadCd(e.DriveDirectory);
             };
             _audioCdDriveMonitor.AudioCdEjected += (o, e) => Tracks = new List<Track>();
-            _audioCdDriveMonitor.StartMonitoring();
 
             Tracks = new List<Track>();
             LoadTrack = new RelayCommand<Track>(DoLoadTrack);
+
+            _audioCdDriveMonitor.StartMonitoring();
         }
         
         private void OfferToLoadCd(string cdDirectory)
@@ -82,6 +84,8 @@ namespace Dukebox.Desktop.ViewModel
             if (response == MessageBoxResult.Yes)
             {
                 _audioPlaylist.LoadPlaylistFromList(Tracks);
+
+                SendNotificationMessage(NotificationMessages.AudioPlaylistLoadedNewTracks);
             }
         }
 
@@ -89,6 +93,8 @@ namespace Dukebox.Desktop.ViewModel
         {
             _audioPlaylist.LoadPlaylistFromList(Tracks);
             _audioPlaylist.SkipToTrack(track);
+
+            SendNotificationMessage(NotificationMessages.AudioPlaylistLoadedNewTracks);
         }
     }
 }

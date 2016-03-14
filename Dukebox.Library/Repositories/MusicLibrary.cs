@@ -600,14 +600,14 @@ namespace Dukebox.Library.Repositories
 
         #region Library Lookups
         
-        public List<Track> GetTracksForArtist(album album)
+        public List<Track> GetTracksForArtist(artist artist)
         {
-            return album.songs.Select(s => GetTrackFromFile(s.filename)).ToList();
+            return artist.songs.Select(Track.BuildTrackInstance).ToList();
         }
 
         public List<Track> GetTracksForAlbum(album album)
         {
-            return album.songs.Select(s => GetTrackFromFile(s.filename)).ToList();
+            return album.songs.Select(Track.BuildTrackInstance).ToList();
         }
 
         public artist GetArtistById(long? artistId)

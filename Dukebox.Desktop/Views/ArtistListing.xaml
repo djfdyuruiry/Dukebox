@@ -13,7 +13,13 @@
     <UserControl.Resources>
         <DataTemplate DataType="{x:Type DukeboxLibrary:artist}">
             <StackPanel Name="Artist">
-                <Image Width="auto" Height="auto" Source="{Binding ElementName=Artist, Path=DataContext, Converter={StaticResource ArtistToThumbnailConverter}}"/>
+                <Image Width="auto" Height="auto" Source="{Binding ElementName=Artist, Path=DataContext, Converter={StaticResource ArtistToThumbnailConverter}}">
+                    <Image.InputBindings>
+                        <MouseBinding MouseAction="LeftDoubleClick" 
+                                      Command="{Binding LoadArtist}" 
+                                      CommandParameter="{Binding Data}"/>
+                    </Image.InputBindings>
+                </Image>
                 <TextBlock HorizontalAlignment="center" Text="{Binding name}"/>
             </StackPanel>
         </DataTemplate>

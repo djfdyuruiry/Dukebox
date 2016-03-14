@@ -85,6 +85,8 @@ namespace Dukebox.Desktop.ViewModel
         {
             _audioPlaylist.LoadPlaylistFromList(_tracks);
             _audioPlaylist.SkipToTrack(track);
+
+            SendNotificationMessage(NotificationMessages.AudioPlaylistLoadedNewTracks);
         }
 
         private void RefreshTrackListing()

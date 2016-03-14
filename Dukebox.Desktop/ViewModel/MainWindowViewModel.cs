@@ -8,6 +8,8 @@ using System;
 using Dukebox.Library.Interfaces;
 using log4net;
 using System.Reflection;
+using GalaSoft.MvvmLight.Messaging;
+using System.Windows.Threading;
 
 namespace Dukebox.Desktop.ViewModel
 {
@@ -22,6 +24,18 @@ namespace Dukebox.Desktop.ViewModel
         private Visibility _showRecentlyPlayedListing;
         private Visibility _showAudioCdListing;
 
+        public Visibility ShowCurrentlyPlayingListing
+        {
+            get
+            {
+                return _showLibraryListing;
+            }
+            private set
+            {
+                _showLibraryListing = value;
+                OnPropertyChanged("ShowCurrentlyPlayingListing");
+            }
+        }
         public Visibility ShowLibraryListing 
         { 
             get 
@@ -90,6 +104,7 @@ namespace Dukebox.Desktop.ViewModel
         {
             _audioPlaylist = audioPlaylist;
 
+            ShowCurrentlyPlayingListing = Visibility.Hidden;
             ShowLibraryListing = Visibility.Visible;
             ShowAlbumListing = Visibility.Hidden;
             ShowArtistListing = Visibility.Hidden;
@@ -99,6 +114,15 @@ namespace Dukebox.Desktop.ViewModel
             ShowLoadingScreen = new RelayCommand(DoShowSplashScreen);
             NavBarItemClickCommand = new RelayCommand<string>(NavBarItemClicked);
             StopAudio = new RelayCommand(DoStopAudio);
+            
+            // Enable passing message to show currently playing view
+            Messenger.Default.Register<NotificationMessage>(this, (nm) =>
+            {
+                if (nm.Notification == NotificationMessages.AudioPlaylistLoadedNewTracks)
+                {
+                    NavBarItemClicked(NavIconNames.CurrentlyPlaying);
+                }
+            });
         }
 
         private void DoShowSplashScreen()
@@ -125,7 +149,11 @@ namespace Dukebox.Desktop.ViewModel
         {
             HideAllViews();
 
-            if (navIconName == NavIconNames.Library)
+            if (navIconName == NavIconNames.CurrentlyPlaying)
+            {
+                ShowCurrentlyPlayingListing = Visibility.Visible;
+            }
+            else if (navIconName == NavIconNames.Library)
             {
                 ShowLibraryListing = Visibility.Visible;
             }
