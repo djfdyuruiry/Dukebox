@@ -10,5 +10,6 @@ namespace Dukebox.Desktop.Interfaces
     public interface IAlbumListingViewModel : ISearchControlViewModel
     {
         List<Album> Albums { get; }
+        ICommand LoadAlbum { get; }
     }
 }

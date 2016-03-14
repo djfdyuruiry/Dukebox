@@ -7,6 +7,7 @@ namespace Dukebox.Desktop.Model
 {
     public class NavIconNames
     {
+        public const string CurrentlyPlaying = "CurrentlyPlayingNavIcon";
         public const string Library = "LibraryNavIcon";
         public const string Albums = "AlbumsNavIcon";
         public const string Artists = "ArtistsNavIcon";

@@ -1,27 +1,25 @@
-﻿using Dukebox.Desktop.Helper;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Input;
+using GalaSoft.MvvmLight.Command;
+using Dukebox.Desktop.Helper;
 using Dukebox.Desktop.Interfaces;
 using Dukebox.Desktop.Model;
 using Dukebox.Desktop.Services;
 using Dukebox.Library;
 using Dukebox.Library.Interfaces;
-using GalaSoft.MvvmLight.Command;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows.Input;
 
 namespace Dukebox.Desktop.ViewModel
 {
     public class AlbumListingViewModel : ViewModelBase, IAlbumListingViewModel, ISearchControlViewModel
     {
-        private readonly IMusicLibrary _mediaLibrary;
+        private readonly IMusicLibrary _musicLibrary;
+        private readonly IAudioPlaylist _audioPlaylist;
 
         private List<Album> _albums;
         private ListSearchHelper<Album> _listSearchHelper;
         private string _searchText;
 
-        public ICommand ClearSearch { get; private set; }
         public string SearchText
         {
             get
@@ -59,26 +57,39 @@ namespace Dukebox.Desktop.ViewModel
                 OnPropertyChanged("Albums");
             }
         }
+        public ICommand ClearSearch { get; private set; }
+        public ICommand LoadAlbum { get; private set; }
 
-        public AlbumListingViewModel(IMusicLibrary mediaLibrary) : base()
+        public AlbumListingViewModel(IMusicLibrary musicLibrary, IAudioPlaylist audioPlaylist) : base()
         {
-            _mediaLibrary = mediaLibrary;            
+            _musicLibrary = musicLibrary;
+            _audioPlaylist = audioPlaylist;
             _listSearchHelper = new ListSearchHelper<Album>
             {
                 FilterLambda = Album.ContainsString
             };
 
-            _mediaLibrary.AlbumAdded += (o, e) => LoadAlbumsFromLibrary();
+            _musicLibrary.AlbumAdded += (o, e) => LoadAlbumsFromLibrary();
 
             ClearSearch = new RelayCommand(() => SearchText = string.Empty);
+            LoadAlbum = new RelayCommand<album>(DoLoadAlbum);
+
             LoadAlbumsFromLibrary();
         }
 
         private void LoadAlbumsFromLibrary()
         {
-            Albums = _mediaLibrary.OrderedAlbums
+            Albums = _musicLibrary.OrderedAlbums
                 .Select(a => Album.BuildAlbumInstance(a))
                 .ToList();
+        }
+
+        private void DoLoadAlbum(album album)
+        {
+            var tracks = _musicLibrary.GetTracksForAlbum(album);
+            _audioPlaylist.LoadPlaylistFromList(tracks);
+
+            SendNotificationMessage(NotificationMessages.AudioPlaylistLoadedNewTracks);
         }
 
         private void DoSearch()

@@ -9,6 +9,7 @@ using GalaSoft.MvvmLight.Command;
 using Dukebox.Desktop.Interfaces;
 using Dukebox.Library.Interfaces;
 using Dukebox.Desktop.Views;
+using Dukebox.Desktop.Model;
 
 namespace Dukebox.Desktop.ViewModel
 {
@@ -58,6 +59,8 @@ namespace Dukebox.Desktop.ViewModel
 
             var tracks = _musicLibrary.GetTracksForDirectory(audioCdDrive, false);
             _audioPlaylist.LoadPlaylistFromList(tracks);
+
+            SendNotificationMessage(NotificationMessages.AudioPlaylistLoadedNewTracks);
         }
 
         private void DoRipCdToFolder()

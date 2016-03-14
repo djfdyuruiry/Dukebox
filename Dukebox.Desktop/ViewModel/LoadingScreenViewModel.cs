@@ -10,6 +10,7 @@ using GalaSoft.MvvmLight.Messaging;
 using Dukebox.Desktop.Helper;
 using Dukebox.Desktop.Interfaces;
 using System.Threading;
+using Dukebox.Desktop.Model;
 
 namespace Dukebox.Desktop.ViewModel
 {
@@ -80,15 +81,9 @@ namespace Dukebox.Desktop.ViewModel
                 Application.Current.Shutdown();
             }
 
-            SendWindowMessage("HideLoadingScreen");
-            SendWindowMessage("LoadingFinished");
-            SendWindowMessage("CloseLoadingScreen");
-        }
-
-        private void SendWindowMessage(string message)
-        {
-            var messageObj = new NotificationMessage(this, message);
-            Messenger.Default.Send(messageObj);
+            SendNotificationMessage(NotificationMessages.LoadingScreenShouldHide);
+            SendNotificationMessage(NotificationMessages.LoadingFinished);
+            SendNotificationMessage(NotificationMessages.LoadingScreenShouldClose);
         }
     }
 }

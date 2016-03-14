@@ -11,6 +11,7 @@ using Dukebox.Model.Services;
 using System.Threading.Tasks;
 using Dukebox.Desktop.Views;
 using System.IO;
+using Dukebox.Desktop.Model;
 
 namespace Dukebox.Desktop.ViewModel
 {
@@ -66,6 +67,8 @@ namespace Dukebox.Desktop.ViewModel
             var track = _musicLibrary.GetTrackFromFile(fileName);
 
             _audioPlaylist.LoadPlaylistFromList(new List<Track> { track });
+
+            SendNotificationMessage(NotificationMessages.AudioPlaylistLoadedNewTracks);
         }
 
         private void DoPlayFolder()
@@ -79,6 +82,8 @@ namespace Dukebox.Desktop.ViewModel
             
             var tracks = _musicLibrary.GetTracksForDirectory(_selectFolderDialog.SelectedPath, false);
             _audioPlaylist.LoadPlaylistFromList(tracks);
+
+            SendNotificationMessage(NotificationMessages.AudioPlaylistLoadedNewTracks);
         }
 
         private void DoAddFilesToLibrary()

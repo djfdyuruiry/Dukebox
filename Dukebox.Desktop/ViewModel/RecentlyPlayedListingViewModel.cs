@@ -79,7 +79,7 @@ namespace Dukebox.Desktop.ViewModel
             _listSearchHelper = new ListSearchHelper<Track>
             {
                 Items = _tracks,
-                FilterLambda = (t, s) => t.Song.title.ToLower().Contains(s.ToLower())
+                FilterLambda = (t, s) => t.ToString().ToLower().Contains(s.ToLower())
             };
 
             ClearSearch = new RelayCommand(() => SearchText = string.Empty);
@@ -93,6 +93,8 @@ namespace Dukebox.Desktop.ViewModel
         {
             _audioPlaylist.LoadPlaylistFromList(_tracks);
             _audioPlaylist.SkipToTrack(track);
+
+            SendNotificationMessage(NotificationMessages.AudioPlaylistLoadedNewTracks);
         }
 
         public void RefreshRecentlyPlayedFromLibrary()

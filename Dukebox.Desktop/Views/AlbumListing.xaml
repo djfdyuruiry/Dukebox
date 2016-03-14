@@ -7,6 +7,7 @@
              xmlns:DukeboxServices="clr-namespace:Dukebox.Desktop.Services"
              xmlns:DukeboxLibrary="clr-namespace:Dukebox.Library;assembly=Dukebox.Library"
              xmlns:DukeboxViews="clr-namespace:Dukebox.Desktop.Views" 
+             xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              mc:Ignorable="d" 
              d:DesignHeight="592" d:DesignWidth="1016"
              Name="AlbumListingControl"
@@ -14,7 +15,13 @@
     <UserControl.Resources>
         <DataTemplate DataType="{x:Type DukeboxServices:Album}">
             <StackPanel>
-                <Image Width="194" Height="194" Source="{Binding AlbumArt}"/>
+                <Image Width="194" Height="194" Source="{Binding AlbumArt}">
+                    <Image.InputBindings>
+                        <MouseBinding MouseAction="LeftDoubleClick" 
+                                      Command="{Binding LoadAlbum}" 
+                                      CommandParameter="{Binding Data}"/>
+                    </Image.InputBindings>
+                </Image>
                 <TextBlock HorizontalAlignment="center" Text="{Binding Data.name}"/>
             </StackPanel>
         </DataTemplate>

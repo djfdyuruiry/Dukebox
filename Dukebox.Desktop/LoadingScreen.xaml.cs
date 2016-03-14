@@ -1,4 +1,5 @@
-﻿using GalaSoft.MvvmLight.Messaging;
+﻿using Dukebox.Desktop.Model;
+using GalaSoft.MvvmLight.Messaging;
 using System.Windows;
 
 namespace Dukebox.Desktop
@@ -16,11 +17,11 @@ namespace Dukebox.Desktop
             {
                 Dispatcher.Invoke(() =>
                 {
-                    if (nm.Notification == "HideLoadingScreen")
+                    if (nm.Notification == NotificationMessages.LoadingScreenShouldHide)
                     {
                         Hide();
                     }
-                    else if (nm.Notification == "CloseLoadingScreen")
+                    else if (nm.Notification == NotificationMessages.LoadingScreenShouldClose)
                     {
                         Close();
                     }

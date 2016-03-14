@@ -1,14 +1,11 @@
-﻿using Dukebox.Desktop.Helper;
+﻿using System.Collections.Generic;
+using System.Windows.Input;
+using GalaSoft.MvvmLight.Command;
+using Dukebox.Desktop.Helper;
 using Dukebox.Desktop.Interfaces;
 using Dukebox.Desktop.Model;
 using Dukebox.Library;
 using Dukebox.Library.Interfaces;
-using GalaSoft.MvvmLight.Command;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows.Input;
 
 namespace Dukebox.Desktop.ViewModel
 {
@@ -19,8 +16,8 @@ namespace Dukebox.Desktop.ViewModel
         private List<artist> _artists;
         private ListSearchHelper<artist> _listSearchHelper;
         private string _searchText;
+        private readonly IAudioPlaylist _audioPlaylist;
 
-        public ICommand ClearSearch { get; private set; }
         public string SearchText
         {
             get
@@ -58,10 +55,13 @@ namespace Dukebox.Desktop.ViewModel
                 OnPropertyChanged("Artists");
             }
         }
+        public ICommand ClearSearch { get; private set; }
+        public ICommand LoadArtist { get; private set; }
 
-        public ArtistListingViewModel(IMusicLibrary musicLibrary) : base()
+        public ArtistListingViewModel(IMusicLibrary musicLibrary, IAudioPlaylist audioPlaylist) : base()
         {
             _musicLibrary = musicLibrary;
+            _audioPlaylist = audioPlaylist;
 
             _listSearchHelper = new ListSearchHelper<artist>
             {
@@ -69,14 +69,24 @@ namespace Dukebox.Desktop.ViewModel
             };
 
             _musicLibrary.ArtistAdded += (o, e) => RefreshArtistsFromLibrary();
-
+            
+            LoadArtist = new RelayCommand<artist>(DoLoadArtist);
             ClearSearch = new RelayCommand(() => SearchText = string.Empty);
+
             RefreshArtistsFromLibrary();
         }
 
         public void RefreshArtistsFromLibrary()
         {
             Artists = _musicLibrary.OrderedArtists;
+        }
+
+        private void DoLoadArtist(artist artist)
+        {
+            var tracks = _musicLibrary.GetTracksForArtist(artist);
+            _audioPlaylist.LoadPlaylistFromList(tracks);
+
+            SendNotificationMessage(NotificationMessages.AudioPlaylistLoadedNewTracks);
         }
 
         private void DoSearch()

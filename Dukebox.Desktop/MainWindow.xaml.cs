@@ -1,4 +1,5 @@
 ﻿using Dukebox.Desktop.Interfaces;
+using Dukebox.Desktop.Model;
 using GalaSoft.MvvmLight.Messaging;
 using System.Windows;
 
@@ -19,7 +20,7 @@ namespace Dukebox.Desktop
             {
                 Dispatcher.Invoke(() =>
                 {
-                    if (nm.Notification == "LoadingFinished")
+                    if (nm.Notification == NotificationMessages.LoadingFinished)
                     {
                         Show();
                     }

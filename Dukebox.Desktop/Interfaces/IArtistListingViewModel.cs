@@ -9,5 +9,6 @@ namespace Dukebox.Desktop.Interfaces
     public interface IArtistListingViewModel : ISearchControlViewModel
     {
         List<artist> Artists { get; }
+        ICommand LoadArtist { get; }
     }
 }
