@@ -9,7 +9,7 @@
         Title="Dukebox" 
         Height="180" 
         Width="600" 
-        WindowStyle="None">
+        WindowStyle="None" WindowStartupLocation="CenterScreen">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
             <i:InvokeCommandAction Command="{Binding LoadComponents}" />
