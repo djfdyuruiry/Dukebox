@@ -9,6 +9,7 @@
         Icon="app.ico"
         WindowState="Maximized" 
         WindowStartupLocation="CenterScreen"
+        Visibility="Hidden"
         DataContext="{Binding MainWindow, Source={StaticResource ViewModelLocator}}">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Closing">
