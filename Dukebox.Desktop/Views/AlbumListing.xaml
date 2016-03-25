@@ -15,9 +15,9 @@
     <UserControl.Resources>
         <DataTemplate DataType="{x:Type DukeboxServices:Album}">
             <StackPanel>
-                <Image Width="194" Height="194" Source="{Binding AlbumArt}">
+                <Image x:Name="AlbumArt" Width="194" Height="194" IsHitTestVisible="False" Source="{Binding AlbumArt}">
                     <Image.InputBindings>
-                        <MouseBinding MouseAction="LeftDoubleClick" 
+                        <MouseBinding Gesture="LeftDoubleClick" 
                                       Command="{Binding LoadAlbum}" 
                                       CommandParameter="{Binding Data}"/>
                     </Image.InputBindings>
@@ -39,6 +39,22 @@
                                     DataContext="{Binding ElementName=AlbumListingControl, Path=DataContext}">
         </DukeboxViews:SearchControl>
         <ListBox Grid.Row="1" Grid.Column="0" ItemsSource="{Binding Albums}">
+            <ListBox.Resources>
+                <Style TargetType="ListBox">
+                    <Style.Resources>
+                        <!-- SelectedItem with focus -->
+                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}"
+                                         Color="Transparent" />
+                        <!-- SelectedItem without focus -->
+                        <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}"
+                                         Color="Transparent" />
+                        <!-- SelectedItem text foreground -->
+                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}"
+                                         Color="Black" />
+                    </Style.Resources>
+                    <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                </Style>
+            </ListBox.Resources>
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
                     <UniformGrid IsItemsHost="True"/>

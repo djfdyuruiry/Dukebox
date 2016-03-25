@@ -252,7 +252,6 @@ namespace Dukebox.Library.Repositories
             }
 
             var stopwatch = Stopwatch.StartNew();
-            var tracks = new ConcurrentDictionary<string, AudioFileMetaData>();
             var filesToAddMutex = new Mutex();
         
             var allfiles = Directory.GetFiles(@directory, "*.*", subDirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
@@ -269,28 +268,12 @@ namespace Dukebox.Library.Repositories
             {
                 try
                 {
-                    if (progressHandler != null)
-                    {
-                        progressHandler.Invoke(this, new AudioFileImportedEventArgs() { JustProcessing = true, FileAdded = file, TotalFilesThisImport = numFilesToAdd });
-                    }
-                    
-                    tracks[file] = AudioFileMetaData.BuildAudioFileMetaData(file);
-                }
-                catch (Exception ex)
-                {
-                    logger.Error("Error opening/reading audio file while adding files from directory", ex);
-                }
-            });
-
-            foreach (var kvp in tracks)
-            {
-                try
-                {
-                    AddFile(kvp.Key, kvp.Value);
+                    var metadata = AudioFileMetaData.BuildAudioFileMetaData(file);
+                    AddFile(file, metadata);
 
                     if (progressHandler != null)
                     {
-                        progressHandler.Invoke(this, new AudioFileImportedEventArgs() { JustProcessing = false, FileAdded = kvp.Key, TotalFilesThisImport = numFilesToAdd });
+                        progressHandler.Invoke(this, new AudioFileImportedEventArgs() { JustProcessing = false, FileAdded = file, TotalFilesThisImport = numFilesToAdd });
                     }
 
                     filesAdded++;
@@ -299,7 +282,7 @@ namespace Dukebox.Library.Repositories
                 {
                     logger.Error("Error adding audio file to the database while adding files from directory", ex);
                 }
-            }
+            });
           
             RefreshCaches();
 

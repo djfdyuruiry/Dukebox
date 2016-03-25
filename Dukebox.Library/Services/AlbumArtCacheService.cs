@@ -1,6 +1,7 @@
 ﻿using Dukebox.Library.Config;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
+using Dukebox.Model.Interfaces;
 using Dukebox.Model.Services;
 using log4net;
 using System;
@@ -48,7 +49,7 @@ namespace Dukebox.Library.Services
             }
         }
 
-        public void AddSongToCache(song songToProcess, AudioFileMetaData metadata, album albumObj)
+        public void AddSongToCache(song songToProcess, IAudioFileMetaData metadata, album albumObj)
         {
             var stopwatch = Stopwatch.StartNew();
 
@@ -138,7 +139,8 @@ namespace Dukebox.Library.Services
         {
             var ids = Directory.EnumerateFiles(_cachePath)
                 .Select(f => Path.GetFileNameWithoutExtension(f))
-                .Cast<long>().ToList();
+                .Select(f => long.Parse(f))
+                .ToList();
 
             return ids;
         }

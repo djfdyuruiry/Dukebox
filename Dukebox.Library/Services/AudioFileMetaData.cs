@@ -3,13 +3,11 @@ using Dukebox.Audio.Interfaces;
 using Dukebox.Library;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
-using Dukebox.Library.Model.Services;
-using Dukebox.Library.Services;
+using Dukebox.Model.Interfaces;
 using log4net;
 using org.jaudiotagger.audio;
 using org.jaudiotagger.tag;
 using System;
-using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -20,7 +18,7 @@ namespace Dukebox.Model.Services
     /// Holds metadata on a single audio file, including track information
     /// and album art, if available.
     /// </summary>
-    public class AudioFileMetaData
+    public class AudioFileMetaData : IAudioFileMetaData
     {
         private static readonly ILog logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
