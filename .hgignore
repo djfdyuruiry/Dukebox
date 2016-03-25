@@ -13,3 +13,5 @@ packages/*
 Dukebox.Desktop.WinForms/obj/*
 Dukebox.Desktop.WinForms/bin/*
 desktop.ini
+Dukebox.Tests/bin/*
+Dukebox.Tests/obj/*

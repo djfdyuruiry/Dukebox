@@ -35,12 +35,12 @@
                   ItemsSource="{Binding Tracks}">
             <DataGrid.RowStyle>
                 <Style TargetType="DataGridRow">
-                    <Setter Property="Margin" Value="5"></Setter>
+                    <Setter Property="Margin" Value="1"></Setter>
                 </Style>
             </DataGrid.RowStyle>
             <DataGrid.CellStyle>
                 <Style TargetType="DataGridCell">
-                    <Setter Property="BorderThickness" Value="1"></Setter>
+                    <Setter Property="BorderThickness" Value="5"></Setter>
                 </Style>
             </DataGrid.CellStyle>
             <DataGrid.Columns>

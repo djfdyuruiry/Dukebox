@@ -72,21 +72,27 @@ namespace Dukebox.Desktop.ViewModel
             _musicLibrary.AlbumAdded += (o, e) => LoadAlbumsFromLibrary();
 
             ClearSearch = new RelayCommand(() => SearchText = string.Empty);
-            LoadAlbum = new RelayCommand<album>(DoLoadAlbum);
+            LoadAlbum = new RelayCommand<Album>(DoLoadAlbum);
 
             LoadAlbumsFromLibrary();
         }
 
         private void LoadAlbumsFromLibrary()
         {
-            Albums = _musicLibrary.OrderedAlbums
+            var albums = _musicLibrary.OrderedAlbums
                 .Select(a => Album.BuildAlbumInstance(a))
                 .ToList();
+
+            var album = Album.BuildAlbumInstance(new album() { name = "llllol" });
+
+            albums.Add(album);
+
+            Albums = albums;
         }
 
-        private void DoLoadAlbum(album album)
+        private void DoLoadAlbum(Album album)
         {
-            var tracks = _musicLibrary.GetTracksForAlbum(album);
+            var tracks = _musicLibrary.GetTracksForAlbum(album.Data);
             _audioPlaylist.LoadPlaylistFromList(tracks);
 
             SendNotificationMessage(NotificationMessages.AudioPlaylistLoadedNewTracks);

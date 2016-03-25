@@ -120,8 +120,7 @@ namespace Dukebox.Desktop.ViewModel
             }
 
             viewModel.CurrentProgressValue++;
-            viewModel.StatusText = string.Format(@"{0} '...\{1}\{2}'", fileImportedArgs.Status, 
-                Path.GetDirectoryName(fileImportedArgs.FileAdded), Path.GetFileName(fileImportedArgs.FileAdded));
+            viewModel.StatusText = string.Format(@"{0} '{1}'", fileImportedArgs.Status, Path.GetFileName(fileImportedArgs.FileAdded));
         }
     }
 }

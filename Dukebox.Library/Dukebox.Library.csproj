@@ -161,6 +161,7 @@
     <Compile Include="Repositories\MusicLibrary.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Model\SearchAreas.cs" />
+    <Compile Include="Interfaces\IAudioFileMetaData.cs" />
     <Compile Include="Services\Track.cs" />
     <Compile Include="song.cs" />
   </ItemGroup>
