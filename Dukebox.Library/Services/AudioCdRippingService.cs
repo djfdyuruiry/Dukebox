@@ -13,6 +13,7 @@ using System.Windows.Threading;
 using System.Linq;
 using Un4seen.Bass.Misc;
 using Dukebox.Audio.Interfaces;
+using System.Threading.Tasks;
 
 namespace Dukebox.Library.Services
 {
@@ -40,7 +41,7 @@ namespace Dukebox.Library.Services
         /// <param name="inPath">The CD drive root folder.</param>
         /// <param name="outPath">The folder to save MP3 files to.</param>
         /// <param name="viewUpdater">A ICdRipViewUpdater implementation object that will recieve messages on ripping progress.</param>
-        public void RipCdToFolder(string inPath, string outPath, ICdRipViewUpdater viewUpdater)
+        public async Task RipCdToFolder(string inPath, string outPath, ICdRipViewUpdater viewUpdater)
         {
             try
             {
@@ -56,7 +57,7 @@ namespace Dukebox.Library.Services
 
                 string[] inFiles = Directory.GetFiles(inPath);
                 string outFileFormat = outPath + "\\{0}.mp3";
-                List<AudioFileMetaData> cdMetadata = _cdMetadataService.GetAudioFileMetaDataForCd(inPath[0]);
+                List<AudioFileMetadata> cdMetadata = _cdMetadataService.GetAudioFileMetaDataForCd(inPath[0]);
                 int numTracks = inFiles.Length;
 
                 viewUpdater.Text = "Dukebox - MP3 Ripping Progress";
@@ -69,14 +70,8 @@ namespace Dukebox.Library.Services
                         Track t = _musicLibrary.GetTrackFromFile(inFiles[trackIdx], cdMetadata[trackIdx]);
                         string outFile = string.Format(outFileFormat, t.ToString());
 
-                        _audioConverterService.ConvertCdaFileToMp3(inFiles[trackIdx], outFile,
+                        await _audioConverterService.ConvertCdaFileToMp3(inFiles[trackIdx], outFile,
                             new BaseEncoder.ENCODEFILEPROC((a, b) => CdRippingProgressMonitor(viewUpdater, a, b, t, numTracks, trackIdx)), true);
-
-                        // Wait until track has been ripped.
-                        while (viewUpdater.ProgressBarValue != viewUpdater.ProgressBarMaximum)
-                        {
-                            Thread.Sleep(10);
-                        }
 
                         // Save the track metadata details to the MP3 file. BROKEN as of rev. 25   
                         /*                 
@@ -92,9 +87,9 @@ namespace Dukebox.Library.Services
                     }
                     catch (Exception ex)
                     {
-                        string msg = string.Format("Error ripping music track #{0} from Audio CD: {1}", trackIdx + 1, ex.Message);
+                        string msg = string.Format("Error ripping music track #{0} from Audio CD", trackIdx + 1);
 
-                        logger.Error(msg);
+                        logger.Error(msg, ex);
                         MessageBox.Show(msg, "Dukebox - Error Ripping from CD", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
@@ -103,9 +98,9 @@ namespace Dukebox.Library.Services
             }
             catch (Exception ex)
             {
-                string msg = "Error ripping music from Audio CD: " + ex.Message;
+                string msg = "Error ripping music from Audio CD";
 
-                logger.Error(msg);
+                logger.Error(msg, ex);
                 MessageBox.Show(msg, "Dukebox - Error Ripping from CD", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }

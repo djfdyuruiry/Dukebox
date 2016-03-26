@@ -1,11 +1,8 @@
 ﻿using Dukebox.Audio.Interfaces;
 using log4net;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Dukebox.Audio.Services
 {
@@ -20,31 +17,18 @@ namespace Dukebox.Audio.Services
         /// <returns></returns>
         public int GetCdDriveIndex(char driveLetter)
         {
-            driveLetter = Char.ToLower(driveLetter);
-
-            DriveInfo[] drives = DriveInfo.GetDrives().Where(d => d.DriveType == DriveType.CDRom).ToArray();
-            DriveInfo drive = null;
-
-            int driveIndex = 0;
-
-            for (; driveIndex < drives.Length; driveIndex++)
-            {
-                if (drives[driveIndex].Name.ToLower() == driveLetter + @":\")
-                {
-                    drive = drives[driveIndex];
-                    break;
-                }
-            }
+            var driveLetterAsString = Char.ToLower(driveLetter).ToString();
+            
+            var drives = DriveInfo.GetDrives().Where(d => d.DriveType == DriveType.CDRom).ToArray();
+            var drive = drives.FirstOrDefault(d => d.Name.ToLower().StartsWith(driveLetterAsString));
 
             // Drive does not exist or is not a CD drive.
             if (drive == null)
             {
-                throw new Exception("Drive '" + driveLetter + "' does not exist or is not a CD drive!");
+                throw new Exception(string.Format("Drive '{0}' does not exist or is not a CD drive!", driveLetterAsString));
             }
-            else if (!IsAudioCd(drive))
-            {
-                throw new Exception("Drive '" + driveLetter + "' does not contain an audio CD!");
-            }
+
+            var driveIndex = Array.IndexOf(drives, drive);
 
             return driveIndex;
         }
@@ -54,12 +38,20 @@ namespace Dukebox.Audio.Services
         /// </summary>
         /// <param name="drive"></param>
         /// <returns></returns>
-        private bool IsAudioCd(DriveInfo drive)
+        public bool IsAudioCd(char driveLetter)
         {
-            bool result = false;
-            string[] driveContents = Directory.GetFiles(drive.RootDirectory.FullName);
+            var driveLetterAsString = Char.ToLower(driveLetter).ToString();
+            var drive = DriveInfo.GetDrives().FirstOrDefault(d => d.Name.ToLower().StartsWith(driveLetterAsString));
+            var result = false;
 
-            result = (driveContents.Count() == driveContents.Where(f => (new FileInfo(f)).Extension == ".cda").Count());
+            if (!drive.IsReady)
+            {
+                return result;
+            }
+
+            var driveContents = Directory.GetFiles(drive.RootDirectory.FullName);
+
+            result = driveContents.Select(f => new FileInfo(f)).Any(f => f.Extension == ".cda");
 
             return result;
         }

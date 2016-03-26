@@ -23,7 +23,7 @@ namespace Dukebox.Model.Services
 
         private IDukeboxSettings _settings;
         private IMusicLibrary _musicLibrary;
-        private AudioFileMetaData _metadata;
+        private AudioFileMetadata _metadata;
         private album _album;
         private artist _artist;
 
@@ -89,13 +89,13 @@ namespace Dukebox.Model.Services
         /// <summary>
         /// Metadata information and accessor.
         /// </summary>
-        public AudioFileMetaData Metadata 
+        public AudioFileMetadata Metadata 
         {
             get
             {
                 if (_metadata == null)
                 {
-                    _metadata = AudioFileMetaData.BuildAudioFileMetaData(Song.filename, Album.id);
+                    _metadata = AudioFileMetadata.BuildAudioFileMetaData(Song.filename, Album.id);
                 }
 
                 return _metadata;

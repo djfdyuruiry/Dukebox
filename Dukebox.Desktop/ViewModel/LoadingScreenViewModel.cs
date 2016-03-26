@@ -11,6 +11,7 @@ using Dukebox.Desktop.Helper;
 using Dukebox.Desktop.Interfaces;
 using System.Threading;
 using Dukebox.Desktop.Model;
+using Dukebox.Library.Helper;
 
 namespace Dukebox.Desktop.ViewModel
 {
@@ -42,10 +43,10 @@ namespace Dukebox.Desktop.ViewModel
         public LoadingScreenViewModel(DukeboxInitialisationHelper DukeboxInitialisationHelper)
         {
             _initHelper = DukeboxInitialisationHelper;
-            LoadComponents = new RelayCommand(() => Task.Run(DoLoadComponents));
+            LoadComponents = new RelayCommand(() => Task.Run(() => DoLoadComponents()));
         }
         
-        private async Task DoLoadComponents()
+        private void DoLoadComponents()
         {
             var loadOk = true;
 

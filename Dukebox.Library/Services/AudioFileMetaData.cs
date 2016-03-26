@@ -18,7 +18,7 @@ namespace Dukebox.Model.Services
     /// Holds metadata on a single audio file, including track information
     /// and album art, if available.
     /// </summary>
-    public class AudioFileMetaData : IAudioFileMetaData
+    public class AudioFileMetadata : IAudioFileMetaData
     {
         private static readonly ILog logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -163,9 +163,9 @@ namespace Dukebox.Model.Services
 
         #endregion
 
-        public static AudioFileMetaData BuildAudioFileMetaData(CdMetadata cdMetadata, int trackNumber)
+        public static AudioFileMetadata BuildAudioFileMetaData(CdMetadata cdMetadata, int trackNumber)
         {
-            var audioFileMetadata = LibraryPackage.GetInstance<AudioFileMetaData>();
+            var audioFileMetadata = LibraryPackage.GetInstance<AudioFileMetadata>();
 
             audioFileMetadata._title = cdMetadata.Tracks[trackNumber];
             audioFileMetadata._artist = cdMetadata.Artist;
@@ -174,9 +174,9 @@ namespace Dukebox.Model.Services
             return audioFileMetadata;
         }
 
-        public static AudioFileMetaData BuildAudioFileMetaData(string fileName, long albumId = -1)
+        public static AudioFileMetadata BuildAudioFileMetaData(string fileName, long albumId = -1)
         {
-            var audioFileMetadata = LibraryPackage.GetInstance<AudioFileMetaData>();
+            var audioFileMetadata = LibraryPackage.GetInstance<AudioFileMetadata>();
 
             try
             {
@@ -207,7 +207,7 @@ namespace Dukebox.Model.Services
             return audioFileMetadata;
         }
 
-        public AudioFileMetaData(IAlbumArtCacheService albumArtCache, ICdMetadataService cdMetadataService, IAudioCdService audioCdService)
+        public AudioFileMetadata(IAlbumArtCacheService albumArtCache, ICdMetadataService cdMetadataService, IAudioCdService audioCdService)
         {
             _albumArtCache = albumArtCache;
             _cdMetadataService = cdMetadataService;

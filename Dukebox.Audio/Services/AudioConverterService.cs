@@ -23,7 +23,7 @@ namespace Dukebox.Audio.Services
         /// </summary>
         /// <param name="_fileName"></param>
         /// <returns></returns>
-        public void ConvertCdaFileToMp3(string cdaFileName, string mp3OutFile, BaseEncoder.ENCODEFILEPROC progressCallback, bool overwriteOuputFile)
+        public async Task ConvertCdaFileToMp3(string cdaFileName, string mp3OutFile, BaseEncoder.ENCODEFILEPROC progressCallback, bool overwriteOuputFile)
         {
             EncoderLAME lameEncoder = new EncoderLAME(0);
             lameEncoder.EncoderDirectory = Dukebox.Audio.Properties.Settings.Default.lameEncoderPath;
@@ -31,17 +31,23 @@ namespace Dukebox.Audio.Services
             lameEncoder.InputFile = @cdaFileName;
             lameEncoder.OutputFile = @mp3OutFile;
 
-            (new Thread(() =>
+            await Task.Run(() =>
             {
                 // Extract cda file to wav file on disk.
                 string wavFile = lameEncoder.OutputFile + ".wav";
-                bool conversionResult = WriteCdaToWavFile(lameEncoder.InputFile, wavFile, progressCallback);
 
-                if (!conversionResult && lameEncoder.EncoderExists)
+                try
                 {
-                    string msg = "Encoder result: " + conversionResult + "\nLast BASS error: " + Bass.BASS_ErrorGetCode().ToString();
+                    WriteCdaFileToWavFile(lameEncoder.InputFile, wavFile, progressCallback);
+                }
+                catch (Exception ex)
+                {
+                    if (lameEncoder.EncoderExists)
+                    {
+                        logger.ErrorFormat("Encoder result: failed\nLast BASS error: ", Bass.BASS_ErrorGetCode().ToString());
+                    }
 
-                    logger.Info(msg);
+                    logger.Error(ex);
                     return;
                 }
 
@@ -51,59 +57,60 @@ namespace Dukebox.Audio.Services
 
                 // Clean up.
                 File.Delete(wavFile);
-            })).Start();
+            });      
         }
 
-        public bool WriteCdaToWavFile(string inCdaFile, string outWavFile, BaseEncoder.ENCODEFILEPROC progressCallback)
+        public void WriteCdaFileToWavFile(string inCdaFile, string outWavFile, BaseEncoder.ENCODEFILEPROC progressCallback)
         {
-            int measuringStream = BassCd.BASS_CD_StreamCreateFile(inCdaFile, BASSFlag.BASS_DEFAULT);
-            long totalLength = 0;
+            var measuringStream = BassCd.BASS_CD_StreamCreateFile(inCdaFile, BASSFlag.BASS_DEFAULT);
 
-            if (measuringStream != 0)
+            if (measuringStream == 0)
             {
-                totalLength = Bass.BASS_ChannelGetLength(measuringStream, BASSMode.BASS_POS_BYTES);
-                Bass.BASS_StreamFree(measuringStream);
-
-                int stream = BassCd.BASS_CD_StreamCreateFile(inCdaFile, BASSFlag.BASS_STREAM_DECODE);
-
-                if (stream != 0)
-                {
-                    try
-                    {
-                        WaveWriter ww = new WaveWriter(outWavFile, stream, true);
-                        short[] data = new short[32768];
-
-                        long bytesSoFar = 0;
-
-                        while (Bass.BASS_ChannelIsActive(stream) == BASSActive.BASS_ACTIVE_PLAYING)
-                        {
-                            int length = Bass.BASS_ChannelGetData(stream, data, 32768);
-
-                            if (length > 0)
-                            {
-                                ww.Write(data, length);
-
-                                bytesSoFar += length;
-
-                                progressCallback.Invoke(totalLength, bytesSoFar);
-                            }
-                        }
-
-                        // finilize the wave file!
-                        ww.Close();
-                        return Bass.BASS_StreamFree(stream);
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.Info("Error copying cda file '" + inCdaFile + "' to wav file '" + outWavFile + "': " + ex.Message);
-                    }
-                }
+                return;
             }
 
-            return false;
+            var totalLength = Bass.BASS_ChannelGetLength(measuringStream, BASSMode.BASS_POS_BYTES);
+            Bass.BASS_StreamFree(measuringStream);
+
+            var stream = BassCd.BASS_CD_StreamCreateFile(inCdaFile, BASSFlag.BASS_STREAM_DECODE);
+
+            if (stream == 0)
+            {
+                return;
+            }
+
+            try
+            {
+                var ww = new WaveWriter(outWavFile, stream, true);
+                var data = new short[32768];
+
+                var bytesSoFar = 0;
+
+                while (Bass.BASS_ChannelIsActive(stream) == BASSActive.BASS_ACTIVE_PLAYING)
+                {
+                    var length = Bass.BASS_ChannelGetData(stream, data, 32768);
+
+                    if (length > 0)
+                    {
+                        ww.Write(data, length);
+
+                        bytesSoFar += length;
+
+                        progressCallback.Invoke(totalLength, bytesSoFar);
+                    }
+                }
+
+                // finilize the wave file!
+                ww.Close();
+                Bass.BASS_StreamFree(stream);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(string.Format("Error copying cda file '{0}' to wav file '{1}'", inCdaFile, outWavFile), ex);
+            }
         }
 
-        public void CallLameEncoder(EncoderLAME lameEncoder)
+        private void CallLameEncoder(EncoderLAME lameEncoder)
         {
             Process pProcess = new System.Diagnostics.Process();
             pProcess.StartInfo.CreateNoWindow = true;

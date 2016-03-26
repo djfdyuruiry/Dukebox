@@ -185,7 +185,7 @@ namespace Dukebox.Library.Repositories
         /// <param name="fileName">The file to model in the track object.</param>
         /// <param name="metadata">Optional metadata object, if you wish to build this manually.</param>
         /// <returns></returns>
-        public Track GetTrackFromFile(string fileName, AudioFileMetaData metadata = null)
+        public Track GetTrackFromFile(string fileName, AudioFileMetadata metadata = null)
         {
             if (!File.Exists(fileName))
             {
@@ -201,7 +201,7 @@ namespace Dukebox.Library.Repositories
             }
             else
             {
-                track.Metadata = AudioFileMetaData.BuildAudioFileMetaData(fileName);
+                track.Metadata = AudioFileMetadata.BuildAudioFileMetaData(fileName);
             }
 
             track.Song.title = track.Metadata.Title;
@@ -268,7 +268,7 @@ namespace Dukebox.Library.Repositories
             {
                 try
                 {
-                    var metadata = AudioFileMetaData.BuildAudioFileMetaData(file);
+                    var metadata = AudioFileMetadata.BuildAudioFileMetaData(file);
                     AddFile(file, metadata);
 
                     if (progressHandler != null)
@@ -313,7 +313,7 @@ namespace Dukebox.Library.Repositories
         /// to database.
         /// </summary>
         /// <param name="kvp"></param>
-        public void AddFile(string filename, AudioFileMetaData metadata)
+        public void AddFile(string filename, AudioFileMetadata metadata)
         {
             if (!File.Exists(filename))
             {
@@ -400,7 +400,7 @@ namespace Dukebox.Library.Repositories
         /// Add an artist to the library and save changes
         /// to database.
         /// </summary>
-        private void AddArtist(AudioFileMetaData tag)
+        private void AddArtist(AudioFileMetadata tag)
         {
             var stopwatch = Stopwatch.StartNew();
 
@@ -437,7 +437,7 @@ namespace Dukebox.Library.Repositories
         /// Add an album to the library and save changes
         /// to database.
         /// </summary>
-        private void AddAlbum(AudioFileMetaData tag)
+        private void AddAlbum(AudioFileMetadata tag)
         {
             var stopwatch = Stopwatch.StartNew();
 
@@ -473,7 +473,7 @@ namespace Dukebox.Library.Repositories
         /// Add a song to the library and save changes
         /// to database.
         /// </summary>
-        private void AddSong(string filename, AudioFileMetaData metadata, artist artistObj, album albumObj)
+        private void AddSong(string filename, AudioFileMetadata metadata, artist artistObj, album albumObj)
         {
             var stopwatch = Stopwatch.StartNew();
             song newSong = null;

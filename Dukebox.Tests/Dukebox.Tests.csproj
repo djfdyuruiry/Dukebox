@@ -38,6 +38,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Bass.Net, Version=2.4.10.3, Culture=neutral, PublicKeyToken=b7566c273e6ef480" />
     <Reference Include="FakeItEasy, Version=1.25.3.0, Culture=neutral, PublicKeyToken=eff28e2146d5fd2c, processorArchitecture=MSIL">
       <HintPath>..\packages\FakeItEasy.1.25.3\lib\net40\FakeItEasy.dll</HintPath>
       <Private>True</Private>
@@ -70,13 +71,26 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
-    <Compile Include="IAlbumArtCacheServiceTests.cs" />
+    <Compile Include="AlbumArtCacheServiceTests.cs" />
+    <Compile Include="AudioCdRippingServiceTests.cs" />
+    <Compile Include="AudioCdServiceTests.cs" />
+    <Compile Include="AudioCdTestConstants.cs" />
+    <Compile Include="AudioConverterServiceTests.cs" />
+    <Compile Include="BassLoader.cs" />
+    <Compile Include="CdMetadataServiceTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Dukebox.exe.Config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Dukebox.Assets\Dukebox.Assets.csproj">
+      <Project>{e69d9eb5-0707-41ee-8537-3ffea9a8bb99}</Project>
+      <Name>Dukebox.Assets</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Dukebox.Audio\Dukebox.Audio.csproj">
       <Project>{8ea07179-2c2a-42a3-90c4-c700c4681181}</Project>
       <Name>Dukebox.Audio</Name>

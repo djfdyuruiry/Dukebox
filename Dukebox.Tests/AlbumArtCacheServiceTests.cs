@@ -13,9 +13,21 @@ using Xunit;
 
 namespace Dukebox.Tests
 {
-    public class IAlbumArtCacheServiceTests
+    public class AlbumArtCacheServiceTests
     {
         private const string cachePath = "./cache";
+
+        public AlbumArtCacheServiceTests()
+        {
+            try
+            {
+                Directory.Delete(cachePath);
+            }
+            catch (Exception ex)
+            {
+                // do nothing
+            }
+        }
 
         [Fact]
         public void BuildCachePath()
@@ -118,18 +130,18 @@ namespace Dukebox.Tests
             A.CallTo(() => settings.AlbumArtCachePath).Returns(cachePath);
 
             var albumArtCache = new AlbumArtCacheService(settings);
-            var albumId = 0;
-
             var albumIds = new List<long> { 0, 2, 3, 5 };
 
-            AddDummyImageToAlbumArtCache(albumArtCache, albumIds[0], albumId);
-            AddDummyImageToAlbumArtCache(albumArtCache, albumIds[1], albumId);
-            AddDummyImageToAlbumArtCache(albumArtCache, albumIds[2], albumId);
-            AddDummyImageToAlbumArtCache(albumArtCache, albumIds[3], albumId);
+            AddDummyImageToAlbumArtCache(albumArtCache, 0, albumIds[0]);
+            AddDummyImageToAlbumArtCache(albumArtCache, 0, albumIds[1]);
+            AddDummyImageToAlbumArtCache(albumArtCache, 0, albumIds[2]);
+            AddDummyImageToAlbumArtCache(albumArtCache, 0, albumIds[3]);
 
             var idsInCache = albumArtCache.GetAlbumIdsFromCache();
 
-            // TODO: Fix test
+            albumIds.Sort();
+            idsInCache.Sort();
+
             var idsReturnedAreSameToAddedAlbums = idsInCache.SequenceEqual(albumIds);
 
             Assert.True(idsReturnedAreSameToAddedAlbums, "Album art IDs returned by cache are not equal to those added to the cache");

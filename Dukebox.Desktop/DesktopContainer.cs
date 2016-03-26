@@ -46,7 +46,6 @@ namespace Dukebox.Desktop
 
             // helpers
             container.RegisterSingleton<ImageToImageSourceConverter>();
-            container.RegisterSingleton<DukeboxInitialisationHelper>();
 
             // services
             container.Register<Album>();
