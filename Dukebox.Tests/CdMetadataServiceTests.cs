@@ -29,7 +29,7 @@ namespace Dukebox.Tests
             
             var noAlbumReturned = string.IsNullOrEmpty(metadata.Album);
 
-            Assert.False(noAlbumReturned, "No album name was returned in the metadata");
+            Assert.False(noAlbumReturned, string.Format("No album name was returned in the metadata ({0})", AudioCdTestConstants.CheckDriveMessage));
 
             var noArtistReturned = string.IsNullOrEmpty(metadata.Artist);
 
@@ -49,7 +49,7 @@ namespace Dukebox.Tests
 
             var metadataIsEmpty = metadata.Any();
 
-            Assert.True(metadataIsEmpty, "No metadata was found for the Audio CD");
+            Assert.True(metadataIsEmpty, string.Format("No metadata was found for the Audio CD ({0})", AudioCdTestConstants.CheckDriveMessage));
 
             var metadataCount = metadata.Count;
             var audioCdTrackCount = Directory.EnumerateFiles(AudioCdTestConstants.CdDrivePath).Count();

@@ -76,6 +76,7 @@
     <Compile Include="AudioCdServiceTests.cs" />
     <Compile Include="AudioCdTestConstants.cs" />
     <Compile Include="AudioConverterServiceTests.cs" />
+    <Compile Include="AudioFileMetaDataTests.cs" />
     <Compile Include="BassLoader.cs" />
     <Compile Include="CdMetadataServiceTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -99,6 +100,11 @@
       <Project>{6c5b8890-79a4-43ee-9734-b5db714fcf16}</Project>
       <Name>Dukebox.Library</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="sample.mp3">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
