@@ -147,7 +147,6 @@
     <Compile Include="Helper\ImageResourceLoader.cs" />
     <Compile Include="Helper\ImageResources.cs" />
     <Compile Include="Helper\ImageToImageSourceConverter.cs" />
-    <Compile Include="Helper\DukeboxInitialisationHelper.cs" />
     <Compile Include="Helper\ListSearchHelper.cs" />
     <Compile Include="Interfaces\IDukeboxUserSettings.cs" />
     <Compile Include="Interfaces\IArtistListingViewModel.cs" />

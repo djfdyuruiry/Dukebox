@@ -79,11 +79,24 @@ namespace Dukebox.Library.Model.Services
             return new CdMetadata { Artist = artist, Album = album, Tracks = trackNames };
         }
 
+        public List<AudioFileMetadata> GetAudioFileMetaDataForCd(char driveLetter)
+        {
+            CdMetadata metadata = GetMetadataForCd(driveLetter);
+            List<AudioFileMetadata> audioMetadata = new List<AudioFileMetadata>();
+
+            for (int i = 0; i < metadata.Tracks.Count(); i++)
+            {
+                audioMetadata.Add(AudioFileMetadata.BuildAudioFileMetaData(metadata, i));
+            }
+
+            return audioMetadata;
+        }
+
         /// <summary>
         /// This methods throws an exception if there is
         /// no connection to the CDDB_SERVER.
         /// </summary>
-        public void CheckForCddbServerConnection()
+        private void CheckForCddbServerConnection()
         {
             try
             {
@@ -103,19 +116,5 @@ namespace Dukebox.Library.Model.Services
                 throw new Exception(errMsg, ex);
             }
         }
-
-        public List<AudioFileMetaData> GetAudioFileMetaDataForCd(char driveLetter)
-        {
-            CdMetadata metadata = GetMetadataForCd(driveLetter);
-            List<AudioFileMetaData> audioMetadata = new List<AudioFileMetaData>();
-
-            for (int i = 0; i < metadata.Tracks.Count(); i++)
-            {
-                audioMetadata.Add(AudioFileMetaData.BuildAudioFileMetaData(metadata, i));
-            }
-
-            return audioMetadata;
-        }
-
     }
 }

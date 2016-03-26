@@ -87,7 +87,7 @@ namespace Dukebox.Desktop.ViewModel
 
             progressViewModel.OnComplete += (o, e) => progressWindow.Dispatcher.InvokeAsync(progressWindow.Hide);
 
-            Task.Run(() => _cdRippingService.RipCdToFolder(audioCdDrive, _selectMp3OutputDialog.SelectedPath, progressViewModel));
+            _cdRippingService.RipCdToFolder(audioCdDrive, _selectMp3OutputDialog.SelectedPath, progressViewModel);
 
             progressWindow.Show();
         }

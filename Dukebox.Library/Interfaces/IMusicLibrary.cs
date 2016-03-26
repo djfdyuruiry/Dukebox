@@ -30,7 +30,7 @@ namespace Dukebox.Library.Interfaces
         playlist GetPlaylistById(long? playlistId);
         int GetPlaylistCount();
         playlist GetPlaylistFromFile(string playlistFile);
-        Track GetTrackFromFile(string fileName, AudioFileMetaData metadata = null);
+        Track GetTrackFromFile(string fileName, AudioFileMetadata metadata = null);
         List<Track> GetTracksForArtist(artist artist);
         List<Track> GetTracksForAlbum(album album);
         List<Track> SearchForTracks(string searchTerm, List<SearchAreas> searchAreas);
@@ -39,7 +39,7 @@ namespace Dukebox.Library.Interfaces
         List<Track> GetTracksByAttributeId(SearchAreas attribute, long attributeId);
         List<Track> GetTracksForDirectory(string directory, bool subDirectories);
         void AddDirectory(string directory, bool subDirectories, Action<object, AudioFileImportedEventArgs> progressHandler, Action<object, int> completeHandler);
-        void AddFile(string filename, AudioFileMetaData metadata);
+        void AddFile(string filename, AudioFileMetadata metadata);
         void AddPlaylist(string name, IEnumerable<string> filenames);
         void AddPlaylistFile(string filename);
         void RemoveTrack(Track track);

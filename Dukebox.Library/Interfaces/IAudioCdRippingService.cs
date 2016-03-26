@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace Dukebox.Library.Interfaces
 {
     public interface IAudioCdRippingService
     {
-        void RipCdToFolder(string inPath, string outPath, ICdRipViewUpdater viewUpdater);
+        Task RipCdToFolder(string inPath, string outPath, ICdRipViewUpdater viewUpdater);
     }
 }

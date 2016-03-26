@@ -132,6 +132,7 @@
   <ItemGroup>
     <Compile Include="album.cs" />
     <Compile Include="artist.cs" />
+    <Compile Include="Helper\DukeboxInitialisationHelper.cs" />
     <Compile Include="Interfaces\IAudioCdDriveMonitoringService.cs" />
     <Compile Include="Interfaces\ICdRipViewUpdater.cs" />
     <Compile Include="Config\DukeboxSettings.cs" />
@@ -151,7 +152,7 @@
     <Compile Include="Services\AudioCdDriveMonitoringService.cs" />
     <Compile Include="Services\AudioCdRippingService.cs" />
     <Compile Include="Services\CdMetadataService.cs" />
-    <Compile Include="Services\AudioFileMetaData.cs" />
+    <Compile Include="Services\AudioFileMetadata.cs" />
     <Compile Include="Interfaces\IAlbumArtCacheService.cs" />
     <Compile Include="Interfaces\ICdMetadataService.cs" />
     <Compile Include="Interfaces\IAudioCdRippingService.cs" />

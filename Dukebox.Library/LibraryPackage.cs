@@ -1,5 +1,6 @@
 ﻿using Dukebox.Audio;
 using Dukebox.Library.Config;
+using Dukebox.Library.Helper;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model.Services;
 using Dukebox.Library.Repositories;
@@ -35,11 +36,13 @@ namespace Dukebox.Library
             container.RegisterSingleton<IMusicLibrary>(() => GetMusicLibraryInstance(container));
             container.RegisterSingleton<IAudioCdDriveMonitoringService, AudioCdDriveMonitoringService>();
             container.Register<Track>();
-            container.Register<AudioFileMetaData>();
+            container.Register<AudioFileMetadata>();
 
             var assemblies = new List<Assembly> {Assembly.GetAssembly(typeof(AudioPackage))};
 
             container.RegisterPackages(assemblies);
+
+            container.RegisterSingleton<DukeboxInitialisationHelper>();
         }
 
         public static TService GetInstance<TService>() where TService : class
