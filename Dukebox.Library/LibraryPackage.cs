@@ -36,7 +36,7 @@ namespace Dukebox.Library
             container.RegisterSingleton(() => GetMusicLibraryInstance(container));
             container.RegisterSingleton<IAudioCdDriveMonitoringService, AudioCdDriveMonitoringService>();
             container.Register<ITrack, Track>();
-            container.Register<AudioFileMetadata>();
+            container.Register<IAudioFileMetadata, AudioFileMetadata>();
 
             var assemblies = new List<Assembly> {Assembly.GetAssembly(typeof(AudioPackage))};
 

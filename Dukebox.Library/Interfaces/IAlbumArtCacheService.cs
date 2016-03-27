@@ -10,7 +10,7 @@ namespace Dukebox.Library.Interfaces
     public interface IAlbumArtCacheService
     {
         event EventHandler AlbumAdded;
-        void AddSongToCache(Song songToProcess, IAudioFileMetaData metadata, Album albumObj);
+        void AddSongToCache(Song songToProcess, IAudioFileMetadata metadata, Album albumObj);
         bool CheckCacheForAlbum(long albumId);
         Image GetAlbumArtFromCache(long albumId);
         List<long> GetAlbumIdsFromCache();

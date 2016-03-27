@@ -79,10 +79,10 @@ namespace Dukebox.Library.Services
             return new CdMetadata { Artist = artist, Album = album, Tracks = trackNames };
         }
 
-        public List<AudioFileMetadata> GetAudioFileMetaDataForCd(char driveLetter)
+        public List<IAudioFileMetadata> GetAudioFileMetaDataForCd(char driveLetter)
         {
             CdMetadata metadata = GetMetadataForCd(driveLetter);
-            List<AudioFileMetadata> audioMetadata = new List<AudioFileMetadata>();
+            List<IAudioFileMetadata> audioMetadata = new List<IAudioFileMetadata>();
 
             for (int i = 0; i < metadata.Tracks.Count(); i++)
             {

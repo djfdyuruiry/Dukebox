@@ -1,8 +1,13 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Dukebox.Library.Interfaces
 {
-    public interface IAudioFileMetaData
+    public interface IAudioFileMetadata
     {
         string Album { get; set; }
         Image AlbumArt { get; }

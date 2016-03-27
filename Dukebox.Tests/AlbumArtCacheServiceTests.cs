@@ -152,7 +152,7 @@ namespace Dukebox.Tests
         {
             var songToAdd = new Song();
             var albumObj = new Album();
-            var metadata = A.Fake<IAudioFileMetaData>();
+            var metadata = A.Fake<IAudioFileMetadata>();
             var blankImage = new Bitmap(128, 128, PixelFormat.Format32bppRgb);
 
             songToAdd.id = songId;
