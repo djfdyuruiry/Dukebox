@@ -97,7 +97,7 @@
     <Compile Include="AudioFileMetaDataTests.cs" />
     <Compile Include="BassLoader.cs" />
     <Compile Include="CdMetadataServiceTests.cs" />
-    <Compile Include="DbMockDataLoader.cs" />
+    <Compile Include="LibraryDbMockGenerator.cs" />
     <Compile Include="MusicLibraryTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -1,4 +1,5 @@
-﻿using Dukebox.Library.Interfaces;
+﻿using Dukebox.Library;
+using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
 using FakeItEasy;
 using System;
@@ -12,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Dukebox.Tests
 {
-    public class DbMockDataLoader
+    public class LibraryDbMockGenerator
     {
         public static readonly string Mp3FilePath = Path.Combine(Directory.GetCurrentDirectory(), "sample.mp3");
 
@@ -42,12 +43,22 @@ namespace Dukebox.Tests
         };
 
         public readonly List<Song> Songs;
+        
+        public IMusicLibraryDbContext DbContextMock { get; private set; }
 
-        private IMusicLibraryDbContext _dbContext;
-
-        public DbMockDataLoader(IMusicLibraryDbContext dbContext)
+        public LibraryDbMockGenerator(bool overrideLibraryPackage = true)
         {
-            _dbContext = dbContext;
+            DbContextMock = A.Fake<IMusicLibraryDbContext>();
+
+            if (overrideLibraryPackage)
+            {
+                LibraryPackage.ExecutingForUnitTests = true;
+                var libraryContainer = LibraryPackage.GetContainerForTestOverrides();
+
+                libraryContainer.Options.AllowOverridingRegistrations = true;
+                libraryContainer.RegisterSingleton<IMusicLibraryDbContext>(DbContextMock);
+            }
+
             Songs = new List<Song>();
 
             var songId = 0;
@@ -69,33 +80,35 @@ namespace Dukebox.Tests
                     songId++;
                 });
             });
+
+            WireUpMockData();
         }
 
-        public void LoadMockData()
+        private void WireUpMockData()
         {
             var albums = A.Fake<DbSet<Album>>(o => o.Implements(typeof(IQueryable<Album>))
                 .Implements(typeof(IDbAsyncEnumerable<Album>)))
                 .SetupData(Albums);
 
-            A.CallTo(() => _dbContext.Albums).Returns(albums);
+            A.CallTo(() => DbContextMock.Albums).Returns(albums);
 
             var artists = A.Fake<DbSet<Artist>>(o => o.Implements(typeof(IQueryable<Artist>))
                 .Implements(typeof(IDbAsyncEnumerable<Artist>)))
                 .SetupData(Artists);
 
-            A.CallTo(() => _dbContext.Artists).Returns(artists);
+            A.CallTo(() => DbContextMock.Artists).Returns(artists);
 
             var playlists = A.Fake<DbSet<Playlist>>(o => o.Implements(typeof(IQueryable<Playlist>))
                             .Implements(typeof(IDbAsyncEnumerable<Playlist>)))
                             .SetupData(Playlists);
             
-            A.CallTo(() => _dbContext.Playlists).Returns(playlists);
+            A.CallTo(() => DbContextMock.Playlists).Returns(playlists);
 
             var songs = A.Fake<DbSet<Song>>(o => o.Implements(typeof(IQueryable<Song>))
                     .Implements(typeof(IDbAsyncEnumerable<Song>)))
                     .SetupData(Songs);
 
-            A.CallTo(() => _dbContext.Songs).Returns(songs);
+            A.CallTo(() => DbContextMock.Songs).Returns(songs);
         }
     }
 }

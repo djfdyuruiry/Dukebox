@@ -14,22 +14,13 @@ namespace Dukebox.Tests
     public class MusicLibraryTests
     {
         private readonly IMusicLibraryDbContext _musicLibraryDbContext;
-        private readonly DbMockDataLoader _mockDataLoader;
+        private readonly LibraryDbMockGenerator _mockDataLoader;
         private readonly MusicLibrary _musicLibrary;
 
         public MusicLibraryTests()
         {
-            _musicLibraryDbContext = A.Fake<IMusicLibraryDbContext>();
-
-            LibraryPackage.ExecutingForUnitTests = true;
-            var libraryContainer = LibraryPackage.GetContainerForTestOverrides();
-
-            libraryContainer.Options.AllowOverridingRegistrations = true;
-            libraryContainer.RegisterSingleton<IMusicLibraryDbContext>(_musicLibraryDbContext);
-
-            _mockDataLoader = new DbMockDataLoader(_musicLibraryDbContext);
-            
-            _mockDataLoader.LoadMockData();
+            _mockDataLoader = new LibraryDbMockGenerator();
+            _musicLibraryDbContext = _mockDataLoader.DbContextMock; 
 
             var settings = A.Fake<IDukeboxSettings>();
             var albumArtCache = A.Fake<IAlbumArtCacheService>();
