@@ -8,7 +8,7 @@ using Dukebox.Library.Model;
 using System.IO;
 using System.Timers;
 using Dukebox.Audio;
-using Dukebox.Model.Services;
+using Dukebox.Library.Services;
 using log4net;
 using System.Reflection;
 
@@ -132,7 +132,7 @@ namespace Dukebox.Library.Services
             }
         }
 
-        private List<Track> GetTracksForCd()
+        private List<ITrack> GetTracksForCd()
         {
             try
             {
@@ -143,7 +143,7 @@ namespace Dukebox.Library.Services
                 var errMsg = "Unable to get tracks from cd drive";
                 logger.Error(errMsg, ex);
 
-                return new List<Track>();
+                return new List<ITrack>();
             }
         }
     }

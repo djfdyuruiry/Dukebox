@@ -1,7 +1,7 @@
 ﻿using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
 using Dukebox.Library.Repositories;
-using Dukebox.Model.Services;
+using Dukebox.Library.Services;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -110,10 +110,10 @@ namespace Dukebox.Library
             return base.Equals(obj);
         }
 
-        public List<Track> GetTracksForPlaylist()
+        public List<ITrack> GetTracksForPlaylist()
         {
             var musicLibrary = LibraryPackage.GetInstance<IMusicLibrary>();
-            var tracks = Enumerable.Empty<Track>();
+            var tracks = Enumerable.Empty<ITrack>();
             var nonLibraryFiles = new List<string>();
 
             foreach (var file in Files)

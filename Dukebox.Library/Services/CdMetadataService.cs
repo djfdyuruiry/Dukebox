@@ -1,7 +1,7 @@
 ﻿using Dukebox.Audio;
 using Dukebox.Audio.Interfaces;
 using Dukebox.Library.Interfaces;
-using Dukebox.Model.Services;
+using Dukebox.Library.Services;
 using log4net;
 using System;
 using System.Collections.Generic;

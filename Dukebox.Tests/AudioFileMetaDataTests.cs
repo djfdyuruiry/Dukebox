@@ -1,4 +1,4 @@
-﻿using Dukebox.Model.Services;
+﻿using Dukebox.Library.Services;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;

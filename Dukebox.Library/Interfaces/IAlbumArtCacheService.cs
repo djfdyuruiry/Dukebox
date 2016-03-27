@@ -1,5 +1,5 @@
-﻿using Dukebox.Model.Interfaces;
-using Dukebox.Model.Services;
+﻿using Dukebox.Library.Interfaces;
+using Dukebox.Library.Services;
 using System;
 using System.Collections.Generic;
 using System.Drawing;

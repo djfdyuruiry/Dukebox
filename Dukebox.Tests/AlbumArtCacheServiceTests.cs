@@ -1,7 +1,7 @@
 ﻿using Dukebox.Library;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Services;
-using Dukebox.Model.Interfaces;
+using Dukebox.Library.Interfaces;
 using FakeItEasy;
 using System;
 using System.Collections.Generic;

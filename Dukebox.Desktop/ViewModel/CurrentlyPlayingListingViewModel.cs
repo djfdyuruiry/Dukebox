@@ -5,7 +5,7 @@ using GalaSoft.MvvmLight.Command;
 using Dukebox.Desktop.Helper;
 using Dukebox.Desktop.Interfaces;
 using Dukebox.Library.Interfaces;
-using Dukebox.Model.Services;
+using Dukebox.Library.Services;
 
 namespace Dukebox.Desktop.ViewModel
 {
@@ -13,11 +13,11 @@ namespace Dukebox.Desktop.ViewModel
     {
         private readonly IAudioPlaylist _audioPlaylist;
         
-        private List<Track> _tracks;
+        private List<ITrack> _tracks;
         private string _searchText;
-        private ListSearchHelper<Track> _listSearchHelper;
+        private ListSearchHelper<ITrack> _listSearchHelper;
 
-        public List<Track> Tracks
+        public List<ITrack> Tracks
         {
             get
             {
@@ -71,7 +71,7 @@ namespace Dukebox.Desktop.ViewModel
         public CurrentlyPlayingListingViewModel(IAudioPlaylist audioPlaylist) : base()
         {
             _audioPlaylist = audioPlaylist;
-            _listSearchHelper = new ListSearchHelper<Track>
+            _listSearchHelper = new ListSearchHelper<ITrack>
             {
                 FilterLambda = (t, s) => t.ToString().ToLower().Contains(s.ToLower())
             };
@@ -79,7 +79,7 @@ namespace Dukebox.Desktop.ViewModel
             _audioPlaylist.TrackListModified += (o, e) => RefreshTracks();
             
             ClearSearch = new RelayCommand(() => SearchText = string.Empty);
-            LoadTrack = new RelayCommand<Track>(DoLoadTrack);
+            LoadTrack = new RelayCommand<ITrack>(DoLoadTrack);
 
             RefreshTracks();
         }
@@ -89,7 +89,7 @@ namespace Dukebox.Desktop.ViewModel
             Tracks = _audioPlaylist.Tracks.ToList();
         }
 
-        private void DoLoadTrack(Track track)
+        private void DoLoadTrack(ITrack track)
         {
             _audioPlaylist.SkipToTrack(track);
         }

@@ -14,7 +14,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 
-namespace Dukebox.Model.Services
+namespace Dukebox.Library.Services
 {
     /// <summary>
     /// Provides facilities to create a playlist of
@@ -67,12 +67,12 @@ namespace Dukebox.Model.Services
         /// <summary>
         /// The list of tracks in the playlist.
         /// </summary>
-        public ObservableCollection<Track> Tracks { get; private set; }
+        public ObservableCollection<ITrack> Tracks { get; private set; }
         
         /// <summary>
         /// The track currently loaded into memory for playback.
         /// </summary>
-        public Track CurrentlyLoadedTrack
+        public ITrack CurrentlyLoadedTrack
         {
             get
             {
@@ -190,7 +190,7 @@ namespace Dukebox.Model.Services
             _musicLibrary = musicLibrary;
             _mediaPlayer = mediaPlayer;
 
-            Tracks = new ObservableCollection<Track>();
+            Tracks = new ObservableCollection<ITrack>();
             Tracks.CollectionChanged += (o, e) => CallTrackModifiedHandler();
 
             _previousTracks = new Stack<int>();
@@ -341,7 +341,7 @@ namespace Dukebox.Model.Services
         /// occurs if track is not in the current playlist.
         /// </summary>
         /// <param name="trackIndex">The track to skip to.</param>
-        public void SkipToTrack(Track trackToPlay)
+        public void SkipToTrack(ITrack trackToPlay)
         {
             int idx = Tracks.IndexOf(trackToPlay);
 
@@ -482,7 +482,7 @@ namespace Dukebox.Model.Services
             return LoadPlaylistFromList(tracks);
         }
 
-        public int LoadPlaylistFromList(List<Track> tracks)
+        public int LoadPlaylistFromList(List<ITrack> tracks)
         {
             StopPlaylistPlayback();
 

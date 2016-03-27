@@ -2,7 +2,7 @@
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model.Services;
 using Dukebox.Library.Repositories;
-using Dukebox.Model.Services;
+using Dukebox.Library.Services;
 using log4net;
 using System;
 using System.Collections.Generic;
@@ -67,7 +67,7 @@ namespace Dukebox.Library.Services
                 {
                     try
                     {
-                        Track t = _musicLibrary.GetTrackFromFile(inFiles[trackIdx], cdMetadata[trackIdx]);
+                        ITrack t = _musicLibrary.GetTrackFromFile(inFiles[trackIdx], cdMetadata[trackIdx]);
                         string outFile = string.Format(outFileFormat, t.ToString());
 
                         await _audioConverterService.ConvertCdaFileToMp3(inFiles[trackIdx], outFile,
@@ -115,7 +115,7 @@ namespace Dukebox.Library.Services
         /// <param name="totalTracksToRip">Total tracks being ripped.</param>
         /// <param name="currentTrackIndex">The index of the track currently being ripped.</param>
         private void CdRippingProgressMonitor(ICdRipViewUpdater cdRipViewUpdater, long totalBytesToEncode, long bytesEncodedSoFar, 
-                                              Track track, int totalTracksToRip, int currentTrackIndex)
+                                              ITrack track, int totalTracksToRip, int currentTrackIndex)
         {
             if (cdRipViewUpdater == null)
             {
