@@ -13,7 +13,7 @@ namespace Dukebox.Library.Interfaces
     {
         Album Album { get; set; }
         Artist Artist { get; set; }
-        AudioFileMetadata Metadata { get; set; }
+        IAudioFileMetadata Metadata { get; set; }
         Song Song { get; set; }
         string ToString();
     }

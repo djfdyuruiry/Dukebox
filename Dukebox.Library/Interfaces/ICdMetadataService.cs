@@ -7,7 +7,7 @@ namespace Dukebox.Library.Interfaces
 {
     public interface ICdMetadataService
     {
-        List<AudioFileMetadata> GetAudioFileMetaDataForCd(char driveLetter);
+        List<IAudioFileMetadata> GetAudioFileMetaDataForCd(char driveLetter);
         CdMetadata GetMetadataForCd(char driveLetter);
     }
 }

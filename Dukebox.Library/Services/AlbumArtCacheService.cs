@@ -49,7 +49,7 @@ namespace Dukebox.Library.Services
             }
         }
 
-        public void AddSongToCache(Song songToProcess, IAudioFileMetaData metadata, Album albumObj)
+        public void AddSongToCache(Song songToProcess, IAudioFileMetadata metadata, Album albumObj)
         {
             var stopwatch = Stopwatch.StartNew();
 

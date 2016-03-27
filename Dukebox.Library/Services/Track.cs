@@ -24,7 +24,7 @@ namespace Dukebox.Library.Services
 
         private IDukeboxSettings _settings;
         private IMusicLibrary _musicLibrary;
-        private AudioFileMetadata _metadata;
+        private IAudioFileMetadata _metadata;
         private Album _album;
         private Artist _artist;
 
@@ -90,7 +90,7 @@ namespace Dukebox.Library.Services
         /// <summary>
         /// Metadata information and accessor.
         /// </summary>
-        public AudioFileMetadata Metadata 
+        public IAudioFileMetadata Metadata 
         {
             get
             {

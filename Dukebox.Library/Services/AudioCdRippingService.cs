@@ -57,7 +57,7 @@ namespace Dukebox.Library.Services
 
                 string[] inFiles = Directory.GetFiles(inPath);
                 string outFileFormat = outPath + "\\{0}.mp3";
-                List<AudioFileMetadata> cdMetadata = _cdMetadataService.GetAudioFileMetaDataForCd(inPath[0]);
+                List<IAudioFileMetadata> cdMetadata = _cdMetadataService.GetAudioFileMetaDataForCd(inPath[0]);
                 int numTracks = inFiles.Length;
 
                 viewUpdater.Text = "Dukebox - MP3 Ripping Progress";

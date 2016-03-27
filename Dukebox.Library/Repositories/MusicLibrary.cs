@@ -182,7 +182,7 @@ namespace Dukebox.Library.Repositories
         /// <param name="fileName">The file to model in the track object.</param>
         /// <param name="metadata">Optional metadata object, if you wish to build this manually.</param>
         /// <returns></returns>
-        public ITrack GetTrackFromFile(string fileName, AudioFileMetadata metadata = null)
+        public ITrack GetTrackFromFile(string fileName, IAudioFileMetadata metadata = null)
         {
             if (!File.Exists(fileName))
             {
@@ -310,7 +310,7 @@ namespace Dukebox.Library.Repositories
         /// to database.
         /// </summary>
         /// <param name="kvp"></param>
-        public void AddFile(string filename, AudioFileMetadata metadata)
+        public void AddFile(string filename, IAudioFileMetadata metadata)
         {
             if (!File.Exists(filename))
             {
@@ -397,7 +397,7 @@ namespace Dukebox.Library.Repositories
         /// Add an artist to the library and save changes
         /// to database.
         /// </summary>
-        private void AddArtist(AudioFileMetadata tag)
+        private void AddArtist(IAudioFileMetadata tag)
         {
             var stopwatch = Stopwatch.StartNew();
 
@@ -434,7 +434,7 @@ namespace Dukebox.Library.Repositories
         /// Add an album to the library and save changes
         /// to database.
         /// </summary>
-        private void AddAlbum(AudioFileMetadata tag)
+        private void AddAlbum(IAudioFileMetadata tag)
         {
             var stopwatch = Stopwatch.StartNew();
 
@@ -470,7 +470,7 @@ namespace Dukebox.Library.Repositories
         /// Add a song to the library and save changes
         /// to database.
         /// </summary>
-        private void AddSong(string filename, AudioFileMetadata metadata, Artist artistObj, Album albumObj)
+        private void AddSong(string filename, IAudioFileMetadata metadata, Artist artistObj, Album albumObj)
         {
             var stopwatch = Stopwatch.StartNew();
             Song newSong = null;
