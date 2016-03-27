@@ -1,4 +1,5 @@
 ﻿using Dukebox.Audio;
+using Dukebox.Library;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Repositories;
 using FakeItEasy;
@@ -9,6 +10,7 @@ using Xunit;
 
 namespace Dukebox.Tests
 {
+    
     public class MusicLibraryTests
     {
         private readonly IMusicLibraryDbContext _musicLibraryDbContext;
@@ -18,6 +20,13 @@ namespace Dukebox.Tests
         public MusicLibraryTests()
         {
             _musicLibraryDbContext = A.Fake<IMusicLibraryDbContext>();
+
+            LibraryPackage.ExecutingForUnitTests = true;
+            var libraryContainer = LibraryPackage.GetContainerForTestOverrides();
+
+            libraryContainer.Options.AllowOverridingRegistrations = true;
+            libraryContainer.RegisterSingleton<IMusicLibraryDbContext>(_musicLibraryDbContext);
+
             _mockDataLoader = new DbMockDataLoader(_musicLibraryDbContext);
             
             _mockDataLoader.LoadMockData();
@@ -29,7 +38,7 @@ namespace Dukebox.Tests
             A.CallTo(() => settings.AddDirectoryConcurrencyLimit).Returns(10);
 
             audioFormats.SupportedFormats.Add(".mp3");
-
+            
             _musicLibrary = new MusicLibrary(_musicLibraryDbContext, settings, albumArtCache, audioFormats);
 
         }
@@ -157,7 +166,35 @@ namespace Dukebox.Tests
         [Fact]
         public void SearchByText()
         {
+            var resultsForKnownPhrase = _musicLibrary.SearchForTracksInArea(Library.Model.SearchAreas.All, "drom");
+            var resultsForMissingPhrase= _musicLibrary.SearchForTracksInArea(Library.Model.SearchAreas.All, "fake.it.easy");
 
+            Assert.True(resultsForKnownPhrase.Any(), "Failed to get tracks by known phrase");
+            Assert.False(resultsForMissingPhrase.Any(), "Incorrectly got results for an unknown phrase");
+
+            var resultsForKnownArtist = _musicLibrary.SearchForTracksInArea(Library.Model.SearchAreas.Artist, "spike");
+            var resultsForMissingArtist = _musicLibrary.SearchForTracksInArea(Library.Model.SearchAreas.Artist, "gamblor");
+
+            Assert.True(resultsForKnownArtist.Any(), "Failed to get tracks by known artist title");
+            Assert.False(resultsForMissingArtist.Any(), "Incorrectly got results for an unknown artist title");
+
+            var resultsForKnownAlbum = _musicLibrary.SearchForTracksInArea(Library.Model.SearchAreas.Album, "neptune");
+            var resultsForMissingAlbum = _musicLibrary.SearchForTracksInArea(Library.Model.SearchAreas.Album, "homer");
+
+            Assert.True(resultsForKnownAlbum.Any(), "Failed to get tracks by known album title");
+            Assert.False(resultsForMissingAlbum.Any(), "Incorrectly got results for an unknown album title");
+
+            var resultsForKnownSong = _musicLibrary.SearchForTracksInArea(Library.Model.SearchAreas.Song, "wish you were here");
+            var resultsForMissingSong = _musicLibrary.SearchForTracksInArea(Library.Model.SearchAreas.Song, "shine on");
+
+            Assert.True(resultsForKnownSong.Any(), "Failed to get tracks by known song title");
+            Assert.False(resultsForMissingSong.Any(), "Incorrectly got results for an unknown song title");
+
+            var resultsForKnownFilename = _musicLibrary.SearchForTracksInArea(Library.Model.SearchAreas.Filename, "sample.mp3");
+            var resultsForMissingFilename = _musicLibrary.SearchForTracksInArea(Library.Model.SearchAreas.Filename, "fakeiteasy.man");
+
+            Assert.True(resultsForKnownFilename.Any(), "Failed to get tracks by known filename");
+            Assert.False(resultsForMissingFilename.Any(), "Incorrectly got results for an unknown filename");
         }
 
         [Fact]
