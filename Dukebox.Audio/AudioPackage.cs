@@ -13,6 +13,8 @@ namespace Dukebox.Audio
         private static readonly ILog logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static Container container;
 
+        public static bool ExecutingForUnitTests { get; set; }
+
         static AudioPackage()
         {
             container = new Container();
@@ -35,6 +37,16 @@ namespace Dukebox.Audio
         public void RegisterServices(Container container)
         {
             Configure(container);
+        }
+
+        public static Container GetContainerForTestOverrides()
+        {
+            if (!ExecutingForUnitTests)
+            {
+                throw new InvalidOperationException("Accessing the internal container is only valid when ExecutingForUnitTests is true");
+            }
+
+            return container;
         }
     }
 }

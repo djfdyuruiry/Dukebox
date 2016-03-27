@@ -5,6 +5,7 @@ using Dukebox.Desktop.ViewModel;
 using Dukebox.Library;
 using SimpleInjector;
 using SimpleInjector.Packaging;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -13,6 +14,8 @@ namespace Dukebox.Desktop
     public class DesktopContainer : IPackage
     {        
         private static Container container;
+
+        public static bool ExecutingForUnitTests { get; set; }
 
         static DesktopContainer()
         {
@@ -67,6 +70,16 @@ namespace Dukebox.Desktop
         public void RegisterServices(Container container)
         {
             Configure(container);
+        }
+
+        public static Container GetContainerForTestOverrides()
+        {
+            if (!ExecutingForUnitTests)
+            {
+                throw new InvalidOperationException("Accessing the internal container is only valid when ExecutingForUnitTests is true");
+            }
+
+            return container;
         }
     }
 }
