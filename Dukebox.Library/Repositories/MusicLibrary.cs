@@ -30,7 +30,7 @@ namespace Dukebox.Library.Repositories
         /// <summary>
         /// The ADO entities model for the SQL music database.
         /// </summary>
-        private Library _dukeboxData;
+        private IMusicLibraryDbContext _dukeboxData;
         private IDukeboxSettings _settings;
         private AudioFileFormats _audioFormats;
         private IAlbumArtCacheService _albumArtCache;
@@ -126,15 +126,9 @@ namespace Dukebox.Library.Repositories
 
         #endregion
         
-        /// <summary>
-        /// Singleton pattern private constructor. Open connection to
-        /// SQL lite database file and populate track cache
-        /// </summary>
-        public MusicLibrary(IDukeboxSettings settings, IAlbumArtCacheService albumArtCache, AudioFileFormats audioFormats)
+        public MusicLibrary(IMusicLibraryDbContext libraryDbContext, IDukeboxSettings settings, IAlbumArtCacheService albumArtCache, AudioFileFormats audioFormats)
         {
-            _dukeboxData = new Library();
-
-            _dukeboxData.Database.Log = (s) => Debug.Write(s);
+            _dukeboxData = libraryDbContext;
 
             _settings = settings;
             _audioFormats = audioFormats;
