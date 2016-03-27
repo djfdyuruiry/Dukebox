@@ -18,21 +18,21 @@ namespace Dukebox.Library.Interfaces
         event EventHandler PlaylistCacheRefreshed;
         event EventHandler CachesRefreshed;
         event EventHandler<NotifyCollectionChangedEventArgs> RecentlyPlayedListModified;
-        List<album> OrderedAlbums { get; }
-        List<artist> OrderedArtists { get; }
-        List<playlist> OrderedPlaylists { get; }
+        List<Album> OrderedAlbums { get; }
+        List<Artist> OrderedArtists { get; }
+        List<Playlist> OrderedPlaylists { get; }
         ObservableCollection<ITrack> RecentlyPlayed { get; }
         List<ITrack> RecentlyPlayedAsList { get; }
-        album GetAlbumById(long? albumId);
+        Album GetAlbumById(long? albumId);
         int GetAlbumCount();
-        artist GetArtistById(long? artistId);
+        Artist GetArtistById(long? artistId);
         int GetArtistCount();
-        playlist GetPlaylistById(long? playlistId);
+        Playlist GetPlaylistById(long? playlistId);
         int GetPlaylistCount();
-        playlist GetPlaylistFromFile(string playlistFile);
+        Playlist GetPlaylistFromFile(string playlistFile);
         ITrack GetTrackFromFile(string fileName, AudioFileMetadata metadata = null);
-        List<ITrack> GetTracksForArtist(artist artist);
-        List<ITrack> GetTracksForAlbum(album album);
+        List<ITrack> GetTracksForArtist(Artist artist);
+        List<ITrack> GetTracksForAlbum(Album album);
         List<ITrack> SearchForTracks(string searchTerm, List<SearchAreas> searchAreas);
         List<ITrack> SearchForTracksInArea(SearchAreas attribute, string nameOrTitle);
         List<ITrack> GetTracksByAttributeValue(SearchAreas attribute, string nameOrTitle);

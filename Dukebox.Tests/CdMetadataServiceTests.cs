@@ -1,6 +1,6 @@
 ﻿using Dukebox.Audio.Interfaces;
 using Dukebox.Library.Interfaces;
-using Dukebox.Library.Model.Services;
+using Dukebox.Library.Services;
 using FakeItEasy;
 using System.IO;
 using System.Linq;

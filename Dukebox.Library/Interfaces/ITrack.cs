@@ -1,4 +1,5 @@
-﻿using Dukebox.Library.Services;
+﻿using Dukebox.Library.Model;
+using Dukebox.Library.Services;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,10 +11,10 @@ namespace Dukebox.Library.Interfaces
 {
     public interface ITrack : IEqualityComparer
     {
-        album Album { get; set; }
-        artist Artist { get; set; }
+        Album Album { get; set; }
+        Artist Artist { get; set; }
         AudioFileMetadata Metadata { get; set; }
-        song Song { get; set; }
+        Song Song { get; set; }
         string ToString();
     }
 }

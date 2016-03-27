@@ -2,7 +2,7 @@
 using Dukebox.Library.Config;
 using Dukebox.Library.Helper;
 using Dukebox.Library.Interfaces;
-using Dukebox.Library.Model.Services;
+using Dukebox.Library.Services;
 using Dukebox.Library.Repositories;
 using Dukebox.Library.Services;
 using Dukebox.Library.Services;

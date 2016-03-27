@@ -1,6 +1,7 @@
 ﻿using Dukebox.Library;
 using Dukebox.Library.Config;
 using Dukebox.Library.Interfaces;
+using Dukebox.Library.Model;
 using Dukebox.Library.Repositories;
 using log4net;
 using System;
@@ -24,18 +25,18 @@ namespace Dukebox.Library.Services
         private IDukeboxSettings _settings;
         private IMusicLibrary _musicLibrary;
         private AudioFileMetadata _metadata;
-        private album _album;
-        private artist _artist;
+        private Album _album;
+        private Artist _artist;
 
         /// <summary>
         /// Details specific to track file.
         /// </summary>
-        public song Song { get; set; }
+        public Song Song { get; set; }
 
         /// <summary>
         /// Associated artist information and accessor.
         /// </summary>
-        public artist Artist
+        public Artist Artist
         {
             get
             {
@@ -62,7 +63,7 @@ namespace Dukebox.Library.Services
         /// <summary>
         /// Associated album information and accessor.
         /// </summary>
-        public album Album
+        public Album Album
         {
             get
             {
@@ -113,7 +114,7 @@ namespace Dukebox.Library.Services
             }
         }
 
-        public static ITrack BuildTrackInstance(song song)
+        public static ITrack BuildTrackInstance(Song song)
         {
             if (song == null)
             {
@@ -122,8 +123,8 @@ namespace Dukebox.Library.Services
 
             var track = LibraryPackage.GetInstance<ITrack>();
 
-            track.Album = song.album ?? new album { id = -1 };
-            track.Artist = song.artist ?? new artist { id = -1 };
+            track.Album = song.album ?? new Album { id = -1 };
+            track.Artist = song.artist ?? new Artist { id = -1 };
             track.Song = song;
 
             return track;

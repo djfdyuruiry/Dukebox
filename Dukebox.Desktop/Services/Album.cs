@@ -1,11 +1,6 @@
 ﻿using Dukebox.Desktop.Helper;
-using Dukebox.Library;
 using Dukebox.Library.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using LibraryAlbum = Dukebox.Library.Model.Album;
 using System.Windows.Media;
 
 namespace Dukebox.Desktop.Services
@@ -16,7 +11,7 @@ namespace Dukebox.Desktop.Services
         private readonly ImageToImageSourceConverter _imageToImageSourceConverter;
         private ImageSource _albumArt;
 
-        public album Data { get; private set; }
+        public LibraryAlbum Data { get; private set; }
 
         public ImageSource AlbumArt
         {
@@ -32,7 +27,7 @@ namespace Dukebox.Desktop.Services
         }
 
 
-        public static Album BuildAlbumInstance(album data)
+        public static Album BuildAlbumInstance(LibraryAlbum data)
         {
             var instance = DesktopContainer.GetInstance<Album>();
             instance.Data = data;

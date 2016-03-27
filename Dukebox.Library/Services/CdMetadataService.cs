@@ -1,7 +1,7 @@
 ﻿using Dukebox.Audio;
 using Dukebox.Audio.Interfaces;
 using Dukebox.Library.Interfaces;
-using Dukebox.Library.Services;
+using Dukebox.Library.Model;
 using log4net;
 using System;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ using System.Net;
 using System.Text.RegularExpressions;
 using Un4seen.Bass.AddOn.Cd;
 
-namespace Dukebox.Library.Model.Services
+namespace Dukebox.Library.Services
 {
     /// <summary>
     /// Holds metadata for a single audio CD. Use GetMetatadataFormCd(..) to
