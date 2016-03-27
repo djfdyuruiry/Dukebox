@@ -18,6 +18,8 @@ namespace Dukebox.Library
         private static readonly ILog logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private static Container container;
 
+        public static bool ExecutingForUnitTests { get; set; }
+
         static LibraryPackage()
         {
             container = new Container();
@@ -31,6 +33,7 @@ namespace Dukebox.Library
             container.RegisterSingleton<ICdMetadataService, CdMetadataService>();
             container.RegisterSingleton<IAudioCdRippingService, AudioCdRippingService>();
             container.RegisterSingleton<IAudioPlaylist, AudioPlaylist>();
+            container.RegisterSingleton<IMusicLibraryDbContext>(() => new MusicLibraryDbContext());
             container.RegisterSingleton(() => GetMusicLibraryInstance(container));
             container.RegisterSingleton<IAudioCdDriveMonitoringService, AudioCdDriveMonitoringService>();
             container.Register<ITrack, Track>();
@@ -85,6 +88,16 @@ namespace Dukebox.Library
         public void RegisterServices(Container container)
         {
             Configure(container);
+        }
+
+        public static Container GetContainerForTestOverrides()
+        {
+            if (!ExecutingForUnitTests)
+            {
+                throw new InvalidOperationException("Accessing the internal container is only valid when ExecutingForUnitTests is true");
+            }
+
+            return container;
         }
     }
 }
