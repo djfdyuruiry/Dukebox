@@ -4,8 +4,6 @@ using Dukebox.Library.Helper;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Services;
 using Dukebox.Library.Repositories;
-using Dukebox.Library.Services;
-using Dukebox.Library.Services;
 using log4net;
 using SimpleInjector;
 using SimpleInjector.Packaging;
@@ -70,8 +68,9 @@ namespace Dukebox.Library
         {
             try
             {
-                var musicLibrary = new MusicLibrary(container.GetInstance<IDukeboxSettings>(),
+                var musicLibrary = new MusicLibrary(container.GetInstance<IMusicLibraryDbContext>(), container.GetInstance<IDukeboxSettings>(),
                     container.GetInstance<IAlbumArtCacheService>(), container.GetInstance<AudioFileFormats>());
+
                 return musicLibrary;
             }
             catch (Exception ex)

@@ -138,7 +138,8 @@
     <Compile Include="Config\DukeboxSettings.cs" />
     <Compile Include="Interfaces\IDukeboxSettings.cs" />
     <Compile Include="Interfaces\ITrack.cs" />
-    <Compile Include="Repositories\Library.cs" />
+    <Compile Include="Interfaces\IMusicLibraryDbContext.cs" />
+    <Compile Include="Repositories\MusicLibraryDbContext.cs" />
     <Compile Include="LibraryPackage.cs" />
     <Compile Include="Model\AlbumArtCacheOperations.cs" />
     <Compile Include="Model\AudioCdDriveEventArguments.cs" />
