@@ -6,7 +6,7 @@ using Dukebox.Desktop.Helper;
 using Dukebox.Desktop.Interfaces;
 using Dukebox.Desktop.Model;
 using Dukebox.Desktop.Services;
-using Dukebox.Library;
+using LibraryAlbum = Dukebox.Library.Model.Album;
 using Dukebox.Library.Interfaces;
 
 namespace Dukebox.Desktop.ViewModel
@@ -16,8 +16,8 @@ namespace Dukebox.Desktop.ViewModel
         private readonly IMusicLibrary _musicLibrary;
         private readonly IAudioPlaylist _audioPlaylist;
 
-        private List<Album> _albums;
-        private ListSearchHelper<Album> _listSearchHelper;
+        private List<Services.Album> _albums;
+        private ListSearchHelper<Services.Album> _listSearchHelper;
         private string _searchText;
 
         public string SearchText
@@ -42,7 +42,7 @@ namespace Dukebox.Desktop.ViewModel
                 return true;
             }
         }
-        public List<Album> Albums
+        public List<Services.Album> Albums
         {
             get
             {
@@ -64,15 +64,15 @@ namespace Dukebox.Desktop.ViewModel
         {
             _musicLibrary = musicLibrary;
             _audioPlaylist = audioPlaylist;
-            _listSearchHelper = new ListSearchHelper<Album>
+            _listSearchHelper = new ListSearchHelper<Services.Album>
             {
-                FilterLambda = Album.ContainsString
+                FilterLambda = Services.Album.ContainsString
             };
 
             _musicLibrary.AlbumAdded += (o, e) => LoadAlbumsFromLibrary();
 
             ClearSearch = new RelayCommand(() => SearchText = string.Empty);
-            LoadAlbum = new RelayCommand<Album>(DoLoadAlbum);
+            LoadAlbum = new RelayCommand<Services.Album>(this.DoLoadAlbum);
 
             LoadAlbumsFromLibrary();
         }
@@ -83,7 +83,7 @@ namespace Dukebox.Desktop.ViewModel
                 .Select(a => Album.BuildAlbumInstance(a))
                 .ToList();
 
-            var album = Album.BuildAlbumInstance(new album() { name = "llllol" });
+            var album = Services.Album.BuildAlbumInstance(new LibraryAlbum() { name = "llllol" });
 
             albums.Add(album);
 
@@ -92,7 +92,7 @@ namespace Dukebox.Desktop.ViewModel
 
         private void DoLoadAlbum(Album album)
         {
-            var tracks = _musicLibrary.GetTracksForAlbum(album.Data);
+            var tracks = _musicLibrary.GetTracksForAlbum((LibraryAlbum)album.Data);
             _audioPlaylist.LoadPlaylistFromList(tracks);
 
             SendNotificationMessage(NotificationMessages.AudioPlaylistLoadedNewTracks);

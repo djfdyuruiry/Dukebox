@@ -5,13 +5,13 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Dukebox.Desktop.Views"
              xmlns:DukeboxViews="clr-namespace:Dukebox.Desktop.Views" 
-             xmlns:DukeboxLibrary="clr-namespace:Dukebox.Library;assembly=Dukebox.Library"
+             xmlns:DukeboxLibrary="clr-namespace:Dukebox.Library.Model;assembly=Dukebox.Library"
              mc:Ignorable="d" 
              d:DesignHeight="592" d:DesignWidth="1016"
              Name="ArtistListingControl"
              DataContext="{Binding IArtistListing, Source={StaticResource ViewModelLocator}}">
     <UserControl.Resources>
-        <DataTemplate DataType="{x:Type DukeboxLibrary:artist}">
+        <DataTemplate DataType="{x:Type DukeboxLibrary:Artist}">
             <StackPanel Name="Artist">
                 <Image Width="auto" Height="auto" Source="{Binding ElementName=Artist, Path=DataContext, Converter={StaticResource ArtistToThumbnailConverter}}">
                     <Image.InputBindings>

@@ -1,5 +1,6 @@
 ﻿using Dukebox.Desktop.Model;
 using Dukebox.Library;
+using Dukebox.Library.Model;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -21,7 +22,7 @@ namespace Dukebox.Desktop.Helper
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var artist = value as artist;
+            var artist = value as Artist;
             // return a blank thumbnail if artist is null
             var artistLetter = string.Empty;
 

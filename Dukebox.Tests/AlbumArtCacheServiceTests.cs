@@ -10,6 +10,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using Xunit;
+using Dukebox.Library.Model;
 
 namespace Dukebox.Tests
 {
@@ -149,8 +150,8 @@ namespace Dukebox.Tests
 
         private Image AddDummyImageToAlbumArtCache(IAlbumArtCacheService albumArtCache, long songId, long albumId)
         {
-            var songToAdd = new song();
-            var albumObj = new album();
+            var songToAdd = new Song();
+            var albumObj = new Album();
             var metadata = A.Fake<IAudioFileMetaData>();
             var blankImage = new Bitmap(128, 128, PixelFormat.Format32bppRgb);
 

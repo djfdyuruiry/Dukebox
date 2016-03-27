@@ -6,6 +6,7 @@ using Dukebox.Desktop.Interfaces;
 using Dukebox.Desktop.Model;
 using Dukebox.Library;
 using Dukebox.Library.Interfaces;
+using Dukebox.Library.Model;
 
 namespace Dukebox.Desktop.ViewModel
 {
@@ -13,8 +14,8 @@ namespace Dukebox.Desktop.ViewModel
     {
         private readonly IMusicLibrary _musicLibrary;
 
-        private List<artist> _artists;
-        private ListSearchHelper<artist> _listSearchHelper;
+        private List<Artist> _artists;
+        private ListSearchHelper<Artist> _listSearchHelper;
         private string _searchText;
         private readonly IAudioPlaylist _audioPlaylist;
 
@@ -40,7 +41,7 @@ namespace Dukebox.Desktop.ViewModel
                 return true;
             }
         }
-        public List<artist> Artists
+        public List<Artist> Artists
         {
             get
             {
@@ -63,14 +64,14 @@ namespace Dukebox.Desktop.ViewModel
             _musicLibrary = musicLibrary;
             _audioPlaylist = audioPlaylist;
 
-            _listSearchHelper = new ListSearchHelper<artist>
+            _listSearchHelper = new ListSearchHelper<Artist>
             {
                 FilterLambda = (a, s) => a.name.ToLower().Contains(s.ToLower())
             };
 
             _musicLibrary.ArtistAdded += (o, e) => RefreshArtistsFromLibrary();
             
-            LoadArtist = new RelayCommand<artist>(DoLoadArtist);
+            LoadArtist = new RelayCommand<Artist>(DoLoadArtist);
             ClearSearch = new RelayCommand(() => SearchText = string.Empty);
 
             RefreshArtistsFromLibrary();
@@ -81,7 +82,7 @@ namespace Dukebox.Desktop.ViewModel
             Artists = _musicLibrary.OrderedArtists;
         }
 
-        private void DoLoadArtist(artist artist)
+        private void DoLoadArtist(Artist artist)
         {
             var tracks = _musicLibrary.GetTracksForArtist(artist);
             _audioPlaylist.LoadPlaylistFromList(tracks);
