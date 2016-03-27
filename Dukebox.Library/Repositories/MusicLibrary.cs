@@ -172,40 +172,8 @@ namespace Dukebox.Library.Repositories
             var validFiles = Directory.EnumerateFiles(directory, "*.*", searchOption).Where((f) => supportedFormats.Any(sf => f.EndsWith(sf))).ToList();
             validFiles = validFiles.Except(_dukeboxData.Songs.Select((s) => s.filename)).ToList();
 
-            var tracksToReturn = validFiles.Select((f) => GetTrackFromFile(f)).ToList();
+            var tracksToReturn = validFiles.Select((f) => Track.BuildTrackInstance(f)).ToList();
             return tracksToReturn;
-        }
-
-        /// <summary>
-        /// Construct a track object from a given audio file.
-        /// </summary>
-        /// <param name="fileName">The file to model in the track object.</param>
-        /// <param name="metadata">Optional metadata object, if you wish to build this manually.</param>
-        /// <returns></returns>
-        public ITrack GetTrackFromFile(string fileName, IAudioFileMetadata metadata = null)
-        {
-            if (!File.Exists(fileName))
-            {
-                throw new FileNotFoundException(string.Format("The audio file '{0}' does not exist on this system", fileName));
-            }
-
-            var trackSong = new Song() { id = -1, albumId = -1, artistId = -1, filename = fileName };
-            var track = Track.BuildTrackInstance(trackSong);
-
-            if (metadata != null)
-            {
-                track.Metadata = metadata;
-            }
-            else
-            {
-                track.Metadata = AudioFileMetadata.BuildAudioFileMetaData(fileName);
-            }
-
-            track.Song.title = track.Metadata.Title;
-            track.Album.name = track.Metadata.Album;
-            track.Artist.name = track.Metadata.Artist;
-
-            return track;
         }
 
         /// <summary>

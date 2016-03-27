@@ -30,7 +30,6 @@ namespace Dukebox.Library.Interfaces
         Playlist GetPlaylistById(long? playlistId);
         int GetPlaylistCount();
         Playlist GetPlaylistFromFile(string playlistFile);
-        ITrack GetTrackFromFile(string fileName, IAudioFileMetadata metadata = null);
         List<ITrack> GetTracksForArtist(Artist artist);
         List<ITrack> GetTracksForAlbum(Album album);
         List<ITrack> SearchForTracks(string searchTerm, List<SearchAreas> searchAreas);

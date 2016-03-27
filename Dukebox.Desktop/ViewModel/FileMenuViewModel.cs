@@ -64,7 +64,7 @@ namespace Dukebox.Desktop.ViewModel
             }
 
             var fileName = _selectFileDialog.FileName;
-            var track = _musicLibrary.GetTrackFromFile(fileName);
+            var track = Track.BuildTrackInstance(fileName);
 
             _audioPlaylist.LoadPlaylistFromList(new List<ITrack> { track });
 

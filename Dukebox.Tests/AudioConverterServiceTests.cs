@@ -40,8 +40,8 @@ namespace Dukebox.Tests
 
             var audioConverter = new AudioConverterService();
             var cdaFile = string.Format(@"{0}:\track01.cda", AudioCdTestConstants.CdDriveLetter);
-            var mp3File = Path.Combine(Directory.GetCurrentDirectory(), "track01.mp3");
-
+            var mp3File = "track01.mp3";
+        
             await audioConverter.ConvertCdaFileToMp3(cdaFile, mp3File, ProgressCallback, true);
 
             var mp3FileExists = File.Exists(mp3File);

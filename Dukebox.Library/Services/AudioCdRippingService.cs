@@ -23,13 +23,11 @@ namespace Dukebox.Library.Services
     public class AudioCdRippingService : IAudioCdRippingService
     {
         private static readonly ILog logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-        private IMusicLibrary _musicLibrary;
-        private ICdMetadataService _cdMetadataService;
-        private IAudioConverterService _audioConverterService;
+        private readonly ICdMetadataService _cdMetadataService;
+        private readonly IAudioConverterService _audioConverterService;
 
-        public AudioCdRippingService(IMusicLibrary musicLibrary, ICdMetadataService cdMetadataService, IAudioConverterService audioConverterService)
+        public AudioCdRippingService(ICdMetadataService cdMetadataService, IAudioConverterService audioConverterService)
         {
-            _musicLibrary = musicLibrary;
             _cdMetadataService = cdMetadataService;
             _audioConverterService = audioConverterService;
         }
@@ -67,7 +65,7 @@ namespace Dukebox.Library.Services
                 {
                     try
                     {
-                        ITrack t = _musicLibrary.GetTrackFromFile(inFiles[trackIdx], cdMetadata[trackIdx]);
+                        ITrack t = Track.BuildTrackInstance(inFiles[trackIdx], cdMetadata[trackIdx]);
                         string outFile = string.Format(outFileFormat, t.ToString());
 
                         await _audioConverterService.ConvertCdaFileToMp3(inFiles[trackIdx], outFile,
