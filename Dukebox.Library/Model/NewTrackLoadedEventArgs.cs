@@ -1,4 +1,5 @@
-﻿using Dukebox.Model.Services;
+﻿using Dukebox.Library.Interfaces;
+using Dukebox.Library.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace Dukebox.Library.Model
 {
     public class NewTrackLoadedEventArgs : EventArgs
     {
-        public Track Track { get; set; }
+        public ITrack Track { get; set; }
         public int TrackIndex { get; set; }
     }
 }

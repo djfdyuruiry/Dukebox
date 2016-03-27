@@ -137,6 +137,7 @@
     <Compile Include="Interfaces\ICdRipViewUpdater.cs" />
     <Compile Include="Config\DukeboxSettings.cs" />
     <Compile Include="Interfaces\IDukeboxSettings.cs" />
+    <Compile Include="Interfaces\ITrack.cs" />
     <Compile Include="Library.cs" />
     <Compile Include="LibraryPackage.cs" />
     <Compile Include="Model\AlbumArtCacheOperations.cs" />

@@ -10,7 +10,7 @@ using log4net;
 using GalaSoft.MvvmLight.Command;
 using Dukebox.Desktop.Interfaces;
 using Dukebox.Library.Interfaces;
-using Dukebox.Model.Services;
+using Dukebox.Library.Services;
 using Dukebox.Audio;
 using Dukebox.Desktop.Model;
 
@@ -23,11 +23,11 @@ namespace Dukebox.Desktop.ViewModel
         private readonly IAudioPlaylist _audioPlaylist;
         private readonly IAudioCdDriveMonitoringService _audioCdDriveMonitor;
 
-        private List<Track> _tracks;
+        private List<ITrack> _tracks;
 
         public ICommand ClearSearch { get; private set; }
         public string SearchText { get; set; }
-        public List<Track> Tracks
+        public List<ITrack> Tracks
         {
             get
             {
@@ -68,10 +68,10 @@ namespace Dukebox.Desktop.ViewModel
                 Tracks = e.CdTracks;
                 OfferToLoadCd(e.DriveDirectory);
             };
-            _audioCdDriveMonitor.AudioCdEjected += (o, e) => Tracks = new List<Track>();
+            _audioCdDriveMonitor.AudioCdEjected += (o, e) => Tracks = new List<ITrack>();
 
-            Tracks = new List<Track>();
-            LoadTrack = new RelayCommand<Track>(DoLoadTrack);
+            Tracks = new List<ITrack>();
+            LoadTrack = new RelayCommand<ITrack>(DoLoadTrack);
 
             _audioCdDriveMonitor.StartMonitoring();
         }
@@ -89,7 +89,7 @@ namespace Dukebox.Desktop.ViewModel
             }
         }
 
-        private void DoLoadTrack(Track track)
+        private void DoLoadTrack(ITrack track)
         {
             _audioPlaylist.LoadPlaylistFromList(Tracks);
             _audioPlaylist.SkipToTrack(track);

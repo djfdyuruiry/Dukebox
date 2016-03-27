@@ -7,7 +7,7 @@ using Dukebox.Audio;
 using Dukebox.Desktop.Interfaces;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
-using Dukebox.Model.Services;
+using Dukebox.Library.Services;
 using System.Threading.Tasks;
 using Dukebox.Desktop.Views;
 using System.IO;
@@ -66,7 +66,7 @@ namespace Dukebox.Desktop.ViewModel
             var fileName = _selectFileDialog.FileName;
             var track = _musicLibrary.GetTrackFromFile(fileName);
 
-            _audioPlaylist.LoadPlaylistFromList(new List<Track> { track });
+            _audioPlaylist.LoadPlaylistFromList(new List<ITrack> { track });
 
             SendNotificationMessage(NotificationMessages.AudioPlaylistLoadedNewTracks);
         }

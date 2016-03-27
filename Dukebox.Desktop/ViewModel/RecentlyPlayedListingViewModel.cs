@@ -3,7 +3,7 @@ using Dukebox.Desktop.Interfaces;
 using Dukebox.Desktop.Model;
 using Dukebox.Library;
 using Dukebox.Library.Interfaces;
-using Dukebox.Model.Services;
+using Dukebox.Library.Services;
 using GalaSoft.MvvmLight.Command;
 using System;
 using System.Collections.Generic;
@@ -18,8 +18,8 @@ namespace Dukebox.Desktop.ViewModel
         private readonly IMusicLibrary _musicLibrary;
         private readonly IAudioPlaylist _audioPlaylist;
 
-        private List<Track> _tracks;
-        private ListSearchHelper<Track> _listSearchHelper;
+        private List<ITrack> _tracks;
+        private ListSearchHelper<ITrack> _listSearchHelper;
         private string _searchText;
 
         public ICommand ClearSearch { get; private set; }
@@ -38,7 +38,7 @@ namespace Dukebox.Desktop.ViewModel
                 OnPropertyChanged("SearchText");
             }
         }
-        public List<Track> Tracks
+        public List<ITrack> Tracks
         {
             get
             {
@@ -74,22 +74,22 @@ namespace Dukebox.Desktop.ViewModel
         {
             _musicLibrary = musicLibrary;
             _audioPlaylist = audioPlaylist;
-            _tracks = new List<Track>();
+            _tracks = new List<ITrack>();
 
-            _listSearchHelper = new ListSearchHelper<Track>
+            _listSearchHelper = new ListSearchHelper<ITrack>
             {
                 Items = _tracks,
                 FilterLambda = (t, s) => t.ToString().ToLower().Contains(s.ToLower())
             };
 
             ClearSearch = new RelayCommand(() => SearchText = string.Empty);
-            LoadTrack = new RelayCommand<Track>(DoLoadTrack);
+            LoadTrack = new RelayCommand<ITrack>(DoLoadTrack);
 
             _musicLibrary.RecentlyPlayedListModified += (o, e) => RefreshRecentlyPlayedFromLibrary();
             RefreshRecentlyPlayedFromLibrary();
         }
 
-        private void DoLoadTrack(Track track)
+        private void DoLoadTrack(ITrack track)
         {
             _audioPlaylist.LoadPlaylistFromList(_tracks);
             _audioPlaylist.SkipToTrack(track);

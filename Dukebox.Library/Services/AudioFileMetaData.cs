@@ -3,7 +3,6 @@ using Dukebox.Audio.Interfaces;
 using Dukebox.Library;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
-using Dukebox.Model.Interfaces;
 using log4net;
 using org.jaudiotagger.audio;
 using org.jaudiotagger.tag;
@@ -12,7 +11,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 
-namespace Dukebox.Model.Services
+namespace Dukebox.Library.Services
 {
     /// <summary>
     /// Holds metadata on a single audio file, including track information

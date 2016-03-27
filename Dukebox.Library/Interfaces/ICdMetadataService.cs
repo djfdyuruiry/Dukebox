@@ -1,5 +1,5 @@
 ﻿using Dukebox.Library.Model;
-using Dukebox.Model.Services;
+using Dukebox.Library.Services;
 using System;
 using System.Collections.Generic;
 

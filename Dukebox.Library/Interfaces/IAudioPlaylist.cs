@@ -1,5 +1,5 @@
 ﻿using Dukebox.Library.Model;
-using Dukebox.Model.Services;
+using Dukebox.Library.Services;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -16,13 +16,13 @@ namespace Dukebox.Library.Interfaces
         bool Shuffle { get; set; }
         bool StreamingPlaylist { get; }
         bool TrackLoaded { get; }
-        ObservableCollection<Track> Tracks { get; }
-        Track CurrentlyLoadedTrack { get; }
+        ObservableCollection<ITrack> Tracks { get; }
+        ITrack CurrentlyLoadedTrack { get; }
         int LoadPlaylistFromFile(string filename);
-        int LoadPlaylistFromList(List<Track> tracks);
+        int LoadPlaylistFromList(List<ITrack> tracks);
         void ClearPlaylist();
         void SavePlaylistToFile(string filename);
-        void SkipToTrack(Track trackToPlay);
+        void SkipToTrack(ITrack trackToPlay);
         void SkipToTrack(int trackIndex);
         void StartPlaylistPlayback();
         void PausePlay();

@@ -1,4 +1,5 @@
-﻿using Dukebox.Model.Services;
+﻿using Dukebox.Library.Interfaces;
+using Dukebox.Library.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,7 @@ namespace Dukebox.Library.Model
     {
         public string DriveDirectory { get; set; }
 
-        public List<Track> CdTracks { get; set; }
+        public List<ITrack> CdTracks { get; set; }
 
         public AudioCdDriveEventArguments() : base()
         {

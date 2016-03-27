@@ -3,7 +3,7 @@ using Dukebox.Library.Config;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
 using Dukebox.Library.Services;
-using Dukebox.Model.Services;
+using Dukebox.Library.Services;
 using log4net;
 using Newtonsoft.Json;
 using System;
@@ -117,9 +117,9 @@ namespace Dukebox.Library.Repositories
             }
         }
         
-        public ObservableCollection<Track> RecentlyPlayed { get; private set; }
+        public ObservableCollection<ITrack> RecentlyPlayed { get; private set; }
 
-        public List<Track> RecentlyPlayedAsList
+        public List<ITrack> RecentlyPlayedAsList
         {
             get
             {
@@ -143,7 +143,7 @@ namespace Dukebox.Library.Repositories
             _audioFormats = audioFormats;
             _albumArtCache = albumArtCache;
 
-            RecentlyPlayed = new ObservableCollection<Track>();
+            RecentlyPlayed = new ObservableCollection<ITrack>();
             RecentlyPlayed.CollectionChanged += RecentlyPlayedChangedHander;
 
             _addAlbumMutex = new Mutex();
@@ -167,7 +167,7 @@ namespace Dukebox.Library.Repositories
         /// <param name="subDirectories">Search all sub directories in the path given?</param>
         /// <returns>A list of tracks </returns>
         /// <exception cref="Exception">If the directory lookup operation fails.</exception>
-        public List<Track> GetTracksForDirectory(string directory, bool subDirectories)
+        public List<ITrack> GetTracksForDirectory(string directory, bool subDirectories)
         {
             var searchOption = subDirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
             var supportedFormats = _audioFormats.SupportedFormats;
@@ -185,7 +185,7 @@ namespace Dukebox.Library.Repositories
         /// <param name="fileName">The file to model in the track object.</param>
         /// <param name="metadata">Optional metadata object, if you wish to build this manually.</param>
         /// <returns></returns>
-        public Track GetTrackFromFile(string fileName, AudioFileMetadata metadata = null)
+        public ITrack GetTrackFromFile(string fileName, AudioFileMetadata metadata = null)
         {
             if (!File.Exists(fileName))
             {
@@ -511,7 +511,7 @@ namespace Dukebox.Library.Repositories
             }        
         }
 
-        public void RemoveTrack (Track track)
+        public void RemoveTrack (ITrack track)
         {
             if (track == null)
             {
@@ -583,12 +583,12 @@ namespace Dukebox.Library.Repositories
 
         #region Library Lookups
         
-        public List<Track> GetTracksForArtist(artist artist)
+        public List<ITrack> GetTracksForArtist(artist artist)
         {
             return artist.songs.Select(Track.BuildTrackInstance).ToList();
         }
 
-        public List<Track> GetTracksForAlbum(album album)
+        public List<ITrack> GetTracksForAlbum(album album)
         {
             return album.songs.Select(Track.BuildTrackInstance).ToList();
         }
@@ -682,7 +682,7 @@ namespace Dukebox.Library.Repositories
         /// </summary>
         /// <param name="searchTerm">The term to search for in track descriptions.</param>
         /// <returns>A list of tracks that match the given search criteria.</returns>
-        public List<Track> SearchForTracks(string searchTerm, List<SearchAreas> searchAreas)
+        public List<ITrack> SearchForTracks(string searchTerm, List<SearchAreas> searchAreas)
         {
             var stopwatch = Stopwatch.StartNew();
 
@@ -730,15 +730,15 @@ namespace Dukebox.Library.Repositories
             logger.DebugFormat("Getting tracks by attribute(s) '{0}' where name or title contain '{1}' took {2}ms and returned {3} results.",
                 searchAreasString, searchTerm, stopwatch.ElapsedMilliseconds, matchingSongs.Count());
 
-            return matchingSongs.Count() < 1 ? new List<Track>() : matchingSongs.ToList().Select(Track.BuildTrackInstance).ToList();
+            return matchingSongs.Count() < 1 ? new List<ITrack>() : matchingSongs.ToList().Select(Track.BuildTrackInstance).ToList();
         }
 
-        public List<Track> SearchForTracksInArea(SearchAreas attribute, string nameOrTitle)
+        public List<ITrack> SearchForTracksInArea(SearchAreas attribute, string nameOrTitle)
         {
             return SearchForTracks(nameOrTitle, new List<SearchAreas> { attribute });
         }
 
-        public List<Track> GetTracksByAttributeValue(SearchAreas attribute, string nameOrTitle)
+        public List<ITrack> GetTracksByAttributeValue(SearchAreas attribute, string nameOrTitle)
         {
             var stopwatch = Stopwatch.StartNew();
 
@@ -772,7 +772,7 @@ namespace Dukebox.Library.Repositories
             logger.DebugFormat("Getting tracks by attribute(s) '{0}' where name or title equal '{1}' took {2}ms and returned {3} results.",
                 attribute, nameOrTitle, stopwatch.ElapsedMilliseconds, matchingSongs.Count());
 
-            return matchingSongs.Count() < 1 ? new List<Track>() : matchingSongs.ToList().Select(Track.BuildTrackInstance).ToList();
+            return matchingSongs.Count() < 1 ? new List<ITrack>() : matchingSongs.ToList().Select(Track.BuildTrackInstance).ToList();
         }
 
         /// <summary>
@@ -782,7 +782,7 @@ namespace Dukebox.Library.Repositories
         /// <param name="attribute">The attribute type to select.</param>
         /// <param name="attributeId">The id of the attribute.</param>
         /// <returns>A list of tracks that match the given attribute keypair.</returns>
-        public List<Track> GetTracksByAttributeId(SearchAreas attribute, long attributeId)
+        public List<ITrack> GetTracksByAttributeId(SearchAreas attribute, long attributeId)
         {
             var stopwatch = Stopwatch.StartNew();
 
@@ -823,7 +823,7 @@ namespace Dukebox.Library.Repositories
             logger.DebugFormat("Getting tracks by attribute {0} and value {1} took {2}ms and returned {3} results.", 
                 Enum.GetName(typeof(SearchAreas), attribute), attributeId, stopwatch.ElapsedMilliseconds, matchingSongs.Count());
 
-            return matchingSongs.Count() < 1 ? new List<Track>() : matchingSongs.Select(Track.BuildTrackInstance).ToList();
+            return matchingSongs.Count() < 1 ? new List<ITrack>() : matchingSongs.Select(Track.BuildTrackInstance).ToList();
         }
 
         private IEnumerable<long> GetMatchingAttributeIds(SearchAreas attribute, string searchTerm, bool exactMatch = false)

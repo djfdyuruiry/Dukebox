@@ -1,6 +1,7 @@
 ﻿using Dukebox.Desktop.Model;
 using Dukebox.Desktop.ViewModel;
-using Dukebox.Model.Services;
+using Dukebox.Library.Interfaces;
+using Dukebox.Library.Services;
 using System;
 using System.Collections.Generic;
 using System.Windows.Input;
@@ -9,7 +10,7 @@ namespace Dukebox.Desktop.Interfaces
 {
     public interface ITrackListingViewModel : ISearchControlViewModel
     {
-        List<Track> Tracks { get; }
+        List<ITrack> Tracks { get; }
         bool EditingListingsDisabled { get; }
         ICommand LoadTrack { get; }
     }

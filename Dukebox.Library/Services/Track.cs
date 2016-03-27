@@ -11,13 +11,13 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Dukebox.Model.Services
+namespace Dukebox.Library.Services
 {
     /// <summary>
     /// An audio track, with source information and
     /// metadata properties.
     /// </summary>
-    public class Track : IEqualityComparer
+    public class Track : ITrack
     {
         private static readonly ILog logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -113,14 +113,14 @@ namespace Dukebox.Model.Services
             }
         }
 
-        public static Track BuildTrackInstance(song song)
+        public static ITrack BuildTrackInstance(song song)
         {
             if (song == null)
             {
                 throw new ArgumentException("Cannot build track instance with a null song instance");
             }
 
-            var track = LibraryPackage.GetInstance<Track>();
+            var track = LibraryPackage.GetInstance<ITrack>();
 
             track.Album = song.album ?? new album { id = -1 };
             track.Artist = song.artist ?? new artist { id = -1 };
@@ -175,8 +175,8 @@ namespace Dukebox.Model.Services
         /// <returns>Are the two parameter tracks equal?</returns>
         bool IEqualityComparer.Equals(object x, object y)
         {
-            Track a = (Track)x;
-            Track b = (Track)y;
+            ITrack a = (ITrack)x;
+            ITrack b = (ITrack)y;
 
             return a.Song.id == b.Song.id;
         }
@@ -189,7 +189,7 @@ namespace Dukebox.Model.Services
         /// <returns>The hashcode for this track.</returns>
         public int GetHashCode(object obj)
         {
-            Track trackObj = (Track)obj;
+            ITrack trackObj = (ITrack)obj;
 
             return (int)trackObj.Song.id;
         }

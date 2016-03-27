@@ -5,7 +5,7 @@ using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model.Services;
 using Dukebox.Library.Repositories;
 using Dukebox.Library.Services;
-using Dukebox.Model.Services;
+using Dukebox.Library.Services;
 using log4net;
 using SimpleInjector;
 using SimpleInjector.Packaging;
@@ -29,13 +29,13 @@ namespace Dukebox.Library
         private static void Configure(Container container)
         {
             container.RegisterSingleton<IDukeboxSettings, DukeboxSettings>();
-            container.RegisterSingleton<IAlbumArtCacheService>(() => GetAlbumArtCacheServiceInstance(container));
+            container.RegisterSingleton(() => GetAlbumArtCacheServiceInstance(container));
             container.RegisterSingleton<ICdMetadataService, CdMetadataService>();
             container.RegisterSingleton<IAudioCdRippingService, AudioCdRippingService>();
             container.RegisterSingleton<IAudioPlaylist, AudioPlaylist>();
-            container.RegisterSingleton<IMusicLibrary>(() => GetMusicLibraryInstance(container));
+            container.RegisterSingleton(() => GetMusicLibraryInstance(container));
             container.RegisterSingleton<IAudioCdDriveMonitoringService, AudioCdDriveMonitoringService>();
-            container.Register<Track>();
+            container.Register<ITrack, Track>();
             container.Register<AudioFileMetadata>();
 
             var assemblies = new List<Assembly> {Assembly.GetAssembly(typeof(AudioPackage))};

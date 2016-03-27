@@ -1,6 +1,6 @@
 ﻿using System.Drawing;
 
-namespace Dukebox.Model.Interfaces
+namespace Dukebox.Library.Interfaces
 {
     public interface IAudioFileMetaData
     {
@@ -11,7 +11,6 @@ namespace Dukebox.Model.Interfaces
         bool HasFutherMetadataTag { get; }
         int Length { get; }
         string Title { get; set; }
-
         void CommitChangesToFile();
     }
 }
