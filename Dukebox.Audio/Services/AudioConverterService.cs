@@ -28,8 +28,8 @@ namespace Dukebox.Audio.Services
             EncoderLAME lameEncoder = new EncoderLAME(0);
             lameEncoder.EncoderDirectory = Dukebox.Audio.Properties.Settings.Default.lameEncoderPath;
 
-            lameEncoder.InputFile = @cdaFileName;
-            lameEncoder.OutputFile = @mp3OutFile;
+            lameEncoder.InputFile = cdaFileName;
+            lameEncoder.OutputFile = Path.GetFullPath(mp3OutFile);
 
             await Task.Run(() =>
             {

@@ -94,11 +94,6 @@ namespace Dukebox.Library.Services
         {
             get
             {
-                if (_metadata == null)
-                {
-                    _metadata = AudioFileMetadata.BuildAudioFileMetaData(Song.filename, Album.id);
-                }
-
                 return _metadata;
             }
             set
@@ -109,7 +104,7 @@ namespace Dukebox.Library.Services
                 }
                 else
                 {
-                    throw new InvalidOperationException("Can only manually set the property 'Metadata' if the song is not stored in the database!");
+                    throw new InvalidOperationException("Can't manually set the property 'Metadata' because this song's metadata is maintained in the database");
                 }
             }
         }
@@ -121,13 +116,32 @@ namespace Dukebox.Library.Services
                 throw new ArgumentException("Cannot build track instance with a null song instance");
             }
 
-            var track = LibraryPackage.GetInstance<ITrack>();
+            var track = LibraryPackage.GetInstance<ITrack>() as Track;
 
-            track.Album = song.album ?? new Album { id = -1 };
-            track.Artist = song.artist ?? new Artist { id = -1 };
+            track._album = song.album ?? new Album { id = -1 };
+            track._artist = song.artist ?? new Artist { id = -1 };
             track.Song = song;
 
-            return track;
+            return track as ITrack;
+        }
+
+        public static ITrack BuildTrackInstance(string fileName, IAudioFileMetadata audioFileMetadata = null)
+        {
+            if (string.IsNullOrEmpty(fileName))
+            {
+                throw new ArgumentException("Cannot build track instance with a null or empty file name");
+            }
+
+            var song = new Song() { id = -1, albumId = -1, artistId = -1, filename = fileName };             
+            var track = BuildTrackInstance(song) as Track;
+            
+            track.Metadata = audioFileMetadata ?? AudioFileMetadata.BuildAudioFileMetaData(fileName);
+            
+            track.Song.title = track.Metadata.Title;
+            track._album.name = track.Metadata.Album;
+            track._artist.name = track.Metadata.Artist;
+
+            return track as ITrack;
         }
 
         public Track(IDukeboxSettings settings, IMusicLibrary musicLibrary)
