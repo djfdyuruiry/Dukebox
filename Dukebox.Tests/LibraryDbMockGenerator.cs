@@ -15,6 +15,7 @@ namespace Dukebox.Tests
 {
     public class LibraryDbMockGenerator
     {
+        private static bool containerModified;
         public static readonly string Mp3FilePath = Path.Combine(Directory.GetCurrentDirectory(), "sample.mp3");
 
         public readonly List<Album> Albums = new List<Album>
@@ -50,13 +51,15 @@ namespace Dukebox.Tests
         {
             DbContextMock = A.Fake<IMusicLibraryDbContext>();
 
-            if (overrideLibraryPackage)
+            if (overrideLibraryPackage && !containerModified)
             {
                 LibraryPackage.ExecutingForUnitTests = true;
                 var libraryContainer = LibraryPackage.GetContainerForTestOverrides();
 
                 libraryContainer.Options.AllowOverridingRegistrations = true;
                 libraryContainer.RegisterSingleton<IMusicLibraryDbContext>(DbContextMock);
+
+                containerModified = true;
             }
 
             Songs = new List<Song>();
