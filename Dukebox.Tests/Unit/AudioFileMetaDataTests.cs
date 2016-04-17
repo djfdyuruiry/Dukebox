@@ -1,10 +1,10 @@
-﻿using Dukebox.Library.Services;
-using System.Drawing;
+﻿using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using Xunit;
+using Dukebox.Library.Services;
 
-namespace Dukebox.Tests
+namespace Dukebox.Tests.Unit
 {
     public class AudioFileMetaDataTests
     {

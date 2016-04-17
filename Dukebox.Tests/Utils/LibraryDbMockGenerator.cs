@@ -2,16 +2,13 @@
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
 using FakeItEasy;
-using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Dukebox.Tests
+namespace Dukebox.Tests.Utils
 {
     public class LibraryDbMockGenerator
     {

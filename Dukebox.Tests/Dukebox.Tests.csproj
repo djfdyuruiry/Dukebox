@@ -91,16 +91,16 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
-    <Compile Include="AlbumArtCacheServiceTests.cs" />
-    <Compile Include="AudioCdRippingServiceTests.cs" />
-    <Compile Include="AudioCdServiceTests.cs" />
-    <Compile Include="AudioCdTestConstants.cs" />
-    <Compile Include="AudioConverterServiceTests.cs" />
-    <Compile Include="AudioFileMetaDataTests.cs" />
-    <Compile Include="BassLoader.cs" />
-    <Compile Include="CdMetadataServiceTests.cs" />
-    <Compile Include="LibraryDbMockGenerator.cs" />
-    <Compile Include="MusicLibraryTests.cs" />
+    <Compile Include="Unit\AlbumArtCacheServiceTests.cs" />
+    <Compile Include="Integration\AudioCdRippingServiceTests.cs" />
+    <Compile Include="Integration\AudioCdServiceTests.cs" />
+    <Compile Include="Utils\AudioCdTestConstants.cs" />
+    <Compile Include="Integration\AudioConverterServiceTests.cs" />
+    <Compile Include="Unit\AudioFileMetaDataTests.cs" />
+    <Compile Include="Utils\BassLoader.cs" />
+    <Compile Include="Integration\CdMetadataServiceTests.cs" />
+    <Compile Include="Utils\LibraryDbMockGenerator.cs" />
+    <Compile Include="Unit\MusicLibraryTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -1,14 +1,14 @@
-﻿using Dukebox.Audio;
-using Dukebox.Library;
-using Dukebox.Library.Interfaces;
-using Dukebox.Library.Repositories;
-using FakeItEasy;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FakeItEasy;
 using Xunit;
+using Dukebox.Audio;
+using Dukebox.Library.Interfaces;
+using Dukebox.Library.Repositories;
+using Dukebox.Tests.Utils;
 
-namespace Dukebox.Tests
+namespace Dukebox.Tests.Unit
 {
     
     public class MusicLibraryTests

@@ -1,16 +1,15 @@
-﻿using Dukebox.Audio.Interfaces;
-using Dukebox.Audio.Services;
-using Dukebox.Library.Interfaces;
-using Dukebox.Library.Services;
-using Dukebox.Library.Services;
-using FakeItEasy;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using FakeItEasy;
 using Xunit;
+using Dukebox.Audio.Services;
+using Dukebox.Library.Interfaces;
+using Dukebox.Library.Services;
+using Dukebox.Tests.Utils;
 
-namespace Dukebox.Tests
+namespace Dukebox.Tests.Integration
 {
     public class AudioCdRippingServiceTests
     {
