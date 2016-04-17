@@ -1,9 +1,10 @@
-﻿using Dukebox.Audio.Services;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
 using Xunit;
+using Dukebox.Audio.Services;
+using Dukebox.Tests.Utils;
 
-namespace Dukebox.Tests
+namespace Dukebox.Tests.Integration
 {
     public class AudioConverterServiceTests
     {

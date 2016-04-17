@@ -1,18 +1,16 @@
-﻿using Dukebox.Library;
-using Dukebox.Library.Interfaces;
-using Dukebox.Library.Services;
-using Dukebox.Library.Interfaces;
-using FakeItEasy;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using FakeItEasy;
 using Xunit;
 using Dukebox.Library.Model;
+using Dukebox.Library.Interfaces;
+using Dukebox.Library.Services;
 
-namespace Dukebox.Tests
+namespace Dukebox.Tests.Unit
 {
     public class AlbumArtCacheServiceTests
     {

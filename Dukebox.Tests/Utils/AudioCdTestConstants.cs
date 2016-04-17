@@ -1,4 +1,4 @@
-﻿namespace Dukebox.Tests
+﻿namespace Dukebox.Tests.Utils
 {
     public static class AudioCdTestConstants
     {

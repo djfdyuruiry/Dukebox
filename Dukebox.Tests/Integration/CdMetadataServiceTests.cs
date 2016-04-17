@@ -1,12 +1,13 @@
-﻿using Dukebox.Audio.Interfaces;
+﻿using System.IO;
+using System.Linq;
+using FakeItEasy;
+using Xunit;
+using Dukebox.Audio.Interfaces;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Services;
-using FakeItEasy;
-using System.IO;
-using System.Linq;
-using Xunit;
+using Dukebox.Tests.Utils;
 
-namespace Dukebox.Tests
+namespace Dukebox.Tests.Integration
 {
     public class CdMetadataServiceTests
     {

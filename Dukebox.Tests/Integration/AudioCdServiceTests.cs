@@ -1,7 +1,8 @@
-﻿using Dukebox.Audio.Services;
-using Xunit;
+﻿using Xunit;
+using Dukebox.Audio.Services;
+using Dukebox.Tests.Utils;
 
-namespace Dukebox.Tests
+namespace Dukebox.Tests.Integration
 {
     public class AudioCdServiceTests
     {

@@ -1,12 +1,10 @@
 ﻿using Dukebox.Audio;
 using Dukebox.Library.Config;
 using Dukebox.Library.Helper;
-using Dukebox.Library.Interfaces;
-using FakeItEasy;
 using System;
 using System.Diagnostics;
 
-namespace Dukebox.Tests
+namespace Dukebox.Tests.Utils
 {
     public class BassLoader
     {
