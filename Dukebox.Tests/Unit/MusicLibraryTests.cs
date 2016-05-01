@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using FakeItEasy;
 using Xunit;
@@ -7,6 +8,7 @@ using Dukebox.Audio;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Repositories;
 using Dukebox.Tests.Utils;
+using Dukebox.Library.Model;
 
 namespace Dukebox.Tests.Unit
 {
@@ -197,13 +199,52 @@ namespace Dukebox.Tests.Unit
         [Fact]
         public void AddDirectory()
         {
+            var numSamples = 5;
+            Directory.CreateDirectory("samples");
+
+            for (var i = 0; i < numSamples; i++)
+            {
+                File.Copy("sample.mp3", string.Format("samples/sample{0}.mp3", i), true);
+            }
+
+            _musicLibrary.AddDirectory("samples", false, null, null);
+
+            var tracks = _musicLibrary.SearchForTracks("samples", new List<SearchAreas> { SearchAreas.Filename });
+            var tracksReturned = tracks.Any();
+
+            Assert.True(tracksReturned, "Music library failed to return any tracks after adding directory");
+
+            var trackAreCorrect = tracks.All(t => t.Song.title == "sample title") && tracks.Count == 5;
+
+            Assert.True(trackAreCorrect, "Music library failed to return correct tracks after adding directory");
 
         }
 
         [Fact]
         public void AddFile()
         {
+            var sampleFileName = "new_sample.mp3";
+            var songTitle = "Unique Song Title $%3£$";
 
+            File.Copy("sample.mp3", sampleFileName, true);
+
+            var trackFile = new FileInfo(sampleFileName);
+            var audioMetadata = A.Fake<IAudioFileMetadata>();
+            
+            A.CallTo(() => audioMetadata.Title).Returns(songTitle);
+            A.CallTo(() => audioMetadata.HasFutherMetadataTag).Returns(false);
+
+            _musicLibrary.AddFile(trackFile.FullName, audioMetadata);
+
+            var tracks = _musicLibrary.SearchForTracks(songTitle, new List<SearchAreas> { SearchAreas.Song });
+            var tracksReturned = tracks.Any();
+
+            Assert.True(tracksReturned, "Music library failed to return any tracks after adding new track");
+
+            var track = tracks.First();
+            var trackIsCorrect = track.Song.filename == trackFile.FullName;
+
+            Assert.True(trackIsCorrect, "Music library failed to return correct track after adding new track");
         }
 
         [Fact]
