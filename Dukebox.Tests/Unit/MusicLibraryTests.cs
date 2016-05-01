@@ -258,7 +258,7 @@ namespace Dukebox.Tests.Unit
 
             _musicLibrary.AddPlaylistFile(jplFileName);
 
-            var tracks = _musicLibrary.SearchForTracks("samples", new List<SearchAreas> { SearchAreas.Filename });
+            var tracks = _musicLibrary.SearchForTracksInArea(SearchAreas.Filename, "samples");
             var tracksReturned = tracks.Any();
 
             Assert.True(tracksReturned, "Music library failed to return any tracks after adding playlist");
@@ -292,7 +292,15 @@ namespace Dukebox.Tests.Unit
         [Fact]
         public void RemoveTrack()
         {
+            var tracks = _musicLibrary.SearchForTracks("wish you were here", new List<SearchAreas> { SearchAreas.Song });
+            var track = tracks.First();
 
+            _musicLibrary.RemoveTrack(track);
+
+            tracks = _musicLibrary.GetTracksByAttributeId(SearchAreas.Song, track.Song.id);
+            var trackDeleted = !tracks.Any();
+
+            Assert.True(trackDeleted, "Music library failed to delete track");
         }
 
         private List<string> PrepareSamplesDirectory(string directoryName = "samples", int numSamples = 5)
