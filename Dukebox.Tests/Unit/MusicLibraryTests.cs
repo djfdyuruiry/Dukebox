@@ -9,6 +9,7 @@ using Dukebox.Library.Interfaces;
 using Dukebox.Library.Repositories;
 using Dukebox.Tests.Utils;
 using Dukebox.Library.Model;
+using Newtonsoft.Json;
 
 namespace Dukebox.Tests.Unit
 {
@@ -200,13 +201,8 @@ namespace Dukebox.Tests.Unit
         public void AddDirectory()
         {
             var numSamples = 5;
-            Directory.CreateDirectory("samples");
 
-            for (var i = 0; i < numSamples; i++)
-            {
-                File.Copy("sample.mp3", string.Format("samples/sample{0}.mp3", i), true);
-            }
-
+            PrepareSamplesDirectory("samples", numSamples);
             _musicLibrary.AddDirectory("samples", false, null, null);
 
             var tracks = _musicLibrary.SearchForTracks("samples", new List<SearchAreas> { SearchAreas.Filename });
@@ -214,7 +210,7 @@ namespace Dukebox.Tests.Unit
 
             Assert.True(tracksReturned, "Music library failed to return any tracks after adding directory");
 
-            var trackAreCorrect = tracks.All(t => t.Song.title == "sample title") && tracks.Count == 5;
+            var trackAreCorrect = tracks.All(t => t.Song.title == "sample title") && tracks.Count == numSamples;
 
             Assert.True(trackAreCorrect, "Music library failed to return correct tracks after adding directory");
 
@@ -248,15 +244,71 @@ namespace Dukebox.Tests.Unit
         }
 
         [Fact]
+        public void AddPlaylistFile()
+        {
+            var jplFileName = "sample_playlist.jpl";
+            var numSamples = 5;
+
+            var files = PrepareSamplesDirectory("samples", numSamples);
+
+            var jplJson = JsonConvert.SerializeObject(files);
+
+            File.Delete(jplFileName);
+            File.WriteAllText(jplFileName, jplJson);
+
+            _musicLibrary.AddPlaylistFile(jplFileName);
+
+            var tracks = _musicLibrary.SearchForTracks("samples", new List<SearchAreas> { SearchAreas.Filename });
+            var tracksReturned = tracks.Any();
+
+            Assert.True(tracksReturned, "Music library failed to return any tracks after adding playlist");
+
+            var trackAreCorrect = tracks.All(t => t.Song.title == "sample title") && tracks.Count == numSamples;
+
+            Assert.True(trackAreCorrect, "Music library failed to return correct tracks after adding playlist");
+        }
+
+        [Fact]
         public void AddPlaylist()
         {
+            var playlistName = "magical music";
+            var files = new List<string> { "samples/music.mp3", "samples/music1.mp3", "samples/music2.mp3", "samples/music3.mp3" };
+            var maxPlaylistId = _musicLibrary.OrderedPlaylists.Max(p => p.id);
 
+            _musicLibrary.AddPlaylist(playlistName, files);
+
+            var playlist = _musicLibrary.OrderedPlaylists.FirstOrDefault(p => p.name == playlistName);
+            var playlistReturned = playlist != null;
+
+            Assert.True(playlistReturned, "Music library failed to add playlist");
+
+            var playlistFileNames = playlist.Files;
+            var foundFilesInPlaylist = files.Where(f => playlistFileNames.Any(pf => pf.Contains(f)));
+            var allFilesInPlaylist = foundFilesInPlaylist.Count() == files.Count;
+
+            Assert.True(allFilesInPlaylist, "Music library failed to store all files for playlist");
         }
 
         [Fact]
         public void RemoveTrack()
         {
 
+        }
+
+        private List<string> PrepareSamplesDirectory(string directoryName = "samples", int numSamples = 5)
+        {
+            var files = new List<string>();
+            Directory.CreateDirectory(directoryName);
+
+            for (var i = 0; i < numSamples; i++)
+            {
+                var newFilePath = string.Format("samples/sample{0}.mp3", i);
+
+                File.Copy("sample.mp3", newFilePath, true);
+                files.Add(newFilePath);
+            }
+
+            return files;
         }
     }
 }
