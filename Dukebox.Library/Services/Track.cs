@@ -1,16 +1,9 @@
-﻿using Dukebox.Library;
-using Dukebox.Library.Config;
+﻿using System;
+using System.Collections;
+using System.Reflection;
+using log4net;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
-using Dukebox.Library.Repositories;
-using log4net;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Dukebox.Library.Services
 {
@@ -27,15 +20,9 @@ namespace Dukebox.Library.Services
         private IAudioFileMetadata _metadata;
         private Album _album;
         private Artist _artist;
-
-        /// <summary>
-        /// Details specific to track file.
-        /// </summary>
+        
         public Song Song { get; set; }
-
-        /// <summary>
-        /// Associated artist information and accessor.
-        /// </summary>
+        
         public Artist Artist
         {
             get
@@ -59,10 +46,7 @@ namespace Dukebox.Library.Services
                 }
             }
         }
-
-        /// <summary>
-        /// Associated album information and accessor.
-        /// </summary>
+        
         public Album Album
         {
             get
@@ -86,10 +70,7 @@ namespace Dukebox.Library.Services
                 }
             }
         }
-
-        /// <summary>
-        /// Metadata information and accessor.
-        /// </summary>
+        
         public IAudioFileMetadata Metadata 
         {
             get
@@ -150,10 +131,6 @@ namespace Dukebox.Library.Services
             _musicLibrary = musicLibrary;
         }
 
-        /// <summary>
-        /// Audio track information in "$artist - $title" format.
-        /// </summary>
-        /// <returns>A string describing this audio track.</returns>
         public override string ToString()
         {
             var trackFormat = _settings.TrackDisplayFormat.ToLower();
@@ -181,32 +158,22 @@ namespace Dukebox.Library.Services
 
             return trackFormat;
         }
-
-        /// <summary>
-        /// Whether the tracks have the database song id.
-        /// </summary>
-        /// <param name="x">Track one.</param>
-        /// <param name="y">Track two.</param>
-        /// <returns>Are the two parameter tracks equal?</returns>
-        bool IEqualityComparer.Equals(object x, object y)
+        
+        public override bool Equals(object otherTrack)
         {
-            ITrack a = (ITrack)x;
-            ITrack b = (ITrack)y;
+            var otherTrackObj = otherTrack as ITrack;
 
-            return a.Song.id == b.Song.id;
+            if (otherTrackObj == null)
+            {
+                return false;
+            }
+
+            return GetHashCode() == otherTrack.GetHashCode();
         }
 
-        /// <summary>
-        /// Return the id of the song id in the database
-        ///  for a track object as the hashcode.
-        /// </summary>
-        /// <param name="obj">The track object to extract id from.</param>
-        /// <returns>The hashcode for this track.</returns>
-        public int GetHashCode(object obj)
+        public override int GetHashCode()
         {
-            ITrack trackObj = (ITrack)obj;
-
-            return (int)trackObj.Song.id;
+            return (int)Song.id;
         }
     }
 }
