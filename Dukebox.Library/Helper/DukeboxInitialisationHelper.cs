@@ -91,7 +91,7 @@ namespace Dukebox.Library.Helper
             }
             catch (Exception ex)
             {
-                logger.Warn("Could not preload Dukebox assemblies.");
+                logger.Error("Could not preload Dukebox assemblies.");
                 throw;
             }
         }
