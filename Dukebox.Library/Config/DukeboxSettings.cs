@@ -15,10 +15,10 @@ namespace Dukebox.Library.Config
         // Fetch the settings object from foreign assembly.
         private KeyValueConfigurationCollection _settings;
 
-        public DukeboxSettings()
+        public DukeboxSettings(string settingsFileName = @"Dukebox.exe.Config")
         {
             var configMap = new ExeConfigurationFileMap();
-            configMap.ExeConfigFilename = @"Dukebox.exe.Config";
+            configMap.ExeConfigFilename = settingsFileName;
 
             var config = ConfigurationManager.OpenMappedExeConfiguration(configMap, ConfigurationUserLevel.None);
             _settings = config.AppSettings.Settings;
