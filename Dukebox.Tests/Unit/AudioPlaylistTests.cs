@@ -142,7 +142,7 @@ namespace Dukebox.Tests.Unit
             _audioPlaylist.StartPlaylistPlayback();
             _audioPlaylist.Stop();
 
-            _audioPlaylist.WaitForPlaybackToFinish();
+            _audioPlaylist.StopPlaylistPlayback();
 
             A.CallTo(() => _mediaPlayer.StopAudio()).MustHaveHappened();
         }
