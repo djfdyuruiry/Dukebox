@@ -1,18 +1,15 @@
-﻿using Dukebox.Audio;
-using Dukebox.Audio.Interfaces;
-using Dukebox.Audio.Model;
-using Dukebox.Library;
-using Dukebox.Library.Interfaces;
-using Dukebox.Library.Model;
-using Dukebox.Library.Repositories;
-using log4net;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using log4net;
+using Newtonsoft.Json;
+using Dukebox.Audio.Interfaces;
+using Dukebox.Audio.Model;
+using Dukebox.Library.Interfaces;
+using Dukebox.Library.Model;
 
 namespace Dukebox.Library.Services
 {
@@ -311,6 +308,7 @@ namespace Dukebox.Library.Services
                     return;
                 }
 
+                // WTF does this even do...
                 while (GetCurrentTrackIndex() != 0)
                 {
                     Thread.Sleep(10);
@@ -364,8 +362,8 @@ namespace Dukebox.Library.Services
                 var currentTrack = Tracks[GetCurrentTrackIndex()];
                 var mediaPlayMetadata = new MediaPlayerMetadata
                 {
-                    AlbumName = currentTrack.Album.name,
-                    ArtistName = currentTrack.Artist.name,
+                    AlbumName = currentTrack.Album?.name,
+                    ArtistName = currentTrack.Artist?.name,
                     TrackName = currentTrack.Song.title
                 };
 
@@ -504,13 +502,21 @@ namespace Dukebox.Library.Services
         /// Export a JSON playlist file ('.jpl') that represents
         /// the current list of tracks loaded.
         /// </summary>
-        public void SavePlaylistToFile(string filename)
+        public void SavePlaylistToFile(string filename, bool overwriteFile = false)
         {
-            string jsonTracks = JsonConvert.SerializeObject(Tracks.Select(t => t.Song.filename).ToList());
-            StreamWriter playlistFile = new StreamWriter(filename, false);
+            if (File.Exists(filename) && !overwriteFile)
+            {
+                return;
+            }
 
-            playlistFile.Write(jsonTracks);
-            playlistFile.Close();
+            var jsonTracks = JsonConvert.SerializeObject(Tracks.Select(t => t.Song.filename).ToList());
+
+            File.WriteAllText(filename, jsonTracks);             
+        }
+
+        public void WaitForPlaybackToFinish()
+        {
+            _playlistManagerThread?.Join();
         }
 
         /// <summary>
