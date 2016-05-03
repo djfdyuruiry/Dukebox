@@ -21,7 +21,7 @@ namespace Dukebox.Library.Interfaces
         int LoadPlaylistFromFile(string filename);
         int LoadPlaylistFromList(List<ITrack> tracks);
         void ClearPlaylist();
-        void SavePlaylistToFile(string filename);
+        void SavePlaylistToFile(string filename, bool overwriteFile = false);
         void SkipToTrack(ITrack trackToPlay);
         void SkipToTrack(int trackIndex);
         void StartPlaylistPlayback();
@@ -31,5 +31,6 @@ namespace Dukebox.Library.Interfaces
         void Forward();
         int GetCurrentTrackIndex();
         void StopPlaylistPlayback();
+        void WaitForPlaybackToFinish();
     }
 }
