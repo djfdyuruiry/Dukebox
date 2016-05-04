@@ -75,6 +75,11 @@ namespace Dukebox.Library.Services
         {
             get
             {
+                if (_metadata == null)
+                {
+                    _metadata = AudioFileMetadata.BuildAudioFileMetaData(Song.filename);
+                }
+
                 return _metadata;
             }
             set
@@ -115,8 +120,6 @@ namespace Dukebox.Library.Services
 
             var song = new Song() { id = -1, albumId = -1, artistId = -1, filename = fileName };             
             var track = BuildTrackInstance(song) as Track;
-            
-            track.Metadata = audioFileMetadata ?? AudioFileMetadata.BuildAudioFileMetaData(fileName);
             
             track.Song.title = track.Metadata.Title;
             track._album.name = track.Metadata.Album;

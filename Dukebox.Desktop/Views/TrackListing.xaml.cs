@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Dukebox.Desktop.Interfaces;
+using Dukebox.Library.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,6 +24,18 @@ namespace Dukebox.Desktop.Views
         public TrackListing()
         {
             InitializeComponent();
+        }
+        private void TrackListingRowDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            var row = sender as DataGridRow;
+
+            if (row != null)
+            {
+                var item = row.Item;
+                var trackListingViewModel = DataContext as ITrackListingViewModel;
+
+                trackListingViewModel?.LoadTrack?.Execute(item);
+            }
         }
     }
 }
