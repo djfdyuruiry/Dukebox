@@ -13,13 +13,7 @@
     <UserControl.Resources>
         <DataTemplate DataType="{x:Type DukeboxLibrary:Artist}">
             <StackPanel Name="Artist">
-                <Image Width="auto" Height="auto" Source="{Binding ElementName=Artist, Path=DataContext, Converter={StaticResource ArtistToThumbnailConverter}}">
-                    <Image.InputBindings>
-                        <MouseBinding MouseAction="LeftDoubleClick" 
-                                      Command="{Binding LoadArtist}" 
-                                      CommandParameter="{Binding Data}"/>
-                    </Image.InputBindings>
-                </Image>
+                <Image Width="auto" Height="auto" Source="{Binding ElementName=Artist, Path=DataContext, Converter={StaticResource ArtistToThumbnailConverter}}"/>
                 <TextBlock HorizontalAlignment="center" Text="{Binding name}"/>
             </StackPanel>
         </DataTemplate>
@@ -36,7 +30,7 @@
                                     Grid.Column="0" 
                                     DataContext="{Binding ElementName=ArtistListingControl, Path=DataContext}">
         </DukeboxViews:SearchControl>
-        <ListBox Grid.Row="1" Grid.Column="0" ItemsSource="{Binding Artists}">
+        <ListBox Grid.Row="1" Grid.Column="0" ItemsSource="{Binding Artists}" MouseDoubleClick="ListBox_MouseDoubleClick">
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
                     <UniformGrid IsItemsHost="True"/>
