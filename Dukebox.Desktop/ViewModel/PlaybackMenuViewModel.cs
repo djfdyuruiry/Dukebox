@@ -29,7 +29,7 @@ namespace Dukebox.Desktop.ViewModel
             {
                 return _shuffleOn;
             }
-            private set
+            set
             {
                 _shuffleOn = value;
                 OnPropertyChanged("ShuffleOn");
@@ -43,7 +43,7 @@ namespace Dukebox.Desktop.ViewModel
             {
                 return _repeatOn;
             }
-            private set
+            set
             {
                 _repeatOn = value;
                 OnPropertyChanged("RepeatOn");
@@ -57,7 +57,7 @@ namespace Dukebox.Desktop.ViewModel
             {
                 return _repeatAllOn;
             }
-            private set
+            set
             {
                 _repeatAllOn = value;
                 OnPropertyChanged("RepeatAllOn");

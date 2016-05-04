@@ -1,16 +1,10 @@
-﻿using Dukebox.Desktop.Helper;
+﻿using System.Collections.Generic;
+using System.Windows.Input;
+using GalaSoft.MvvmLight.Command;
 using Dukebox.Desktop.Interfaces;
 using Dukebox.Desktop.Model;
-using Dukebox.Library;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
-using Dukebox.Library.Services;
-using GalaSoft.MvvmLight.Command;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows.Input;
 
 namespace Dukebox.Desktop.ViewModel
 {

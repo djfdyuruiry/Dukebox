@@ -32,10 +32,12 @@
                   SelectionMode="Single"
                   SelectionUnit="FullRow"
                   Name="TrackListingsGrid"
-                  ItemsSource="{Binding Tracks}">
+                  ItemsSource="{Binding Tracks}"
+                  IsSynchronizedWithCurrentItem="True">
             <DataGrid.RowStyle>
                 <Style TargetType="DataGridRow">
                     <Setter Property="Margin" Value="1"></Setter>
+                    <EventSetter Event="MouseDoubleClick" Handler="TrackListingRowDoubleClick"/>
                 </Style>
             </DataGrid.RowStyle>
             <DataGrid.CellStyle>
@@ -48,11 +50,6 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Artist.name}">
-                                <TextBlock.InputBindings>
-                                    <MouseBinding MouseAction="LeftDoubleClick"
-                                                  Command="{Binding LoadTrack}"
-                                                  CommandParameter="{Binding ElementName=TrackListingsGrid, Path=SelectedItem}"/>
-                                </TextBlock.InputBindings>
                             </TextBlock> 
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -61,11 +58,6 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Album.name}">
-                                <TextBlock.InputBindings>
-                                    <MouseBinding MouseAction="LeftDoubleClick"
-                                                  Command="{Binding LoadTrack}"
-                                                  CommandParameter="{Binding ElementName=TrackListingsGrid, Path=SelectedItem}"/>
-                                </TextBlock.InputBindings>
                             </TextBlock>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -74,11 +66,6 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Song.title}">
-                                <TextBlock.InputBindings>
-                                    <MouseBinding MouseAction="LeftDoubleClick"
-                                                  Command="{Binding LoadTrack}"
-                                                  CommandParameter="{Binding ElementName=TrackListingsGrid, Path=SelectedItem}"/>
-                                </TextBlock.InputBindings>
                             </TextBlock>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>

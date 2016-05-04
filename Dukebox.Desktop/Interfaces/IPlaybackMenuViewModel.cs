@@ -8,8 +8,8 @@ namespace Dukebox.Desktop.Interfaces
         ICommand Repeat { get; }
         ICommand RepeatAll { get; }
         ICommand Shuffle { get; }
-        bool ShuffleOn { get; }
-        bool RepeatOn { get; }
-        bool RepeatAllOn { get; }
+        bool ShuffleOn { get; set; }
+        bool RepeatOn { get; set; }
+        bool RepeatAllOn { get; set; }
     }
 }
