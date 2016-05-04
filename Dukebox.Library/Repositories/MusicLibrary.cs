@@ -223,7 +223,8 @@ namespace Dukebox.Library.Repositories
 
             // For each set of 5 files, create a new thread
             // which processes the metadata of those 
-            filesToAdd.AsParallel().WithDegreeOfParallelism(concurrencyLimit).ForAll(file =>
+            //filesToAdd.AsParallel().WithDegreeOfParallelism(concurrencyLimit).ForAll(file =>
+            filesToAdd.ToList().ForEach(file =>
             {
                 try
                 {
