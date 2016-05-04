@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Dukebox.Desktop.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,6 +23,19 @@ namespace Dukebox.Desktop.Views
         public ArtistListing()
         {
             InitializeComponent();
+        }
+
+        private void ListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            var listBox = sender as ListBox;
+
+            if (listBox != null)
+            {
+                var item = listBox.SelectedItem;
+                var albumListingViewModel = DataContext as IArtistListingViewModel;
+
+                albumListingViewModel?.LoadArtist?.Execute(item);
+            }
         }
     }
 }

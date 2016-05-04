@@ -15,13 +15,7 @@
     <UserControl.Resources>
         <DataTemplate DataType="{x:Type DukeboxServices:Album}">
             <StackPanel>
-                <Image x:Name="AlbumArt" Width="194" Height="194" IsHitTestVisible="False" Source="{Binding AlbumArt}">
-                    <Image.InputBindings>
-                        <MouseBinding Gesture="LeftDoubleClick" 
-                                      Command="{Binding LoadAlbum}" 
-                                      CommandParameter="{Binding Data}"/>
-                    </Image.InputBindings>
-                </Image>
+                <Image x:Name="AlbumArt" Width="194" Height="194" IsHitTestVisible="False" Source="{Binding AlbumArt}"/>
                 <TextBlock HorizontalAlignment="center" Text="{Binding Data.name}"/>
             </StackPanel>
         </DataTemplate>
@@ -38,7 +32,7 @@
                                     Grid.Column="0" 
                                     DataContext="{Binding ElementName=AlbumListingControl, Path=DataContext}">
         </DukeboxViews:SearchControl>
-        <ListBox Grid.Row="1" Grid.Column="0" ItemsSource="{Binding Albums}">
+        <ListBox Grid.Row="1" Grid.Column="0" ItemsSource="{Binding Albums}" MouseDoubleClick="ListBox_MouseDoubleClick">
             <ListBox.Resources>
                 <Style TargetType="ListBox">
                     <Style.Resources>
