@@ -5,7 +5,6 @@ using GalaSoft.MvvmLight.Command;
 using Dukebox.Desktop.Helper;
 using Dukebox.Desktop.Interfaces;
 using Dukebox.Library.Interfaces;
-using Dukebox.Library.Services;
 
 namespace Dukebox.Desktop.ViewModel
 {

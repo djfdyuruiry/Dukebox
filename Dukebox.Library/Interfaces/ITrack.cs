@@ -9,7 +9,5 @@ namespace Dukebox.Library.Interfaces
         IAudioFileMetadata Metadata { get; set; }
         Song Song { get; set; }
         string ToString();
-        bool Equals(object otherTrack);
-        int GetHashCode();
     }
 }
