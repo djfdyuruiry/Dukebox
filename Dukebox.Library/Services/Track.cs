@@ -161,22 +161,5 @@ namespace Dukebox.Library.Services
 
             return trackFormat;
         }
-        
-        public override bool Equals(object otherTrack)
-        {
-            var otherTrackObj = otherTrack as ITrack;
-
-            if (otherTrackObj == null)
-            {
-                return false;
-            }
-
-            return GetHashCode() == otherTrack.GetHashCode();
-        }
-
-        public override int GetHashCode()
-        {
-            return (int)Song.id;
-        }
     }
 }
