@@ -1,8 +1,8 @@
-using Dukebox.Library.Interfaces;
-using Dukebox.Library.Model;
 using System.Data.Entity;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using Dukebox.Library.Interfaces;
+using Dukebox.Library.Model;
 
 namespace Dukebox.Library.Repositories
 {

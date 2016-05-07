@@ -314,7 +314,7 @@ namespace Dukebox.Library.Repositories
 
             _addAlbumMutex.ReleaseMutex();
 
-            if (string.IsNullOrWhiteSpace(metadata.Title) && albumObj == null && artistObj == null)
+            if (metadata.IsEmpty)
             {
                 logger.WarnFormat("Not adding song from filename '{0}' as no metadata could be extracted", filename);
                 return;
@@ -377,21 +377,28 @@ namespace Dukebox.Library.Repositories
 
             var newArtist = new Artist() { id = _dukeboxData.Artists.Count(), name = tag.Artist };
 
-            _dukeboxData.Artists.Add(newArtist);
-            _dukeboxData.SaveChanges();
-
-            // Invalidate artist cache.
-            _allArtistsCache = null;
-                    
-            stopwatch.Stop();
-            logger.InfoFormat("Added artist to library: {0}", newArtist.name);
-            logger.DebugFormat("Adding artist to library took {0}ms. Artist name: {1}", stopwatch.ElapsedMilliseconds, newArtist.name);
-
-            if (ArtistAdded != null)
+            try
             {
-                ArtistAdded(this, EventArgs.Empty);
+                _dukeboxData.Artists.Add(newArtist);
+                _dukeboxData.SaveChanges();
+
+                // Invalidate artist cache.
+                _allArtistsCache = null;
+                    
+                stopwatch.Stop();
+                logger.InfoFormat("Added artist to library: {0}", newArtist.name);
+                logger.DebugFormat("Adding artist to library took {0}ms. Artist name: {1}", stopwatch.ElapsedMilliseconds, newArtist.name);
+
+                if (ArtistAdded != null)
+                {
+                    ArtistAdded(this, EventArgs.Empty);
+                }
             }
-        }
+            catch (Exception ex)
+            {
+                logger.Error(string.Format("Error adding artist '{0}' to database", newArtist.name), ex);
+            }
+}
 
         /// <summary>
         /// Add an album to the library and save changes
@@ -413,19 +420,26 @@ namespace Dukebox.Library.Repositories
 
             var newAlbum = new Album() { id = _dukeboxData.Albums.Count(), name = tag.Album, hasAlbumArt = tag.HasAlbumArt ? 1 : 0 };
 
-            _dukeboxData.Albums.Add(newAlbum);
-            _dukeboxData.SaveChanges();
-
-            // Invalidate album cache.
-            _allAlbumsCache = null;
-
-            stopwatch.Stop();
-            logger.InfoFormat("Added album to library: {0}", newAlbum.name);
-            logger.DebugFormat("Adding album to library took {0}ms. Album name: {1}", stopwatch.ElapsedMilliseconds, newAlbum.name);
-
-            if (AlbumAdded != null)
+            try
             {
-                AlbumAdded(this, EventArgs.Empty);
+                _dukeboxData.Albums.Add(newAlbum);
+                _dukeboxData.SaveChanges();
+
+                // Invalidate album cache.
+                _allAlbumsCache = null;
+
+                stopwatch.Stop();
+                logger.InfoFormat("Added album to library: {0}", newAlbum.name);
+                logger.DebugFormat("Adding album to library took {0}ms. Album name: {1}", stopwatch.ElapsedMilliseconds, newAlbum.name);
+
+                if (AlbumAdded != null)
+                {
+                    AlbumAdded(this, EventArgs.Empty);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error(string.Format("Error adding album '{0}' to database", newAlbum.name), ex);
             }
         }
 
@@ -456,19 +470,26 @@ namespace Dukebox.Library.Repositories
                 newSong = new Song() { filename = filename, title = metadata.Title, albumId = null, artistId = null };
             }
 
-            _dukeboxData.Songs.Add(newSong);
-            _dukeboxData.SaveChanges();
-
-            stopwatch.Stop();
-            logger.InfoFormat("Added song with id {0} to library.", newSong.id);
-            logger.DebugFormat("Adding song to library took {0}ms. Song id: {1}", stopwatch.ElapsedMilliseconds, newSong.id);
-
-            _albumArtCache.AddSongToCache(newSong, metadata, albumObj);
-
-            if (SongAdded != null)
+            try
             {
-                SongAdded(this, EventArgs.Empty);
-            }        
+                _dukeboxData.Songs.Add(newSong);
+                _dukeboxData.SaveChanges();
+
+                stopwatch.Stop();
+                logger.InfoFormat("Added song with id {0} to library.", newSong.id);
+                logger.DebugFormat("Adding song to library took {0}ms. Song id: {1}", stopwatch.ElapsedMilliseconds, newSong.id);
+
+                _albumArtCache.AddSongToCache(newSong, metadata, albumObj);
+
+                if (SongAdded != null)
+                {
+                    SongAdded(this, EventArgs.Empty);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error(string.Format("Error adding song from file '{0}' to database", newSong.filename), ex);
+            }
         }
 
         public void RemoveTrack (ITrack track)

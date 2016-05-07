@@ -1,15 +1,13 @@
-﻿using Dukebox.Audio;
-using Dukebox.Audio.Interfaces;
-using Dukebox.Library;
-using Dukebox.Library.Interfaces;
-using Dukebox.Library.Model;
-using log4net;
-using org.jaudiotagger.audio;
-using org.jaudiotagger.tag;
-using System;
+﻿using System;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using log4net;
+using org.jaudiotagger.audio;
+using org.jaudiotagger.tag;
+using Dukebox.Audio.Interfaces;
+using Dukebox.Library.Interfaces;
+using Dukebox.Library.Model;
 
 namespace Dukebox.Library.Services
 {
@@ -26,15 +24,17 @@ namespace Dukebox.Library.Services
         private IAudioCdService _audioCdService;
 
         #region Metadata properties
-
+        
         private string _title = string.Empty;
         private string _artist = string.Empty;
         private string _album = string.Empty;
-
+        
         private long _dbAlbumId;
 
         private AudioFile _audioFile;
         private Tag _tag;
+
+        public string FileName { get; private set; }
 
         public string Title
         {
@@ -116,6 +116,14 @@ namespace Dukebox.Library.Services
             }
         }
 
+        public bool IsEmpty
+        {
+            get
+            {
+                return string.IsNullOrEmpty(Title) && string.IsNullOrEmpty(Artist) && string.IsNullOrEmpty(Album);
+            }
+        }
+
         public int Length
         {
             get
@@ -175,35 +183,42 @@ namespace Dukebox.Library.Services
 
         public static IAudioFileMetadata BuildAudioFileMetaData(string fileName, long albumId = -1)
         {
-            var AudioFileMetadata = LibraryPackage.GetInstance<IAudioFileMetadata>() as AudioFileMetadata;
+            var audioFileMetadata = LibraryPackage.GetInstance<IAudioFileMetadata>() as AudioFileMetadata;
+            audioFileMetadata.FileName = fileName;
 
             try
             {
-                var fileInfo = new FileInfo(fileName);
+                var fileInfo = new FileInfo(audioFileMetadata.FileName);
 
                 if (fileInfo.Extension != ".cda")
                 {
                     var javaFile = new java.io.File(fileInfo.FullName);
 
-                    AudioFileMetadata._audioFile = AudioFileIO.read(javaFile);
-                    AudioFileMetadata._tag = AudioFileMetadata._audioFile.getTag();
+                    audioFileMetadata._audioFile = AudioFileIO.read(javaFile);
+                    audioFileMetadata._tag = audioFileMetadata._audioFile.getTag();
+
+                    if (audioFileMetadata.IsEmpty)
+                    {
+                        audioFileMetadata._tag = null;
+                        audioFileMetadata.GetTrackDetailsFromUnsupportedFormat();
+                    }
                 }
                 else
                 {
-                    AudioFileMetadata.GetDetailsFromCddbServer(fileName);
-                }
+                    audioFileMetadata.GetDetailsFromCddbServer();
+                }                
             }
             catch (Exception ex)
             {
-                logger.Error(string.Format("Error occured while parsing metadata from audio file '{0}'", fileName), ex);
+                logger.Error(string.Format("Error occured while parsing metadata from audio file '{0}'", audioFileMetadata.FileName), ex);
 
-                AudioFileMetadata._tag = null;
-                AudioFileMetadata.GetTrackDetailsFromUnsupportedFormat(fileName);
+                audioFileMetadata._tag = null;
+                audioFileMetadata.GetTrackDetailsFromUnsupportedFormat();
             }
 
-            AudioFileMetadata._dbAlbumId = albumId;
+            audioFileMetadata._dbAlbumId = albumId;
 
-            return AudioFileMetadata as IAudioFileMetadata;
+            return audioFileMetadata as IAudioFileMetadata;
         }
 
         public AudioFileMetadata(IAlbumArtCacheService albumArtCache, ICdMetadataService cdMetadataService, IAudioCdService audioCdService)
@@ -220,44 +235,39 @@ namespace Dukebox.Library.Services
         /// <returns></returns>
         private string ExtractFieldText(FieldKey key)
         {
-            if (HasFutherMetadataTag)
+            if (!HasFutherMetadataTag || _tag.getFirstField(key) == null)
             {
-                if (_tag.getFirstField(key) != null)
-                {
-                    if (_tag.getFirstField(key).toString().Split('"').Length > 1)
-                    {
-                        return _tag.getFirstField(key).toString().Split('"')[1];
-                    }
-                    else
-                    {
-                        return _tag.getFirstField(key).toString();
-                    }
-                }
+                return string.Empty;
             }
 
-            return string.Empty;
+            if (_tag.getFirstField(key).toString().Split('"').Length > 1)
+            {
+                return _tag.getFirstField(key).toString().Split('"')[1];
+            }
+
+            return _tag.getFirstField(key).toString();
         }
 
-        private void GetTrackDetailsFromUnsupportedFormat(string fileName)
+        private void GetTrackDetailsFromUnsupportedFormat()
         {
             string title = string.Empty;
             string artist = string.Empty;
             string album = string.Empty;
 
-            fileName = Path.GetFileNameWithoutExtension(fileName);
+            FileName = Path.GetFileNameWithoutExtension(FileName);
 
             string[] metadata = null;
-            if (fileName.Contains('-'))
+            if (FileName.Contains('-'))
             {
-                metadata = fileName.Split('-');
+                metadata = FileName.Split('-');
             }
-            else if (fileName.Contains('_'))
+            else if (FileName.Contains('_'))
             {
-                metadata = fileName.Split('\\').LastOrDefault().Split('_');
+                metadata = FileName.Split('\\').LastOrDefault().Split('_');
             }
             else
             {
-                metadata = fileName.Split('\\').LastOrDefault().Split(' ');
+                metadata = FileName.Split('\\').LastOrDefault().Split(' ');
             }
 
             artist = metadata.FirstOrDefault();
@@ -270,17 +280,17 @@ namespace Dukebox.Library.Services
                 }
             }
 
-            logger.InfoFormat("Parsed '{0}' as {1} - {2}", fileName, artist, title);
+            logger.InfoFormat("Parsed '{0}' as {1} - {2}", FileName, artist, title);
 
             _title = title;
             _artist = artist;
             _album = album;
         }
 
-        private void GetDetailsFromCddbServer(string fileName)
+        private void GetDetailsFromCddbServer()
         {
-            CdMetadata cdData = _cdMetadataService.GetMetadataForCd(fileName[0]);
-            int trackIdx = _audioCdService.GetTrackNumberFromCdaFilename(fileName);
+            CdMetadata cdData = _cdMetadataService.GetMetadataForCd(FileName[0]);
+            int trackIdx = _audioCdService.GetTrackNumberFromCdaFilename(FileName);
 
             _artist = cdData.Artist;
             _album = cdData.Album;
