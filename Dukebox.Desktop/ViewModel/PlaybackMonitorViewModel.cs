@@ -8,11 +8,17 @@ using Dukebox.Desktop.Helper;
 using Dukebox.Desktop.Interfaces;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
+using System.Windows;
+using System;
 
 namespace Dukebox.Desktop.ViewModel
 {
     public class PlaybackMonitorViewModel : ViewModelBase, IPlaybackMonitorViewModel
-    {     
+    {
+        private const string retryRegisterHotKeysDialogText = "Error registering global multimedia hot keys! Do you want to retry (This usually happens when another media player or web browser is open)";
+        private const string retryRegisterHotKeysDialogTitle = "Dukebox - Error Registering Hot Keys";
+        private const string emptyTrackTimeText = "00";
+
         private readonly IMediaPlayer _mediaPlayer;
         private readonly IAudioPlaylist _audioPlaylist;
         private readonly ImageToImageSourceConverter _imageToImageSourceConverter;
@@ -24,6 +30,7 @@ namespace Dukebox.Desktop.ViewModel
         private string _trackMinutesTotal;
         private ImageSource _albumArt;
         private ImageSource _playPauseImage;
+        private readonly IGlobalMultimediaHotKeyService _globalHotKeyService;
 
         public string Artist
         {
@@ -121,11 +128,12 @@ namespace Dukebox.Desktop.ViewModel
         public ICommand BackCommand { get; private set; }
         public ICommand ForwardCommand { get; private set; }
 
-        public PlaybackMonitorViewModel(IMediaPlayer mediaPlayer, IAudioPlaylist audioPlaylist, 
-            ImageToImageSourceConverter imageToImageSourceConverter) : base()
+        public PlaybackMonitorViewModel(IMediaPlayer mediaPlayer, IAudioPlaylist audioPlaylist,
+            IGlobalMultimediaHotKeyService globalHotKeyService, ImageToImageSourceConverter imageToImageSourceConverter) : base()
         {
             _mediaPlayer = mediaPlayer;
             _audioPlaylist = audioPlaylist;
+            _globalHotKeyService = globalHotKeyService;
             _imageToImageSourceConverter = imageToImageSourceConverter;
 
             AlbumArt = ImageResources.DefaultAlbumArtImage;
@@ -133,8 +141,10 @@ namespace Dukebox.Desktop.ViewModel
 
             SetupAudioEventListeners();
             SetupPlaybackControlCommands();
+
+            RegisterHotKeys();
         }
-        
+
         private void SetupAudioEventListeners()
         {
             _mediaPlayer.LoadedTrackFromFile += (o, e) => LoadedTrackFromFile(e);
@@ -143,7 +153,7 @@ namespace Dukebox.Desktop.ViewModel
             _mediaPlayer.FinishedPlayingTrack += (o, e) => TrackFinishedPlaying();
             _mediaPlayer.AudioPositionChanged += (o, e) => TrackPositionChanged();
 
-            // pause\play image toggles
+            // pause/play image toggles
             _mediaPlayer.StartPlayingTrack += (o, e) => PlayPauseImage = ImageResources.PauseImage;
             _mediaPlayer.TrackPaused += (o, e) => PlayPauseImage = ImageResources.PlayImage;
             _mediaPlayer.TrackResumed += (o, e) => PlayPauseImage = ImageResources.PauseImage;
@@ -155,6 +165,31 @@ namespace Dukebox.Desktop.ViewModel
             StopCommand = new RelayCommand(_audioPlaylist.Stop);
             BackCommand = new RelayCommand(_audioPlaylist.Back);
             ForwardCommand = new RelayCommand(_audioPlaylist.Forward);
+        }
+
+        private void RegisterHotKeys()
+        {
+            var hotKeysRegistered = _globalHotKeyService.RegisterMultimediaHotKeys(true, RetryRegisterHotKeys);
+
+            if (!hotKeysRegistered)
+            {
+                return;
+            }
+
+            _globalHotKeyService.PlayPausePressed += (o, e) => _audioPlaylist.PausePlay();
+            _globalHotKeyService.StopPressed += (o, e) => _audioPlaylist.Stop();
+            _globalHotKeyService.PreviousTrackPressed += (o, e) => _audioPlaylist.Back();
+            _globalHotKeyService.NextTrackPressed += (o, e) => _audioPlaylist.Forward();
+        }
+
+        private bool RetryRegisterHotKeys()
+        {
+            var msgBoxResult = MessageBox.Show(retryRegisterHotKeysDialogText, retryRegisterHotKeysDialogTitle, 
+                MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            
+            var shouldRetry = msgBoxResult == MessageBoxResult.Yes;
+
+            return shouldRetry;
         }
 
         private void LoadedTrackFromFile(TrackLoadedFromFileEventArgs trackLoadedArgs)
@@ -186,7 +221,7 @@ namespace Dukebox.Desktop.ViewModel
         private void TrackFinishedPlaying()
         {
             PlayPauseImage = ImageResources.PlayImage;
-            TrackMinutesPassed = string.Format(MediaPlayer.MinuteFormat, "00", "00");
+            TrackMinutesPassed = string.Format(MediaPlayer.MinuteFormat, emptyTrackTimeText, emptyTrackTimeText);
         }
 
         private void TrackPositionChanged()
