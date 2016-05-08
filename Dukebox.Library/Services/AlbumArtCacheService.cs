@@ -1,15 +1,12 @@
-﻿using Dukebox.Library.Config;
-using Dukebox.Library.Interfaces;
-using Dukebox.Library.Model;
-using Dukebox.Library.Interfaces;
-using Dukebox.Library.Services;
-using log4net;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using log4net;
+using Dukebox.Library.Interfaces;
+using Dukebox.Library.Model;
 
 namespace Dukebox.Library.Services
 {
@@ -49,33 +46,35 @@ namespace Dukebox.Library.Services
             }
         }
 
-        public void AddSongToCache(Song songToProcess, IAudioFileMetadata metadata, Album albumObj)
+        public void AddAlbumToCache(Album album, IAudioFileMetadata metadata)
         {
-            var stopwatch = Stopwatch.StartNew();
-
-            if (albumObj == null)
+            if (album == null)
             {
-                logger.InfoFormat("Not processing song with id {0} into album art cache as it has no associated album.", songToProcess.id);
-                return;
-            }
-            else if (!metadata.HasFutherMetadataTag || !metadata.HasAlbumArt)
-            {
-                logger.InfoFormat("Not processing song with id {0} into album art cache as the song does not contain album art data.", songToProcess.id);
-                return;
+                throw new ArgumentNullException("album");
             }
 
-            var albumId = albumObj.id;
-
+            var albumId = album.id;
+            
             if (CheckCacheForAlbum(albumId))
             {
-                logger.InfoFormat("Not processing song with id {0} into album art cache as it is already in the album art cache.", songToProcess.id);
+                logger.InfoFormat("Not processing album with id {0} into album art cache as it is already in the album art cache.", 
+                    albumId);
                 return;
             }
-                                       
+
+            if (!metadata.HasFutherMetadataTag || !metadata.HasAlbumArt)
+            {
+                logger.InfoFormat("Not processing album with id {0} into album art cache as the song does not contain album art data.", 
+                    albumId);
+                return;
+            }
+
+            var stopwatch = Stopwatch.StartNew();
+
             try
             {
                 var img = metadata.AlbumArt;
-                var albumIdString = albumObj.id.ToString();
+                var albumIdString = album.id.ToString();
                 var path = Path.Combine(_cachePath, albumIdString);
 
                 if (img != null && !File.Exists(path))
@@ -85,7 +84,8 @@ namespace Dukebox.Library.Services
 
                 stopwatch.Stop();
                 logger.InfoFormat("Added album with id {0} into album art cache.", albumIdString);
-                logger.DebugFormat("Adding album into album art cache took {0}ms. Album id: {1}", stopwatch.ElapsedMilliseconds, albumIdString);
+                logger.DebugFormat("Adding album into album art cache took {0}ms. Album id: {1}", 
+                    stopwatch.ElapsedMilliseconds, albumIdString);
 
                 if (AlbumAdded != null)
                 {

@@ -200,7 +200,11 @@ namespace Dukebox.Library.Services
                     if (audioFileMetadata.IsEmpty)
                     {
                         audioFileMetadata._tag = null;
-                        audioFileMetadata.GetTrackDetailsFromUnsupportedFormat();
+                    }
+
+                    if (string.IsNullOrEmpty(audioFileMetadata.Title))
+                    {
+                        audioFileMetadata.GetMissingTrackDetailsFromFileName();
                     }
                 }
                 else
@@ -213,7 +217,7 @@ namespace Dukebox.Library.Services
                 logger.Error(string.Format("Error occured while parsing metadata from audio file '{0}'", audioFileMetadata.FileName), ex);
 
                 audioFileMetadata._tag = null;
-                audioFileMetadata.GetTrackDetailsFromUnsupportedFormat();
+                audioFileMetadata.GetMissingTrackDetailsFromFileName();
             }
 
             audioFileMetadata._dbAlbumId = albumId;
@@ -248,11 +252,18 @@ namespace Dukebox.Library.Services
             return _tag.getFirstField(key).toString();
         }
 
-        private void GetTrackDetailsFromUnsupportedFormat()
+        private void GetMissingTrackDetailsFromFileName()
         {
+            var titleExists = string.IsNullOrEmpty(_title);
+            var artistExists = string.IsNullOrEmpty(_artist);
+
+            if (titleExists && artistExists)
+            {
+                return;
+            }
+
             string title = string.Empty;
             string artist = string.Empty;
-            string album = string.Empty;
 
             FileName = Path.GetFileNameWithoutExtension(FileName);
 
@@ -280,11 +291,17 @@ namespace Dukebox.Library.Services
                 }
             }
 
-            logger.InfoFormat("Parsed '{0}' as {1} - {2}", FileName, artist, title);
+            if (!titleExists)
+            {
+                _title = string.IsNullOrWhiteSpace(title) ? "Unknown Title" : title;
+            }
 
-            _title = title;
-            _artist = artist;
-            _album = album;
+            if (!artistExists)
+            {
+                _artist = string.IsNullOrWhiteSpace(artist) ? "Unknown Artist" : artist;
+            }
+
+            logger.InfoFormat("Updated metadata for file ('{0}') to '{1}' - '{2}'", FileName, Artist, Title);
         }
 
         private void GetDetailsFromCddbServer()

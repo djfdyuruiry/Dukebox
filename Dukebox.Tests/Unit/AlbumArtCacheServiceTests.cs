@@ -160,7 +160,7 @@ namespace Dukebox.Tests.Unit
             A.CallTo(() => metadata.HasFutherMetadataTag).Returns(true);
             A.CallTo(() => metadata.AlbumArt).Returns(blankImage);
 
-            albumArtCache.AddSongToCache(songToAdd, metadata, albumObj);
+            albumArtCache.AddAlbumToCache(albumObj, metadata);
 
             return blankImage;
         }

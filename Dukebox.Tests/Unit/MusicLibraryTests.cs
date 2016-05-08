@@ -247,7 +247,7 @@ namespace Dukebox.Tests.Unit
             var numSamples = 5;
 
             PrepareSamplesDirectory("samples", numSamples);
-            _musicLibrary.AddDirectory("samples", false, null, null);
+            _musicLibrary.AddSupportedFilesInDirectory("samples", false, null, null);
 
             var tracks = _musicLibrary.SearchForTracks("samples", new List<SearchAreas> { SearchAreas.Filename });
             var tracksReturned = tracks.Any();
@@ -300,7 +300,7 @@ namespace Dukebox.Tests.Unit
             File.Delete(jplFileName);
             File.WriteAllText(jplFileName, jplJson);
 
-            _musicLibrary.AddPlaylistFile(jplFileName);
+            _musicLibrary.AddPlaylistFiles(jplFileName);
 
             var tracks = _musicLibrary.SearchForTracksInArea(SearchAreas.Filename, "samples");
             var tracksReturned = tracks.Any();

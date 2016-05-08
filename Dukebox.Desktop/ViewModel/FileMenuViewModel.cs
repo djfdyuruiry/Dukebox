@@ -104,7 +104,7 @@ namespace Dukebox.Desktop.ViewModel
 
             Task.Run(() =>
             {
-                _musicLibrary.AddDirectory(_selectFolderDialog.SelectedPath, true,
+                _musicLibrary.AddSupportedFilesInDirectory(_selectFolderDialog.SelectedPath, true,
                     (o, a) => ImportStep(progressViewModel, a),
                     (o, i) => progressWindow.Dispatcher.InvokeAsync(progressWindow.Close));
             });

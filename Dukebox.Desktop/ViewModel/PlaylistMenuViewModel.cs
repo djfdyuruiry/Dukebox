@@ -98,7 +98,7 @@ namespace Dukebox.Desktop.ViewModel
 
             var fileName = _selectFileDialog.FileName;
 
-            _musicLibrary.AddPlaylistFile(fileName);
+            _musicLibrary.AddPlaylistFiles(fileName);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System.Data.Entity;
 using Dukebox.Library.Model;
 using System.Threading.Tasks;
+using System.Data.Entity.Validation;
 
 namespace Dukebox.Library.Interfaces
 {
@@ -12,5 +13,6 @@ namespace Dukebox.Library.Interfaces
         DbSet<Song> Songs { get; set; }
         int SaveChanges();
         Task<int> SaveChangesAsync();
+        void LogEntityValidationException(DbEntityValidationException ex);
     }
 }

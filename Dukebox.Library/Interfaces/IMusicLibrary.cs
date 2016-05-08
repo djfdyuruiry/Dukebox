@@ -37,10 +37,10 @@ namespace Dukebox.Library.Interfaces
         List<ITrack> GetTracksByAttributeValue(SearchAreas attribute, string nameOrTitle);
         List<ITrack> GetTracksByAttributeId(SearchAreas attribute, long attributeId);
         List<ITrack> GetTracksForDirectory(string directory, bool subDirectories);
-        void AddDirectory(string directory, bool subDirectories, Action<object, AudioFileImportedEventArgs> progressHandler, Action<object, int> completeHandler);
-        void AddFile(string filename, IAudioFileMetadata metadata);
-        void AddPlaylist(string name, IEnumerable<string> filenames);
-        void AddPlaylistFile(string filename);
+        ITrack AddFile(string filename, IAudioFileMetadata metadata = null);
+        List<ITrack> AddSupportedFilesInDirectory(string directory, bool subDirectories, Action<object, AudioFileImportedEventArgs> progressHandler, Action<object, int> completeHandler);
+        List<ITrack> AddPlaylistFiles(string filename);
+        Playlist AddPlaylist(string name, IEnumerable<string> filenames);
         void RemoveTrack(ITrack track);
     }
 }
