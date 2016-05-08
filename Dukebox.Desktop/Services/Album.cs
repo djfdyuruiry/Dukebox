@@ -26,7 +26,6 @@ namespace Dukebox.Desktop.Services
             }
         }
 
-
         public static Album BuildAlbumInstance(LibraryAlbum data)
         {
             var instance = DesktopContainer.GetInstance<Album>();

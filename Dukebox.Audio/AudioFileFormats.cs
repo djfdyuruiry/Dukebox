@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -53,6 +54,22 @@ namespace Dukebox.Audio
         public AudioFileFormats()
         {
             SupportedFormats = new List<string>();
+        }
+
+        public bool FileSupported(string filename)
+        {
+            var fileExtension = Path.GetExtension(filename);
+            return FileFormatSupported(fileExtension);
+        }
+
+        public bool FileFormatSupported(string fileExtension)
+        {
+            if (string.IsNullOrEmpty(fileExtension))
+            {
+                return false;
+            }
+
+            return SupportedFormats.Any(f => f.Equals(fileExtension, StringComparison.OrdinalIgnoreCase));
         }
     } 
 }
