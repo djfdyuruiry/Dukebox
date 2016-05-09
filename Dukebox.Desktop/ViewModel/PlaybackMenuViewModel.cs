@@ -7,6 +7,7 @@ namespace Dukebox.Desktop.ViewModel
 {
     public class PlaybackMenuViewModel : ViewModelBase, IPlaybackMenuViewModel
     {
+        private readonly IAudioPlaylist _audioPlaylist;
         private readonly IDukeboxUserSettings _userSettings;
 
         private bool _shuffleOn;
@@ -29,6 +30,7 @@ namespace Dukebox.Desktop.ViewModel
                 OnPropertyChanged("ShuffleOn");
 
                 _userSettings.Shuffle = value;
+                _audioPlaylist.Shuffle = value;
             }
         }
         public bool RepeatOn
@@ -43,6 +45,7 @@ namespace Dukebox.Desktop.ViewModel
                 OnPropertyChanged("RepeatOn");
 
                 _userSettings.Repeat = value;
+                _audioPlaylist.Repeat = value;
             }
         }
         public bool RepeatAllOn
@@ -57,11 +60,13 @@ namespace Dukebox.Desktop.ViewModel
                 OnPropertyChanged("RepeatAllOn");
                 
                 _userSettings.RepeatAll = value;
+                _audioPlaylist.RepeatAll = value;
             }
         }
 
         public PlaybackMenuViewModel(IAudioPlaylist audioPlaylist, IDukeboxUserSettings userSettings) : base()
         {
+            _audioPlaylist = audioPlaylist;
             _userSettings = userSettings;
 
             ShuffleOn = _userSettings.Shuffle;
