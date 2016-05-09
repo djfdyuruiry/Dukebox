@@ -13,6 +13,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Dukebox.Library.Repositories
 {
@@ -36,9 +37,9 @@ namespace Dukebox.Library.Repositories
         private AudioFileFormats _audioFormats;
         private IAlbumArtCacheService _albumArtCache;
         private IMusicLibrarySearchService _searchService;
-
-        private Mutex _addAlbumMutex;
-        private Mutex _addArtistMutex;
+        
+        private SemaphoreSlim _addFileMutex;
+        private SemaphoreSlim _addPlaylistMutex;
 
         private List<Artist> _allArtistsCache;
         private List<Album> _allAlbumsCache;
@@ -141,9 +142,9 @@ namespace Dukebox.Library.Repositories
 
             RecentlyPlayed = new ObservableCollection<ITrack>();
             RecentlyPlayed.CollectionChanged += RecentlyPlayedChangedHander;
-
-            _addAlbumMutex = new Mutex();
-            _addArtistMutex = new Mutex();
+            
+            _addFileMutex = new SemaphoreSlim(1, 1);
+            _addPlaylistMutex = new SemaphoreSlim(1, 1);
         }
 
         private void RecentlyPlayedChangedHander(object source, NotifyCollectionChangedEventArgs eventData)
@@ -201,7 +202,12 @@ namespace Dukebox.Library.Repositories
 
         #region Database update methods
         
-        public List<ITrack> AddSupportedFilesInDirectory(string directory, bool subDirectories, Action<object, AudioFileImportedEventArgs> progressHandler, Action<object, int> completeHandler)
+        public async Task<List<ITrack>> AddSupportedFilesInDirectory(string directory, bool subDirectories, Action<object, AudioFileImportedEventArgs> progressHandler, Action<object, int> completeHandler)
+        {
+            return await Task.Run(() => DoAddSupportedFilesInDirectory(directory, subDirectories, progressHandler, completeHandler));
+        }
+
+        private List<ITrack> DoAddSupportedFilesInDirectory(string directory, bool subDirectories, Action<object, AudioFileImportedEventArgs> progressHandler, Action<object, int> completeHandler)
         {
             if (!Directory.Exists(directory))
             {
@@ -209,7 +215,7 @@ namespace Dukebox.Library.Repositories
             }
 
             var stopwatch = Stopwatch.StartNew();
-        
+
             var allfiles = Directory.GetFiles(@directory, "*.*", subDirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
             var filesToAdd = allfiles.Where(_audioFormats.FileSupported);
             var numFilesToAdd = filesToAdd.Count();
@@ -219,12 +225,12 @@ namespace Dukebox.Library.Repositories
             // For each set of 5 files, create a new thread
             // which processes the metadata of those 
             //filesToAdd.AsParallel().WithDegreeOfParallelism(concurrencyLimit).ForAll(file =>
-            var newTracks = filesToAdd.Select(file =>
+            var addFileTasks = filesToAdd.Select(file => Task.Run(async () =>
             {
                 try
                 {
-                    var newTrack = AddFile(file);
-                                        
+                    var newTrack = await AddFile(file);
+
                     progressHandler?.Invoke(this, new AudioFileImportedEventArgs()
                     {
                         JustProcessing = false,
@@ -239,16 +245,16 @@ namespace Dukebox.Library.Repositories
                     logger.Error("Error adding audio file to the database while adding files from directory", ex);
                     return null;
                 }
-            }).Where(t => t != null).ToList<ITrack>();
+            })).ToArray();
+
+            Task.WaitAll(addFileTasks);
+
+            var newTracks = addFileTasks.Select(t => t.Result).Where(t => t != null).ToList<ITrack>();
 
             var filesAdded = newTracks.Count;
 
             RefreshCaches();
-
-            if (completeHandler != null)
-            {
-                completeHandler.Invoke(this, numFilesToAdd);
-            }
+            completeHandler?.Invoke(this, numFilesToAdd);
 
             if (filesAdded < 1)
             {
@@ -263,14 +269,14 @@ namespace Dukebox.Library.Repositories
 
             if (numFilesToAdd > filesAdded)
             {
-                logger.WarnFormat("Not all files found in directory '{0}' were added to the database [{1}/{2} files added]", 
-                    directory, filesAdded, numFilesToAdd); 
+                logger.WarnFormat("Not all files found in directory '{0}' were added to the database [{1}/{2} files added]",
+                    directory, filesAdded, numFilesToAdd);
             }
 
             return newTracks;
         }
         
-        public ITrack AddFile(string filename, IAudioFileMetadata metadata = null)
+        public async Task<ITrack> AddFile(string filename, IAudioFileMetadata metadata = null)
         {
             if (!File.Exists(filename))
             {
@@ -287,9 +293,13 @@ namespace Dukebox.Library.Repositories
                 metadata = AudioFileMetadata.BuildAudioFileMetaData(filename);
             }
 
-            var artist = AddArtist(metadata);
-            var album = AddAlbum(metadata);           
-            var newSong = AddSong(filename, metadata, artist, album);
+            await _addFileMutex.WaitAsync();
+
+            var artist = await AddArtist(metadata);
+            var album = await AddAlbum(metadata);           
+            var newSong = await AddSong(filename, metadata, artist, album);
+
+            _addFileMutex.Release();
 
             return newSong != null ? Track.BuildTrackInstance(newSong) : null;
         }
@@ -298,17 +308,25 @@ namespace Dukebox.Library.Repositories
         /// Add all files specified in a playlist to the library and save changes
         /// to database.
         /// </summary>
-        public List<ITrack> AddPlaylistFiles(string filename)
+        public async Task<List<ITrack>> AddPlaylistFiles(string filename)
         {
-            var playlist = GetPlaylistFromFile(filename);            
-            return playlist.Files.Select(f => AddFile(f)).Where(t => t != null).ToList();
+            return await Task.Run(() =>
+            {
+                var playlist = GetPlaylistFromFile(filename);
+                var addFilesTasks = playlist.Files.Select(f => AddFile(f)).ToArray();
+
+                Task.WaitAll(addFilesTasks);
+
+                var filesAdded = addFilesTasks.Select(t => t.Result).Where(t => t != null).ToList();
+                return filesAdded;
+            });
         }
 
         /// <summary>
         /// Add an artist to the library and save changes
         /// to database.
         /// </summary>
-        private Artist AddArtist(IAudioFileMetadata tag)
+        private async Task<Artist> AddArtist(IAudioFileMetadata tag)
         {
             var stopwatch = Stopwatch.StartNew();
 
@@ -325,8 +343,6 @@ namespace Dukebox.Library.Repositories
                 return existingArtist;
             }
 
-            _addArtistMutex.WaitOne();
-
             var newArtist = new Artist() { id = _dukeboxData.Artists.Count(), name = tag.Artist };
 
             try
@@ -334,7 +350,7 @@ namespace Dukebox.Library.Repositories
                 logger.DebugFormat("Adding artist: {0}", newArtist.name);
 
                 _dukeboxData.Artists.Add(newArtist);
-                _dukeboxData.SaveChanges();
+                await _dukeboxData.SaveChangesAsync();
 
                 // Invalidate artist cache.
                 _allArtistsCache = null;
@@ -356,10 +372,6 @@ namespace Dukebox.Library.Repositories
             {
                 logger.Error(string.Format("Error adding artist '{0}' to database", newArtist.name), ex);
             }
-            finally
-            {
-                _addArtistMutex.ReleaseMutex();
-            }
 
             return null;            
         }
@@ -368,7 +380,7 @@ namespace Dukebox.Library.Repositories
         /// Add an album to the library and save changes
         /// to database.
         /// </summary>
-        private Album AddAlbum(IAudioFileMetadata tag)
+        private async Task<Album> AddAlbum(IAudioFileMetadata tag)
         {
             var stopwatch = Stopwatch.StartNew();
 
@@ -384,8 +396,6 @@ namespace Dukebox.Library.Repositories
                 logger.WarnFormat("Not adding album with name '{0}' as another album with the same name already exists in the database", tag.Album);
                 return existingAlbum;
             }
-            
-            _addAlbumMutex.WaitOne();
 
             var newAlbum = new Album() { id = _dukeboxData.Albums.Count(), name = tag.Album, hasAlbumArt = tag.HasAlbumArt ? 1 : 0 };
 
@@ -394,7 +404,7 @@ namespace Dukebox.Library.Repositories
                 logger.DebugFormat("Adding album: {0}", newAlbum.name);
 
                 _dukeboxData.Albums.Add(newAlbum);
-                _dukeboxData.SaveChanges();
+                await _dukeboxData.SaveChangesAsync();
 
                 // Invalidate album cache.
                 _allAlbumsCache = null;
@@ -418,10 +428,6 @@ namespace Dukebox.Library.Repositories
             {
                 logger.Error(string.Format("Error adding album '{0}' to database", newAlbum.name), ex);
             }
-            finally
-            {
-                _addAlbumMutex.ReleaseMutex();
-            }
 
             return null;
         }
@@ -430,7 +436,7 @@ namespace Dukebox.Library.Repositories
         /// Add a song to the library and save changes
         /// to database.
         /// </summary>
-        private Song AddSong(string filename, IAudioFileMetadata metadata, Artist artistObj, Album albumObj)
+        private async Task<Song> AddSong(string filename, IAudioFileMetadata metadata, Artist artistObj, Album albumObj)
         {
             var stopwatch = Stopwatch.StartNew();
             Song newSong = null;
@@ -446,19 +452,19 @@ namespace Dukebox.Library.Repositories
             // Build new song with all available information.
             if (albumObj != null && artistObj != null)
             {
-                newSong = new Song() { filename = filename, title = metadata.Title, albumId = albumObj.id, artistId = artistObj.id };
+                newSong = new Song() { filename = filename, title = metadata.Title, album = albumObj, artist = artistObj };
             }
             else if (albumObj != null && artistObj == null)
             {
-                newSong = new Song() { filename = filename, title = metadata.Title, albumId = albumObj.id, artistId = null };
+                newSong = new Song() { filename = filename, title = metadata.Title, album = albumObj };
             }
             else if (albumObj == null && artistObj != null)
             {
-                newSong = new Song() { filename = filename, title = metadata.Title, albumId = null, artistId = artistObj.id };
+                newSong = new Song() { filename = filename, title = metadata.Title, artist = artistObj };
             }
             else if (albumObj == null && artistObj == null)
             {
-                newSong = new Song() { filename = filename, title = metadata.Title, albumId = null, artistId = null };
+                newSong = new Song() { filename = filename, title = metadata.Title };
             }
 
             try
@@ -466,7 +472,7 @@ namespace Dukebox.Library.Repositories
                 logger.DebugFormat("Title for file '{0}': {1}", newSong.filename, newSong.title);
 
                 _dukeboxData.Songs.Add(newSong);
-                _dukeboxData.SaveChanges();
+                await _dukeboxData.SaveChangesAsync();
 
                 stopwatch.Stop();
                 logger.InfoFormat("Added song with id {0} to library.", newSong.id);
@@ -489,7 +495,7 @@ namespace Dukebox.Library.Repositories
             return null;
         }
 
-        public Playlist AddPlaylist(string name, IEnumerable<string> filenames)
+        public async Task<Playlist> AddPlaylist(string name, IEnumerable<string> filenames)
         {
             if (name == null)
             {
@@ -512,10 +518,12 @@ namespace Dukebox.Library.Repositories
             var stopwatch = Stopwatch.StartNew();
             var newPlaylist = new Playlist() { name = name, filenamesCsv = string.Join(",", filenames) };
 
+            await _addPlaylistMutex.WaitAsync();
+
             try
             {
                 _dukeboxData.Playlists.Add(newPlaylist);
-                _dukeboxData.SaveChanges();
+                await _dukeboxData.SaveChangesAsync();
 
                 // Invalidate playlist cache.
                 _allPlaylistsCache = null;
@@ -537,11 +545,15 @@ namespace Dukebox.Library.Repositories
             {
                 logger.Error(string.Format("Error adding playlist '{0}' to database", newPlaylist.name), ex);
             }
+            finally
+            {
+                _addPlaylistMutex.Release();
+            }
 
             return null;
         }
 
-        public void RemoveTrack (ITrack track)
+        public async Task RemoveTrack (ITrack track)
         {
             if (track == null)
             {
@@ -549,7 +561,7 @@ namespace Dukebox.Library.Repositories
             }
 
             _dukeboxData.Songs.Remove(track.Song);
-            _dukeboxData.SaveChanges();
+            await _dukeboxData.SaveChangesAsync();
         }
 
         /// <summary>
