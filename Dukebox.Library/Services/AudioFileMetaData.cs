@@ -254,8 +254,8 @@ namespace Dukebox.Library.Services
 
         private void GetMissingTrackDetailsFromFileName()
         {
-            var titleExists = string.IsNullOrEmpty(_title);
-            var artistExists = string.IsNullOrEmpty(_artist);
+            var titleExists = !string.IsNullOrEmpty(_title);
+            var artistExists = !string.IsNullOrEmpty(_artist);
 
             if (titleExists && artistExists)
             {
