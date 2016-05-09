@@ -102,14 +102,11 @@ namespace Dukebox.Desktop.ViewModel
             progressViewModel.Title = AddToLibraryTitle;
             progressViewModel.HeaderText = AddToLibraryHeader;
 
-            Task.Run(() =>
-            {
-                _musicLibrary.AddSupportedFilesInDirectory(_selectFolderDialog.SelectedPath, true,
+            progressWindow.Show();
+
+            _musicLibrary.AddSupportedFilesInDirectory(_selectFolderDialog.SelectedPath, true,
                     (o, a) => ImportStep(progressViewModel, a),
                     (o, i) => progressWindow.Dispatcher.InvokeAsync(progressWindow.Close));
-            });
-
-            progressWindow.Show();
         }
 
         private void ImportStep(ProgressMonitorViewModel viewModel, AudioFileImportedEventArgs fileImportedArgs)

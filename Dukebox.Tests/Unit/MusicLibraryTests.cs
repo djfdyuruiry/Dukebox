@@ -242,12 +242,12 @@ namespace Dukebox.Tests.Unit
         }
 
         [Fact]
-        public void AddDirectory()
+        public async void AddDirectory()
         {
             var numSamples = 5;
 
             PrepareSamplesDirectory("samples", numSamples);
-            _musicLibrary.AddSupportedFilesInDirectory("samples", false, null, null);
+            await _musicLibrary.AddSupportedFilesInDirectory("samples", false, null, null);
 
             var tracks = _musicLibrary.SearchForTracks("samples", new List<SearchAreas> { SearchAreas.Filename });
             var tracksReturned = tracks.Any();
@@ -261,7 +261,7 @@ namespace Dukebox.Tests.Unit
         }
 
         [Fact]
-        public void AddFile()
+        public async void AddFile()
         {
             var sampleFileName = "new_sample.mp3";
             var songTitle = "Unique Song Title $%3£$";
@@ -274,7 +274,7 @@ namespace Dukebox.Tests.Unit
             A.CallTo(() => audioMetadata.Title).Returns(songTitle);
             A.CallTo(() => audioMetadata.HasFutherMetadataTag).Returns(false);
 
-            _musicLibrary.AddFile(trackFile.FullName, audioMetadata);
+            await _musicLibrary.AddFile(trackFile.FullName, audioMetadata);
 
             var tracks = _musicLibrary.SearchForTracks(songTitle, new List<SearchAreas> { SearchAreas.Song });
             var tracksReturned = tracks.Any();
@@ -288,7 +288,7 @@ namespace Dukebox.Tests.Unit
         }
 
         [Fact]
-        public void AddPlaylistFile()
+        public async void AddPlaylistFile()
         {
             var jplFileName = "sample_playlist.jpl";
             var numSamples = 5;
@@ -300,7 +300,7 @@ namespace Dukebox.Tests.Unit
             File.Delete(jplFileName);
             File.WriteAllText(jplFileName, jplJson);
 
-            _musicLibrary.AddPlaylistFiles(jplFileName);
+            await _musicLibrary.AddPlaylistFiles(jplFileName);
 
             var tracks = _musicLibrary.SearchForTracksInArea(SearchAreas.Filename, "samples");
             var tracksReturned = tracks.Any();
@@ -313,13 +313,13 @@ namespace Dukebox.Tests.Unit
         }
 
         [Fact]
-        public void AddPlaylist()
+        public async void AddPlaylist()
         {
             var playlistName = "magical music";
             var files = new List<string> { "samples/music.mp3", "samples/music1.mp3", "samples/music2.mp3", "samples/music3.mp3" };
             var maxPlaylistId = _musicLibrary.OrderedPlaylists.Max(p => p.id);
 
-            _musicLibrary.AddPlaylist(playlistName, files);
+            await _musicLibrary.AddPlaylist(playlistName, files);
 
             var playlist = _musicLibrary.OrderedPlaylists.FirstOrDefault(p => p.name == playlistName);
             var playlistReturned = playlist != null;
@@ -334,12 +334,12 @@ namespace Dukebox.Tests.Unit
         }
 
         [Fact]
-        public void RemoveTrack()
+        public async void RemoveTrack()
         {
             var tracks = _musicLibrary.SearchForTracks("wish you were here", new List<SearchAreas> { SearchAreas.Song });
             var track = tracks.First();
 
-            _musicLibrary.RemoveTrack(track);
+            await _musicLibrary.RemoveTrack(track);
 
             tracks = _musicLibrary.GetTracksByAttributeId(SearchAreas.Song, track.Song.id);
             var trackDeleted = !tracks.Any();
