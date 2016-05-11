@@ -12,5 +12,6 @@ namespace Dukebox.Library.Interfaces
         bool CheckCacheForAlbum(long albumId);
         void AddAlbumToCache(Album album, IAudioFileMetadata tag);
         Image GetAlbumArtFromCache(long albumId);
+        string GetAlbumArtPathFromCache(long albumId);
     }
 }

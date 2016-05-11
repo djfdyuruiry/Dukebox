@@ -8,21 +8,22 @@ namespace Dukebox.Desktop.Services
     public class Album
     {
         private readonly IAlbumArtCacheService _albumArtCacheService;
-        private readonly ImageToImageSourceConverter _imageToImageSourceConverter;
-        private ImageSource _albumArt;
+        private string _albumArtPath;
 
         public LibraryAlbum Data { get; private set; }
 
-        public ImageSource AlbumArt
+        public string AlbumArtPath
         {
             get
             {
-                if (_albumArt == null)
+                if (_albumArtPath == null)
                 {
-                    _albumArt = Data.HasAlbumArt ? GetAlbumArt() : ImageResources.DefaultAlbumArtImage;
+                    _albumArtPath = _albumArtCacheService.CheckCacheForAlbum(Data.id) ? 
+                        _albumArtCacheService.GetAlbumArtPathFromCache(Data.id) : 
+                        ImageResources.DefaultAlbumArtUri;
                 }
 
-                return _albumArt;
+                return _albumArtPath;
             }
         }
 
@@ -34,22 +35,16 @@ namespace Dukebox.Desktop.Services
             return instance;
         }
 
-        public Album(IAlbumArtCacheService albumArtCacheService, ImageToImageSourceConverter imageToImageSourceConverter)
+        public Album(IAlbumArtCacheService albumArtCacheService)
         {
             _albumArtCacheService = albumArtCacheService;
-            _imageToImageSourceConverter = imageToImageSourceConverter;
         }
 
         public static bool ContainsString(Album album, string stringToFind)
         {
-            return album.Data.name.ToLower().Contains(stringToFind.ToLower());
-        }
+            var name = album.Data.name;
 
-        private ImageSource GetAlbumArt()
-        {
-            var albumArtImage = _albumArtCacheService.GetAlbumArtFromCache(Data.id);
-            var albumArtImageSource = _imageToImageSourceConverter.Convert(albumArtImage);
-            return albumArtImageSource;
-        }
+            return string.IsNullOrEmpty(name) ? false : name.ToLower().Contains(stringToFind.ToLower());
+        }        
     }
 }

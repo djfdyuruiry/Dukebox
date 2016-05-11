@@ -25,15 +25,17 @@ namespace Dukebox.Desktop.Helper
         {
             var image = value as Image;
             var bitmapImage = new BitmapImage();
-            var memoryStream = new MemoryStream();
 
-            bitmapImage.BeginInit();
+            using (var memoryStream = new MemoryStream())
+            {
+                bitmapImage.BeginInit();
 
-            image.Save(memoryStream, ImageFormat.Bmp);
-            memoryStream.Seek(0, SeekOrigin.Begin);
+                image.Save(memoryStream, ImageFormat.Bmp);
+                memoryStream.Seek(0, SeekOrigin.Begin);
 
-            bitmapImage.StreamSource = memoryStream;
-            bitmapImage.EndInit();
+                bitmapImage.StreamSource = memoryStream;
+                bitmapImage.EndInit();
+            }
 
             return bitmapImage;
         }

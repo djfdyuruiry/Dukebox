@@ -9,7 +9,8 @@ namespace Dukebox.Library.Interfaces
 {
     public interface IAudioFileMetadata
     {
-        string FileName { get; }
+        string AudioFilePath { get; }
+        string Title { get; set; }
         string Album { get; set; }
         Image AlbumArt { get; }
         string Artist { get; set; }
@@ -17,7 +18,5 @@ namespace Dukebox.Library.Interfaces
         bool HasFutherMetadataTag { get; }
         bool IsEmpty { get; }
         int Length { get; }
-        string Title { get; set; }
-        void CommitChangesToFile();
     }
 }
