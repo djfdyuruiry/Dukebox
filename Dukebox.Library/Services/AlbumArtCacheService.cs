@@ -116,15 +116,11 @@ namespace Dukebox.Library.Services
         {
             try
             {
-                if (!CheckCacheForAlbum(albumId))
-                {
-                    throw new Exception(string.Format("Album with id {0} is not in the album art cache.", albumId));
-                }
-
+                var path = GetPathToCachedAlbumArt(albumId);
                 logger.InfoFormat("Fetching album artwork for album with id {0} from ablum art file cache.", albumId);
-                var path = Path.Combine(_cachePath, albumId.ToString());
 
-                return Image.FromFile(path);
+                var albumArt =  Image.FromFile(path);
+                return albumArt;
             }
             catch (Exception ex)
             {            
@@ -133,6 +129,36 @@ namespace Dukebox.Library.Services
 
                 throw new Exception(string.Format("{0}: {1}", msg, ex.Message)); 
             }
+        }
+
+        public string GetAlbumArtPathFromCache(long albumId)
+        {
+            try
+            {
+                var path = GetPathToCachedAlbumArt(albumId);
+                logger.InfoFormat("Fetching album artwork path for album with id {0} from ablum art file cache.", albumId);
+
+                return path;
+            }
+            catch (Exception ex)
+            {
+                var msg = string.Format("Error getting album art path for album with id {0} from cache.", albumId);
+                logger.Error(msg, ex);
+
+                throw new Exception(string.Format("{0}: {1}", msg, ex.Message));
+            }
+        }
+
+        private string GetPathToCachedAlbumArt(long albumId)
+        {
+            if (!CheckCacheForAlbum(albumId))
+            {
+                throw new Exception(string.Format("Album with id {0} is not in the album art cache.", albumId));
+            }
+
+            var path = Path.Combine(_cachePath, albumId.ToString());
+
+            return path;
         }
 
         public List<long> GetAlbumIdsFromCache()
