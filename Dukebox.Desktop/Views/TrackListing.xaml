@@ -46,7 +46,7 @@
                 </Style>
             </DataGrid.CellStyle>
             <DataGrid.Columns>
-                <DataGridTemplateColumn Header="Artist" Width="auto" SortMemberPath="Artist" IsReadOnly="{Binding EditingListingsDisabled}">
+                <DataGridTemplateColumn Header="Artist" Width="auto" SortMemberPath="Artist.name" CanUserSort="True"  IsReadOnly="{Binding EditingListingsDisabled}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Artist.name}">
@@ -54,7 +54,7 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="Album" Width="auto" SortMemberPath="Album" IsReadOnly="{Binding EditingListingsDisabled}">
+                <DataGridTemplateColumn Header="Album" Width="auto" SortMemberPath="Album.name" CanUserSort="True" IsReadOnly="{Binding EditingListingsDisabled}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Album.name}">
@@ -62,7 +62,7 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="Title" Width="*" SortMemberPath="Song" IsReadOnly="{Binding EditingListingsDisabled}">
+                <DataGridTemplateColumn Header="Title" Width="*" SortMemberPath="Song.title" CanUserSort="True" IsReadOnly="{Binding EditingListingsDisabled}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Song.title}">
