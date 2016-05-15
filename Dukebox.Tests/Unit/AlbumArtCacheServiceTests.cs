@@ -157,7 +157,6 @@ namespace Dukebox.Tests.Unit
             albumObj.id = albumId;
 
             A.CallTo(() => metadata.HasAlbumArt).Returns(true);
-            A.CallTo(() => metadata.HasFutherMetadataTag).Returns(true);
             A.CallTo(() => metadata.AlbumArt).Returns(blankImage);
 
             albumArtCache.AddAlbumToCache(albumObj, metadata);

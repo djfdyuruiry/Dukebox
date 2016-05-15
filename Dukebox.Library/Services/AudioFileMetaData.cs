@@ -68,39 +68,7 @@ namespace Dukebox.Library.Services
         {
             get
             {
-                if (!HasFutherMetadataTag)
-                {
-                    throw new InvalidOperationException("There is no metadata tag available for this audio file!");
-                }
-
-                Image albumArt = null;
-
-                logger.InfoFormat("Fetching album artwork from file: {0}", AudioFilePath);
-
-                try
-                {
-                    var audioFile = OpenAudioFile(AudioFilePath);
-                    var tag = audioFile.getTag();
-                    var artWork = tag.getFirstArtwork();
-
-                    var albumArtBytes = artWork.getBinaryData();                    
-
-                    using (var albumArtStream = new MemoryStream(albumArtBytes))
-                    {
-                        albumArt = Image.FromStream(albumArtStream);
-                    }
-
-                    if (albumArt == null)
-                    {
-                        throw new Exception("Error opening memory stream to save album art image to disk");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception(string.Format("Error getting album art from metadata in file {0}", AudioFilePath), ex);
-                }
-
-                return albumArt;
+                return GetAlbumArt();
             }
         }
 
@@ -139,14 +107,14 @@ namespace Dukebox.Library.Services
                     var artworkList = tag.getArtworkList();
 
                     audioFileMetadata._trackLength = audioHeader.getTrackLength();
-                    audioFileMetadata._hasAlbumArt = artworkList.size() > 0;
+                    audioFileMetadata.HasAlbumArt = artworkList.size() > 0;
 
                     if (string.IsNullOrEmpty(audioFileMetadata.Title))
                     {
                         audioFileMetadata.LoadMissingTrackDetailsFromFileName();
                     }
 
-                    audioFileMetadata.HasAlbumArt = true;
+                    audioFileMetadata.HasFutherMetadataTag = true;
                 }
                 else
                 {
@@ -171,7 +139,66 @@ namespace Dukebox.Library.Services
             _cdMetadataService = cdMetadataService;
             _audioCdService = audioCdService;
         }
-        
+
+        public Image GetAlbumArt(Action<Image> beforeStreamClosedCallback = null)
+        {
+            if (!HasAlbumArt)
+            {
+                throw new InvalidOperationException("There is no metadata tag available for this audio file!");
+            }
+
+            Image albumArt = null;
+
+            logger.InfoFormat("Fetching album artwork from file: {0}", AudioFilePath);
+
+            try
+            {
+                var audioFile = OpenAudioFile(AudioFilePath);
+                var tag = audioFile.getTag();
+                var artWork = tag.getFirstArtwork();
+
+                var albumArtBytes = artWork.getBinaryData();
+
+                if (albumArtBytes.Length == 0)
+                {
+                    throw new InvalidDataException("Album art binary data was empty");
+                }
+
+                using (var albumArtStream = new MemoryStream(albumArtBytes))
+                {
+                    albumArt = Image.FromStream(albumArtStream);
+                    beforeStreamClosedCallback?.Invoke(albumArt);
+                }
+
+                if (albumArt == null)
+                {
+                    throw new Exception("Error opening memory stream to save album art image to disk");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(string.Format("Error getting album art from metadata in file {0}", AudioFilePath), ex);
+            }
+
+            return albumArt;
+        }
+
+        public string SaveAlbumArtToTempFile()
+        {
+            try
+            {
+                var path = Path.GetTempFileName();
+
+                GetAlbumArt(i => i.Save(path));
+
+                return path;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(string.Format("Error saving album art to temporary file from audio file at path '{0}'", AudioFilePath), ex);
+            }
+        }
+
         private void LoadMissingTrackDetailsFromFileName()
         {
             var titleExists = !string.IsNullOrEmpty(Title);

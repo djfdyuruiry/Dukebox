@@ -10,6 +10,7 @@ using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
 using System.Windows;
 using System;
+using System.Windows.Media.Imaging;
 
 namespace Dukebox.Desktop.ViewModel
 {
@@ -21,6 +22,8 @@ namespace Dukebox.Desktop.ViewModel
 
         private readonly IMediaPlayer _mediaPlayer;
         private readonly IAudioPlaylist _audioPlaylist;
+        private readonly IGlobalMultimediaHotKeyService _globalHotKeyService;
+        private readonly IAlbumArtCacheService _albumArtCache;
         private readonly ImageToImageSourceConverter _imageToImageSourceConverter;
 
         private string _artist;
@@ -28,9 +31,9 @@ namespace Dukebox.Desktop.ViewModel
         private string _album;
         private string _trackMinutesPassed;
         private string _trackMinutesTotal;
-        private ImageSource _albumArt;
+        private string _albumArtPath;
         private ImageSource _playPauseImage;
-        private readonly IGlobalMultimediaHotKeyService _globalHotKeyService;
+        private ImageSource _albumArtImage;
 
         public string Artist
         {
@@ -101,11 +104,11 @@ namespace Dukebox.Desktop.ViewModel
         {
             get
             {
-                return _albumArt;
+                return _albumArtImage;
             }
             private set
             {
-                _albumArt = value;
+                _albumArtImage = value;
 
                 OnPropertyChanged("AlbumArt");
             }
@@ -129,14 +132,16 @@ namespace Dukebox.Desktop.ViewModel
         public ICommand ForwardCommand { get; private set; }
 
         public PlaybackMonitorViewModel(IMediaPlayer mediaPlayer, IAudioPlaylist audioPlaylist,
-            IGlobalMultimediaHotKeyService globalHotKeyService, ImageToImageSourceConverter imageToImageSourceConverter) : base()
+            IGlobalMultimediaHotKeyService globalHotKeyService, IAlbumArtCacheService albumArtCache,
+            ImageToImageSourceConverter imageToImageSourceConverter) : base()
         {
             _mediaPlayer = mediaPlayer;
             _audioPlaylist = audioPlaylist;
             _globalHotKeyService = globalHotKeyService;
+            _albumArtCache = albumArtCache;
             _imageToImageSourceConverter = imageToImageSourceConverter;
 
-            AlbumArt = ImageResources.DefaultAlbumArtImage;
+            AlbumArt = new BitmapImage(new Uri(ImageResources.DefaultAlbumArtUri));
             PlayPauseImage = ImageResources.PlayImage;
 
             SetupAudioEventListeners();
@@ -195,7 +200,7 @@ namespace Dukebox.Desktop.ViewModel
         private void LoadedTrackFromFile(TrackLoadedFromFileEventArgs trackLoadedArgs)
         {
             TrackMinutesTotal = _mediaPlayer.AudioLengthInMins;
-            AlbumArt = ImageResources.DefaultAlbumArtImage;
+            AlbumArt = new BitmapImage(new Uri(ImageResources.DefaultAlbumArtUri));
 
             if (trackLoadedArgs.Metadata == null)
             {
@@ -209,13 +214,32 @@ namespace Dukebox.Desktop.ViewModel
 
         private void LoadNewTrackAlbumArtIfPresent(NewTrackLoadedEventArgs newTrackArgs)
         {
-            if (!newTrackArgs.Track.Metadata.HasAlbumArt)
+            var albumId = newTrackArgs.Track.Album?.id;
+
+            AlbumArt = new BitmapImage(new Uri(ImageResources.DefaultAlbumArtUri));
+
+            if (albumId.HasValue && _albumArtCache.CheckCacheForAlbum(albumId.Value))
             {
-                AlbumArt = ImageResources.DefaultAlbumArtImage;
+                var albumArtCachedImagePath = _albumArtCache.GetAlbumArtPathFromCache(albumId.Value);
+                AlbumArt = new BitmapImage(new Uri(albumArtCachedImagePath));
+
                 return;
             }
 
-            AlbumArt = _imageToImageSourceConverter.Convert(newTrackArgs.Track.Metadata.AlbumArt);
+            if (!newTrackArgs.Track.Metadata.HasAlbumArt)
+            {
+                return;
+            }
+
+            try
+            {
+                var albumArtTempImagePath = newTrackArgs.Track.Metadata.SaveAlbumArtToTempFile();
+                AlbumArt = new BitmapImage(new Uri(albumArtTempImagePath));
+            }
+            catch
+            {
+                AlbumArt = new BitmapImage(new Uri(ImageResources.DefaultAlbumArtUri));
+            }
         }
 
         private void TrackFinishedPlaying()
@@ -227,11 +251,6 @@ namespace Dukebox.Desktop.ViewModel
         private void TrackPositionChanged()
         {
             TrackMinutesPassed = _mediaPlayer.MinutesPlayed;
-        }
-
-        private void AlbumArtChanged(ImageSource albumArt)
-        {
-            AlbumArt = albumArt;
         }
     }
 }

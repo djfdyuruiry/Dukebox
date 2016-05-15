@@ -24,7 +24,7 @@
         </Grid.ColumnDefinitions>
         <!-- Current album art -->
         <Grid Name="AlbumArtContainer" Grid.Row="0" Grid.Column="0">
-            <Image Name="CurrentAlbumArt" Height="auto" Width="auto" Source="../Graphics/black_7_music_node.png" ></Image>
+            <Image Name="CurrentTrackAlbumArt" Width="auto" Height="auto" IsHitTestVisible="False" Source="{Binding AlbumArt}"/>
         </Grid>
         <!-- Playing now -->
         <Grid Name="PlayingNowContainer" Grid.Row="0" Grid.Column="1">

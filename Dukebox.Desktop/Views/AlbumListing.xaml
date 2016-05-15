@@ -17,12 +17,11 @@
             <StackPanel>
                 <Image x:Name="AlbumArt" Width="194" Height="194" IsHitTestVisible="False">
                     <Image.Source>
-                        <BitmapImage
-                            DecodePixelHeight="194"
-                            DecodePixelWidth="194"
-                            UriSource="{Binding AlbumArtPath, Mode=OneWay, UpdateSourceTrigger=Explicit}" 
-                            CreateOptions="DelayCreation" 
-                            CacheOption="None"/>
+                        <BitmapImage DecodePixelHeight="194"
+                                     DecodePixelWidth="194"
+                                     UriSource="{Binding AlbumArtPath, Mode=OneWay, UpdateSourceTrigger=Explicit}" 
+                                     CreateOptions="DelayCreation" 
+                                     CacheOption="None"/>
                     </Image.Source>
                 </Image>
                 <TextBlock HorizontalAlignment="center" Text="{Binding Data.name}"/>
