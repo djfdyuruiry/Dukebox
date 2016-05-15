@@ -37,15 +37,5 @@ namespace Dukebox.Library.Model
 
             return string.Format("{0} - {1}", displayArtist, displayTitle);
         }
-
-        public override bool Equals(object obj)
-        {
-            if (obj.GetType() == typeof(string))
-            {
-                return (string)obj == ToString();
-            }
-
-            return base.Equals(obj);
-        }
     }
 }

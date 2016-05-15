@@ -20,16 +20,6 @@ namespace Dukebox.Library.Model
         public override string ToString()
         {
             return name;
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (obj.GetType() == typeof(string))
-            {
-                return (string)obj == ToString();
-            }
-
-            return base.Equals(obj);
-        }
+        }        
     }
 }
