@@ -30,15 +30,5 @@ namespace Dukebox.Library.Model
         {
             return name;
         }
-
-        public override bool Equals(object obj)
-        {
-            if (obj.GetType() == typeof(string))
-            {
-                return (string)obj == ToString();
-            }
-
-            return base.Equals(obj);
-        }
     }
 }
