@@ -470,22 +470,25 @@ namespace Dukebox.Library.Services
         /// Replace the current playlist tracks with those
         /// found in the given playlist file.
         /// </summary>
-        public int LoadPlaylistFromFile(string filename)
+        public int LoadPlaylistFromFile(string filename, bool startPlayback = true)
         {
             var playlist = _musicLibrary.GetPlaylistFromFile(filename);
             var tracks = playlist.GetTracksForPlaylist();
 
-            return LoadPlaylistFromList(tracks);
+            return LoadPlaylistFromList(tracks, startPlayback);
         }
 
-        public int LoadPlaylistFromList(List<ITrack> tracks)
+        public int LoadPlaylistFromList(List<ITrack> tracks, bool startPlayback = true)
         {
             StopPlaylistPlayback();
 
             Tracks.Clear();
             tracks.ForEach(t => Tracks.Add(t));
 
-            StartPlaylistPlayback();
+            if (startPlayback)
+            {
+                StartPlaylistPlayback();
+            }
 
             return Tracks.Count;
         }
