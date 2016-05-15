@@ -10,6 +10,7 @@ using Dukebox.Audio.Interfaces;
 using Dukebox.Audio.Model;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
+using System.Diagnostics;
 
 namespace Dukebox.Library.Services
 {
@@ -204,10 +205,7 @@ namespace Dukebox.Library.Services
 
         private void CallTrackModifiedHandler()
         {
-            if (TrackListModified != null)
-            {
-                TrackListModified(this, new TrackListAccessEventArgs { TrackListSize = Tracks.Count });
-            }
+            TrackListModified?.Invoke(this, new TrackListAccessEventArgs { TrackListSize = Tracks.Count });
         }
 
         /// <summary>
@@ -218,6 +216,7 @@ namespace Dukebox.Library.Services
         {
             if (!StreamingPlaylist)
             {
+                SetCurrentTrackIndex(0);
                 _playlistManagerThread = new Thread(PlayAllTracks);
                 _playlistManagerThread.Start();
             }
@@ -458,7 +457,6 @@ namespace Dukebox.Library.Services
             // Set playback flow controls to default values.            
             _back = false;
             _forward = false;
-            SetCurrentTrackIndex(0);
 
             while (GetCurrentTrackIndex() < Tracks.Count)
             {
