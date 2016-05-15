@@ -273,6 +273,7 @@ namespace Dukebox.Tests.Unit
             
             A.CallTo(() => audioMetadata.Title).Returns(songTitle);
             A.CallTo(() => audioMetadata.HasFutherMetadataTag).Returns(false);
+            A.CallTo(() => audioMetadata.HasAlbumArt).Returns(false);
 
             await _musicLibrary.AddFile(trackFile.FullName, audioMetadata);
 
