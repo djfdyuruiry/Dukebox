@@ -203,11 +203,6 @@ namespace Dukebox.Desktop.ViewModel
         {
             TrackMinutesTotal = _mediaPlayer.AudioLengthInMins;
 
-            if (trackLoadedArgs.Metadata == null)
-            {
-                Album = Artist = Track = string.Empty;
-            }
-
             Artist = trackLoadedArgs.Metadata.ArtistName;
             Track = trackLoadedArgs.Metadata.TrackName;
             Album = trackLoadedArgs.Metadata.AlbumName;

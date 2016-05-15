@@ -16,8 +16,11 @@ namespace Dukebox.Audio
     /// </summary>
     public class MediaPlayer : IMediaPlayer
     {
-        private static readonly ILog logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         public const string MinuteFormat = "{0}:{1}";
+        public const string startPlayingTrackEventName = "StartPlayingTrack";
+
+        private static readonly ILog logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly MediaPlayerMetadata defaultMetadata = new MediaPlayerMetadata { ArtistName = "Unknown Artist", AlbumName = "Unknown Album", TrackName = "Unknown Song" };
 
         private IAudioCdService _audioCdService;
 
@@ -131,11 +134,11 @@ namespace Dukebox.Audio
             {
                 throw new ArgumentException("File name string specified has no value or is empty.");
             }
-            else if(!File.Exists(fileName))
+            else if (!File.Exists(fileName))
             {
                 throw new ArgumentException(string.Format("File '{0}' does not exist.", fileName));
             }
-            else if(File.ReadAllBytes(fileName).Count() == 0)
+            else if (File.ReadAllBytes(fileName).Count() == 0)
             {
                 throw new ArgumentException(string.Format("File '{0}' contains no data!", fileName));
             }
@@ -144,7 +147,7 @@ namespace Dukebox.Audio
             {
                 Bass.BASS_StreamFree(_stream);
             }
-           
+
             _stream = 0;
 
             _fileName = fileName;
@@ -154,21 +157,30 @@ namespace Dukebox.Audio
                 _playbackThread.Abort();
             }
 
-            if (LoadedTrackFromFile != null)
-            {
-                var eventArgs = new TrackLoadedFromFileEventArgs 
-                { 
-                    FileName = _fileName, 
-                    Metadata = mediaPlayerMetadata 
-                };
-
-                LoadedTrackFromFile(this, eventArgs);
-            }
+            ScheduleLoadedTrackFromFileEvent(fileName, mediaPlayerMetadata);
 
             _playbackThread = new Thread(PlayAudioFile);
             _playbackThread.Start();
 
-            logger.Info(fileName + " loaded for playback by the media player");
+            logger.InfoFormat("{0} loaded for playback by the media player", fileName);
+        }
+
+        private void ScheduleLoadedTrackFromFileEvent(string fileName, MediaPlayerMetadata mediaPlayerMetadata)
+        {
+            EventHandler handler = null;
+            handler = (o, e) =>
+            {
+                LoadedTrackFromFile?.Invoke(this, new TrackLoadedFromFileEventArgs
+                {
+                    FileName = fileName,
+                    Metadata = mediaPlayerMetadata ?? defaultMetadata
+                });
+
+                var eventInfo = o.GetType().GetEvent(startPlayingTrackEventName);
+                eventInfo.RemoveEventHandler(o, handler);
+            };
+
+            StartPlayingTrack += handler;
         }
 
         /// <summary>
@@ -257,10 +269,7 @@ namespace Dukebox.Audio
                 Playing = true;
                 Stopped = false;
 
-                if (StartPlayingTrack != null)
-                {
-                    StartPlayingTrack(this, EventArgs.Empty);
-                }
+                StartPlayingTrack.Invoke(this, EventArgs.Empty);
             }
             else // Error.
             {
@@ -309,12 +318,7 @@ namespace Dukebox.Audio
                     _newPosition = -1;
                 }
 
-                Thread.Sleep(100);
-
-                if (AudioPositionChanged != null)
-                {
-                    AudioPositionChanged(this, EventArgs.Empty);
-                }
+                AudioPositionChanged?.Invoke(this, EventArgs.Empty);
             }
 
             if (Stopped)
