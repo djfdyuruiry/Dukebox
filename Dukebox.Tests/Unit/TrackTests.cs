@@ -56,40 +56,6 @@ namespace Dukebox.Tests.Unit
             Assert.True(trackStringIsCorrect, "Track string was incorrect for current track details");
         }
 
-        [Fact]
-        public void Equals()
-        {
-            var track = BuildTrack();
-            track.Song = new Song();
-
-            var trackOne = BuildTrack();
-            trackOne.Song = new Song();
-
-            var trackTwo = BuildTrack();
-            trackTwo.Song = new Song { id = 100 };
-
-            var tracksEqual = track.Equals(trackOne);
-
-            Assert.True(tracksEqual, "Tracks with matching songs failed to return true for Equals");
-
-            var tracksUnequal = !track.Equals(trackTwo);
-
-            Assert.True(tracksUnequal, "Tracks with non-matching songs failed to return false for Equals");
-        }
-
-        [Fact]
-        public new void GetHashCode()
-        {
-            var track = BuildTrack();
-            track.Song = new Song();
-
-            var hashCode = track.GetHashCode();
-
-            var hashCodeIsCorrect = hashCode == 0;
-
-            Assert.True(hashCodeIsCorrect, "Tracks hash code did not match current song id");
-        }
-
         private Track BuildTrack()
         {
             var settings = A.Fake<IDukeboxSettings>();
