@@ -31,7 +31,6 @@ namespace Dukebox.Desktop.ViewModel
         private string _album;
         private string _trackMinutesPassed;
         private string _trackMinutesTotal;
-        private string _albumArtPath;
         private ImageSource _playPauseImage;
         private ImageSource _albumArtImage;
 
@@ -141,7 +140,7 @@ namespace Dukebox.Desktop.ViewModel
             _albumArtCache = albumArtCache;
             _imageToImageSourceConverter = imageToImageSourceConverter;
 
-            AlbumArt = new BitmapImage(new Uri(ImageResources.DefaultAlbumArtUri));
+            SetAlbumArtUri(ImageResources.DefaultAlbumArtUri);
             PlayPauseImage = ImageResources.PlayImage;
 
             SetupAudioEventListeners();
@@ -200,7 +199,7 @@ namespace Dukebox.Desktop.ViewModel
         private void LoadedTrackFromFile(TrackLoadedFromFileEventArgs trackLoadedArgs)
         {
             TrackMinutesTotal = _mediaPlayer.AudioLengthInMins;
-            AlbumArt = new BitmapImage(new Uri(ImageResources.DefaultAlbumArtUri));
+            SetAlbumArtUri(ImageResources.DefaultAlbumArtUri);
 
             if (trackLoadedArgs.Metadata == null)
             {
@@ -216,12 +215,12 @@ namespace Dukebox.Desktop.ViewModel
         {
             var albumId = newTrackArgs.Track.Album?.id;
 
-            AlbumArt = new BitmapImage(new Uri(ImageResources.DefaultAlbumArtUri));
+            SetAlbumArtUri(ImageResources.DefaultAlbumArtUri);
 
             if (albumId.HasValue && _albumArtCache.CheckCacheForAlbum(albumId.Value))
             {
                 var albumArtCachedImagePath = _albumArtCache.GetAlbumArtPathFromCache(albumId.Value);
-                AlbumArt = new BitmapImage(new Uri(albumArtCachedImagePath));
+                SetAlbumArtUri(albumArtCachedImagePath);
 
                 return;
             }
@@ -234,12 +233,17 @@ namespace Dukebox.Desktop.ViewModel
             try
             {
                 var albumArtTempImagePath = newTrackArgs.Track.Metadata.SaveAlbumArtToTempFile();
-                AlbumArt = new BitmapImage(new Uri(albumArtTempImagePath));
+                SetAlbumArtUri(albumArtTempImagePath);
             }
             catch
             {
-                AlbumArt = new BitmapImage(new Uri(ImageResources.DefaultAlbumArtUri));
+                SetAlbumArtUri(ImageResources.DefaultAlbumArtUri);
             }
+        }
+
+        private void SetAlbumArtUri(string albumArtUri)
+        {
+            AlbumArt = new BitmapImage(new Uri(albumArtUri));
         }
 
         private void TrackFinishedPlaying()
