@@ -18,8 +18,8 @@ namespace Dukebox.Library.Interfaces
         bool TrackLoaded { get; }
         ObservableCollection<ITrack> Tracks { get; }
         ITrack CurrentlyLoadedTrack { get; }
-        int LoadPlaylistFromFile(string filename);
-        int LoadPlaylistFromList(List<ITrack> tracks);
+        int LoadPlaylistFromFile(string filename, bool startPlayback = true);
+        int LoadPlaylistFromList(List<ITrack> tracks, bool startPlayback = true);
         void ClearPlaylist();
         void SavePlaylistToFile(string filename, bool overwriteFile = false);
         void SkipToTrack(ITrack trackToPlay);
