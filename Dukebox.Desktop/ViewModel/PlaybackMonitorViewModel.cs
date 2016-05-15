@@ -11,6 +11,8 @@ using Dukebox.Library.Model;
 using System.Windows;
 using System;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
+using System.Diagnostics;
 
 namespace Dukebox.Desktop.ViewModel
 {
@@ -32,6 +34,7 @@ namespace Dukebox.Desktop.ViewModel
         private string _trackMinutesPassed;
         private string _trackMinutesTotal;
         private ImageSource _playPauseImage;
+        private string _albumArtUri;
         private ImageSource _albumArtImage;
 
         public string Artist
@@ -122,7 +125,7 @@ namespace Dukebox.Desktop.ViewModel
             {
                 _playPauseImage = value;
 
-                OnPropertyChanged("ImageSource");
+                OnPropertyChanged("PlayPauseImage");
             }
         }
         public ICommand PlayPauseCommand { get; private set; }
@@ -140,7 +143,7 @@ namespace Dukebox.Desktop.ViewModel
             _albumArtCache = albumArtCache;
             _imageToImageSourceConverter = imageToImageSourceConverter;
 
-            SetAlbumArtUri(ImageResources.DefaultAlbumArtUri);
+            UpdateAlbumArt(ImageResources.DefaultAlbumArtUri);
             PlayPauseImage = ImageResources.PlayImage;
 
             SetupAudioEventListeners();
@@ -188,9 +191,9 @@ namespace Dukebox.Desktop.ViewModel
 
         private bool RetryRegisterHotKeys()
         {
-            var msgBoxResult = MessageBox.Show(retryRegisterHotKeysDialogText, retryRegisterHotKeysDialogTitle, 
+            var msgBoxResult = MessageBox.Show(retryRegisterHotKeysDialogText, retryRegisterHotKeysDialogTitle,
                 MessageBoxButton.YesNo, MessageBoxImage.Warning);
-            
+
             var shouldRetry = msgBoxResult == MessageBoxResult.Yes;
 
             return shouldRetry;
@@ -199,7 +202,6 @@ namespace Dukebox.Desktop.ViewModel
         private void LoadedTrackFromFile(TrackLoadedFromFileEventArgs trackLoadedArgs)
         {
             TrackMinutesTotal = _mediaPlayer.AudioLengthInMins;
-            SetAlbumArtUri(ImageResources.DefaultAlbumArtUri);
 
             if (trackLoadedArgs.Metadata == null)
             {
@@ -214,36 +216,54 @@ namespace Dukebox.Desktop.ViewModel
         private void LoadNewTrackAlbumArtIfPresent(NewTrackLoadedEventArgs newTrackArgs)
         {
             var albumId = newTrackArgs.Track.Album?.id;
-
-            SetAlbumArtUri(ImageResources.DefaultAlbumArtUri);
-
-            if (albumId.HasValue && _albumArtCache.CheckCacheForAlbum(albumId.Value))
-            {
-                var albumArtCachedImagePath = _albumArtCache.GetAlbumArtPathFromCache(albumId.Value);
-                SetAlbumArtUri(albumArtCachedImagePath);
-
-                return;
-            }
-
-            if (!newTrackArgs.Track.Metadata.HasAlbumArt)
-            {
-                return;
-            }
-
+            
             try
             {
+                if (albumId.HasValue && _albumArtCache.CheckCacheForAlbum(albumId.Value))
+                {
+                    var albumArtCachedImagePath = _albumArtCache.GetAlbumArtPathFromCache(albumId.Value);
+                    UpdateAlbumArt(albumArtCachedImagePath);
+
+                    return;
+                }
+
+                if (!newTrackArgs.Track.Metadata.HasAlbumArt)
+                {
+                    UpdateAlbumArt(ImageResources.DefaultAlbumArtUri);
+                    return;
+                }
+
                 var albumArtTempImagePath = newTrackArgs.Track.Metadata.SaveAlbumArtToTempFile();
-                SetAlbumArtUri(albumArtTempImagePath);
+                UpdateAlbumArt(albumArtTempImagePath);
             }
             catch
             {
-                SetAlbumArtUri(ImageResources.DefaultAlbumArtUri);
+                UpdateAlbumArt(ImageResources.DefaultAlbumArtUri);
             }
         }
 
-        private void SetAlbumArtUri(string albumArtUri)
+        private void UpdateAlbumArt(string albumArtUri)
         {
-            AlbumArt = new BitmapImage(new Uri(albumArtUri));
+            if(string.IsNullOrEmpty(albumArtUri))
+            {
+                throw new Exception("Unable to update album art for playback monitor: album art uri string was null or empty");
+            }
+
+            if (_albumArtUri == albumArtUri)
+            {
+                // if currently displaying requested image
+                return;
+            }
+            
+            ImageSource albumArtImage = null;
+
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                albumArtImage = ImageResourceLoader.LoadImageFromResourceUri(albumArtUri);
+            });
+
+            AlbumArt = albumArtImage;
+            _albumArtUri = albumArtUri;
         }
 
         private void TrackFinishedPlaying()
