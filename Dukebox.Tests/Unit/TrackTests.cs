@@ -53,7 +53,7 @@ namespace Dukebox.Tests.Unit
 
             var trackStringIsCorrect = trackString == "artist - song";
 
-            Assert.True(trackStringIsCorrect, "Track string was incorrect for current track details");
+            Assert.True(trackStringIsCorrect, string.Format("Track string was incorrect for current track details (track string: '{0}')", trackString));
         }
 
         private Track BuildTrack()
@@ -72,10 +72,10 @@ namespace Dukebox.Tests.Unit
 
             A.CallTo(() => settings.TrackDisplayFormat).Returns("{artist} - {title}");
 
-            A.CallTo(() => library.GetArtistById(A<long>.Ignored)).ReturnsLazily(o => artists.FirstOrDefault(a => a.id == (long)o.Arguments[0]));
+            A.CallTo(() => library.GetArtistById(A<long>.Ignored)).ReturnsLazily(o => artists[0]);
             A.CallTo(() => library.GetArtistCount()).Returns(artists.Count);
 
-            A.CallTo(() => library.GetAlbumById(A<long>.Ignored)).ReturnsLazily(o => albums.FirstOrDefault(a => a.id == (long)o.Arguments[0]));
+            A.CallTo(() => library.GetAlbumById(A<long>.Ignored)).ReturnsLazily(o => albums[0]);
             A.CallTo(() => library.GetAlbumCount()).Returns(albums.Count);
 
             return new Track(settings, library);

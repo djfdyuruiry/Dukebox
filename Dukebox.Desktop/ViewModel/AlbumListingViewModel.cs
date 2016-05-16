@@ -83,10 +83,6 @@ namespace Dukebox.Desktop.ViewModel
                 .Select(a => Album.BuildAlbumInstance(a))
                 .ToList();
 
-            var album = Services.Album.BuildAlbumInstance(new LibraryAlbum() { name = "llllol" });
-
-            albums.Add(album);
-
             Albums = albums;
         }
 

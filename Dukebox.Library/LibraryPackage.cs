@@ -1,20 +1,24 @@
-﻿using Dukebox.Audio;
+﻿using System;
+using System.Collections.Generic;
+using System.Reflection;
+using log4net;
+using SimpleInjector;
+using SimpleInjector.Packaging;
+using Dukebox.Audio;
 using Dukebox.Library.Config;
 using Dukebox.Library.Helper;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Services;
 using Dukebox.Library.Repositories;
-using log4net;
-using SimpleInjector;
-using SimpleInjector.Packaging;
-using System;
-using System.Collections.Generic;
-using System.Reflection;
+using System.IO;
 
 namespace Dukebox.Library
 {
     public class LibraryPackage : IPackage
     {
+        private const string appDataFolderName = "Dukebox";
+        private const string libraryDbFileName = "library.s3db";
+
         private static readonly ILog logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private static Container container;
 
@@ -71,6 +75,8 @@ namespace Dukebox.Library
         {
             try
             {
+                EnsureLocalEnvironmentValid();
+
                 var musicLibrary = new MusicLibrary(container.GetInstance<IMusicLibraryDbContext>(), container.GetInstance<IDukeboxSettings>(),
                     container.GetInstance<IAlbumArtCacheService>(), container.GetInstance<AudioFileFormats>());
 
@@ -83,6 +89,44 @@ namespace Dukebox.Library
                 logger.Error(errMsg, ex);
                 throw new Exception(errMsg, ex);
             }
+        }
+
+        /// <summary>
+        /// Ensure application data folders are correct and a DB file is present, also populate DB connection string.
+        /// </summary>
+        private static void EnsureLocalEnvironmentValid()
+        {
+            var appDirectoryUri = Assembly.GetExecutingAssembly().CodeBase;
+            var appDirectory = Path.GetDirectoryName(appDirectoryUri.Replace("file:///", string.Empty));
+            var libraryDbFilePath = Path.Combine(appDirectory, libraryDbFileName);
+
+            var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            appDataPath = Path.Combine(appDataPath, appDataFolderName);
+
+            var dbFilePath = Path.Combine(appDataPath, libraryDbFileName);
+
+            if (!Directory.Exists(appDataPath))
+            {
+                // create app data directory
+                Directory.CreateDirectory(appDataPath);
+            }
+
+#if DEBUG 
+            if (File.Exists(dbFilePath))
+            {
+                // ensure fresh DB state on each debug run
+                File.Delete(dbFilePath);
+            }
+#endif
+
+            if (!File.Exists(dbFilePath))
+            {
+                // create new library DB file
+                File.Copy(libraryDbFilePath, dbFilePath);
+            }
+            
+            // populate database connection string
+            AppDomain.CurrentDomain.SetData("DataDirectory", appDataPath);
         }
 
         public void RegisterServices(Container container)
