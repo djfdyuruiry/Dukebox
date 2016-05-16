@@ -158,6 +158,11 @@ namespace Dukebox.Tests.Unit
 
             A.CallTo(() => metadata.HasAlbumArt).Returns(true);
             A.CallTo(() => metadata.AlbumArt).Returns(blankImage);
+            A.CallTo(() => metadata.GetAlbumArt(A<Action<Image>>.Ignored)).Invokes(e =>
+            {
+                var action = e.Arguments[0] as Action<Image>;
+                action(blankImage);
+            });
 
             albumArtCache.AddAlbumToCache(albumObj, metadata);
 

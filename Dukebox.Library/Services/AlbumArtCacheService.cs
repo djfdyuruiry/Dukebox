@@ -29,8 +29,9 @@ namespace Dukebox.Library.Services
         {
             try
             {
-                var relativePath = _settings.AlbumArtCachePath;
-                var absolutePath = Path.GetFullPath(relativePath);
+                var configPath = _settings.AlbumArtCachePath;
+                var expandedPath = Environment.ExpandEnvironmentVariables(configPath);
+                var absolutePath = Path.GetFullPath(expandedPath);
 
                 if (!Directory.Exists(absolutePath))
                 {
