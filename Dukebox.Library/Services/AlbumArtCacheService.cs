@@ -33,6 +33,13 @@ namespace Dukebox.Library.Services
                 var expandedPath = Environment.ExpandEnvironmentVariables(configPath);
                 var absolutePath = Path.GetFullPath(expandedPath);
 
+#if DEBUG
+                if (!Directory.Exists(absolutePath))
+                {
+                    Directory.Delete(absolutePath);
+                }
+#endif
+
                 if (!Directory.Exists(absolutePath))
                 {
                     Directory.CreateDirectory(absolutePath);
