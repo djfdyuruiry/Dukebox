@@ -34,7 +34,7 @@ namespace Dukebox.Library.Services
                 var absolutePath = Path.GetFullPath(expandedPath);
 
 #if DEBUG
-                if (!Directory.Exists(absolutePath))
+                if (Directory.Exists(absolutePath))
                 {
                     Directory.Delete(absolutePath);
                 }
