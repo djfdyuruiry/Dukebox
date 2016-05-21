@@ -1,23 +1,27 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Dukebox.Library.Model
 {
+    [Table("albums")]
     public class Album
     {
         public Album()
         {
-            songs = new HashSet<Song>();
+            Songs = new HashSet<Song>();
         }
 
-        public long id { get; set; }
+        [Column("id")]
+        public long Id { get; set; }
 
         [Required]
         [StringLength(2147483647)]
-        public string name { get; set; }
+        [Column("name")]
+        public string Name { get; set; }
         public int hasAlbumArt { get; set; }
 
-        public virtual ICollection<Song> songs { get; set; }
+        public virtual ICollection<Song> Songs { get; set; }
         public bool HasAlbumArt
         {
             get
@@ -28,7 +32,7 @@ namespace Dukebox.Library.Model
 
         public override string ToString()
         {
-            return name;
+            return Name;
         }
     }
 }

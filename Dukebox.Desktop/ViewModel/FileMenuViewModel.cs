@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Dukebox.Desktop.Views;
 using System.IO;
 using Dukebox.Desktop.Model;
+using System.Threading;
 
 namespace Dukebox.Desktop.ViewModel
 {
@@ -101,23 +102,32 @@ namespace Dukebox.Desktop.ViewModel
             progressWindow.DataContext = progressViewModel;
             progressViewModel.Title = AddToLibraryTitle;
             progressViewModel.HeaderText = AddToLibraryHeader;
+            progressViewModel.StatusText = "Collecting Audio File Metadata...";
 
             progressWindow.Show();
 
+            int filesAdded = 0;
+
             _musicLibrary.AddSupportedFilesInDirectory(_selectFolderDialog.SelectedPath, true,
-                    (o, a) => ImportStep(progressViewModel, a),
+                    (o, a) => ImportStep(progressViewModel, a, ref filesAdded),
                     (o, i) => progressWindow.Dispatcher.InvokeAsync(progressWindow.Close));
         }
 
-        private void ImportStep(ProgressMonitorViewModel viewModel, AudioFileImportedEventArgs fileImportedArgs)
+        private void ImportStep(ProgressMonitorViewModel viewModel, AudioFileImportedEventArgs fileImportedArgs, ref int filesAdded)
         {
-            if (viewModel.MaximumProgressValue != fileImportedArgs.TotalFilesThisImport)
+            if (viewModel.MaximumProgressValue != (fileImportedArgs.TotalFilesThisImport * 2))
             {
-                viewModel.MaximumProgressValue = fileImportedArgs.TotalFilesThisImport;
+                viewModel.MaximumProgressValue = (fileImportedArgs.TotalFilesThisImport * 2);
             }
 
+            var percentComplete = (filesAdded / ((float)fileImportedArgs.TotalFilesThisImport / 100)) / 2;
+
             viewModel.CurrentProgressValue++;
+
+            viewModel.NotificationText = string.Format("{0:P}%", percentComplete);
             viewModel.StatusText = string.Format(@"{0} '{1}'", fileImportedArgs.Status, Path.GetFileName(fileImportedArgs.FileAdded));
+
+            Interlocked.Increment(ref filesAdded);
         }
     }
 }

@@ -10,8 +10,9 @@ namespace Dukebox.Desktop.ViewModel
     public class ProgressMonitorViewModel : ViewModelBase, IProgressMonitorViewModel
     {
         private string _title;
-        private string _statusText;
+        private string _notificationText;
         private string _headerText;
+        private string _statusText;
         private int _maximumProgressValue;
         private int _currentProgressValue;
 
@@ -37,6 +38,19 @@ namespace Dukebox.Desktop.ViewModel
             {
                 _headerText = value;
                 OnPropertyChanged("HeaderText");
+            }
+        }
+        public string NotificationText
+
+        {
+            get
+            {
+                return _notificationText;
+            }
+            set
+            {
+                _notificationText = value;
+                OnPropertyChanged("NotificationText");
             }
         }
         public string StatusText

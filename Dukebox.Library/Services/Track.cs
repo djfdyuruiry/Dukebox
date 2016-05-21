@@ -27,20 +27,20 @@ namespace Dukebox.Library.Services
         {
             get
             {
-                if (Song.artistId.HasValue && Song.artistId != -1 && _artist == null)
+                if (Song.ArtistId.HasValue && Song.ArtistId != -1 && _artist == null)
                 {
-                    _artist = _musicLibrary.GetArtistById(Song.artistId.Value); 
+                    _artist = _musicLibrary.GetArtistById(Song.ArtistId.Value); 
                 }
 
                 return _artist;
             }
             set
             {
-                if (value.id <= _musicLibrary.GetArtistCount())
+                if (value.Id <= _musicLibrary.GetArtistCount())
                 {
                     _artist = value;
                 }
-                else if (value.id != -1)
+                else if (value.Id != -1)
                 {
                     throw new ArgumentOutOfRangeException(string.Format("The artist id '{0}' is invalid!", value));
                 }
@@ -51,22 +51,22 @@ namespace Dukebox.Library.Services
         {
             get
             {
-                if (Song.albumId.HasValue && Song.albumId != -1 && _album == null)
+                if (Song.AlbumId.HasValue && Song.AlbumId != -1 && _album == null)
                 {
-                    _album = _musicLibrary.GetAlbumById(Song.albumId.Value);
+                    _album = _musicLibrary.GetAlbumById(Song.AlbumId.Value);
                 }
 
                 return _album;
             }
             set
             {
-                if (value.id <= _musicLibrary.GetAlbumCount())
+                if (value.Id <= _musicLibrary.GetAlbumCount())
                 {
                     _album = value;
                 }
-                else if (value.id != -1)
+                else if (value.Id != -1)
                 {
-                    throw new ArgumentOutOfRangeException(string.Format("The album id '{0}' is invalid!", value.id));
+                    throw new ArgumentOutOfRangeException(string.Format("The album id '{0}' is invalid!", value.Id));
                 }
             }
         }
@@ -77,14 +77,14 @@ namespace Dukebox.Library.Services
             {
                 if (_metadata == null)
                 {
-                    _metadata = AudioFileMetadata.BuildAudioFileMetaData(Song.filename);
+                    _metadata = AudioFileMetadata.BuildAudioFileMetaData(Song.FileName);
                 }
 
                 return _metadata;
             }
             set
             {
-                if (Song.id == -1)
+                if (Song.Id == -1)
                 {
                     _metadata = value;
                 }
@@ -104,8 +104,8 @@ namespace Dukebox.Library.Services
 
             var track = LibraryPackage.GetInstance<ITrack>() as Track;
 
-            track._album = song.album ?? new Album { id = -1 };
-            track._artist = song.artist ?? new Artist { id = -1 };
+            track._album = song.Album ?? new Album { Id = -1 };
+            track._artist = song.Artist ?? new Artist { Id = -1 };
             track.Song = song;
 
             return track as ITrack;
@@ -118,12 +118,12 @@ namespace Dukebox.Library.Services
                 throw new ArgumentException("Cannot build track instance with a null or empty file name");
             }
 
-            var song = new Song() { id = -1, albumId = -1, artistId = -1, filename = fileName };             
+            var song = new Song() { Id = -1, AlbumId = -1, ArtistId = -1, FileName = fileName };             
             var track = BuildTrackInstance(song) as Track;
             
-            track.Song.title = track.Metadata.Title;
-            track._album.name = track.Metadata.Album;
-            track._artist.name = track.Metadata.Artist;
+            track.Song.Title = track.Metadata.Title;
+            track._album.Name = track.Metadata.Album;
+            track._artist.Name = track.Metadata.Artist;
 
             return track as ITrack;
         }
@@ -144,7 +144,7 @@ namespace Dukebox.Library.Services
             }
             else
             {
-                trackFormat = trackFormat.Replace("{artist}", Artist.name);
+                trackFormat = trackFormat.Replace("{artist}", Artist.Name);
             }
 
             if (Album == null)
@@ -153,11 +153,11 @@ namespace Dukebox.Library.Services
             }
             else
             {
-                trackFormat = trackFormat.Replace("{album}", Album.name);
+                trackFormat = trackFormat.Replace("{album}", Album.Name);
             }
 
-            trackFormat = trackFormat.Replace("{filename}", Song.filename);
-            trackFormat = trackFormat.Replace("{title}", Song.title);
+            trackFormat = trackFormat.Replace("{filename}", Song.FileName);
+            trackFormat = trackFormat.Replace("{title}", Song.Title);
 
             return trackFormat;
         }

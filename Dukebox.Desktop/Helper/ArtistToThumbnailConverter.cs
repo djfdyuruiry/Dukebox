@@ -28,7 +28,7 @@ namespace Dukebox.Desktop.Helper
 
             if (artist != null)
             {
-                artistLetter = string.IsNullOrEmpty(artist.name) ? UnkownArtistLetter : artist.name.Substring(0, 1).ToUpper(); 
+                artistLetter = string.IsNullOrEmpty(artist.Name) ? UnkownArtistLetter : artist.Name.Substring(0, 1).ToUpper(); 
             }
 
             var thumbnail = new Bitmap(DefaultThumbnailSize.Width, DefaultThumbnailSize.Height);

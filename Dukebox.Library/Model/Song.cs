@@ -1,38 +1,48 @@
 using Dukebox.Library.Interfaces;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Dukebox.Library.Model
 {
+    [Table("songs")]
     public class Song
     {
-        public long id { get; set; }
+        [Column("id")]
+        public long Id { get; set; }
 
         [Required]
         [StringLength(2147483647)]
-        public string filename { get; set; }
+        [Column("fileName")]
+        public string FileName { get; set; }
 
         [Required]
         [StringLength(2147483647)]
-        public string title { get; set; }
+        [Column("title")]
+        public string Title { get; set; }
 
-        public long lengthInSeconds { get; set; }
+        [Column("lengthInSeconds")]
+        public long LengthInSeconds { get; set; }
 
-        public long? albumId { get; set; }
+        [Column("albumId")]
+        public long? AlbumId { get; set; }
 
-        public long? artistId { get; set; }
+        [Column("artistId")]
+        public long? ArtistId { get; set; }
 
-        public virtual Album album { get; set; }
+        [ForeignKey("AlbumId")]
+        public virtual Album Album { get; set; }
 
-        public virtual Artist artist { get; set; }
+        [ForeignKey("ArtistId")]
+        public virtual Artist Artist { get; set; }
         public override string ToString()
         {
             var musicLibrary = LibraryPackage.GetInstance<IMusicLibrary>();
-            var displayTitle = title == string.Empty ? "Unknown Title" : title;
+            var displayTitle = Title == string.Empty ? "Unknown Title" : Title;
             var displayArtist = "Unknown Artist";
 
-            if (artistId != null && artistId != -1)
+            if (ArtistId != null && ArtistId != -1)
             {
-                displayArtist = musicLibrary.GetArtistById((long)artistId).ToString();
+                displayArtist = musicLibrary.GetArtistById((long)ArtistId).ToString();
             }
 
             return string.Format("{0} - {1}", displayArtist, displayTitle);

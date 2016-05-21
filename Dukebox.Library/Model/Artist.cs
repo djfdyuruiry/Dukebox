@@ -1,25 +1,37 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Dukebox.Library.Model
 {
+    [Table("artists")]
     public class Artist
     {
         public Artist()
         {
-            songs = new HashSet<Song>();
+            Songs = new HashSet<Song>();
         }
 
-        public long id { get; set; }
+        [Column("id")]
+        public long Id { get; set; }
 
         [Required]
         [StringLength(2147483647)]
-        public string name { get; set; }
+        [Column("name")]
+        public string Name { get; set; }
 
-        public virtual ICollection<Song> songs { get; set; }
+        public string FirstCharacterOfName
+        {
+            get
+            {
+                return string.IsNullOrEmpty(Name) ? "?" : Name.Substring(0, 1).ToUpper();
+            }
+        }
+
+        public virtual ICollection<Song> Songs { get; set; }
         public override string ToString()
         {
-            return name;
+            return Name;
         }        
     }
 }

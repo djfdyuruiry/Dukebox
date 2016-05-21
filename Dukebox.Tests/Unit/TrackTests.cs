@@ -15,12 +15,12 @@ namespace Dukebox.Tests.Unit
         {
             var track = BuildTrack();
 
-            track.Song = new Song { artistId = 0 };
+            track.Song = new Song { ArtistId = 0 };
 
             var artist = track.Artist;
 
-            var artistIdIsCorrect = artist.id == 0;
-            var artistNameIsCorrect = artist.name == "artist";
+            var artistIdIsCorrect = artist.Id == 0;
+            var artistNameIsCorrect = artist.Name == "artist";
             var artistReturnedIsCorrect = artistIdIsCorrect && artistNameIsCorrect;
 
             Assert.True(artistReturnedIsCorrect, "Artist returned by Track was incorrect");
@@ -31,12 +31,12 @@ namespace Dukebox.Tests.Unit
         {
             var track = BuildTrack();
 
-            track.Song = new Song { albumId = 0 };
+            track.Song = new Song { AlbumId = 0 };
 
             var album = track.Album;
 
-            var albumIdIsCorrect = album.id == 0;
-            var albumNameIsCorrect = album.name == "album";
+            var albumIdIsCorrect = album.Id == 0;
+            var albumNameIsCorrect = album.Name == "album";
             var albumReturnedIsCorrect = albumIdIsCorrect && albumNameIsCorrect;
 
             Assert.True(albumReturnedIsCorrect, "Album returned by Track was incorrect");
@@ -47,7 +47,7 @@ namespace Dukebox.Tests.Unit
         {
             var track = BuildTrack();
 
-            track.Song = new Song { albumId = 0, artistId = 0, filename = "C:/some.mp3", title = "song" };
+            track.Song = new Song { AlbumId = 0, ArtistId = 0, FileName = "C:/some.mp3", Title = "song" };
 
             var trackString = track.ToString();
 
@@ -63,11 +63,11 @@ namespace Dukebox.Tests.Unit
 
             var artists = new List<Artist>
             {
-                new Artist { id = 0, name = "artist" }
+                new Artist { Id = 0, Name = "artist" }
             };
             var albums = new List<Album>
             {
-                new Album { id = 0, name = "album" }
+                new Album { Id = 0, Name = "album" }
             };
 
             A.CallTo(() => settings.TrackDisplayFormat).Returns("{artist} - {title}");

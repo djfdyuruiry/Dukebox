@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using Dukebox.Library.Model;
+using System.Threading.Tasks;
 
 namespace Dukebox.Library.Interfaces
 {
