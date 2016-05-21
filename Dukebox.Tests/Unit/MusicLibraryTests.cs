@@ -29,7 +29,7 @@ namespace Dukebox.Tests.Unit
             var albumArtCache = A.Fake<IAlbumArtCacheService>();
             var audioFormats = new AudioFileFormats();
 
-            A.CallTo(() => settings.AddDirectoryConcurrencyLimit).Returns(10);
+            A.CallTo(() => settings.AddDirectoryConcurrencyLimit).Returns(20);
 
             audioFormats.SupportedFormats.Add(".mp3");
 
@@ -42,8 +42,8 @@ namespace Dukebox.Tests.Unit
         {
             var albums = _musicLibrary.OrderedAlbums;
 
-            var mockOrderedAlbumNames = _mockDataLoader.Albums.OrderBy(a => a.name).Select(a => a.name);
-            var allAlbumsReturned = albums.Select(a => a.name).SequenceEqual(mockOrderedAlbumNames);
+            var mockOrderedAlbumNames = _mockDataLoader.Albums.OrderBy(a => a.Name).Select(a => a.Name);
+            var allAlbumsReturned = albums.Select(a => a.Name).SequenceEqual(mockOrderedAlbumNames);
 
             Assert.True(allAlbumsReturned, "Failed to return all albums from the database");
 
@@ -58,8 +58,8 @@ namespace Dukebox.Tests.Unit
             {
                 _mockDataLoader.Albums.ForEach(a =>
                 {
-                    var album = _musicLibrary.GetAlbumById(a.id);
-                    albumIdsReturned.Add(album.id);
+                    var album = _musicLibrary.GetAlbumById(a.Id);
+                    albumIdsReturned.Add(album.Id);
                 });
             }
             catch (Exception ex)
@@ -71,7 +71,7 @@ namespace Dukebox.Tests.Unit
 
             albumIdsReturned.Sort();
 
-            var mockAlbumsIds = _mockDataLoader.Albums.OrderBy(a => a.id).Select(a => a.id);
+            var mockAlbumsIds = _mockDataLoader.Albums.OrderBy(a => a.Id).Select(a => a.Id);
             var allAblumsRetured = albumIdsReturned.SequenceEqual(mockAlbumsIds);
 
             Assert.True(allAblumsRetured, "Failed to return all albums by ID");
@@ -82,8 +82,8 @@ namespace Dukebox.Tests.Unit
         {
             var artists = _musicLibrary.OrderedArtists;
 
-            var mockOrderedArtistNames = _mockDataLoader.Artists.OrderBy(a => a.name).Select(a => a.name);
-            var allArtistsReturned = artists.Select(a => a.name).SequenceEqual(mockOrderedArtistNames);
+            var mockOrderedArtistNames = _mockDataLoader.Artists.OrderBy(a => a.Name).Select(a => a.Name);
+            var allArtistsReturned = artists.Select(a => a.Name).SequenceEqual(mockOrderedArtistNames);
 
             Assert.True(allArtistsReturned, "Failed to return all artists from the database");
 
@@ -98,8 +98,8 @@ namespace Dukebox.Tests.Unit
             {
                 _mockDataLoader.Artists.ForEach(a =>
                 {
-                    var artist = _musicLibrary.GetArtistById(a.id);
-                    artistIdsReturned.Add(artist.id);
+                    var artist = _musicLibrary.GetArtistById(a.Id);
+                    artistIdsReturned.Add(artist.Id);
                 });
             }
             catch (Exception ex)
@@ -111,7 +111,7 @@ namespace Dukebox.Tests.Unit
 
             artistIdsReturned.Sort();
 
-            var mockArtistIds = _mockDataLoader.Artists.OrderBy(a => a.id).Select(a => a.id);
+            var mockArtistIds = _mockDataLoader.Artists.OrderBy(a => a.Id).Select(a => a.Id);
             var allArtistsRetured = artistIdsReturned.SequenceEqual(mockArtistIds);
 
             Assert.True(allArtistsRetured, "Failed to return all artists by ID");
@@ -122,8 +122,8 @@ namespace Dukebox.Tests.Unit
         {
             var playlists = _musicLibrary.OrderedPlaylists;
 
-            var mockOrderedPlaylistNames = _mockDataLoader.Playlists.OrderBy(a => a.name).Select(a => a.name);
-            var allPlaylistsReturned = playlists.Select(a => a.name).SequenceEqual(mockOrderedPlaylistNames);
+            var mockOrderedPlaylistNames = _mockDataLoader.Playlists.OrderBy(a => a.Name).Select(a => a.Name);
+            var allPlaylistsReturned = playlists.Select(a => a.Name).SequenceEqual(mockOrderedPlaylistNames);
 
             Assert.True(allPlaylistsReturned, "Failed to return all playlists from the database");
 
@@ -138,8 +138,8 @@ namespace Dukebox.Tests.Unit
             {
                 _mockDataLoader.Playlists.ForEach(a =>
                 {
-                    var playlist = _musicLibrary.GetPlaylistById(a.id);
-                    playlistIdsReturned.Add(playlist.id);
+                    var playlist = _musicLibrary.GetPlaylistById(a.Id);
+                    playlistIdsReturned.Add(playlist.Id);
                 });
             }
             catch (Exception ex)
@@ -151,7 +151,7 @@ namespace Dukebox.Tests.Unit
 
             playlistIdsReturned.Sort();
 
-            var mockPlaylistIds = _mockDataLoader.Playlists.OrderBy(a => a.id).Select(a => a.id);
+            var mockPlaylistIds = _mockDataLoader.Playlists.OrderBy(a => a.Id).Select(a => a.Id);
             var allPlaylistsRetured = playlistIdsReturned.SequenceEqual(mockPlaylistIds);
 
             Assert.True(allPlaylistsRetured, "Failed to return all playlists by ID");
@@ -254,7 +254,7 @@ namespace Dukebox.Tests.Unit
 
             Assert.True(tracksReturned, "Music library failed to return any tracks after adding directory");
 
-            var trackAreCorrect = tracks.All(t => t.Song.title == "sample title") && tracks.Count == numSamples;
+            var trackAreCorrect = tracks.All(t => t.Song.Title == "sample title") && tracks.Count == numSamples;
 
             Assert.True(trackAreCorrect, "Music library failed to return correct tracks after adding directory");
 
@@ -283,7 +283,7 @@ namespace Dukebox.Tests.Unit
             Assert.True(tracksReturned, "Music library failed to return any tracks after adding new track");
 
             var track = tracks.First();
-            var trackIsCorrect = track.Song.filename == trackFile.FullName;
+            var trackIsCorrect = track.Song.FileName == trackFile.FullName;
 
             Assert.True(trackIsCorrect, "Music library failed to return correct track after adding new track");
         }
@@ -308,7 +308,7 @@ namespace Dukebox.Tests.Unit
 
             Assert.True(tracksReturned, "Music library failed to return any tracks after adding playlist");
 
-            var trackAreCorrect = tracks.All(t => t.Song.title == "sample title") && tracks.Count == numSamples;
+            var trackAreCorrect = tracks.All(t => t.Song.Title == "sample title") && tracks.Count == numSamples;
 
             Assert.True(trackAreCorrect, "Music library failed to return correct tracks after adding playlist");
         }
@@ -318,11 +318,11 @@ namespace Dukebox.Tests.Unit
         {
             var playlistName = "magical music";
             var files = new List<string> { "samples/music.mp3", "samples/music1.mp3", "samples/music2.mp3", "samples/music3.mp3" };
-            var maxPlaylistId = _musicLibrary.OrderedPlaylists.Max(p => p.id);
+            var maxPlaylistId = _musicLibrary.OrderedPlaylists.Max(p => p.Id);
 
             await _musicLibrary.AddPlaylist(playlistName, files);
 
-            var playlist = _musicLibrary.OrderedPlaylists.FirstOrDefault(p => p.name == playlistName);
+            var playlist = _musicLibrary.OrderedPlaylists.FirstOrDefault(p => p.Name == playlistName);
             var playlistReturned = playlist != null;
 
             Assert.True(playlistReturned, "Music library failed to add playlist");
@@ -342,7 +342,7 @@ namespace Dukebox.Tests.Unit
 
             await _musicLibrary.RemoveTrack(track);
 
-            tracks = _musicLibrary.GetTracksByAttributeId(SearchAreas.Song, track.Song.id);
+            tracks = _musicLibrary.GetTracksByAttributeId(SearchAreas.Song, track.Song.Id);
             var trackDeleted = !tracks.Any();
 
             Assert.True(trackDeleted, "Music library failed to delete track");

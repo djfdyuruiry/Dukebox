@@ -33,12 +33,12 @@ namespace Dukebox.Library
         private static void Configure(Container container)
         {
             container.RegisterSingleton<IDukeboxSettings, DukeboxSettings>();
-            container.RegisterSingleton(() => GetAlbumArtCacheServiceInstance(container));
+            container.RegisterSingleton<IAlbumArtCacheService>(() => GetAlbumArtCacheServiceInstance(container));
             container.RegisterSingleton<ICdMetadataService, CdMetadataService>();
             container.RegisterSingleton<IAudioCdRippingService, AudioCdRippingService>();
             container.RegisterSingleton<IAudioPlaylist, AudioPlaylist>();
             container.RegisterSingleton<IMusicLibraryDbContext>(() => new MusicLibraryDbContext());
-            container.RegisterSingleton(() => GetMusicLibraryInstance(container));
+            container.RegisterSingleton<IMusicLibrary>(() => GetMusicLibraryInstance(container));
             container.RegisterSingleton<IAudioCdDriveMonitoringService, AudioCdDriveMonitoringService>();
             container.Register<ITrack, Track>();
             container.Register<IAudioFileMetadata, AudioFileMetadata>();
@@ -112,11 +112,8 @@ namespace Dukebox.Library
             }
 
 #if DEBUG 
-            if (File.Exists(dbFilePath))
-            {
-                // ensure fresh DB state on each debug run
-                File.Delete(dbFilePath);
-            }
+            dbFilePath = "./library.s3db";
+            appDataPath = Environment.CurrentDirectory;
 #endif
 
             if (!File.Exists(dbFilePath))

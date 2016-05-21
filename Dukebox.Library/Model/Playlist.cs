@@ -10,17 +10,21 @@ using System.Linq;
 
 namespace Dukebox.Library.Model
 {
+    [Table("playlists")]
     public class Playlist
     {
-        public long id { get; set; }
+        [Column("id")]
+        public long Id { get; set; }
 
         [Required]
         [StringLength(2147483647)]
-        public string name { get; set; }
+        [Column("name")]
+        public string Name { get; set; }
 
         [Required]
         [StringLength(2147483647)]
-        public string filenamesCsv { get; set; }
+        [Column("filenamesCsv")]
+        public string FilenamesCsv { get; set; }
         /// <summary>
         /// List of files associated with this playlist.
         /// </summary>
@@ -28,13 +32,13 @@ namespace Dukebox.Library.Model
         {
             get
             {
-                return filenamesCsv.Split(',').ToList();
+                return FilenamesCsv.Split(',').ToList();
             }
         }
 
         public override string ToString()
         {
-            return name;
+            return Name;
         }
         
         public List<ITrack> GetTracksForPlaylist()

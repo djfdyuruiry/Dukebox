@@ -361,12 +361,12 @@ namespace Dukebox.Library.Services
                 var currentTrack = Tracks[GetCurrentTrackIndex()];
                 var mediaPlayMetadata = new MediaPlayerMetadata
                 {
-                    AlbumName = currentTrack.Album?.name,
-                    ArtistName = currentTrack.Artist?.name,
-                    TrackName = currentTrack.Song.title
+                    AlbumName = currentTrack.Album?.Name,
+                    ArtistName = currentTrack.Artist?.Name,
+                    TrackName = currentTrack.Song.Title
                 };
 
-                _mediaPlayer.LoadFile(currentTrack.Song.filename, mediaPlayMetadata);
+                _mediaPlayer.LoadFile(currentTrack.Song.FileName, mediaPlayMetadata);
 
                 // Wait until media player thread has started playback.
                 while (!_mediaPlayer.Playing)
@@ -510,7 +510,7 @@ namespace Dukebox.Library.Services
                 return;
             }
 
-            var jsonTracks = JsonConvert.SerializeObject(Tracks.Select(t => t.Song.filename).ToList());
+            var jsonTracks = JsonConvert.SerializeObject(Tracks.Select(t => t.Song.FileName).ToList());
 
             File.WriteAllText(filename, jsonTracks);             
         }

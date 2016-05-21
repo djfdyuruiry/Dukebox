@@ -99,6 +99,11 @@ namespace Dukebox.Library.Services
                     var audioFile = OpenAudioFile(audioFileMetadata.AudioFilePath);
                     var tag = audioFile.getTag();
 
+                    if (tag == null)
+                    {
+                        throw new Exception("Audio file does not contain a valid tag");
+                    }
+
                     audioFileMetadata.Title = ExtractFieldText(tag, FieldKey.TITLE);
                     audioFileMetadata.Artist = ExtractFieldText(tag, FieldKey.ARTIST);
                     audioFileMetadata.Album = ExtractFieldText(tag, FieldKey.ALBUM);

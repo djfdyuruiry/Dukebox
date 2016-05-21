@@ -5,6 +5,7 @@ using System.Linq;
 using log4net;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
+using System.Threading;
 
 namespace Dukebox.Library.Services
 {
@@ -14,11 +15,13 @@ namespace Dukebox.Library.Services
 
         private readonly IMusicLibraryDbContext _dukeboxData;
         private readonly IMusicLibrary _musicLibrary;
+        private readonly SemaphoreSlim _dbContextMutex;
 
-        public MusicLibrarySearchService(IMusicLibraryDbContext dukeboxData, IMusicLibrary musicLibrary)
+        public MusicLibrarySearchService(IMusicLibraryDbContext dukeboxData, IMusicLibrary musicLibrary, SemaphoreSlim dbContextMutex)
         {
             _dukeboxData = dukeboxData;
             _musicLibrary = musicLibrary;
+            _dbContextMutex = dbContextMutex;
         }
 
         /// <summary>
@@ -47,7 +50,10 @@ namespace Dukebox.Library.Services
         {
             var stopwatch = Stopwatch.StartNew();
 
+            _dbContextMutex.Wait();
             var songs = _dukeboxData.Songs;
+            _dbContextMutex.Release();
+
             var matchingSongs = Enumerable.Empty<Song>();
 
             if (string.IsNullOrWhiteSpace(searchTerm))
@@ -66,23 +72,23 @@ namespace Dukebox.Library.Services
             if (searchAreas.Contains(SearchAreas.Album))
             {
                 var matchingAlbums = GetMatchingAttributeIds(SearchAreas.Album, searchTerm);
-                matchingSongs = matchingSongs.Concat(songs.Where(s => s.albumId.HasValue ? matchingAlbums.Contains(s.albumId.Value) : false));
+                matchingSongs = matchingSongs.Concat(songs.Where(s => s.AlbumId.HasValue ? matchingAlbums.Contains(s.AlbumId.Value) : false));
             }
 
             if (searchAreas.Contains(SearchAreas.Artist))
             {
                 var matchingArtists = GetMatchingAttributeIds(SearchAreas.Artist, searchTerm);
-                matchingSongs = matchingSongs.Concat(songs.Where(t => t.artistId.HasValue ? matchingArtists.Contains(t.artistId.Value) : false));
+                matchingSongs = matchingSongs.Concat(songs.Where(t => t.ArtistId.HasValue ? matchingArtists.Contains(t.ArtistId.Value) : false));
             }
 
             if (searchAreas.Contains(SearchAreas.Song))
             {
-                matchingSongs = matchingSongs.Concat(songs.Where(s => s.title.ToLower().Contains(searchTerm)));
+                matchingSongs = matchingSongs.Concat(songs.Where(s => s.Title.ToLower().Contains(searchTerm)));
             }
 
             if (searchAreas.Contains(SearchAreas.Filename))
             {
-                matchingSongs = matchingSongs.Concat(songs.Where(s => s.filename.ToLower().Contains(searchTerm)));
+                matchingSongs = matchingSongs.Concat(songs.Where(s => s.FileName.ToLower().Contains(searchTerm)));
             }
 
 
@@ -103,7 +109,10 @@ namespace Dukebox.Library.Services
         {
             var stopwatch = Stopwatch.StartNew();
 
+            _dbContextMutex.Wait();
             var songs = _dukeboxData.Songs;
+            _dbContextMutex.Release();
+
             var matchingSongs = Enumerable.Empty<Song>();
 
             var lowerAttributeValue = attributeValue.ToLower();
@@ -111,23 +120,23 @@ namespace Dukebox.Library.Services
             if (attribute == SearchAreas.Album)
             {
                 var matchingAlbums = GetMatchingAttributeIds(SearchAreas.Album, lowerAttributeValue, true);
-                matchingSongs = matchingSongs.Concat(songs.Where(s => s.albumId.HasValue ? matchingAlbums.Contains(s.albumId.Value) : false));
+                matchingSongs = matchingSongs.Concat(songs.Where(s => s.AlbumId.HasValue ? matchingAlbums.Contains(s.AlbumId.Value) : false));
             }
 
             if (attribute == SearchAreas.Artist)
             {
                 var matchingArtists = GetMatchingAttributeIds(SearchAreas.Artist, lowerAttributeValue, true);
-                matchingSongs = matchingSongs.Concat(songs.Where(t => t.artistId.HasValue ? matchingArtists.Contains(t.artistId.Value) : false));
+                matchingSongs = matchingSongs.Concat(songs.Where(t => t.ArtistId.HasValue ? matchingArtists.Contains(t.ArtistId.Value) : false));
             }
 
             if (attribute == SearchAreas.Song)
             {
-                matchingSongs = matchingSongs.Concat(songs.Where(s => s.title.ToLower().Equals(lowerAttributeValue)));
+                matchingSongs = matchingSongs.Concat(songs.Where(s => s.Title.ToLower().Equals(lowerAttributeValue)));
             }
 
             if (attribute == SearchAreas.Filename)
             {
-                matchingSongs = matchingSongs.Concat(songs.Where(s => s.filename.ToLower().Equals(lowerAttributeValue)));
+                matchingSongs = matchingSongs.Concat(songs.Where(s => s.FileName.ToLower().Equals(lowerAttributeValue)));
             }
 
 
@@ -144,22 +153,22 @@ namespace Dukebox.Library.Services
             {
                 if (exactMatch)
                 {
-                    return _musicLibrary.OrderedAlbums.Where(a => a.ToString().ToLower().Equals(searchTerm)).Select(a => a.id);
+                    return _musicLibrary.OrderedAlbums.Where(a => a.ToString().ToLower().Equals(searchTerm)).Select(a => a.Id);
                 }
                 else
                 {
-                    return _musicLibrary.OrderedAlbums.Where(a => a.ToString().ToLower().Contains(searchTerm)).Select(a => a.id);
+                    return _musicLibrary.OrderedAlbums.Where(a => a.ToString().ToLower().Contains(searchTerm)).Select(a => a.Id);
                 }
             }
             else if (attribute == SearchAreas.Artist)
             {
                 if (exactMatch)
                 {
-                    return _musicLibrary.OrderedArtists.Where(a => a.ToString().ToLower().Equals(searchTerm)).Select(a => a.id);
+                    return _musicLibrary.OrderedArtists.Where(a => a.ToString().ToLower().Equals(searchTerm)).Select(a => a.Id);
                 }
                 else
                 {
-                    return _musicLibrary.OrderedArtists.Where(a => a.ToString().ToLower().Contains(searchTerm)).Select(a => a.id);
+                    return _musicLibrary.OrderedArtists.Where(a => a.ToString().ToLower().Contains(searchTerm)).Select(a => a.Id);
                 }
             }
 
@@ -178,7 +187,11 @@ namespace Dukebox.Library.Services
             var stopwatch = Stopwatch.StartNew();
 
             var searchAreas = new List<SearchAreas>();
+
+            _dbContextMutex.Wait();
             var songs = _dukeboxData.Songs;
+            _dbContextMutex.Release();
+
             var matchingSongs = Enumerable.Empty<Song>();
 
             if (attribute == SearchAreas.Filename)
@@ -197,17 +210,17 @@ namespace Dukebox.Library.Services
 
             if (searchAreas.Contains(SearchAreas.Album))
             {
-                matchingSongs = matchingSongs.Concat(songs.Where(s => s.albumId != null ? s.albumId == attributeId : false));
+                matchingSongs = matchingSongs.Concat(songs.Where(s => s.AlbumId != null ? s.AlbumId == attributeId : false));
             }
 
             if (searchAreas.Contains(SearchAreas.Artist))
             {
-                matchingSongs = matchingSongs.Concat(songs.Where(s => s.artistId != null ? s.artistId == attributeId : false));
+                matchingSongs = matchingSongs.Concat(songs.Where(s => s.ArtistId != null ? s.ArtistId == attributeId : false));
             }
 
             if (searchAreas.Contains(SearchAreas.Song))
             {
-                matchingSongs = matchingSongs.Concat(songs.Where(s => s.id == attributeId));
+                matchingSongs = matchingSongs.Concat(songs.Where(s => s.Id == attributeId));
             }
 
             stopwatch.Stop();

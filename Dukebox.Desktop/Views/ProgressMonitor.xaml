@@ -11,7 +11,17 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <TextBlock Grid.Row="0" Grid.Column="0" Margin="2" FontSize="14" Text="{Binding HeaderText}"></TextBlock>
+        <Grid Grid.Row="0" Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"></RowDefinition>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.8*"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Row="0" Grid.Column="0" Margin="2" FontSize="14" Text="{Binding HeaderText}" TextAlignment="Left"></TextBlock>
+            <TextBlock Grid.Row="0" Grid.Column="1" Margin="2" FontSize="14" Text="{Binding NotificationText}" TextAlignment="Right"></TextBlock>
+        </Grid>
         <ProgressBar Grid.Row="1" Grid.Column="0" Margin="2" Maximum="{Binding MaximumProgressValue}" Value="{Binding CurrentProgressValue}"></ProgressBar>
         <TextBlock Grid.Row="2" Grid.Column="0" FontSize="14" Text="{Binding StatusText}"></TextBlock>
     </Grid>

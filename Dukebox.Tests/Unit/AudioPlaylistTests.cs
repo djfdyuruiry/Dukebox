@@ -30,7 +30,7 @@ namespace Dukebox.Tests.Unit
             _audioPlaylist = new AudioPlaylist(_musicLibrary, _mediaPlayer);
             _track = A.Fake<ITrack>();
 
-            A.CallTo(() => _track.Song).Returns(new Song { filename = TrackFileName });
+            A.CallTo(() => _track.Song).Returns(new Song { FileName = TrackFileName });
 
             _audioPlaylist.Tracks.Add(_track);
         }

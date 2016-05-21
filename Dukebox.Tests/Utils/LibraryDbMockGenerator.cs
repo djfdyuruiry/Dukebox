@@ -17,27 +17,27 @@ namespace Dukebox.Tests.Utils
 
         public readonly List<Album> Albums = new List<Album>
         {
-            new Album { hasAlbumArt = 0, id = 0, name = "jupiter" },
-            new Album { hasAlbumArt = 1, id = 1, name = "neptune" },
-            new Album { hasAlbumArt = 0, id = 2, name = "andromeda" },
-            new Album { hasAlbumArt = 1, id = 3, name = "uranus" },
-            new Album { hasAlbumArt = 0, id = 4, name = "mars" }
+            new Album { hasAlbumArt = 0, Id = 0, Name = "jupiter" },
+            new Album { hasAlbumArt = 1, Id = 1, Name = "neptune" },
+            new Album { hasAlbumArt = 0, Id = 2, Name = "andromeda" },
+            new Album { hasAlbumArt = 1, Id = 3, Name = "uranus" },
+            new Album { hasAlbumArt = 0, Id = 4, Name = "mars" }
         };
 
         public readonly List<Artist> Artists = new List<Artist>
         {
-            new Artist { id = 0, name = "spike" },
-            new Artist { id = 1, name = "buzz" },
-            new Artist { id = 2, name = "specter" },
-            new Artist { id = 3, name = "professor" },
-            new Artist { id = 4, name = "katy" }
+            new Artist { Id = 0, Name = "spike" },
+            new Artist { Id = 1, Name = "buzz" },
+            new Artist { Id = 2, Name = "specter" },
+            new Artist { Id = 3, Name = "professor" },
+            new Artist { Id = 4, Name = "katy" }
         };
 
         public readonly List<Playlist> Playlists = new List<Playlist>
         {
-            new Playlist { id = 0, name = "awesome", filenamesCsv = string.Format("{0},{0},{0}", Mp3FilePath) },
-            new Playlist { id = 1, name = "fantastic", filenamesCsv = string.Format("{0},{0},{0}", Mp3FilePath) },
-            new Playlist { id = 2, name = "amazing", filenamesCsv = string.Format("{0},{0},{0}", Mp3FilePath) }
+            new Playlist { Id = 0, Name = "awesome", FilenamesCsv = string.Format("{0},{0},{0}", Mp3FilePath) },
+            new Playlist { Id = 1, Name = "fantastic", FilenamesCsv = string.Format("{0},{0},{0}", Mp3FilePath) },
+            new Playlist { Id = 2, Name = "amazing", FilenamesCsv = string.Format("{0},{0},{0}", Mp3FilePath) }
         };
 
         public readonly List<Song> Songs;
@@ -69,12 +69,12 @@ namespace Dukebox.Tests.Utils
                 {
                     Songs.Add(new Song
                     {
-                        id = songId,
-                        filename = Mp3FilePath,
-                        title = "wish you were here",
-                        lengthInSeconds = 120,
-                        albumId = album.id,
-                        artistId = artist.id
+                        Id = songId,
+                        FileName = Mp3FilePath,
+                        Title = "wish you were here",
+                        LengthInSeconds = 120,
+                        AlbumId = album.Id,
+                        ArtistId = artist.Id
                     });
 
                     songId++;

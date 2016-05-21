@@ -13,8 +13,13 @@
     <UserControl.Resources>
         <DataTemplate DataType="{x:Type DukeboxLibrary:Artist}">
             <StackPanel Name="Artist">
-                <Image Width="auto" Height="auto" Source="{Binding ElementName=Artist, Path=DataContext, Converter={StaticResource ArtistToThumbnailConverter}}"/>
-                <TextBlock HorizontalAlignment="center" Text="{Binding name}"/>
+                <StackPanel Width="128" Height="128">
+                    <TextBlock HorizontalAlignment="Center" 
+                               VerticalAlignment="Center" 
+                               Text="{Binding FirstCharacterOfName}"
+                               FontSize="32"/>
+                </StackPanel>
+                <TextBlock HorizontalAlignment="center" Text="{Binding Name}"/>
             </StackPanel>
         </DataTemplate>
     </UserControl.Resources>

@@ -49,7 +49,7 @@
                 <DataGridTemplateColumn Header="Artist" Width="auto" SortMemberPath="Artist.name" CanUserSort="True"  IsReadOnly="{Binding EditingListingsDisabled}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Artist.name}">
+                            <TextBlock Text="{Binding Artist.Name}">
                             </TextBlock> 
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -57,7 +57,7 @@
                 <DataGridTemplateColumn Header="Album" Width="auto" SortMemberPath="Album.name" CanUserSort="True" IsReadOnly="{Binding EditingListingsDisabled}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Album.name}">
+                            <TextBlock Text="{Binding Album.Name}">
                             </TextBlock>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -65,7 +65,7 @@
                 <DataGridTemplateColumn Header="Title" Width="*" SortMemberPath="Song.title" CanUserSort="True" IsReadOnly="{Binding EditingListingsDisabled}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Song.title}">
+                            <TextBlock Text="{Binding Song.Title}">
                             </TextBlock>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>

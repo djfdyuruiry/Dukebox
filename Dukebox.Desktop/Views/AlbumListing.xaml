@@ -24,7 +24,7 @@
                                      CacheOption="None"/>
                     </Image.Source>
                 </Image>
-                <TextBlock HorizontalAlignment="center" Text="{Binding Data.name}"/>
+                <TextBlock HorizontalAlignment="center" Text="{Binding Data.Name}"/>
             </StackPanel>
         </DataTemplate>
     </UserControl.Resources>

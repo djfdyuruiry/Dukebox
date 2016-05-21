@@ -38,8 +38,7 @@ namespace Dukebox.Library.Interfaces
         List<ITrack> GetTracksByAttributeValue(SearchAreas attribute, string nameOrTitle);
         List<ITrack> GetTracksByAttributeId(SearchAreas attribute, long attributeId);
         List<ITrack> GetTracksForDirectory(string directory, bool subDirectories);
-        Task<ITrack> AddFile(string filename, IAudioFileMetadata metadata = null);
-        Task<List<ITrack>> AddSupportedFilesInDirectory(string directory, bool subDirectories, Action<object, AudioFileImportedEventArgs> progressHandler, Action<object, int> completeHandler);
+        Task AddSupportedFilesInDirectory(string directory, bool subDirectories, Action<object, AudioFileImportedEventArgs> progressHandler, Action<object, int> completeHandler);
         Task<List<ITrack>> AddPlaylistFiles(string filename);
         Task<Playlist> AddPlaylist(string name, IEnumerable<string> filenames);
         Task RemoveTrack(ITrack track);

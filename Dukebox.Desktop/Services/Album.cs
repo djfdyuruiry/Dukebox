@@ -18,8 +18,8 @@ namespace Dukebox.Desktop.Services
             {
                 if (_albumArtPath == null)
                 {
-                    _albumArtPath = _albumArtCacheService.CheckCacheForAlbum(Data.id) ? 
-                        _albumArtCacheService.GetAlbumArtPathFromCache(Data.id) : 
+                    _albumArtPath = _albumArtCacheService.CheckCacheForAlbum(Data.Id) ? 
+                        _albumArtCacheService.GetAlbumArtPathFromCache(Data.Id) : 
                         ImageResources.DefaultAlbumArtUri;
                 }
 
@@ -42,7 +42,7 @@ namespace Dukebox.Desktop.Services
 
         public static bool ContainsString(Album album, string stringToFind)
         {
-            var name = album.Data.name;
+            var name = album.Data.Name;
 
             return string.IsNullOrEmpty(name) ? false : name.ToLower().Contains(stringToFind.ToLower());
         }        

@@ -153,8 +153,8 @@ namespace Dukebox.Tests.Unit
             var metadata = A.Fake<IAudioFileMetadata>();
             var blankImage = new Bitmap(128, 128, PixelFormat.Format32bppRgb);
 
-            songToAdd.id = songId;
-            albumObj.id = albumId;
+            songToAdd.Id = songId;
+            albumObj.Id = albumId;
 
             A.CallTo(() => metadata.HasAlbumArt).Returns(true);
             A.CallTo(() => metadata.AlbumArt).Returns(blankImage);

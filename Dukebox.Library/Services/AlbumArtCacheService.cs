@@ -7,12 +7,14 @@ using System.Linq;
 using log4net;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
+using System.Threading.Tasks;
 
 namespace Dukebox.Library.Services
 {
     public class AlbumArtCacheService : IAlbumArtCacheService
     {
         private static readonly ILog logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static bool debugSetup;
 
         private readonly IDukeboxSettings _settings;
         private string _cachePath;
@@ -34,9 +36,16 @@ namespace Dukebox.Library.Services
                 var absolutePath = Path.GetFullPath(expandedPath);
 
 #if DEBUG
-                if (Directory.Exists(absolutePath))
+                if (!debugSetup)
                 {
-                    Directory.Delete(absolutePath);
+                    absolutePath = Path.Combine(Environment.CurrentDirectory, "albumArtCache");
+
+                    if (Directory.Exists(absolutePath))
+                    {
+                        Directory.Delete(absolutePath, true);
+                    }
+
+                    debugSetup = true;
                 }
 #endif
 
@@ -55,24 +64,24 @@ namespace Dukebox.Library.Services
         }
 
         public void AddAlbumToCache(Album album, IAudioFileMetadata metadata)
-        {
+        { 
             if (album == null)
             {
                 throw new ArgumentNullException("album");
             }
 
-            var albumId = album.id;
-            
+            var albumId = album.Id;
+
             if (CheckCacheForAlbum(albumId))
             {
-                logger.WarnFormat("Not processing album with id {0} into album art cache as it is already in the album art cache.", 
+                logger.WarnFormat("Not processing album with id {0} into album art cache as it is already in the album art cache.",
                     albumId);
                 return;
             }
 
             if (!metadata.HasAlbumArt)
             {
-                logger.WarnFormat("Not processing album with id {0} into album art cache as the song does not contain album art data.", 
+                logger.WarnFormat("Not processing album with id {0} into album art cache as the song does not contain album art data.",
                     albumId);
                 return;
             }
@@ -81,7 +90,7 @@ namespace Dukebox.Library.Services
 
             try
             {
-                var albumIdString = album.id.ToString();
+                var albumIdString = album.Id.ToString();
                 var path = Path.Combine(_cachePath, albumIdString);
 
                 metadata.GetAlbumArt(i => { i.Save(path); });
@@ -101,10 +110,10 @@ namespace Dukebox.Library.Services
 
                 stopwatch.Stop();
                 logger.InfoFormat("Added album with id {0} into album art cache.", albumIdString);
-                logger.DebugFormat("Adding album into album art cache took {0}ms. Album id: {1}", 
+                logger.DebugFormat("Adding album into album art cache took {0}ms. Album id: {1}",
                     stopwatch.ElapsedMilliseconds, albumIdString);
 
-                AlbumAdded?.Invoke(this, EventArgs.Empty);
+                Task.Run(() => AlbumAdded?.Invoke(this, EventArgs.Empty));
             }
             catch (Exception ex)
             {

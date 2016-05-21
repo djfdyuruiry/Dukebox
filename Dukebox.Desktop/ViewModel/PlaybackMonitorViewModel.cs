@@ -210,7 +210,7 @@ namespace Dukebox.Desktop.ViewModel
 
         private void LoadNewTrackAlbumArtIfPresent(NewTrackLoadedEventArgs newTrackArgs)
         {
-            var albumId = newTrackArgs.Track.Album?.id;
+            var albumId = newTrackArgs.Track.Album?.Id;
             
             try
             {
