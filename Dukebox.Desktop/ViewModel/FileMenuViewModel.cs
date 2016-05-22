@@ -120,7 +120,7 @@ namespace Dukebox.Desktop.ViewModel
                 viewModel.MaximumProgressValue = (fileImportedArgs.TotalFilesThisImport * 2);
             }
 
-            var percentComplete = (filesAdded / ((float)fileImportedArgs.TotalFilesThisImport / 100)) / 200;
+            var percentComplete = (filesAdded / ((float)fileImportedArgs.TotalFilesThisImport / 100)) / 2;
 
             viewModel.CurrentProgressValue++;
 
