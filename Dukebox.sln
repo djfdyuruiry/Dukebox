@@ -22,6 +22,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dukebox.Desktop", "Dukebox.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dukebox.Tests", "Dukebox.Tests\Dukebox.Tests.csproj", "{5BE6D473-B49E-451C-94F9-19CA55997030}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Utils", "Utils", "{8982A846-7F4B-499D-8CE7-5C5A2C38F7ED}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dukebox.ArtistCardGenerator", "Dukebox.ArtistCardGenerator\Dukebox.ArtistCardGenerator.csproj", "{07AD0C1B-27B5-478B-B87F-610F3CBEC351}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -74,8 +78,19 @@ Global
 		{5BE6D473-B49E-451C-94F9-19CA55997030}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5BE6D473-B49E-451C-94F9-19CA55997030}.Release|x86.ActiveCfg = Release|Any CPU
 		{5BE6D473-B49E-451C-94F9-19CA55997030}.Release|x86.Build.0 = Release|Any CPU
+		{07AD0C1B-27B5-478B-B87F-610F3CBEC351}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07AD0C1B-27B5-478B-B87F-610F3CBEC351}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07AD0C1B-27B5-478B-B87F-610F3CBEC351}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{07AD0C1B-27B5-478B-B87F-610F3CBEC351}.Debug|x86.Build.0 = Debug|Any CPU
+		{07AD0C1B-27B5-478B-B87F-610F3CBEC351}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{07AD0C1B-27B5-478B-B87F-610F3CBEC351}.Release|Any CPU.Build.0 = Release|Any CPU
+		{07AD0C1B-27B5-478B-B87F-610F3CBEC351}.Release|x86.ActiveCfg = Release|Any CPU
+		{07AD0C1B-27B5-478B-B87F-610F3CBEC351}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{07AD0C1B-27B5-478B-B87F-610F3CBEC351} = {8982A846-7F4B-499D-8CE7-5C5A2C38F7ED}
 	EndGlobalSection
 EndGlobal

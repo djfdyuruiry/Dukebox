@@ -20,14 +20,6 @@ namespace Dukebox.Library.Model
         [Column("name")]
         public string Name { get; set; }
 
-        public string FirstCharacterOfName
-        {
-            get
-            {
-                return string.IsNullOrEmpty(Name) ? "?" : Name.Substring(0, 1).ToUpper();
-            }
-        }
-
         public virtual ICollection<Song> Songs { get; set; }
         public override string ToString()
         {

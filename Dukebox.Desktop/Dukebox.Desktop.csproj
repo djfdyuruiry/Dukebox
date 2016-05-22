@@ -143,7 +143,7 @@
     <Compile Include="DesktopContainer.cs" />
     <Compile Include="DukeboxUserSettings.cs" />
     <Compile Include="Helper\BoolToVisibilityConverter.cs" />
-    <Compile Include="Helper\ArtistToThumbnailConverter.cs" />
+    <Compile Include="Helper\ArtistToCardPathConverter.cs" />
     <Compile Include="Helper\ImageResourceLoader.cs" />
     <Compile Include="Helper\ImageResources.cs" />
     <Compile Include="Helper\ImageToImageSourceConverter.cs" />

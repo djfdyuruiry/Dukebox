@@ -15,3 +15,5 @@ Dukebox.Desktop.WinForms/bin/*
 desktop.ini
 Dukebox.Tests/bin/*
 Dukebox.Tests/obj/*
+Dukebox.ArtistCardGenerator/bin/*
+Dukebox.ArtistCardGenerator/obj/*
