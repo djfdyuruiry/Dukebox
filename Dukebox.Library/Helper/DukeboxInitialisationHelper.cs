@@ -16,6 +16,14 @@ namespace Dukebox.Library.Helper
         private readonly IDukeboxSettings _settings;
         private readonly AudioFileFormats _audioFormats;
 
+        public AudioFileFormats AudioFileFormats
+        {
+            get
+            {
+                return _audioFormats;
+            }
+        }
+
         public DukeboxInitialisationHelper(IDukeboxSettings settings, AudioFileFormats audioFileFormats)
         {
             _settings = settings;
@@ -33,11 +41,17 @@ namespace Dukebox.Library.Helper
             var bassInit = Bass.BASS_Init(-1, 44100, BASSInit.BASS_DEVICE_DEFAULT, IntPtr.Zero);
             bassPluginsLoaded = Bass.BASS_PluginLoadDirectory(_settings.BassAddOnsPath);
 
-            // Make sure the BASS library initalised correctly and all available plugins where loaded successfully.
-            if (!bassInit || bassPluginsLoaded == null || bassPluginsLoaded.Count < _settings.BassPluginCount)
+            // Make sure the BASS library initalised correctly and plugins where loaded successfully.
+            if (!bassInit || bassPluginsLoaded == null)
             {
-                var msg = string.Format("Error loading 'bass.dll' or a BASS Plug-In library! [BASS error code: {0}]", Bass.BASS_ErrorGetCode().ToString());
+                var msg = string.Format("Error loading 'bass.dll' or the BASS Plug-In library! [BASS error code: {0}]", Bass.BASS_ErrorGetCode().ToString());
                 throw new TypeInitializationException("Un4seen.Bass.Bass", new Exception(msg));
+            }
+
+            if (bassPluginsLoaded.Count < _settings.BassPluginCount)
+            {
+                logger.WarnFormat("Number of plugins loaded by BASS was lower than expected: {0} expected, {1} actually loaded", 
+                    bassPluginsLoaded.Count, _settings.BassPluginCount);
             }
 
             LogBassPluginsLoaded(bassPluginsLoaded);
