@@ -16,8 +16,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{663629
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dukebox.Desktop.WinForms", "Dukebox.Desktop.WinForms\Dukebox.Desktop.WinForms.csproj", "{CBD05FA9-5B3E-491C-953D-7D39A3C5D391}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dukebox.Desktop", "Dukebox.Desktop\Dukebox.Desktop.csproj", "{2CE69F0E-15ED-47AE-A285-4197D458443F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dukebox.Tests", "Dukebox.Tests\Dukebox.Tests.csproj", "{5BE6D473-B49E-451C-94F9-19CA55997030}"
@@ -62,10 +60,6 @@ Global
 		{E69D9EB5-0707-41EE-8537-3FFEA9A8BB99}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E69D9EB5-0707-41EE-8537-3FFEA9A8BB99}.Release|x86.ActiveCfg = Release|x86
 		{E69D9EB5-0707-41EE-8537-3FFEA9A8BB99}.Release|x86.Build.0 = Release|x86
-		{CBD05FA9-5B3E-491C-953D-7D39A3C5D391}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CBD05FA9-5B3E-491C-953D-7D39A3C5D391}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{CBD05FA9-5B3E-491C-953D-7D39A3C5D391}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CBD05FA9-5B3E-491C-953D-7D39A3C5D391}.Release|x86.ActiveCfg = Release|Any CPU
 		{2CE69F0E-15ED-47AE-A285-4197D458443F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2CE69F0E-15ED-47AE-A285-4197D458443F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2CE69F0E-15ED-47AE-A285-4197D458443F}.Debug|x86.ActiveCfg = Debug|x86
