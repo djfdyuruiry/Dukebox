@@ -218,7 +218,7 @@ namespace Dukebox.Library.Repositories
 
             var concurrencyLimit = _settings.AddDirectoryConcurrencyLimit;
             var allfiles = Directory.GetFiles(@directory, "*.*", subDirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
-            var filesToAdd = allfiles.Where(_audioFormats.FileSupported);
+            var filesToAdd = allfiles.Where(f => !_allFilesCache.Contains(f) && _audioFormats.FileSupported(f));
             var numFilesToAdd = filesToAdd.Count();
 
             var filesWithMetadata = filesToAdd.AsParallel().WithDegreeOfParallelism(concurrencyLimit).Select(f =>
