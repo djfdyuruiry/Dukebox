@@ -102,7 +102,7 @@ namespace Dukebox.Desktop.ViewModel
             progressWindow.DataContext = progressViewModel;
             progressViewModel.Title = AddToLibraryTitle;
             progressViewModel.HeaderText = AddToLibraryHeader;
-            progressViewModel.StatusText = "Collecting Audio File Metadata...";
+            progressViewModel.StatusText = "Searching for Audio Files...";
 
             progressWindow.Show();
 
@@ -120,11 +120,11 @@ namespace Dukebox.Desktop.ViewModel
                 viewModel.MaximumProgressValue = (fileImportedArgs.TotalFilesThisImport * 2);
             }
 
-            var percentComplete = (filesAdded / ((float)fileImportedArgs.TotalFilesThisImport / 100)) / 2;
+            var percentComplete = (filesAdded / ((float)fileImportedArgs.TotalFilesThisImport / 100)) / 200;
 
             viewModel.CurrentProgressValue++;
 
-            viewModel.NotificationText = string.Format("{0:P}%", percentComplete);
+            viewModel.NotificationText = string.Format("{0}%", percentComplete);
             viewModel.StatusText = string.Format(@"{0} '{1}'", fileImportedArgs.Status, Path.GetFileName(fileImportedArgs.FileAdded));
 
             Interlocked.Increment(ref filesAdded);
