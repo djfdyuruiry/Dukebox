@@ -20,6 +20,22 @@ namespace Dukebox.Audio
         /// formats specified by file extension. (e.g. '.mp3')
         /// </summary>
         public List<string> SupportedFormats { get; private set; }
+        
+        public string FileFilter
+        {
+            get
+            {
+                if (!SupportedFormats.Any())
+                {
+                    return "*.*";
+                }
+
+                string formatList = SupportedFormats.Aggregate((a, b) => a + b).Replace(".", ";*.");
+                string filter = formatList.Substring(1);
+
+                return filter;
+            }
+        }
 
         /// <summary>
         /// A file filter string for use with a file dialog
@@ -29,15 +45,7 @@ namespace Dukebox.Audio
         {
             get
             {
-                if (!SupportedFormats.Any())
-                {
-                    return string.Format(FileFilterPrefixFormat, "*.*");
-                }
-
-                string formatList = SupportedFormats.Aggregate((a, b) => a + b).Replace(".", ";*.");
-                string filter = string.Format(FileFilterPrefixFormat, formatList.Substring(1));
-
-                return filter;
+                return string.Format(FileFilterPrefixFormat, FileFilter);
             }
         }
 
@@ -45,10 +53,7 @@ namespace Dukebox.Audio
 
         public void SignalFormatsHaveBeenLoaded()
         {
-            if (FormatsLoaded != null)
-            {
-                FormatsLoaded(this, EventArgs.Empty);
-            }
+            FormatsLoaded?.Invoke(this, EventArgs.Empty);
         }
 
         public AudioFileFormats()
