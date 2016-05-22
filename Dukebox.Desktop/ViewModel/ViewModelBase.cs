@@ -1,9 +1,5 @@
-﻿using GalaSoft.MvvmLight.Messaging;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
+﻿using System.ComponentModel;
+using GalaSoft.MvvmLight.Messaging;
 
 namespace Dukebox.Desktop.ViewModel
 {
@@ -13,10 +9,7 @@ namespace Dukebox.Desktop.ViewModel
 
         protected void OnPropertyChanged(string propertyName)
         {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         } 
         protected void SendNotificationMessage(string message)
         {
