@@ -66,7 +66,9 @@ namespace Dukebox.Desktop.ViewModel
             _audioPlaylist = audioPlaylist;
             _listSearchHelper = new ListSearchHelper<Services.Album>
             {
-                FilterLambda = Services.Album.ContainsString
+                FilterLambda = Services.Album.ContainsString,
+                SortResults = true,
+                SortLambda = (a) => a.Data.Name.ToLower()
             };
 
             _musicLibrary.AlbumAdded += (o, e) => LoadAlbumsFromLibrary();

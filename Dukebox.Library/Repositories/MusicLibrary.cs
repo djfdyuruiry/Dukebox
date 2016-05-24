@@ -234,7 +234,7 @@ namespace Dukebox.Library.Repositories
 
                 return metadataTuple;
             }).ToList();
-
+            
             var filesAdded = 0;
 
             // For each set of 5 files, create a new thread
@@ -263,7 +263,7 @@ namespace Dukebox.Library.Repositories
 
                     return null;
                 }
-            }).Where(at => at != null && at.Item1 != null && at.Item2.HasAlbumArt)
+            }).Where(at => at?.Item1 != null && (at?.Item2?.HasAlbumArt).HasValue && (at?.Item2?.HasAlbumArt).Value)
                 .GroupBy(at => at.Item1.Id)
                 .Select(g => g.First())
                 .ToList();
@@ -271,6 +271,7 @@ namespace Dukebox.Library.Repositories
             if (filesAdded < 1)
             {
                 logger.WarnFormat("No new supported files were found in directory '{0}'", directory);
+                Task.Run(() => completeHandler(this, filesAdded));
                 return;
             }
 
@@ -416,8 +417,6 @@ namespace Dukebox.Library.Repositories
         
         private async Task<Song> BuildSongFromMetadata(string filename, IAudioFileMetadata metadata, Artist artistObj, Album albumObj)
         {
-            Song newSong = null;
-
             await _dbContextMutex.WaitAsync();
             var existingSongFile = _allFilesCache.FirstOrDefault(f => f.Equals(filename, StringComparison.CurrentCulture));
 
@@ -430,26 +429,18 @@ namespace Dukebox.Library.Repositories
                 return existingSong;
             }
 
-            // Build new song with all available information.
-            if (albumObj != null && artistObj != null)
-            {
-                newSong = new Song() { FileName = filename, Title = metadata.Title, Album = albumObj, Artist = artistObj };
-            }
-            else if (albumObj != null && artistObj == null)
-            {
-                newSong = new Song() { FileName = filename, Title = metadata.Title, Album = albumObj };
-            }
-            else if (albumObj == null && artistObj != null)
-            {
-                newSong = new Song() { FileName = filename, Title = metadata.Title, Artist = artistObj };
-            }
-            else if (albumObj == null && artistObj == null)
-            {
-                newSong = new Song() { FileName = filename, Title = metadata.Title };
-            }
+            var newSong = new Song() { FileName = filename, Title = metadata.Title, Album = albumObj, Artist = artistObj };
             
             logger.DebugFormat("Title for file '{0}': {1}", newSong.FileName, newSong.Title);
             
+            if(string.IsNullOrEmpty(newSong.Title))
+            {
+                var errMsg = string.Format("Title for file '{0}' is null or empty", filename);
+
+                logger.Error(errMsg);
+                throw new InvalidDataException(errMsg);
+            }
+                    
             _dukeboxData.Songs.Add(newSong);
             _allFilesCache.Add(filename);
             _dbContextMutex.Release();

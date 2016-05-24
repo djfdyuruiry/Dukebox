@@ -11,6 +11,8 @@ namespace Dukebox.Desktop.Helper
 
         public string SearchFilter { get; set; }
         public Func<T, string, bool> FilterLambda { get; set; }
+        public bool SortResults { get; set; }
+        public Func<T, string> SortLambda { get; set; }
         public List<T> Items { get; set; }
         public List<T> FilteredItems
         {
@@ -24,7 +26,11 @@ namespace Dukebox.Desktop.Helper
                     return Items;
                 }
 
-                return Items.Where(i => FilterLambda(i, SearchFilter)).ToList();
+                var results = Items.Where(i => FilterLambda(i, SearchFilter));
+
+                return SortResults && SortLambda != null ? 
+                    results.OrderBy(SortLambda).ToList() : 
+                    results.ToList();
             } 
         }
     }

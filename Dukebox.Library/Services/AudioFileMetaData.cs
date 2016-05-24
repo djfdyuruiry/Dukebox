@@ -8,6 +8,7 @@ using org.jaudiotagger.tag;
 using Dukebox.Audio.Interfaces;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
+using System.Text.RegularExpressions;
 
 namespace Dukebox.Library.Services
 {
@@ -18,7 +19,8 @@ namespace Dukebox.Library.Services
     public class AudioFileMetadata : IAudioFileMetadata
     {
         private static readonly ILog logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-        
+        private static readonly Regex truncateSpacesRegex = new Regex("\\s+");
+
         private ICdMetadataService _cdMetadataService;
         private IAudioCdService _audioCdService;
 
@@ -114,11 +116,7 @@ namespace Dukebox.Library.Services
                     audioFileMetadata._trackLength = audioHeader.getTrackLength();
                     audioFileMetadata.HasAlbumArt = artworkList.size() > 0;
 
-                    if (string.IsNullOrEmpty(audioFileMetadata.Title))
-                    {
-                        audioFileMetadata.LoadMissingTrackDetailsFromFileName();
-                    }
-
+                    audioFileMetadata.LoadMissingTrackDetailsFromFileName();
                     audioFileMetadata.HasFutherMetadataTag = true;
                 }
                 else
@@ -128,7 +126,7 @@ namespace Dukebox.Library.Services
             }
             catch (Exception ex)
             {
-                logger.Error(string.Format("Error occured while parsing metadata from audio file '{0}'", audioFileMetadata.AudioFilePath), ex);
+                logger.Warn(string.Format("Error occured while parsing metadata from audio file '{0}'", audioFileMetadata.AudioFilePath), ex);
 
                 audioFileMetadata.HasFutherMetadataTag = false;
                 audioFileMetadata.LoadMissingTrackDetailsFromFileName();
@@ -206,44 +204,55 @@ namespace Dukebox.Library.Services
 
         private void LoadMissingTrackDetailsFromFileName()
         {
-            var titleExists = !string.IsNullOrEmpty(Title);
-            var artistExists = !string.IsNullOrEmpty(Artist);
-            var albumExists = !string.IsNullOrEmpty(Album);
+            // validate existing metadata
+            var titleExists = !string.IsNullOrWhiteSpace(Title);
+            var artistExists = !string.IsNullOrWhiteSpace(Artist);
+            var albumExists = !string.IsNullOrWhiteSpace(Album);
 
-            if (titleExists && artistExists)
+            if (titleExists && artistExists && albumExists)
             {
                 return;
             }
 
-            string title = string.Empty;
-            string artist = string.Empty;
-
-            AudioFilePath = Path.GetFileNameWithoutExtension(AudioFilePath);
+            var title = string.Empty;
+            var artist = string.Empty;
+            
+            // extract metadata from filename
+            var audioFileName = Path.GetFileNameWithoutExtension(AudioFilePath);
+            audioFileName = truncateSpacesRegex.Replace(audioFileName, " ");
 
             string[] metadata = null;
-            if (AudioFilePath.Contains('-'))
+
+            if (audioFileName.Contains('-'))
             {
-                metadata = AudioFilePath.Split('-');
+                metadata = audioFileName.Split('-');
             }
-            else if (AudioFilePath.Contains('_'))
+            else if (audioFileName.Contains('_'))
             {
-                metadata = AudioFilePath.Split('\\').LastOrDefault().Split('_');
+                metadata = audioFileName.Split('_');
+            }
+            else if (audioFileName.Contains(' '))
+            {
+                metadata = audioFileName.Split(' ');
+            }
+
+            if (metadata == null || metadata.Length < 1)
+            {
+                // metdata extraction failed, just use filename
+                title = audioFileName;
             }
             else
             {
-                metadata = AudioFilePath.Split('\\').LastOrDefault().Split(' ');
-            }
+                // assign artist and build title
+                artist = metadata[0];
 
-            artist = metadata.FirstOrDefault();
-
-            if (metadata.Length > 1)
-            {
-                for (int i = 1; i < metadata.Length; i++)
+                for (var i = 1; i < metadata.Length; i++)
                 {
                     title += ' ' + metadata[i];
                 }
             }
-
+            
+            // assign found metadata or placeholders if metadata is invalid
             if (!titleExists)
             {
                 Title = string.IsNullOrWhiteSpace(title) ? "Unknown Title" : title;
@@ -254,12 +263,17 @@ namespace Dukebox.Library.Services
                 Artist = string.IsNullOrWhiteSpace(artist) ? "Unknown Artist" : artist;
             }
 
-            if(!albumExists)
+            if (!albumExists)
             {
-                Album = "Unknown Alum";
+                Album = "Unknown Album";
             }
 
-            logger.InfoFormat("Updated metadata for file ('{0}') to '{1}' - '{2}'", AudioFilePath, Artist, Title);
+            // clean strings of NUL terminator rubbish data
+            Title = Title.Trim().Replace("\0", string.Empty);
+            Artist = Artist.Trim().Replace("\0", string.Empty);
+            Album = Album.Trim().Replace("\0", string.Empty);
+
+            logger.InfoFormat("Updated metadata for file ('{0}') to '{1}' - '{2}' [{3}]", AudioFilePath, Artist, Title, Album);
         }
 
         private void LoadDetailsFromCddbServer()
