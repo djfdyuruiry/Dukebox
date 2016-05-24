@@ -13,6 +13,7 @@ using Dukebox.Desktop.Views;
 using System.IO;
 using Dukebox.Desktop.Model;
 using System.Threading;
+using System;
 
 namespace Dukebox.Desktop.ViewModel
 {
@@ -106,11 +107,21 @@ namespace Dukebox.Desktop.ViewModel
 
             progressWindow.Show();
 
-            int filesAdded = 0;
+            var filesAdded = 0;
+            var pathToAdd = _selectFolderDialog.SelectedPath;
 
-            _musicLibrary.AddSupportedFilesInDirectory(_selectFolderDialog.SelectedPath, true,
-                    (o, a) => ImportStep(progressViewModel, a, ref filesAdded),
-                    (o, i) => progressWindow.Dispatcher.InvokeAsync(progressWindow.Close));
+            try
+            {
+                _musicLibrary.AddSupportedFilesInDirectory(pathToAdd, true,
+                        (o, a) => ImportStep(progressViewModel, a, ref filesAdded),
+                        (o, i) => progressWindow.Dispatcher.InvokeAsync(progressWindow.Close));
+            }
+            catch (Exception ex)
+            {
+                var errMsg = string.Format("Unable to add directory '{0}': {1}", pathToAdd, ex.Message);
+                System.Windows.MessageBox.Show(errMsg, "Error Adding Directory", 
+                    System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+            }
         }
 
         private void ImportStep(ProgressMonitorViewModel viewModel, AudioFileImportedEventArgs fileImportedArgs, ref int filesAdded)
