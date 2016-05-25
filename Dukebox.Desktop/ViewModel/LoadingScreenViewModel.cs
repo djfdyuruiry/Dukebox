@@ -57,9 +57,6 @@ namespace Dukebox.Desktop.ViewModel
                 Notification = "Loading BASS audio...";
                 _initHelper.InitaliseBassLibrary();
 
-                Notification = "Loading .NET libraries...";
-                _initHelper.PreloadAssemblies();
-
                 Notification = "Registering supported audio formats...";
                 _initHelper.RegisterSupportedAudioFileFormats();
 
