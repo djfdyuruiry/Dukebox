@@ -75,41 +75,6 @@ namespace Dukebox.Library.Helper
             logger.Info(logData);
         }
 
-        public void PreloadAssemblies()
-        {
-            try
-            {
-                // Preload IKVM Java runtime & jaudiotagger.
-                var ikvmAssemblies = new String[] { "IKVM.Runtime", "IKVM.OpenJDK.Core", "IKVM.OpenJDK.Text", "IKVM.OpenJDK.Util", "jaudiotagger-2.2.0" };
-                ikvmAssemblies.Select(asm => Assembly.Load(asm));
-
-                /*
-                // Load other referenced assemblies next.
-                var loadedAssemblies = AppDomain.CurrentDomain.GetAssemblies().ToList();
-                var loadedPaths = loadedAssemblies.Select(a => a.Location).ToArray();
-
-                // Ignore these DLLs.
-                var forbiddenDlls = new String[] { "Bass.dll", "OptimFROG.dll" };
-
-                var referencedPaths = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory, "*.dll");
-                var notLoadedPaths = referencedPaths.Where(r => !loadedPaths.Contains(r, StringComparer.InvariantCultureIgnoreCase));
-
-                foreach (var path in notLoadedPaths)
-                {
-                    if (!forbiddenDlls.Any(fdll => path.EndsWith(fdll, StringComparison.CurrentCultureIgnoreCase)))
-                    {
-                        loadedAssemblies.Add(AppDomain.CurrentDomain.Load(AssemblyName.GetAssemblyName(path)));
-                    }
-                }
-                */
-            }
-            catch (Exception ex)
-            {
-                logger.Error("Could not preload Dukebox assemblies.");
-                throw;
-            }
-        }
-
         /// <summary>
         /// Get all the supported streaming extensions from the
         /// BASS library core and all add-ons. These are stored
