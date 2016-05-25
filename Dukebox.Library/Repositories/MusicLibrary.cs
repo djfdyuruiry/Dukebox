@@ -220,8 +220,51 @@ namespace Dukebox.Library.Repositories
             var allfiles = Directory.GetFiles(@directory, "*.*", subDirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
             var filesToAdd = allfiles.Where(f => !_allFilesCache.Contains(f) && _audioFormats.FileSupported(f));
             var numFilesToAdd = filesToAdd.Count();
+            
+            var filesWithMetadata = ExtractMetadataFromFiles(filesToAdd, progressHandler, concurrencyLimit, numFilesToAdd);                  
+            var albumsWithMetadata = AddFilesToDatabaseModel(filesWithMetadata, concurrencyLimit, progressHandler, numFilesToAdd);
+            var filesAdded = albumsWithMetadata.Count;
 
-            var filesWithMetadata = filesToAdd.AsParallel().WithDegreeOfParallelism(concurrencyLimit).Select(f =>
+            if (!albumsWithMetadata.Any())
+            {
+                logger.WarnFormat("No new supported files were found in directory '{0}'", directory);
+                Task.Run(() => completeHandler(this, filesAdded));
+                return;
+            }
+
+            SaveDbChanges();
+            RefreshCaches();
+
+            AddAlbumArtToCache(albumsWithMetadata, concurrencyLimit);
+            
+            stopwatch.Stop();
+
+            logger.InfoFormat("Added {0} tracks from directory: {1}", filesAdded, directory);
+            logger.DebugFormat("Adding {0} tracks to library from a directory took {1}ms. Directory path: {2} (Sub-directories searched: {3})",
+                filesAdded, stopwatch.ElapsedMilliseconds, directory, subDirectories);
+
+            CallMetadataAndCompleteHandlers(completeHandler, filesAdded);
+
+            if (numFilesToAdd > filesAdded)
+            {
+                logger.WarnFormat("Not all files found in directory '{0}' were added to the database [{1}/{2} files added]",
+                    directory, filesAdded, numFilesToAdd);
+            }
+        }
+
+        private void CallMetadataAndCompleteHandlers(Action<object, int> completeHandler, int filesAdded)
+        {
+            Task.Run(() => ArtistAdded?.Invoke(this, EventArgs.Empty));
+            Task.Run(() => AlbumAdded?.Invoke(this, EventArgs.Empty));
+            Task.Run(() => SongAdded?.Invoke(this, EventArgs.Empty));
+
+            Task.Run(() => completeHandler(this, filesAdded));
+        }
+
+        private List<Tuple<string, IAudioFileMetadata>> ExtractMetadataFromFiles(IEnumerable<string> filesToAdd, Action<object, AudioFileImportedEventArgs> progressHandler,
+            int concurrencyLimit, int numFilesToAdd)
+        {
+            return filesToAdd.AsParallel().WithDegreeOfParallelism(concurrencyLimit).Select(f =>
             {
                 var metadataTuple = new Tuple<string, IAudioFileMetadata>(f, AudioFileMetadata.BuildAudioFileMetaData(f));
 
@@ -234,12 +277,14 @@ namespace Dukebox.Library.Repositories
 
                 return metadataTuple;
             }).ToList();
-            
-            var filesAdded = 0;
+        }
 
+        private List<Tuple<Album, IAudioFileMetadata>> AddFilesToDatabaseModel(List<Tuple<string, IAudioFileMetadata>> filesWithMetadata, 
+            int concurrencyLimit, Action<object, AudioFileImportedEventArgs> progressHandler, int numFilesToAdd)
+        {
             // For each set of 5 files, create a new thread
             // which processes the metadata of those 
-            var albumsWithMetadata = filesWithMetadata.AsParallel().WithDegreeOfParallelism(concurrencyLimit).Select(fileWithMetdata =>
+            return filesWithMetadata.AsParallel().WithDegreeOfParallelism(concurrencyLimit).Select(fileWithMetdata =>
             {
                 try
                 {
@@ -252,8 +297,6 @@ namespace Dukebox.Library.Repositories
                         TotalFilesThisImport = numFilesToAdd
                     }));
 
-                    filesAdded++;
-
                     return new Tuple<Album, IAudioFileMetadata>(song.Album, fileWithMetdata.Item2);
                 }
                 catch (Exception ex)
@@ -263,44 +306,22 @@ namespace Dukebox.Library.Repositories
 
                     return null;
                 }
-            }).Where(at => at?.Item1 != null && (at?.Item2?.HasAlbumArt).HasValue && (at?.Item2?.HasAlbumArt).Value)
+            }).Where(am => am != null).ToList();
+        }
+
+        public void AddAlbumArtToCache(List<Tuple<Album, IAudioFileMetadata>> albumsWithMetadata, int concurrencyLimit)
+        {
+            albumsWithMetadata = albumsWithMetadata
+                .Where(at => at.Item1 != null && (at.Item2?.HasAlbumArt).HasValue && (at.Item2?.HasAlbumArt).Value)
                 .GroupBy(at => at.Item1.Id)
                 .Select(g => g.First())
                 .ToList();
-
-            if (filesAdded < 1)
-            {
-                logger.WarnFormat("No new supported files were found in directory '{0}'", directory);
-                Task.Run(() => completeHandler(this, filesAdded));
-                return;
-            }
-
-            SaveDbChanges();
-            RefreshCaches();
 
             albumsWithMetadata.AsParallel().WithDegreeOfParallelism(concurrencyLimit).Select(am =>
             {
                 _albumArtCache.AddAlbumToCache(am.Item1, am.Item2);
                 return 0;
             }).ToList();
-            
-            stopwatch.Stop();
-
-            logger.InfoFormat("Added {0} tracks from directory: {1}", filesAdded, directory);
-            logger.DebugFormat("Adding {0} tracks to library from a directory took {1}ms. Directory path: {2} (Sub-directories searched: {3})",
-                filesAdded, stopwatch.ElapsedMilliseconds, directory, subDirectories);
-            
-            Task.Run(() => ArtistAdded?.Invoke(this, EventArgs.Empty));  
-            Task.Run(() => AlbumAdded?.Invoke(this, EventArgs.Empty)); 
-            Task.Run(() => SongAdded?.Invoke(this, EventArgs.Empty));
-
-            Task.Run(() => completeHandler(this, filesAdded));
-
-            if (numFilesToAdd > filesAdded)
-            {
-                logger.WarnFormat("Not all files found in directory '{0}' were added to the database [{1}/{2} files added]",
-                    directory, filesAdded, numFilesToAdd);
-            }
         }
 
         public async Task<Song> AddFile(string filename, IAudioFileMetadata metadata = null)
