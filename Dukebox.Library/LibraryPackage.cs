@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using log4net;
 using SimpleInjector;
@@ -10,7 +11,6 @@ using Dukebox.Library.Helper;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Services;
 using Dukebox.Library.Repositories;
-using System.IO;
 
 namespace Dukebox.Library
 {
@@ -19,7 +19,7 @@ namespace Dukebox.Library
         private const string appDataFolderName = "Dukebox";
         private const string libraryDbFileName = "library.s3db";
 
-        private static readonly ILog logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static Container container;
 
         public static bool ExecutingForUnitTests { get; set; }
@@ -33,12 +33,12 @@ namespace Dukebox.Library
         private static void Configure(Container container)
         {
             container.RegisterSingleton<IDukeboxSettings, DukeboxSettings>();
-            container.RegisterSingleton<IAlbumArtCacheService>(() => GetAlbumArtCacheServiceInstance(container));
+            container.RegisterSingleton(() => GetAlbumArtCacheServiceInstance(container));
             container.RegisterSingleton<ICdMetadataService, CdMetadataService>();
             container.RegisterSingleton<IAudioCdRippingService, AudioCdRippingService>();
             container.RegisterSingleton<IAudioPlaylist, AudioPlaylist>();
             container.RegisterSingleton<IMusicLibraryDbContext>(() => new MusicLibraryDbContext());
-            container.RegisterSingleton<IMusicLibrary>(() => GetMusicLibraryInstance(container));
+            container.RegisterSingleton(() => GetMusicLibraryInstance(container));
             container.RegisterSingleton<IAudioCdDriveMonitoringService, AudioCdDriveMonitoringService>();
             container.Register<ITrack, Track>();
             container.Register<IAudioFileMetadata, AudioFileMetadata>();
