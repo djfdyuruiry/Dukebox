@@ -2,6 +2,7 @@
 using System;
 using System.Globalization;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Windows.Data;
 
 namespace Dukebox.Desktop.Helper
@@ -9,10 +10,10 @@ namespace Dukebox.Desktop.Helper
     public class ArtistToCardPathConverter : IValueConverter
     {
         private const string artistCardDirectory = "artistCards";
-        private const string unknownArtistCardFilename = "unknown.png";
+        private const string unknownArtistCardFilename = "unknown";
 
+        private static readonly Regex validArtistCardCharacterRegex = new Regex(@"[a-zA-Z0-9]");
         private static readonly string artistCardDirectoryPath = Path.Combine(Environment.CurrentDirectory, artistCardDirectory);
-        private static readonly string unknownArtistCardPath = Path.Combine(artistCardDirectoryPath, unknownArtistCardFilename);
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
@@ -20,18 +21,17 @@ namespace Dukebox.Desktop.Helper
 
             if (artist == null)
             {
-                throw new InvalidOperationException("'value' parameter was not of type Dukebox.Library.Model.Artist");
+                throw new InvalidOperationException("Parameter 'value' was not of type Dukebox.Library.Model.Artist");
             }
-
-            var name = artist.Name;
-
-            if(string.IsNullOrEmpty(name))
+            else if (string.IsNullOrWhiteSpace(artist.Name))
             {
-                return unknownArtistCardPath;
+                throw new InvalidDataException("Name property of value parameter is null or whitespace");
             }
 
-            var upperFirstLetter = name.Substring(0, 1).ToUpper();
-            var file = string.Format("{0}.png", upperFirstLetter);
+            var upperFirstLetter = artist.Name.Substring(0, 1).ToUpper();
+            var filename = validArtistCardCharacterRegex.IsMatch(upperFirstLetter) ? upperFirstLetter : unknownArtistCardFilename;
+            var file = string.Format("{0}.png", filename);
+
             var path = Path.Combine(artistCardDirectoryPath, file);
 
             return path;
