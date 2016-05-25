@@ -252,15 +252,6 @@ namespace Dukebox.Library.Repositories
             }
         }
 
-        private void CallMetadataAndCompleteHandlers(Action<object, int> completeHandler, int filesAdded)
-        {
-            Task.Run(() => ArtistAdded?.Invoke(this, EventArgs.Empty));
-            Task.Run(() => AlbumAdded?.Invoke(this, EventArgs.Empty));
-            Task.Run(() => SongAdded?.Invoke(this, EventArgs.Empty));
-
-            Task.Run(() => completeHandler(this, filesAdded));
-        }
-
         private List<Tuple<string, IAudioFileMetadata>> ExtractMetadataFromFiles(IEnumerable<string> filesToAdd, Action<object, AudioFileImportedEventArgs> progressHandler,
             int concurrencyLimit, int numFilesToAdd)
         {
@@ -322,6 +313,15 @@ namespace Dukebox.Library.Repositories
                 _albumArtCache.AddAlbumToCache(am.Item1, am.Item2);
                 return 0;
             }).ToList();
+        }
+
+        private void CallMetadataAndCompleteHandlers(Action<object, int> completeHandler, int filesAdded)
+        {
+            Task.Run(() => ArtistAdded?.Invoke(this, EventArgs.Empty));
+            Task.Run(() => AlbumAdded?.Invoke(this, EventArgs.Empty));
+            Task.Run(() => SongAdded?.Invoke(this, EventArgs.Empty));
+
+            Task.Run(() => completeHandler(this, filesAdded));
         }
 
         public async Task<Song> AddFile(string filename, IAudioFileMetadata metadata = null)
