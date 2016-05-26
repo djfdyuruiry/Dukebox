@@ -58,6 +58,7 @@ namespace Dukebox.Desktop.ViewModel
             {
                 _showAlbumListing = value;
                 OnPropertyChanged("ShowAlbumListing");
+                OnPropertyChanged("ShowTrackListingPreview");
             }
         }
         public Visibility ShowArtistListing
@@ -70,6 +71,7 @@ namespace Dukebox.Desktop.ViewModel
             {
                 _showArtistListing = value;
                 OnPropertyChanged("ShowArtistListing");
+                OnPropertyChanged("ShowTrackListingPreview"); 
             }
         }
         public Visibility ShowRecentlyPlayedListing
@@ -94,6 +96,15 @@ namespace Dukebox.Desktop.ViewModel
             {
                 _showAudioCdListing = value;
                 OnPropertyChanged("ShowAudioCdListing");
+            }
+        }        
+        public Visibility ShowTrackListingPreview
+        {
+            get
+            {
+                return (ShowAlbumListing == Visibility.Visible || ShowArtistListing == Visibility.Visible) ? 
+                    Visibility.Visible : 
+                    Visibility.Hidden;
             }
         }
         public ICommand ShowLoadingScreen { get; private set; }

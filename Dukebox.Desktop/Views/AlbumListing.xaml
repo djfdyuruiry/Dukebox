@@ -43,6 +43,7 @@
         <ListBox Grid.Row="1" 
                  Grid.Column="0" 
                  ItemsSource="{Binding Albums}" 
+                 SelectionChanged="ListBox_SelectionChanged"
                  MouseDoubleClick="ListBox_MouseDoubleClick" 
                  VirtualizingPanel.IsVirtualizing="True">
             <ListBox.Resources>

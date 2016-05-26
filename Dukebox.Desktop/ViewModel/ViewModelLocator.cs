@@ -96,6 +96,14 @@ namespace Dukebox.Desktop.ViewModel
             }
         }
 
+        public ITrackListingViewModel TrackListingPreview
+        {
+            get
+            {
+                return DesktopContainer.GetInstance<TrackListingPreviewViewModel>();
+            }
+        }
+
         public ITrackListingViewModel CurrentlyPlayingListing
         {
             get

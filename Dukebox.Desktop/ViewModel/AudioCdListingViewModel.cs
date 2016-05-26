@@ -55,6 +55,14 @@ namespace Dukebox.Desktop.ViewModel
             }
         }
 
+        public Visibility ShowSearchControl
+        {
+            get
+            {
+                return Visibility.Hidden;
+            }
+        }
+
         public ICommand LoadTrack { get; private set; }
 
         public AudioCdViewModel(IMusicLibrary musicLibrary, IAudioPlaylist audioPlaylist, IAudioCdDriveMonitoringService audioCdDriveMonitor) : base()

@@ -599,12 +599,36 @@ namespace Dukebox.Library.Repositories
         
         public List<ITrack> GetTracksForArtist(Artist artist)
         {
-            return artist.Songs.Select(Track.BuildTrackInstance).ToList();
+            return artist?.Songs?.Select(Track.BuildTrackInstance).ToList() ?? new List<ITrack>();
         }
 
         public List<ITrack> GetTracksForAlbum(Album album)
         {
-            return album.Songs.Select(Track.BuildTrackInstance).ToList();
+            return album?.Songs?.Select(Track.BuildTrackInstance).ToList() ?? new List<ITrack>();
+        }
+
+        public List<ITrack> GetTracksForArtist(long artistId)
+        {
+            var artist = OrderedArtists.FirstOrDefault(a => a.Id == artistId);
+
+            if (artist == null)
+            {
+                throw new Exception(string.Format("Artist with ID {0} cannot be found in the database", artistId));
+            }
+
+            return GetTracksForArtist(artist);
+        }
+
+        public List<ITrack> GetTracksForAlbum(long albumId)
+        {
+            var album = OrderedAlbums.First(a => a.Id == albumId);
+
+            if (album == null)
+            {
+                throw new Exception(string.Format("Album with ID {0} cannot be found in the database", albumId));
+            }
+
+            return GetTracksForAlbum(album);
         }
 
         public Artist GetArtistById(long? artistId)
