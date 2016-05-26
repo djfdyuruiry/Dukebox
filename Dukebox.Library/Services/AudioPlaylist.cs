@@ -216,9 +216,9 @@ namespace Dukebox.Library.Services
         {
             if (!StreamingPlaylist)
             {
-                SetCurrentTrackIndex(0);
                 _playlistManagerThread = new Thread(PlayAllTracks);
                 _playlistManagerThread.Start();
+                SetCurrentTrackIndex(0);
             }
         }
 

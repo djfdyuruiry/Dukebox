@@ -15,5 +15,6 @@ namespace Dukebox.Desktop.Interfaces
         Visibility ShowArtistListing { get; }
         Visibility ShowRecentlyPlayedListing { get; }
         Visibility ShowAudioCdListing { get; }
+        Visibility ShowTrackListingPreview { get; }
     }
 }

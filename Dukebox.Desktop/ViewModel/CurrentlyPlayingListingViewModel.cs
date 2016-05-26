@@ -5,6 +5,7 @@ using GalaSoft.MvvmLight.Command;
 using Dukebox.Desktop.Helper;
 using Dukebox.Desktop.Interfaces;
 using Dukebox.Library.Interfaces;
+using System.Windows;
 
 namespace Dukebox.Desktop.ViewModel
 {
@@ -60,6 +61,14 @@ namespace Dukebox.Desktop.ViewModel
             get
             {
                 return false;
+            }
+        }
+
+        public Visibility ShowSearchControl
+        {
+            get
+            {
+                return Visibility.Visible;
             }
         }
 

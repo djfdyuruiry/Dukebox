@@ -197,6 +197,7 @@
                 <Grid Name="CurrentViewContainer" Grid.Row="0" Grid.Column="1">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"></RowDefinition>
+                        <RowDefinition Height="{Binding ShowTrackListingPreview, Converter={StaticResource ShowTrackListingToHeightConverter}}"></RowDefinition>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"></ColumnDefinition> 
@@ -223,6 +224,10 @@
                     </ContentControl>
                     <ContentControl Grid.Row="0" Grid.Column="0" Visibility="{Binding ShowAudioCdListing}">
                         <DukeboxViews:TrackListing DataContext="{Binding AudioCdListing, Source={StaticResource ViewModelLocator}}">
+                        </DukeboxViews:TrackListing>
+                    </ContentControl>
+                    <ContentControl Grid.Row="1" Grid.Column="0" Visibility="{Binding ShowTrackListingPreview}">
+                        <DukeboxViews:TrackListing DataContext="{Binding TrackListingPreview, Source={StaticResource ViewModelLocator}}">
                         </DukeboxViews:TrackListing>
                     </ContentControl>
                 </Grid>

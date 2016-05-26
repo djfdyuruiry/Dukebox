@@ -1,4 +1,6 @@
 ﻿using Dukebox.Desktop.Interfaces;
+using Dukebox.Desktop.Model;
+using GalaSoft.MvvmLight.Messaging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,6 +38,22 @@ namespace Dukebox.Desktop.Views
                 var albumListingViewModel = DataContext as IAlbumListingViewModel;
 
                 albumListingViewModel?.LoadAlbum?.Execute(item);
+            }
+        }
+
+        private void ListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var listBox = sender as ListBox;
+
+            if (listBox != null)
+            {
+                var item = listBox.SelectedItem as Services.Album;
+
+                Messenger.Default.Send<PreviewArtistOrAlbumMessage>(new PreviewArtistOrAlbumMessage
+                {
+                    Id = item.Data.Id,
+                    IsAlbum = true
+                });
             }
         }
     }

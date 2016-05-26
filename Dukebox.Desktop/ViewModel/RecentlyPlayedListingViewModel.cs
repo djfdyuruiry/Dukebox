@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows;
 using System.Windows.Input;
 
 namespace Dukebox.Desktop.ViewModel
@@ -65,6 +66,14 @@ namespace Dukebox.Desktop.ViewModel
             get
             {
                 return true;
+            }
+        }
+
+        public Visibility ShowSearchControl
+        {
+            get
+            {
+                return Visibility.Visible;
             }
         }
 
