@@ -4,6 +4,7 @@ using Dukebox.Library.Interfaces;
 using Dukebox.Library.Services;
 using System;
 using System.Collections.Generic;
+using System.Windows;
 using System.Windows.Input;
 
 namespace Dukebox.Desktop.Interfaces
@@ -13,5 +14,6 @@ namespace Dukebox.Desktop.Interfaces
         List<ITrack> Tracks { get; }
         bool EditingListingsDisabled { get; }
         ICommand LoadTrack { get; }
+        Visibility ShowSearchControl { get; }
     }
 }

@@ -9,6 +9,7 @@
     <Application.Resources>
         <ViewModelLocator xmlns="clr-namespace:Dukebox.Desktop.ViewModel" x:Key="ViewModelLocator" d:IsDataSource="True"/>
         <BoolToVisibilityConverter xmlns="clr-namespace:Dukebox.Desktop.Helper" x:Key="BoolToVisibilityConverter" />
-        <ArtistToCardPathConverter xmlns="clr-namespace:Dukebox.Desktop.Helper" x:Key="ArtistToCardPathConverter" /> 
+        <ArtistToCardPathConverter xmlns="clr-namespace:Dukebox.Desktop.Helper" x:Key="ArtistToCardPathConverter" />
+        <ShowTrackListingToHeightConverter xmlns="clr-namespace:Dukebox.Desktop.Helper" x:Key="ShowTrackListingToHeightConverter" />
     </Application.Resources>
 </Application>

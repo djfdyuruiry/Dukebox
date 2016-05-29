@@ -1,0 +1,20 @@
+Dukebox v0.85.1
+=============
+
+Changelog
+
+v0.85.1
+------------
+*Fixed currently playing track indicator display issue on window resize.
+=============
+
+Licensed under the CC BY-NC-SA 3.0 [http://creativecommons.org/licenses/by-nc-sa/3.0/]
+
+Basically you can do anything with this project as long as you don't infer
+that I support your use of the code or want to use it for commerical purposes.
+
+The BASS audio library freeware license terms prevent me from allowing 
+commerical use of this product.
+
+See [http://sourceforge.net/p/dukebox/wiki/Libraries%20Used/] for a full list of 
+components used and their licences. (All of which are free or open source!)

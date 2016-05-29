@@ -66,7 +66,9 @@ namespace Dukebox.Desktop.ViewModel
 
             _listSearchHelper = new ListSearchHelper<Artist>
             {
-                FilterLambda = (a, s) => a.Name.ToLower().Contains(s.ToLower())
+                FilterLambda = (a, s) => a.Name.ToLower().Contains(s.ToLower()),
+                SortResults = true,
+                SortLambda = (a) => a.Name.ToLower()
             };
 
             _musicLibrary.ArtistAdded += (o, e) => RefreshArtistsFromLibrary();

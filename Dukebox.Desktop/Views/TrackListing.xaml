@@ -11,7 +11,7 @@
              Name="TrackListingControl">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="0.04*"></RowDefinition>
+            <RowDefinition Height="0.05*"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -19,6 +19,7 @@
         </Grid.ColumnDefinitions>
         <DukeboxViews:SearchControl Grid.Row="0" 
                                     Grid.Column="0" 
+                                    Visibility="{Binding ShowSearchControl}"
                                     DataContext="{Binding ElementName=TrackListingControl, Path=DataContext}">
         </DukeboxViews:SearchControl>
         <DataGrid Grid.Row="1" 

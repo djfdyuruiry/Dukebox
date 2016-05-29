@@ -10,6 +10,7 @@
         WindowState="Maximized" 
         WindowStartupLocation="CenterScreen"
         Visibility="Hidden"
+        VirtualizingPanel.IsVirtualizing="True"
         DataContext="{Binding MainWindow, Source={StaticResource ViewModelLocator}}">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Closing">
@@ -114,82 +115,89 @@
                 <ScrollViewer Grid.Row="0" Grid.Column="0">
                     <Grid Name="NavIconContainer">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="120"></RowDefinition>
-                            <RowDefinition Height="120"></RowDefinition>
-                            <RowDefinition Height="120"></RowDefinition>
-                            <RowDefinition Height="120"></RowDefinition>
-                            <RowDefinition Height="120"></RowDefinition>
-                            <RowDefinition Height="120"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"></ColumnDefinition>
                         </Grid.ColumnDefinitions>
-                        <Button Name="CurrentlyPlayingNavIcon" 
-                                Grid.Row="0" 
-                                Grid.Column="0" 
-                                HorizontalAlignment="Stretch" 
-                                VerticalAlignment="Stretch"  
-                                Command="{Binding NavBarItemClickCommand}"
-                                CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Name}"
-                                Style="{StaticResource MetroButton}">
-                            <Image Source="Graphics/ic_play_arrow_48px.png" />
-                        </Button>
-                        <Button Name="LibraryNavIcon" 
-                                Grid.Row="1" 
-                                Grid.Column="0" 
-                                HorizontalAlignment="Stretch" 
-                                VerticalAlignment="Stretch"  
-                                Command="{Binding NavBarItemClickCommand}"
-                                CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Name}"
-                                Style="{StaticResource MetroButton}">
+                        <StackPanel Grid.Row="0" Grid.Column="0">
+                            <Button Name="CurrentlyPlayingNavIcon" 
+                                    HorizontalAlignment="Stretch" 
+                                    VerticalAlignment="Stretch"  
+                                    Command="{Binding NavBarItemClickCommand}"
+                                    CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Name}"
+                                    Style="{StaticResource MetroButton}">
+                                <Image Source="Graphics/ic_play_arrow_48px.png" />
+                            </Button>
+                            <Label HorizontalAlignment="Center">Now Playing</Label>
+                        </StackPanel>
+                        <StackPanel Grid.Row="1" Grid.Column="0">
+                            <Button Name="LibraryNavIcon" 
+                                    HorizontalAlignment="Stretch" 
+                                    VerticalAlignment="Stretch"  
+                                    Command="{Binding NavBarItemClickCommand}"
+                                    CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Name}"
+                                    Style="{StaticResource MetroButton}">
                             <Image Source="Graphics/black_7_music_nodes.png" />
-                        </Button>
-                        <Button Name="AlbumsNavIcon" 
-                                Grid.Row="2" 
-                                Grid.Column="0" 
-                                HorizontalAlignment="Stretch"
-                                VerticalAlignment="Stretch" 
-                                Command="{Binding NavBarItemClickCommand}"
-                                CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Name}"
-                                Style="{StaticResource MetroButton}">
-                            <Image Source="Graphics/ic_album.png" />
-                        </Button>
-                        <Button Name="ArtistsNavIcon" 
-                                Grid.Row="3" 
-                                Grid.Column="0" 
-                                HorizontalAlignment="Stretch" 
-                                VerticalAlignment="Stretch" 
-                                Command="{Binding NavBarItemClickCommand}"
-                                CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Name}"
-                                Style="{StaticResource MetroButton}">
-                            <Image Source="Graphics/icon-ios7-people.png" />
-                        </Button>
-                        <Button Name="RecentlyPlayedNavIcon" 
-                                Grid.Row="4" 
-                                Grid.Column="0" 
-                                HorizontalAlignment="Stretch" 
-                                VerticalAlignment="Stretch" 
-                                Command="{Binding NavBarItemClickCommand}"
-                                CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Name}"
-                                Style="{StaticResource MetroButton}">
-                            <Image Source="Graphics/ic_history.png" />
-                        </Button>
-                        <Button Name="AudioCdNavIcon" 
-                                Grid.Row="5" 
-                                Grid.Column="0" 
-                                HorizontalAlignment="Stretch" 
-                                VerticalAlignment="Stretch" 
-                                Command="{Binding NavBarItemClickCommand}"
-                                CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Name}"
-                                Style="{StaticResource MetroButton}">
-                            <Image Source="Graphics/BT_cd.png" />
-                        </Button>
+                            </Button>
+                            <Label HorizontalAlignment="Center">Songs</Label>
+                        </StackPanel>
+                        <StackPanel Grid.Row="2" Grid.Column="0">
+                            <Button Name="AlbumsNavIcon"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch" 
+                                    Command="{Binding NavBarItemClickCommand}"
+                                    CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Name}"
+                                    Style="{StaticResource MetroButton}">
+                                <Image Source="Graphics/ic_album.png" />
+                            </Button>
+                            <Label HorizontalAlignment="Center">Albums</Label>
+                        </StackPanel>
+                        <StackPanel Grid.Row="3" Grid.Column="0">
+                            <Button Name="ArtistsNavIcon" 
+                                    HorizontalAlignment="Stretch" 
+                                    VerticalAlignment="Stretch" 
+                                    Command="{Binding NavBarItemClickCommand}"
+                                    CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Name}"
+                                    Style="{StaticResource MetroButton}">
+                                <Image Source="Graphics/icon-ios7-people.png" />
+                            </Button>
+                            <Label HorizontalAlignment="Center">Artists</Label>
+                        </StackPanel>
+                        <StackPanel Grid.Row="4" Grid.Column="0">
+                            <Button Name="RecentlyPlayedNavIcon" 
+                                    HorizontalAlignment="Stretch" 
+                                    VerticalAlignment="Stretch" 
+                                    Command="{Binding NavBarItemClickCommand}"
+                                    CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Name}"
+                                    Style="{StaticResource MetroButton}">
+                                <Image Source="Graphics/ic_history.png" />
+                            </Button>
+                            <Label HorizontalAlignment="Center">Recently Played</Label>
+                        </StackPanel>
+                        <StackPanel Grid.Row="5" Grid.Column="0">
+                            <Button Name="AudioCdNavIcon" 
+                                    HorizontalAlignment="Stretch" 
+                                    VerticalAlignment="Stretch" 
+                                    Command="{Binding NavBarItemClickCommand}"
+                                    CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Name}"
+                                    Style="{StaticResource MetroButton}">
+                                <Image Source="Graphics/BT_cd.png" />
+                            </Button>
+                            <Label HorizontalAlignment="Center">Audio CD</Label>
+                        </StackPanel>
                     </Grid>
                 </ScrollViewer>
                 <!-- Current View -->
                 <Grid Name="CurrentViewContainer" Grid.Row="0" Grid.Column="1">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"></RowDefinition>
+                        <RowDefinition Height="{Binding ShowTrackListingPreview, Converter={StaticResource ShowTrackListingToHeightConverter}}"></RowDefinition>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"></ColumnDefinition> 
@@ -216,6 +224,10 @@
                     </ContentControl>
                     <ContentControl Grid.Row="0" Grid.Column="0" Visibility="{Binding ShowAudioCdListing}">
                         <DukeboxViews:TrackListing DataContext="{Binding AudioCdListing, Source={StaticResource ViewModelLocator}}">
+                        </DukeboxViews:TrackListing>
+                    </ContentControl>
+                    <ContentControl Grid.Row="1" Grid.Column="0" Visibility="{Binding ShowTrackListingPreview}">
+                        <DukeboxViews:TrackListing DataContext="{Binding TrackListingPreview, Source={StaticResource ViewModelLocator}}">
                         </DukeboxViews:TrackListing>
                     </ContentControl>
                 </Grid>

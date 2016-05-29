@@ -33,6 +33,8 @@ namespace Dukebox.Library.Interfaces
         Playlist GetPlaylistFromFile(string playlistFile);
         List<ITrack> GetTracksForArtist(Artist artist);
         List<ITrack> GetTracksForAlbum(Album album);
+        List<ITrack> GetTracksForArtist(long artistId);
+        List<ITrack> GetTracksForAlbum(long albumId);
         List<ITrack> SearchForTracks(string searchTerm, List<SearchAreas> searchAreas);
         List<ITrack> SearchForTracksInArea(SearchAreas attribute, string nameOrTitle);
         List<ITrack> GetTracksByAttributeValue(SearchAreas attribute, string nameOrTitle);

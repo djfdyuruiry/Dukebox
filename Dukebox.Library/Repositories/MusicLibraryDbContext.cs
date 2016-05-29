@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using log4net;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
+using Newtonsoft.Json;
 
 namespace Dukebox.Library.Repositories
 {
@@ -40,9 +41,14 @@ namespace Dukebox.Library.Repositories
         {
             foreach (var vr in ex.EntityValidationErrors)
             {
+                var entity = vr?.Entry?.Entity;
+                var entityJson = entity != null ? JsonConvert.SerializeObject(vr.Entry) : "null";
+                logger.ErrorFormat("Database validation error occurred; Entity is valid? {0} | Entity JSON: '{1}'", 
+                    vr.IsValid, entityJson);
+
                 foreach (var ve in vr.ValidationErrors)
                 {
-                    logger.ErrorFormat("Database validation error on property '{1}': {0}",
+                    logger.ErrorFormat("Error on property '{1}': {0}",
                         ve.ErrorMessage, ve.PropertyName);
                 }
             }
