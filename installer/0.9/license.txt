@@ -1,0 +1,41 @@
+Dukebox v0.9 beta
+=============
+
+Changelog
+
+v0.9 beta
+------------
+
+*Entire GUI has been rewritten using Windows Presentation Foundation
+*Auto-detect when a new Audio-CD is inserted
+*New album art browser
+*New artist browser
+	
+*More to come in final 0.9 version...
+
+v0.86
+------------
+*Added shuffle history, press back button to navigate back through when shuffling.
+*Introduced recently played shortcut in main treeview.
+*Music library can be loaded now via shortcut in treeview.
+*Added Track Display Fromat setting to allow user to change how track info is displayed.
+	Open the 'Dukebox.exe.config' file and change the section:
+	  <setting name="trackDisplayFromat" serializeAs="String">
+        <value>{Artist} - {TITLE}</value>
+      </setting>
+
+	You can use {title},{artist},{album},{filename} in the text between <value></value> to make your own format.
+
+*Fixed issues with CD Ripping not working correctly and made wizard more useful.
+=============
+
+Licensed under the CC BY-NC-SA 3.0 [http://creativecommons.org/licenses/by-nc-sa/3.0/]
+
+Basically you can do anything with this project as long as you don't infer
+that I support your use of the code or want to use it for commerical purposes.
+
+The BASS audio library freeware license terms prevent me from allowing 
+commerical use of this product.
+
+See [http://sourceforge.net/p/dukebox/wiki/Libraries%20Used/] for a full list of 
+components used and their licences. (All of which are free or open source!)
