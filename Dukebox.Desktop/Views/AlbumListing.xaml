@@ -45,7 +45,8 @@
                  ItemsSource="{Binding Albums}" 
                  SelectionChanged="ListBox_SelectionChanged"
                  MouseDoubleClick="ListBox_MouseDoubleClick" 
-                 VirtualizingPanel.IsVirtualizing="True">
+                 VirtualizingPanel.IsVirtualizing="True"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled">
             <ListBox.Resources>
                 <Style TargetType="ListBox">
                     <Style.Resources>
@@ -64,7 +65,7 @@
             </ListBox.Resources>
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <UniformGrid IsItemsHost="True"/>
+                    <WrapPanel IsItemsHost="True"/>
                 </ItemsPanelTemplate>
             </ListBox.ItemsPanel>
         </ListBox>
