@@ -43,10 +43,11 @@
                  ItemsSource="{Binding Artists}"
                  SelectionChanged="ListBox_SelectionChanged"
                  MouseDoubleClick="ListBox_MouseDoubleClick" 
-                 VirtualizingPanel.IsVirtualizing="True">
+                 VirtualizingPanel.IsVirtualizing="True"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled">
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <UniformGrid IsItemsHost="True"/>
+                    <WrapPanel IsItemsHost="True"/>
                 </ItemsPanelTemplate>
             </ListBox.ItemsPanel>
         </ListBox>
