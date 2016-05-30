@@ -7,7 +7,7 @@ An audio library manager and media-player
 
 ### Technical Overview
 
-Dukebox is .NET desktop music jukebox designed to play a wide variety of audio formats and provide simple library management. It uses the [BASS audio library](http://www.un4seen.com/) for playback, SQLite3 & Entity Framework for music library data and WPF as the main GUI framework.
+Dukebox is .NET desktop music jukebox designed to play a wide variety of audio formats and provide simple library management. It uses the [BASS audio library](http://www.un4seen.com/) for playback, [TagLib.Portable](https://github.com/timheuer/taglib-sharp-portable) for audio file metadata, SQLite3 & Entity Framework for music library data and WPF as the main GUI framework.
 
 SimpleInjector is used for Dependency Injection and XUnit & FakeItEasy for Unit/Integration Testing.
 
