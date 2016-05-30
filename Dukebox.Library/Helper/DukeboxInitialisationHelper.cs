@@ -30,7 +30,7 @@ namespace Dukebox.Library.Helper
             _audioFormats = audioFileFormats;
         }
 
-        public void InitaliseBassLibrary()
+        public void InitaliseAudioLibrary()
         {
             var bassPluginsLoaded = new Dictionary<int, string>();
 

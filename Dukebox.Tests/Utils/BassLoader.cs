@@ -17,7 +17,7 @@ namespace Dukebox.Tests.Utils
 
             try
             {
-                helper.InitaliseBassLibrary();
+                helper.InitaliseAudioLibrary();
                 helper.RegisterSupportedAudioFileFormats();
                 // TODO: load more stuff as required
             }

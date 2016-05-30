@@ -55,7 +55,7 @@ namespace Dukebox.Desktop.ViewModel
                 var programLoadStopwatch = Stopwatch.StartNew();
 
                 Notification = "Loading BASS audio...";
-                _initHelper.InitaliseBassLibrary();
+                _initHelper.InitaliseAudioLibrary();
 
                 Notification = "Registering supported audio formats...";
                 _initHelper.RegisterSupportedAudioFileFormats();
