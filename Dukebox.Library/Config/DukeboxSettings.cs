@@ -3,6 +3,7 @@ using System.Configuration;
 using System.Linq;
 using System.Reflection;
 using System;
+using Dukebox.Library.Helper;
 
 namespace Dukebox.Library.Config
 {
@@ -22,7 +23,11 @@ namespace Dukebox.Library.Config
 
             var config = ConfigurationManager.OpenMappedExeConfiguration(configMap, ConfigurationUserLevel.None);
             _settings = config.AppSettings.Settings;
+
+            _settings["bassLicenseEmail"].Value = Base64Decoder.DoubleBase64Decode(_settings["bassLicenseEmail"].Value);
+            _settings["bassLicenseKey"].Value = Base64Decoder.DoubleBase64Decode(_settings["bassLicenseKey"].Value);
         }
+
 
         public int AddDirectoryConcurrencyLimit
         {
