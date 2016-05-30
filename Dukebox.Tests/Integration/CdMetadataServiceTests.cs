@@ -15,7 +15,7 @@ namespace Dukebox.Tests.Integration
 
         public CdMetadataServiceTests()
         {
-            BassLoader.LoadBass();
+            AudioLibraryLoader.LoadBass();
 
             var audioCdService = A.Fake<IAudioCdService>();
             A.CallTo(() => audioCdService.GetCdDriveIndex(A<char>.Ignored)).Returns(AudioCdTestConstants.CdDriveIndex);

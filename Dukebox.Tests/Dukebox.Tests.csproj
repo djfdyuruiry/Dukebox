@@ -121,7 +121,7 @@
     <Compile Include="Utils\AudioCdTestConstants.cs" />
     <Compile Include="Integration\AudioConverterServiceTests.cs" />
     <Compile Include="Unit\AudioFileMetaDataTests.cs" />
-    <Compile Include="Utils\BassLoader.cs" />
+    <Compile Include="Utils\AudioLibraryLoader.cs" />
     <Compile Include="Integration\CdMetadataServiceTests.cs" />
     <Compile Include="Utils\LibraryDbMockGenerator.cs" />
     <Compile Include="Unit\MusicLibraryTests.cs" />

@@ -19,7 +19,7 @@ namespace Dukebox.Tests.Integration
         {
             _audioDir = string.Format(@".\{0}", "audioRipOut");
 
-            BassLoader.LoadBass();
+            AudioLibraryLoader.LoadBass();
 
             try
             {

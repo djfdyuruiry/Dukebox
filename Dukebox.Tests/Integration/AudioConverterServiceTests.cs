@@ -10,7 +10,7 @@ namespace Dukebox.Tests.Integration
     {
         public AudioConverterServiceTests()
         {
-            BassLoader.LoadBass();
+            AudioLibraryLoader.LoadBass();
         }
 
         [Fact]
