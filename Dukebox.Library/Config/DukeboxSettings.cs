@@ -1,9 +1,6 @@
-﻿using Dukebox.Library.Interfaces;
-using System.Configuration;
-using System.Linq;
-using System.Reflection;
-using System;
+﻿using System.Configuration;
 using Dukebox.Library.Helper;
+using Dukebox.Library.Interfaces;
 
 namespace Dukebox.Library.Config
 {
