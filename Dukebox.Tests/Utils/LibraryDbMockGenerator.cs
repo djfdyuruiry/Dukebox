@@ -2,6 +2,7 @@
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
 using FakeItEasy;
+using SimpleInjector;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;

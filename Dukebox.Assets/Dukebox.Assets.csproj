@@ -243,6 +243,22 @@
     <Content Include="OptimFROG.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="x86BASS\Bass.dll" />
+    <None Include="x86BASS\BASS\bassaac.dll" />
+    <None Include="x86BASS\BASS\bassadx.dll" />
+    <None Include="x86BASS\BASS\bassalac.dll" />
+    <None Include="x86BASS\BASS\bassape.dll" />
+    <None Include="x86BASS\BASS\basscd.dll" />
+    <None Include="x86BASS\BASS\bassenc.dll" />
+    <None Include="x86BASS\BASS\bassflac.dll" />
+    <None Include="x86BASS\BASS\bassmidi.dll" />
+    <None Include="x86BASS\BASS\bassmpc.dll" />
+    <None Include="x86BASS\BASS\bassofr.dll" />
+    <None Include="x86BASS\BASS\bassopus.dll" />
+    <None Include="x86BASS\BASS\basstta.dll" />
+    <None Include="x86BASS\BASS\basswma.dll" />
+    <None Include="x86BASS\BASS\basswv.dll" />
+    <None Include="x86BASS\OptimFROG.dll" />
   </ItemGroup>
   <ItemGroup>
     <None Include="library.s3db">

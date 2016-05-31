@@ -22,11 +22,13 @@ AppUpdatesURL={#MyAppURL}
 DefaultDirName={pf}\{#MyAppName}
 DefaultGroupName=Dukebox {#MyAppVersion}
 AllowNoIcons=yes
-LicenseFile=M:\Source Code\C#\Dukebox\installer\{#MyAppVersion}\license.txt
-OutputDir=M:\Source Code\C#\Dukebox\installer\{#MyAppVersion}
-OutputBaseFilename=Dukebox_v{#MyAppVersion}
+LicenseFile=.\license.txt
+OutputDir=.\
+OutputBaseFilename=Dukebox_v{#MyAppVersion}_32bit
 Compression=lzma
 SolidCompression=yes
+ArchitecturesAllowed=x86
+UninstallDisplayIcon=..\..\Dukebox.Desktop\app.ico
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -35,9 +37,8 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "M:\Source Code\C#\Dukebox\Dukebox.Desktop\bin\x86\Release\Dukebox.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "M:\Source Code\C#\Dukebox\Dukebox.Desktop\bin\x86\Release\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs 
-;Source: "NDP452-KB2901907-x86-x64-AllOS-ENU.exe"; DestDir: "{app}"; AfterInstall: RunOtherInstaller
+Source: "..\..\Dukebox.Desktop\bin\x86\Release\Dukebox.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\Dukebox.Desktop\bin\x86\Release\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
