@@ -3,6 +3,8 @@ An audio library manager and media-player
 
 [Project Webpage](https://djfdyuruiry.github.io/Dukebox/)
 
+[Black Duck Stats](https://www.openhub.net/p/Dukebox)
+
 ### 
 
 ### Technical Overview
