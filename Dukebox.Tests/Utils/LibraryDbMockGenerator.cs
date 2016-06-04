@@ -2,18 +2,17 @@
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
 using FakeItEasy;
-using SimpleInjector;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Dukebox.Tests.Utils
 {
     public class LibraryDbMockGenerator
     {
-        private static bool containerModified;
         public static readonly string Mp3FilePath = Path.Combine(Directory.GetCurrentDirectory(), "sample.mp3");
 
         public readonly List<Album> Albums = new List<Album>
@@ -44,22 +43,13 @@ namespace Dukebox.Tests.Utils
         public readonly List<Song> Songs;
         
         public IMusicLibraryDbContext DbContextMock { get; private set; }
-
+        
         public LibraryDbMockGenerator(bool overrideLibraryPackage = true)
         {
             DbContextMock = A.Fake<IMusicLibraryDbContext>();
 
-            if (overrideLibraryPackage && !containerModified)
-            {
-                LibraryPackage.ExecutingForUnitTests = true;
-                var libraryContainer = LibraryPackage.GetContainerForTestOverrides();
-
-                libraryContainer.Options.AllowOverridingRegistrations = true;
-                libraryContainer.RegisterSingleton<IMusicLibraryDbContext>(DbContextMock);
-
-                containerModified = true;
-            }
-
+            A.CallTo(() => DbContextMock.SaveChangesAsync()).Returns(Task.FromResult(0));
+            
             Songs = new List<Song>();
 
             var songId = 0;

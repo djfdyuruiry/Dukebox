@@ -4,10 +4,10 @@ namespace Dukebox.Library.Interfaces
 {
     public interface ITrack
     {
-        Album Album { get; set; }
-        Artist Artist { get; set; }
-        IAudioFileMetadata Metadata { get; set; }
-        Song Song { get; set; }
+        Album Album { get; }
+        Artist Artist { get; }
+        IAudioFileMetadata Metadata { get; }
+        Song Song { get; }
         string ToString();
     }
 }

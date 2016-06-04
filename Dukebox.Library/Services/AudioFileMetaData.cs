@@ -127,7 +127,7 @@ namespace Dukebox.Library.Services
                     audioFileMetadata.Artist = tag.FirstPerformer;
                     audioFileMetadata.Album = tag.Album;
 
-                    audioFileMetadata._trackLength = (int)tagFile.Length;
+                    audioFileMetadata._trackLength = (int)tagFile.Properties.Duration.TotalSeconds;
 
                     try
                     {

@@ -473,7 +473,7 @@ namespace Dukebox.Library.Services
         public int LoadPlaylistFromFile(string filename, bool startPlayback = true)
         {
             var playlist = _musicLibrary.GetPlaylistFromFile(filename);
-            var tracks = playlist.GetTracksForPlaylist();
+            var tracks = _musicLibrary.GetTracksForPlaylist(playlist);
 
             return LoadPlaylistFromList(tracks, startPlayback);
         }

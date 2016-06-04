@@ -36,14 +36,8 @@ namespace Dukebox.Library.Model
         public virtual Artist Artist { get; set; }
         public override string ToString()
         {
-            var musicLibrary = LibraryPackage.GetInstance<IMusicLibrary>();
-            var displayTitle = Title == string.Empty ? "Unknown Title" : Title;
-            var displayArtist = "Unknown Artist";
-
-            if (ArtistId != null && ArtistId != -1)
-            {
-                displayArtist = musicLibrary.GetArtistById((long)ArtistId).ToString();
-            }
+            var displayTitle = string.IsNullOrEmpty(Title) ? "Unknown Title" : Title;
+            var displayArtist = string.IsNullOrEmpty(Artist?.Name) ? "Unknown Artist" : Artist?.Name;
 
             return string.Format("{0} - {1}", displayArtist, displayTitle);
         }

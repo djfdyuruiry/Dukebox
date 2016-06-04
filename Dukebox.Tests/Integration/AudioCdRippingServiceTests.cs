@@ -38,8 +38,10 @@ namespace Dukebox.Tests.Integration
         {
             var metadataService = new CdMetadataService(new AudioCdService());
             var audioConverterService = new AudioConverterService();
+            var musicLibrary = A.Fake<IMusicLibrary>();
+            var settings = A.Fake<IDukeboxSettings>();
 
-            var audioRipper = new AudioCdRippingService(metadataService, audioConverterService);
+            var audioRipper = new AudioCdRippingService(metadataService, audioConverterService, settings);
             var viewUpdater = A.Fake<ICdRipViewUpdater>();
 
             await audioRipper.RipCdToFolder(AudioCdTestConstants.CdDrivePath, _audioDir, viewUpdater);

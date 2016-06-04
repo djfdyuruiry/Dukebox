@@ -14,6 +14,7 @@ using System.IO;
 using Dukebox.Desktop.Model;
 using System.Threading;
 using System;
+using Dukebox.Library.Factories;
 
 namespace Dukebox.Desktop.ViewModel
 {
@@ -25,6 +26,7 @@ namespace Dukebox.Desktop.ViewModel
 
         private readonly IMusicLibrary _musicLibrary;
         private readonly IAudioPlaylist _audioPlaylist;
+        private readonly TrackFactory _trackFactory;
 
         private OpenFileDialog _selectFileDialog;
         private FolderBrowserDialog _selectFolderDialog;
@@ -36,10 +38,11 @@ namespace Dukebox.Desktop.ViewModel
         public ICommand ImportLibrary { get; private set; }
         public ICommand Exit { get; private set; }
 
-        public FileMenuViewModel(IMusicLibrary musicLibrary, IAudioPlaylist audioPlaylist, AudioFileFormats audioFileFormats) : base()
+        public FileMenuViewModel(IMusicLibrary musicLibrary, IAudioPlaylist audioPlaylist, AudioFileFormats audioFileFormats, IDukeboxSettings settings) : base()
         {
             _musicLibrary = musicLibrary;
             _audioPlaylist = audioPlaylist;
+            _trackFactory = new TrackFactory(settings);
 
             _selectFileDialog = new OpenFileDialog();
             _selectFolderDialog = new FolderBrowserDialog();
@@ -66,7 +69,7 @@ namespace Dukebox.Desktop.ViewModel
             }
 
             var fileName = _selectFileDialog.FileName;
-            var track = Track.BuildTrackInstance(fileName);
+            var track = _trackFactory.BuildTrackInstance(fileName);
 
             _audioPlaylist.LoadPlaylistFromList(new List<ITrack> { track });
 

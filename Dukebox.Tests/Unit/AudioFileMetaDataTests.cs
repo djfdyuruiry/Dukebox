@@ -79,7 +79,7 @@ namespace Dukebox.Tests.Unit
             var audioFileMetadata = AudioFileMetadata.BuildAudioFileMetaData(sampleMp3FileName);
 
             var audioLength = audioFileMetadata.Length;
-            var audioLengthIsCorrect = audioLength == 152;
+            var audioLengthIsCorrect = audioLength == 153;
 
             Assert.True(audioLengthIsCorrect, "Audio playback length extract was incorrect");
         }

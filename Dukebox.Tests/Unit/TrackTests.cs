@@ -13,9 +13,8 @@ namespace Dukebox.Tests.Unit
         [Fact]
         public void Artist()
         {
-            var track = BuildTrack();
-
-            track.Song = new Song { ArtistId = 0 };
+            var song = new Song { Artist = new Artist { Id = 0, Name = "artist" } };
+            var track = BuildTrack(song);
 
             var artist = track.Artist;
 
@@ -29,9 +28,8 @@ namespace Dukebox.Tests.Unit
         [Fact]
         public void Album()
         {
-            var track = BuildTrack();
-
-            track.Song = new Song { AlbumId = 0 };
+            var song = new Song { Album = new Album { Id = 0, Name = "album" } };
+            var track = BuildTrack(song);
 
             var album = track.Album;
 
@@ -45,9 +43,8 @@ namespace Dukebox.Tests.Unit
         [Fact]
         public new void ToString()
         {
-            var track = BuildTrack();
-
-            track.Song = new Song { AlbumId = 0, ArtistId = 0, FileName = "C:/some.mp3", Title = "song" };
+            var song = new Song { Artist = new Artist { Id = 0, Name = "artist" }, FileName = "C:/some.mp3", Title = "song" };
+            var track = BuildTrack(song);
 
             var trackString = track.ToString();
 
@@ -56,29 +53,13 @@ namespace Dukebox.Tests.Unit
             Assert.True(trackStringIsCorrect, string.Format("Track string was incorrect for current track details (track string: '{0}')", trackString));
         }
 
-        private Track BuildTrack()
+        private Track BuildTrack(Song song)
         {
             var settings = A.Fake<IDukeboxSettings>();
-            var library = A.Fake<IMusicLibrary>();
-
-            var artists = new List<Artist>
-            {
-                new Artist { Id = 0, Name = "artist" }
-            };
-            var albums = new List<Album>
-            {
-                new Album { Id = 0, Name = "album" }
-            };
 
             A.CallTo(() => settings.TrackDisplayFormat).Returns("{artist} - {title}");
 
-            A.CallTo(() => library.GetArtistById(A<long>.Ignored)).ReturnsLazily(o => artists[0]);
-            A.CallTo(() => library.GetArtistCount()).Returns(artists.Count);
-
-            A.CallTo(() => library.GetAlbumById(A<long>.Ignored)).ReturnsLazily(o => albums[0]);
-            A.CallTo(() => library.GetAlbumCount()).Returns(albums.Count);
-
-            return new Track(settings, library);
+            return new Track(song, settings);
         }
     }
 }

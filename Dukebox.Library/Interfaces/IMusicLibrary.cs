@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using Dukebox.Library.Model;
-using Dukebox.Library.Services;
 using System.Collections.Specialized;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using Dukebox.Library.Model;
 
 namespace Dukebox.Library.Interfaces
 {
@@ -40,6 +39,7 @@ namespace Dukebox.Library.Interfaces
         List<ITrack> GetTracksByAttributeValue(SearchAreas attribute, string nameOrTitle);
         List<ITrack> GetTracksByAttributeId(SearchAreas attribute, long attributeId);
         List<ITrack> GetTracksForDirectory(string directory, bool subDirectories);
+        List<ITrack> GetTracksForPlaylist(Playlist playlist);
         Task AddSupportedFilesInDirectory(string directory, bool subDirectories, Action<object, AudioFileImportedEventArgs> progressHandler, Action<object, int> completeHandler);
         Task<List<ITrack>> AddPlaylistFiles(string filename);
         Task<Playlist> AddPlaylist(string name, IEnumerable<string> filenames);

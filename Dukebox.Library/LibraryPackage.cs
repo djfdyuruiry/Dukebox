@@ -20,16 +20,7 @@ namespace Dukebox.Library
         private const string libraryDbFileName = "library.s3db";
 
         private static readonly ILog logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private static Container container;
-
-        public static bool ExecutingForUnitTests { get; set; }
-
-        static LibraryPackage()
-        {
-            container = new Container();
-            Configure(container);            
-        }
-
+        
         private static void Configure(Container container)
         {
             container.RegisterSingleton<IDukeboxSettings, DukeboxSettings>();
@@ -40,7 +31,6 @@ namespace Dukebox.Library
             container.RegisterSingleton<IMusicLibraryDbContext>(() => new MusicLibraryDbContext());
             container.RegisterSingleton(() => GetMusicLibraryInstance(container));
             container.RegisterSingleton<IAudioCdDriveMonitoringService, AudioCdDriveMonitoringService>();
-            container.Register<ITrack, Track>();
             container.Register<IAudioFileMetadata, AudioFileMetadata>();
 
             var assemblies = new List<Assembly> {Assembly.GetAssembly(typeof(AudioPackage))};
@@ -50,8 +40,11 @@ namespace Dukebox.Library
             container.RegisterSingleton<DukeboxInitialisationHelper>();
         }
 
-        public static TService GetInstance<TService>() where TService : class
+        internal static TService GetInstance<TService>() where TService : class
         {
+            var container = new Container();
+            Configure(container);
+
             return container.GetInstance<TService>();
         }
 
@@ -129,16 +122,6 @@ namespace Dukebox.Library
         public void RegisterServices(Container container)
         {
             Configure(container);
-        }
-
-        public static Container GetContainerForTestOverrides()
-        {
-            if (!ExecutingForUnitTests)
-            {
-                throw new InvalidOperationException("Accessing the internal container is only valid when ExecutingForUnitTests is true");
-            }
-
-            return container;
         }
     }
 }

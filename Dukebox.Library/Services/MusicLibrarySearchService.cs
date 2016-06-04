@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using log4net;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
-using System.Threading;
+using Dukebox.Library.Factories;
 
 namespace Dukebox.Library.Services
 {
@@ -15,13 +16,17 @@ namespace Dukebox.Library.Services
 
         private readonly IMusicLibraryDbContext _dukeboxData;
         private readonly IMusicLibrary _musicLibrary;
+        private readonly TrackFactory _trackFactory;
         private readonly SemaphoreSlim _dbContextMutex;
 
-        public MusicLibrarySearchService(IMusicLibraryDbContext dukeboxData, IMusicLibrary musicLibrary, SemaphoreSlim dbContextMutex)
+        public MusicLibrarySearchService(IMusicLibraryDbContext dukeboxData, IMusicLibrary musicLibrary, 
+            TrackFactory trackFactory, SemaphoreSlim dbContextMutex)
         {
             _dukeboxData = dukeboxData;
             _musicLibrary = musicLibrary;
             _dbContextMutex = dbContextMutex;
+
+            _trackFactory = trackFactory;
         }
 
         /// <summary>
@@ -58,7 +63,7 @@ namespace Dukebox.Library.Services
 
             if (string.IsNullOrWhiteSpace(searchTerm))
             {
-                return songs.ToList().Select(Track.BuildTrackInstance).ToList();
+                return songs.ToList().Select(s => _trackFactory.BuildTrackInstance(s)).ToList();
             }
 
             searchTerm = searchTerm.ToLower();
@@ -97,7 +102,7 @@ namespace Dukebox.Library.Services
             logger.DebugFormat("Getting tracks by attribute(s) '{0}' where name or title contain '{1}' took {2}ms and returned {3} results.",
                 searchAreasString, searchTerm, stopwatch.ElapsedMilliseconds, matchingSongs.Count());
 
-            return matchingSongs.Count() < 1 ? new List<ITrack>() : matchingSongs.ToList().Select(Track.BuildTrackInstance).ToList();
+            return matchingSongs.Count() < 1 ? new List<ITrack>() : matchingSongs.ToList().Select(s => _trackFactory.BuildTrackInstance(s)).ToList();
         }
 
         public List<ITrack> SearchForTracksInArea(SearchAreas attribute, string nameOrTitle)
@@ -139,12 +144,11 @@ namespace Dukebox.Library.Services
                 matchingSongs = matchingSongs.Concat(songs.Where(s => s.FileName.ToLower().Equals(lowerAttributeValue)));
             }
 
-
             stopwatch.Stop();
             logger.DebugFormat("Getting tracks by attribute(s) '{0}' where name or title equal '{1}' took {2}ms and returned {3} results.",
                 attribute, lowerAttributeValue, stopwatch.ElapsedMilliseconds, matchingSongs.Count());
 
-            return matchingSongs.Count() < 1 ? new List<ITrack>() : matchingSongs.ToList().Select(Track.BuildTrackInstance).ToList();
+            return matchingSongs.Count() < 1 ? new List<ITrack>() : matchingSongs.ToList().Select(s => _trackFactory.BuildTrackInstance(s)).ToList();
         }
 
         private IEnumerable<long> GetMatchingAttributeIds(SearchAreas attribute, string searchTerm, bool exactMatch = false)
@@ -227,7 +231,7 @@ namespace Dukebox.Library.Services
             logger.DebugFormat("Getting tracks by attribute {0} and value {1} took {2}ms and returned {3} results.",
                 Enum.GetName(typeof(SearchAreas), attribute), attributeId, stopwatch.ElapsedMilliseconds, matchingSongs.Count());
 
-            return matchingSongs.Count() < 1 ? new List<ITrack>() : matchingSongs.Select(Track.BuildTrackInstance).ToList();
+            return matchingSongs.Count() < 1 ? new List<ITrack>() : matchingSongs.Select(s => _trackFactory.BuildTrackInstance(s)).ToList();
         }
     }
 }

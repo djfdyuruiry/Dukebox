@@ -13,7 +13,7 @@ namespace Dukebox.Tests.Unit
 {
     public class AudioPlaylistTests
     {
-        public const string TrackFileName = "C:/song.mp3";
+        private const string sampleMp3FileName = "sample.mp3";
 
         private readonly AudioPlaylist _audioPlaylist;
         private readonly IMediaPlayer _mediaPlayer;
@@ -30,7 +30,7 @@ namespace Dukebox.Tests.Unit
             _audioPlaylist = new AudioPlaylist(_musicLibrary, _mediaPlayer);
             _track = A.Fake<ITrack>();
 
-            A.CallTo(() => _track.Song).Returns(new Song { FileName = TrackFileName });
+            A.CallTo(() => _track.Song).Returns(new Song { FileName = sampleMp3FileName });
 
             _audioPlaylist.Tracks.Add(_track);
         }
@@ -73,7 +73,7 @@ namespace Dukebox.Tests.Unit
 
             Assert.True(countCorrect, "Audio playlist returned incorrect count after loading from track list");
             
-            A.CallTo(() => _mediaPlayer.LoadFile(A<string>.Ignored, A<MediaPlayerMetadata>.Ignored)).MustHaveHappened();
+            A.CallTo(() => _mediaPlayer.LoadFile(A<string>.Ignored, A<MediaPlayerMetadata>.Ignored)).WithAnyArguments().MustHaveHappened();
         }
 
         [Fact]
@@ -103,7 +103,7 @@ namespace Dukebox.Tests.Unit
             Assert.True(playlistFileGenerated, "Audio playlist failed to generate playlist file");
 
             var playlistText = File.ReadAllText(playlistFile);
-            var playlistJson = JsonConvert.SerializeObject(new List<string> { TrackFileName });
+            var playlistJson = JsonConvert.SerializeObject(new List<string> { sampleMp3FileName });
 
             var playlistFileIsCorrect = playlistText == playlistJson;
 

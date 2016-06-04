@@ -1,19 +1,13 @@
-﻿using Dukebox.Audio;
-using Dukebox.Library.Interfaces;
-using Dukebox.Library.Services;
-using Dukebox.Library.Repositories;
-using Dukebox.Library.Services;
-using log4net;
+﻿using log4net;
+using Un4seen.Bass.Misc;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading;
 using System.Windows.Forms;
-using System.Windows.Threading;
-using System.Linq;
-using Un4seen.Bass.Misc;
-using Dukebox.Audio.Interfaces;
 using System.Threading.Tasks;
+using Dukebox.Audio.Interfaces;
+using Dukebox.Library.Factories;
+using Dukebox.Library.Interfaces;
 
 namespace Dukebox.Library.Services
 {
@@ -25,11 +19,14 @@ namespace Dukebox.Library.Services
         private static readonly ILog logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private readonly ICdMetadataService _cdMetadataService;
         private readonly IAudioConverterService _audioConverterService;
+        private readonly TrackFactory _trackFactory;
 
-        public AudioCdRippingService(ICdMetadataService cdMetadataService, IAudioConverterService audioConverterService)
+        public AudioCdRippingService(ICdMetadataService cdMetadataService, IAudioConverterService audioConverterService, IDukeboxSettings settings)
         {
             _cdMetadataService = cdMetadataService;
             _audioConverterService = audioConverterService;
+
+            _trackFactory = new TrackFactory(settings);
         }
         
         /// <summary>
@@ -65,7 +62,7 @@ namespace Dukebox.Library.Services
                 {
                     try
                     {
-                        ITrack t = Track.BuildTrackInstance(inFiles[trackIdx], cdMetadata[trackIdx]);
+                        ITrack t = _trackFactory.BuildTrackInstance(inFiles[trackIdx], cdMetadata[trackIdx]);
                         string outFile = string.Format(outFileFormat, t.ToString());
 
                         await _audioConverterService.ConvertCdaFileToMp3(inFiles[trackIdx], outFile,

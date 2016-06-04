@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Reflection;
 using log4net;
 using Dukebox.Library.Interfaces;
@@ -21,29 +20,13 @@ namespace Dukebox.Library.Services
         private Album _album;
         private Artist _artist;
         
-        public Song Song { get; set; }
+        public Song Song { get; private set; }
         
         public Artist Artist
         {
             get
             {
-                if (Song.ArtistId.HasValue && Song.ArtistId != -1 && _artist == null)
-                {
-                    _artist = _musicLibrary.GetArtistById(Song.ArtistId.Value); 
-                }
-
-                return _artist;
-            }
-            set
-            {
-                if (value.Id <= _musicLibrary.GetArtistCount())
-                {
-                    _artist = value;
-                }
-                else if (value.Id != -1)
-                {
-                    throw new ArgumentOutOfRangeException(string.Format("The artist id '{0}' is invalid!", value));
-                }
+                return Song.Artist;
             }
         }
         
@@ -51,23 +34,7 @@ namespace Dukebox.Library.Services
         {
             get
             {
-                if (Song.AlbumId.HasValue && Song.AlbumId != -1 && _album == null)
-                {
-                    _album = _musicLibrary.GetAlbumById(Song.AlbumId.Value);
-                }
-
-                return _album;
-            }
-            set
-            {
-                if (value.Id <= _musicLibrary.GetAlbumCount())
-                {
-                    _album = value;
-                }
-                else if (value.Id != -1)
-                {
-                    throw new ArgumentOutOfRangeException(string.Format("The album id '{0}' is invalid!", value.Id));
-                }
+                return Song.Album;
             }
         }
         
@@ -82,56 +49,27 @@ namespace Dukebox.Library.Services
 
                 return _metadata;
             }
-            set
-            {
-                if (Song.Id == -1)
-                {
-                    _metadata = value;
-                }
-                else
-                {
-                    throw new InvalidOperationException("Can't manually set the property 'Metadata' because this song's metadata is maintained in the database");
-                }
-            }
         }
 
-        public static ITrack BuildTrackInstance(Song song)
+        public Track(Song song, IDukeboxSettings settings, IAudioFileMetadata audioFileMetadata = null)
         {
             if (song == null)
             {
                 throw new ArgumentException("Cannot build track instance with a null song instance");
             }
 
-            var track = LibraryPackage.GetInstance<ITrack>() as Track;
-
-            track._album = song.Album ?? new Album { Id = -1 };
-            track._artist = song.Artist ?? new Artist { Id = -1 };
-            track.Song = song;
-
-            return track as ITrack;
-        }
-
-        public static ITrack BuildTrackInstance(string fileName, IAudioFileMetadata audioFileMetadata = null)
-        {
-            if (string.IsNullOrEmpty(fileName))
-            {
-                throw new ArgumentException("Cannot build track instance with a null or empty file name");
-            }
-
-            var song = new Song() { Id = -1, AlbumId = -1, ArtistId = -1, FileName = fileName };             
-            var track = BuildTrackInstance(song) as Track;
-            
-            track.Song.Title = track.Metadata.Title;
-            track._album.Name = track.Metadata.Album;
-            track._artist.Name = track.Metadata.Artist;
-
-            return track as ITrack;
-        }
-
-        public Track(IDukeboxSettings settings, IMusicLibrary musicLibrary)
-        {
             _settings = settings;
-            _musicLibrary = musicLibrary;
+
+            Song = song;
+            _album = Song.Album ?? new Album { Id = -1 };
+            _artist = Song.Artist ?? new Artist { Id = -1 };
+
+            if (audioFileMetadata != null)
+            {
+                Song.Title = audioFileMetadata.Title;
+                _album.Name = audioFileMetadata.Album;
+                _artist.Name = audioFileMetadata.Artist;
+            }
         }
 
         public override string ToString()

@@ -3,21 +3,22 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using FakeItEasy;
+using Newtonsoft.Json;
 using Xunit;
 using Dukebox.Audio;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Repositories;
 using Dukebox.Tests.Utils;
 using Dukebox.Library.Model;
-using Newtonsoft.Json;
+using System.Diagnostics;
 
 namespace Dukebox.Tests.Unit
 {
 
     public class MusicLibraryTests
     {
-        private readonly IMusicLibraryDbContext _musicLibraryDbContext;
         private readonly LibraryDbMockGenerator _mockDataLoader;
+        private readonly IMusicLibraryDbContext _musicLibraryDbContext;
         private readonly MusicLibrary _musicLibrary;
 
         public MusicLibraryTests()
@@ -29,7 +30,7 @@ namespace Dukebox.Tests.Unit
             var albumArtCache = A.Fake<IAlbumArtCacheService>();
             var audioFormats = new AudioFileFormats();
 
-            A.CallTo(() => settings.AddDirectoryConcurrencyLimit).Returns(20);
+            A.CallTo(() => settings.AddDirectoryConcurrencyLimit).Returns(5);
 
             audioFormats.SupportedFormats.Add(".mp3");
 
@@ -242,12 +243,12 @@ namespace Dukebox.Tests.Unit
         }
 
         [Fact]
-        public async void AddDirectory()
+        public void AddDirectory()
         {
-            var numSamples = 5;
+            var numSamples = 1;
 
             PrepareSamplesDirectory("samples", numSamples);
-            await _musicLibrary.AddSupportedFilesInDirectory("samples", false, null, null);
+            _musicLibrary.AddSupportedFilesInDirectory("samples", false, null, null).Wait();
 
             var tracks = _musicLibrary.SearchForTracks("samples", new List<SearchAreas> { SearchAreas.Filename });
             var tracksReturned = tracks.Any();
