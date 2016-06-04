@@ -245,7 +245,7 @@ namespace Dukebox.Tests.Unit
         [Fact]
         public void AddDirectory()
         {
-            var numSamples = 1;
+            var numSamples = 5;
 
             PrepareSamplesDirectory("samples", numSamples);
             _musicLibrary.AddSupportedFilesInDirectory("samples", false, null, null).Wait();

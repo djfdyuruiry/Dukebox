@@ -141,6 +141,8 @@ namespace Dukebox.Library.Repositories
 
             RecentlyPlayed = new ObservableCollection<ITrack>();
             RecentlyPlayed.CollectionChanged += RecentlyPlayedChangedHander;
+
+            RefreshCaches();
         }
 
         private void RecentlyPlayedChangedHander(object source, NotifyCollectionChangedEventArgs eventData)
