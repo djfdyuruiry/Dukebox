@@ -20,12 +20,15 @@ namespace Dukebox.Tests.Unit
         private readonly IMusicLibrary _musicLibrary;
         private readonly ITrack _track;
 
+        private bool _mediaPlayerIsPlaying = false;
+
         public AudioPlaylistTests()
         {
             _musicLibrary = A.Fake<IMusicLibrary>();
             _mediaPlayer = A.Fake<IMediaPlayer>();
 
-            A.CallTo(() => _mediaPlayer.LoadFile(A<string>.Ignored, A<MediaPlayerMetadata>.Ignored)).Invokes((o) => _mediaPlayer.Playing = true);
+            A.CallTo(() => _mediaPlayer.LoadFile(A<string>.Ignored, A<MediaPlayerMetadata>.Ignored)).Invokes((o) =>_mediaPlayerIsPlaying = true);
+            A.CallTo(() => _mediaPlayer.Playing).ReturnsLazily(e => _mediaPlayerIsPlaying);
 
             _audioPlaylist = new AudioPlaylist(_musicLibrary, _mediaPlayer);
             _track = A.Fake<ITrack>();
@@ -50,6 +53,8 @@ namespace Dukebox.Tests.Unit
         [Fact]
         public void GetCurrentTrackIndex()
         {
+            A.CallTo(() => _mediaPlayer.Finished).Returns(true);
+
             _audioPlaylist.StartPlaylistPlayback();
             
             _audioPlaylist.StopPlaylistPlayback();
@@ -64,10 +69,9 @@ namespace Dukebox.Tests.Unit
         public void LoadPlaylistFromList()
         {
             A.CallTo(() => _mediaPlayer.Finished).Returns(true);
-
+            
             var count = _audioPlaylist.LoadPlaylistFromList(new List<ITrack> { _track });
-
-            _audioPlaylist.StopPlaylistPlayback();
+            _audioPlaylist.WaitForPlaybackToFinish();
 
             var countCorrect = count == 1;
 
@@ -150,6 +154,8 @@ namespace Dukebox.Tests.Unit
         [Fact]
         public void StopPlaylistPlayback()
         {
+            A.CallTo(() => _mediaPlayer.Finished).Returns(true);
+
             _audioPlaylist.StartPlaylistPlayback();
             _audioPlaylist.StopPlaylistPlayback();
 

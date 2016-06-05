@@ -480,9 +480,8 @@ namespace Dukebox.Library.Services
 
         public int LoadPlaylistFromList(List<ITrack> tracks, bool startPlayback = true)
         {
-            StopPlaylistPlayback();
+            ClearPlaylist();
 
-            Tracks.Clear();
             tracks.ForEach(t => Tracks.Add(t));
 
             if (startPlayback)
