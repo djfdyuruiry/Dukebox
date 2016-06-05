@@ -194,7 +194,7 @@ namespace Dukebox.Library.Services
             _previousTracks = new Stack<int>();
             _currentTrackIndexMutex = new Mutex();
 
-            SetCurrentTrackIndex(0);
+            SetCurrentTrackIndex(-1);
             _forward = false;
             _back = false;
 
