@@ -125,23 +125,15 @@ namespace Dukebox.Library.Services
         /// <summary>
         /// Get the current index in the playlist that is loaded into memory for playback.
         /// </summary>
-        public int GetCurrentTrackIndex(bool useBoundaryChecks = false)
+        public int GetCurrentTrackIndex()
         {
             _currentTrackIndexMutex.WaitOne();
 
-            if (useBoundaryChecks)
-            {
-                if (_currentTrackIndex < 0 || _currentTrackIndex >= Tracks.Count)
-                {
-                    _currentTrackIndex = 0;
-                }
-            }
-
-            var idx = _currentTrackIndex;
+            var v = _currentTrackIndex;
 
             _currentTrackIndexMutex.ReleaseMutex();
 
-            return idx;
+            return v;
         }
 
         /// <summary>
@@ -225,8 +217,8 @@ namespace Dukebox.Library.Services
             if (!StreamingPlaylist)
             {
                 _playlistManagerThread = new Thread(PlayAllTracks);
-                _playlistManagerThread.Start();
                 SetCurrentTrackIndex(0);
+                _playlistManagerThread.Start();
             }
         }
 
@@ -367,7 +359,7 @@ namespace Dukebox.Library.Services
             if (!_forward && !_back)
             {
                 // Load current track into media player.
-                var currentTrack = Tracks[GetCurrentTrackIndex(true)];
+                var currentTrack = Tracks[GetCurrentTrackIndex()];
                 var mediaPlayMetadata = new MediaPlayerMetadata
                 {
                     AlbumName = currentTrack.Album?.Name,
