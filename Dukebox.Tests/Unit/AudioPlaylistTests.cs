@@ -27,7 +27,7 @@ namespace Dukebox.Tests.Unit
             _musicLibrary = A.Fake<IMusicLibrary>();
             _mediaPlayer = A.Fake<IMediaPlayer>();
 
-            A.CallTo(() => _mediaPlayer.LoadFile(A<string>.Ignored, A<MediaPlayerMetadata>.Ignored)).WithAnyArguments().Invokes((o) =>_mediaPlayerIsPlaying = true);
+            A.CallTo(() => _mediaPlayer.LoadFile(A<string>.Ignored, A<MediaPlayerMetadata>.Ignored)).Invokes((o) =>_mediaPlayerIsPlaying = true);
             A.CallTo(() => _mediaPlayer.Playing).ReturnsLazily(e => _mediaPlayerIsPlaying);
 
             _audioPlaylist = new AudioPlaylist(_musicLibrary, _mediaPlayer);
