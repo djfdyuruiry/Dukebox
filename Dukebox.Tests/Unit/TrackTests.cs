@@ -41,7 +41,7 @@ namespace Dukebox.Tests.Unit
         }
 
         [Fact]
-        public new void ToString()
+        public void TrackToString()
         {
             var song = new Song { Artist = new Artist { Id = 0, Name = "artist" }, FileName = "C:/some.mp3", Title = "song" };
             var track = BuildTrack(song);

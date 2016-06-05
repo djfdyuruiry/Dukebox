@@ -37,7 +37,7 @@ namespace Dukebox.Tests.Unit
 
             _audioPlaylist.Tracks.Add(_track);
         }
-        /*
+        
         [Fact]
         public void ClearPlaylist()
         {
@@ -64,7 +64,7 @@ namespace Dukebox.Tests.Unit
 
             Assert.True(currentIndexIsCorrect, "Audio playlist reported an incorrect current track index");
         }
-
+        /*
         [Fact]
         public void LoadPlaylistFromList()
         {
@@ -79,7 +79,7 @@ namespace Dukebox.Tests.Unit
             
             A.CallTo(() => _mediaPlayer.LoadFile(A<string>.Ignored, A<MediaPlayerMetadata>.Ignored)).WithAnyArguments().MustHaveHappened();
         }
-
+        */
         [Fact]
         public void PausePlay()
         {
@@ -160,6 +160,6 @@ namespace Dukebox.Tests.Unit
             _audioPlaylist.StopPlaylistPlayback();
 
             A.CallTo(() => _mediaPlayer.StopAudio()).MustHaveHappened();
-        }*/
+        }
     }
 }
