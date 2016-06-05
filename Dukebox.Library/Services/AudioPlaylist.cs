@@ -379,6 +379,7 @@ namespace Dukebox.Library.Services
                 // Wait until media player thread has started playback.
                 while (!_mediaPlayer.Playing)
                 {
+                    Console.Write("waiting for playing");
                     Thread.Sleep(10);
                 }
 
@@ -393,6 +394,7 @@ namespace Dukebox.Library.Services
             // While next and back are not pressed and the user is not finished with the song.
             while (!_forward && !_back && !_mediaPlayer.Finished)
             {
+                Console.Write("waiting for finishing");
                 Thread.Sleep(10);
             }
 
