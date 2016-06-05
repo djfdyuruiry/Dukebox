@@ -318,6 +318,7 @@ namespace Dukebox.Library.Services
                 // WTF does this even do...
                 while (GetCurrentTrackIndex() != 0)
                 {
+                    Console.Write("waiting for 0 idx");
                     Thread.Sleep(10);
                 }
             }
