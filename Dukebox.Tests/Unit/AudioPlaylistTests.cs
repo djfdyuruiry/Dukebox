@@ -67,7 +67,7 @@ namespace Dukebox.Tests.Unit
 
             var count = _audioPlaylist.LoadPlaylistFromList(new List<ITrack> { _track });
 
-            _audioPlaylist.WaitForPlaybackToFinish();
+            _audioPlaylist.StopPlaylistPlayback();
 
             var countCorrect = count == 1;
 
