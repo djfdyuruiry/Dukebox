@@ -29,7 +29,7 @@ namespace Dukebox.Library.Interfaces
         void Stop();
         void Back();
         void Forward();
-        int GetCurrentTrackIndex();
+        int GetCurrentTrackIndex(bool useBoundaryChecks = false);
         void StopPlaylistPlayback();
         void WaitForPlaybackToFinish();
     }
