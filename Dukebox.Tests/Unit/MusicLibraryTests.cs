@@ -37,7 +37,7 @@ namespace Dukebox.Tests.Unit
             _musicLibrary = new MusicLibrary(_musicLibraryDbContext, settings, albumArtCache, audioFormats);
 
         }
-        /*
+        
         [Fact]
         public void Album()
         {
@@ -362,6 +362,6 @@ namespace Dukebox.Tests.Unit
             }
 
             return files;
-        }*/
+        }
     }
 }
