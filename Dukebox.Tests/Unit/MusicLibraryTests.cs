@@ -241,7 +241,7 @@ namespace Dukebox.Tests.Unit
             Assert.True(resultsForKnownSong.Any(), "Failed to get tracks by known song id");
             Assert.False(resultsForMissingSong.Any(), "Incorrectly got results for an unknown song id");
         }
-        /*
+        
         [Fact]
         public void AddDirectory()
         {
@@ -333,7 +333,7 @@ namespace Dukebox.Tests.Unit
 
             Assert.True(allFilesInPlaylist, "Music library failed to store all files for playlist");
         }
-        */
+        
         [Fact]
         public async void RemoveTrack()
         {
