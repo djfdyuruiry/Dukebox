@@ -37,7 +37,7 @@ namespace Dukebox.Tests.Unit
             _musicLibrary = new MusicLibrary(_musicLibraryDbContext, settings, albumArtCache, audioFormats);
 
         }
-
+        
         [Fact]
         public void Album()
         {
@@ -241,7 +241,7 @@ namespace Dukebox.Tests.Unit
             Assert.True(resultsForKnownSong.Any(), "Failed to get tracks by known song id");
             Assert.False(resultsForMissingSong.Any(), "Incorrectly got results for an unknown song id");
         }
-
+        
         [Fact]
         public void AddDirectory()
         {
@@ -258,7 +258,6 @@ namespace Dukebox.Tests.Unit
             var trackAreCorrect = tracks.All(t => t.Song.Title == "sample title") && tracks.Count == numSamples;
 
             Assert.True(trackAreCorrect, "Music library failed to return correct tracks after adding directory");
-
         }
 
         [Fact]
@@ -334,7 +333,7 @@ namespace Dukebox.Tests.Unit
 
             Assert.True(allFilesInPlaylist, "Music library failed to store all files for playlist");
         }
-
+        
         [Fact]
         public async void RemoveTrack()
         {

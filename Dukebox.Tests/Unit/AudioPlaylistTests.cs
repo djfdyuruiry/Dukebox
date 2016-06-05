@@ -9,7 +9,7 @@ using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
 using Dukebox.Library.Services;
 
-namespace Dukebox.Tests.Integration
+namespace Dukebox.Tests.Unit
 {
     public class AudioPlaylistTests
     {
@@ -37,7 +37,7 @@ namespace Dukebox.Tests.Integration
 
             _audioPlaylist.Tracks.Add(_track);
         }
-
+        
         [Fact]
         public void ClearPlaylist()
         {
@@ -64,7 +64,7 @@ namespace Dukebox.Tests.Integration
 
             Assert.True(currentIndexIsCorrect, "Audio playlist reported an incorrect current track index");
         }
-
+        
         [Fact]
         public void LoadPlaylistFromList()
         {
@@ -79,7 +79,7 @@ namespace Dukebox.Tests.Integration
             
             A.CallTo(() => _mediaPlayer.LoadFile(A<string>.Ignored, A<MediaPlayerMetadata>.Ignored)).WithAnyArguments().MustHaveHappened();
         }
-
+        
         [Fact]
         public void PausePlay()
         {
