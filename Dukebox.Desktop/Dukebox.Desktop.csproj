@@ -160,6 +160,8 @@
     </ApplicationDefinition>
     <Compile Include="DesktopContainer.cs" />
     <Compile Include="DukeboxUserSettings.cs" />
+    <Compile Include="Helper\AudioCdHelper.cs" />
+    <Compile Include="Interfaces\IAudioDriveListingViewModel.cs" />
     <Compile Include="Model\PreviewArtistOrAlbumMessage.cs" />
     <Compile Include="Helper\BoolToVisibilityConverter.cs" />
     <Compile Include="Helper\ArtistToCardPathConverter.cs" />

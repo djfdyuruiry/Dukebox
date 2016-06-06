@@ -1,9 +1,6 @@
-﻿using Dukebox.Library.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Dukebox.Library.Model;
 
 namespace Dukebox.Library.Interfaces
 {
@@ -13,5 +10,7 @@ namespace Dukebox.Library.Interfaces
         event EventHandler<AudioCdDriveEventArguments> AudioCdInserted;
         event EventHandler AudioCdEjected;
         void StartMonitoring();
+        List<string> GetAudioCdDrivePaths();
+        bool IsDriveReady(string audioDrivePath);
     }
 }

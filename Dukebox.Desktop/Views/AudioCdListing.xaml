@@ -12,13 +12,13 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Styles/MetroButton.xaml" />
+                <ResourceDictionary Source="../Styles/MetroButton.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="0.05*"></RowDefinition>
+            <RowDefinition Height="0.04*"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -41,7 +41,13 @@
                     <ColumnDefinition Width="*"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
                 <Label Grid.Row="0" Grid.Column="0">CD Drive</Label>
-                <ComboBox Grid.Row="0" Grid.Column="1"></ComboBox>
+                <ComboBox Grid.Row="0" 
+                          Grid.Column="1" 
+                          Margin="1" 
+                          Name="AudioCdDriveComboBox" 
+                          ItemsSource="{Binding AudioCdDrivePaths}"
+                          SelectedValue="{Binding SelectedAudioCdDrivePath}"
+                          SelectedIndex="0"></ComboBox>
             </Grid>
             <Grid Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right">
                 <Grid.RowDefinitions>
@@ -51,8 +57,20 @@
                     <ColumnDefinition Width="*"></ColumnDefinition>
                     <ColumnDefinition Width="*"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
-                <Button Grid.Row="0" Grid.Column="0" Style="{StaticResource MetroButton}" Margin="1">Play CD</Button>
-                <Button Grid.Row="0" Grid.Column="1" Style="{StaticResource MetroButton}" Margin="1">Rip CD</Button>
+                <Button Grid.Row="0" 
+                        Grid.Column="0" 
+                        Style="{StaticResource MetroButton}" 
+                        Margin="1" 
+                        Command="{Binding PlayCd}">
+                    Play CD
+                </Button>
+                <Button Grid.Row="0" 
+                        Grid.Column="1" 
+                        Style="{StaticResource MetroButton}" 
+                        Margin="1" 
+                        Command="{Binding RipCd}">
+                    Rip CD
+                </Button>
             </Grid>
         </Grid>
         <ContentControl Grid.Row="1" Grid.Column="0">
