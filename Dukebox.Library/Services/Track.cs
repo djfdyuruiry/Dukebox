@@ -64,11 +64,21 @@ namespace Dukebox.Library.Services
             _album = Song.Album ?? new Album { Id = -1 };
             _artist = Song.Artist ?? new Artist { Id = -1 };
 
-            if (audioFileMetadata != null)
+            _metadata = audioFileMetadata;
+
+            if (song.Id == -1)
             {
-                Song.Title = audioFileMetadata.Title;
-                _album.Name = audioFileMetadata.Album;
-                _artist.Name = audioFileMetadata.Artist;
+                Song.Title = Metadata.Title;
+            }
+
+            if (_album.Id == -1)
+            {
+                _album.Name = Metadata.Album;
+            }
+
+            if (_artist.Id == -1)
+            {
+                _artist.Name = Metadata.Artist;
             }
         }
 
