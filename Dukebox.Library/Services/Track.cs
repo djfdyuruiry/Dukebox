@@ -26,7 +26,7 @@ namespace Dukebox.Library.Services
         {
             get
             {
-                return Song.Artist;
+                return Song.Artist ?? _artist;
             }
         }
         
@@ -34,7 +34,7 @@ namespace Dukebox.Library.Services
         {
             get
             {
-                return Song.Album;
+                return Song.Album ?? _album;
             }
         }
         
