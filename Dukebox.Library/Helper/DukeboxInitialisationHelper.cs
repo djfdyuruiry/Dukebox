@@ -5,7 +5,7 @@ using System.Reflection;
 using log4net;
 using Un4seen.Bass;
 using Dukebox.Audio;
-using Dukebox.Library.Interfaces;
+using Dukebox.Configuration.Interfaces;
 
 namespace Dukebox.Library.Helper
 {

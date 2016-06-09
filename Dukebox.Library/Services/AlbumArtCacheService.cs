@@ -8,6 +8,7 @@ using log4net;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
 using System.Threading.Tasks;
+using Dukebox.Configuration.Interfaces;
 
 namespace Dukebox.Library.Services
 {

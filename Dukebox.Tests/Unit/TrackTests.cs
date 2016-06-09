@@ -1,10 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using FakeItEasy;
+﻿using FakeItEasy;
 using Xunit;
-using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
 using Dukebox.Library.Services;
+using Dukebox.Configuration.Interfaces;
 
 namespace Dukebox.Tests.Unit
 {

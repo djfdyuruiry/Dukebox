@@ -1,8 +1,8 @@
-﻿using Dukebox.Audio;
-using Dukebox.Library.Config;
-using Dukebox.Library.Helper;
-using System;
+﻿using System;
 using System.Diagnostics;
+using Dukebox.Audio;
+using Dukebox.Configuration;
+using Dukebox.Library.Helper;
 
 namespace Dukebox.Tests.Utils
 {

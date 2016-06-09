@@ -1,13 +1,14 @@
-﻿using log4net;
-using Un4seen.Bass.Misc;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
 using System.Threading.Tasks;
+using log4net;
+using Un4seen.Bass.Misc;
 using Dukebox.Audio.Interfaces;
 using Dukebox.Library.Factories;
 using Dukebox.Library.Interfaces;
+using Dukebox.Configuration.Interfaces;
 
 namespace Dukebox.Library.Services
 {

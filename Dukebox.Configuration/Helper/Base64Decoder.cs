@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace Dukebox.Library.Helper
+namespace Dukebox.Configuration.Helper
 {
     public static class Base64Decoder
     {

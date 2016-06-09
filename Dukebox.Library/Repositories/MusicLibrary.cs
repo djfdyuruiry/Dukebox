@@ -1,11 +1,4 @@
-﻿using Dukebox.Audio;
-using Dukebox.Library.Factories;
-using Dukebox.Library.Interfaces;
-using Dukebox.Library.Model;
-using Dukebox.Library.Services;
-using log4net;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -15,6 +8,14 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using log4net;
+using Newtonsoft.Json;
+using Dukebox.Audio;
+using Dukebox.Library.Factories;
+using Dukebox.Library.Interfaces;
+using Dukebox.Library.Model;
+using Dukebox.Library.Services;
+using Dukebox.Configuration.Interfaces;
 
 namespace Dukebox.Library.Repositories
 {

@@ -271,6 +271,12 @@
   <ItemGroup>
     <Reference Include="System" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Dukebox.Configuration\Dukebox.Configuration.csproj">
+      <Project>{b932e6d9-1e93-47c4-a84e-30e0e1d4e4d7}</Project>
+      <Name>Dukebox.Configuration</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

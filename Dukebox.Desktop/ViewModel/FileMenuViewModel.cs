@@ -15,6 +15,7 @@ using Dukebox.Desktop.Model;
 using System.Threading;
 using System;
 using Dukebox.Library.Factories;
+using Dukebox.Configuration.Interfaces;
 
 namespace Dukebox.Desktop.ViewModel
 {
