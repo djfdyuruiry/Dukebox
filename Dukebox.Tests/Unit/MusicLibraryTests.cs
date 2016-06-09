@@ -10,6 +10,7 @@ using Dukebox.Library.Interfaces;
 using Dukebox.Library.Repositories;
 using Dukebox.Tests.Utils;
 using Dukebox.Library.Model;
+using Dukebox.Configuration.Interfaces;
 
 namespace Dukebox.Tests.Unit
 {

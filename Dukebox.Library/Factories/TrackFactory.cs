@@ -1,7 +1,8 @@
-﻿using Dukebox.Library.Interfaces;
+﻿using System;
+using Dukebox.Configuration.Interfaces;
+using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
 using Dukebox.Library.Services;
-using System;
 
 namespace Dukebox.Library.Factories
 {

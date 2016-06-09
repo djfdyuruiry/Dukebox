@@ -1,10 +1,12 @@
-﻿using Dukebox.Audio.Interfaces;
-using Dukebox.Audio.Services;
+﻿using System;
+using System.Collections.Generic;
+using System.Reflection;
 using log4net;
 using SimpleInjector;
 using SimpleInjector.Packaging;
-using System;
-using System.Reflection;
+using Dukebox.Audio.Interfaces;
+using Dukebox.Audio.Services;
+using Dukebox.Configuration;
 
 namespace Dukebox.Audio
 {
@@ -28,6 +30,10 @@ namespace Dukebox.Audio
             container.RegisterSingleton<IAudioConverterService, AudioConverterService>();
             container.RegisterSingleton<IGlobalMultimediaHotKeyService, GlobalMultimediaHotKeyService>();
             container.RegisterSingleton<IMediaPlayer, MediaPlayer>();
+
+            var assemblies = new List<Assembly> { Assembly.GetAssembly(typeof(ConfigurationPackage)) };
+
+            container.RegisterPackages(assemblies);
         }
 
         public static TService GetInstance<TService>() where TService : class

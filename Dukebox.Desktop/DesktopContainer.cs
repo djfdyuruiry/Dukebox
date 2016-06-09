@@ -1,13 +1,14 @@
-﻿using Dukebox.Desktop.Helper;
+﻿using System;
+using System.Collections.Generic;
+using System.Reflection;
+using SimpleInjector;
+using SimpleInjector.Packaging;
+using Dukebox.Configuration;
+using Dukebox.Desktop.Helper;
 using Dukebox.Desktop.Interfaces;
 using Dukebox.Desktop.Services;
 using Dukebox.Desktop.ViewModel;
 using Dukebox.Library;
-using SimpleInjector;
-using SimpleInjector.Packaging;
-using System;
-using System.Collections.Generic;
-using System.Reflection;
 
 namespace Dukebox.Desktop
 {
@@ -55,10 +56,7 @@ namespace Dukebox.Desktop
             container.Register<Album>();
 
             // register external packages
-            var assemblies = new List<Assembly>
-            {
-                Assembly.GetAssembly(typeof(LibraryPackage))
-            };
+            var assemblies = new List<Assembly> {Assembly.GetAssembly(typeof(LibraryPackage))};
 
             container.RegisterPackages(assemblies);
         }

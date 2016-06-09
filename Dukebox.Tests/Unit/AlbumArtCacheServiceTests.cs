@@ -9,6 +9,7 @@ using Xunit;
 using Dukebox.Library.Model;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Services;
+using Dukebox.Configuration.Interfaces;
 
 namespace Dukebox.Tests.Unit
 {

@@ -8,6 +8,7 @@ using Dukebox.Audio.Services;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Services;
 using Dukebox.Tests.Utils;
+using Dukebox.Configuration.Interfaces;
 
 namespace Dukebox.Tests.Integration
 {

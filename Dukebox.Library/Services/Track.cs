@@ -3,6 +3,7 @@ using System.Reflection;
 using log4net;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
+using Dukebox.Configuration.Interfaces;
 
 namespace Dukebox.Library.Services
 {
