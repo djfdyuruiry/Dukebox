@@ -223,8 +223,8 @@
                         </DukeboxViews:TrackListing>
                     </ContentControl>
                     <ContentControl Grid.Row="0" Grid.Column="0" Visibility="{Binding ShowAudioCdListing}">
-                        <DukeboxViews:TrackListing DataContext="{Binding AudioCdListing, Source={StaticResource ViewModelLocator}}">
-                        </DukeboxViews:TrackListing>
+                        <DukeboxViews:AudioCdListing DataContext="{Binding AudioCdListing, Source={StaticResource ViewModelLocator}}">
+                        </DukeboxViews:AudioCdListing>
                     </ContentControl>
                     <ContentControl Grid.Row="1" Grid.Column="0" Visibility="{Binding ShowTrackListingPreview}">
                         <DukeboxViews:TrackListing DataContext="{Binding TrackListingPreview, Source={StaticResource ViewModelLocator}}">

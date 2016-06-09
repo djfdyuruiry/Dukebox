@@ -160,6 +160,8 @@
     </ApplicationDefinition>
     <Compile Include="DesktopContainer.cs" />
     <Compile Include="DukeboxUserSettings.cs" />
+    <Compile Include="Helper\AudioCdHelper.cs" />
+    <Compile Include="Interfaces\IAudioDriveListingViewModel.cs" />
     <Compile Include="Model\PreviewArtistOrAlbumMessage.cs" />
     <Compile Include="Helper\BoolToVisibilityConverter.cs" />
     <Compile Include="Helper\ArtistToCardPathConverter.cs" />
@@ -213,6 +215,9 @@
     <Compile Include="Views\ArtistListing.xaml.cs">
       <DependentUpon>ArtistListing.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\AudioCdListing.xaml.cs">
+      <DependentUpon>AudioCdListing.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\PlaybackMonitor.xaml.cs">
       <DependentUpon>PlaybackMonitor.xaml</DependentUpon>
     </Compile>
@@ -251,6 +256,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\ArtistListing.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\AudioCdListing.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

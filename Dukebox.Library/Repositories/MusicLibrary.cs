@@ -147,56 +147,31 @@ namespace Dukebox.Library.Repositories
 
         private void RecentlyPlayedChangedHander(object source, NotifyCollectionChangedEventArgs eventData)
         {
-            if (RecentlyPlayedListModified != null)
-            {
-                RecentlyPlayedListModified(this, eventData);
-            }
+            RecentlyPlayedListModified?.Invoke(this, eventData);
         }
 
         #region Folder/Playlist/File playback methods
-
-        /// <summary>
-        /// Fetch track objects from a directory of files.
-        /// </summary>
-        /// <param name="directory">The path to load files from.</param>
-        /// <param name="subDirectories">Search all sub directories in the path given?</param>
-        /// <returns>A list of tracks </returns>
-        /// <exception cref="Exception">If the directory lookup operation fails.</exception>
+        
         public List<ITrack> GetTracksForDirectory(string directory, bool subDirectories)
         {
             var searchOption = subDirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
             var supportedFormats = _audioFormats.SupportedFormats;
 
             var validFiles = Directory.EnumerateFiles(directory, "*.*", searchOption).Where((f) => supportedFormats.Any(sf => f.EndsWith(sf))).ToList();
+            var libraryTracks = validFiles.SelectMany(f => GetTracksByAttributeValue(SearchAreas.Filename, f)).ToList();
 
-            _dbContextMutex.Wait();
-            validFiles = validFiles.Except(_dukeboxData.Songs.Select((s) => s.FileName)).ToList();
-            _dbContextMutex.Release();
+            validFiles = validFiles.Except(libraryTracks.Select(t => t.Song.FileName)).ToList();
 
-            var tracksToReturn = validFiles.Select((f) => _trackFactory.BuildTrackInstance(f)).ToList();
+            var tracksToReturn = validFiles.Select((f) => _trackFactory.BuildTrackInstance(f)).Concat(libraryTracks).ToList();
             return tracksToReturn;
         }
 
         public List<ITrack> GetTracksForPlaylist(Playlist playlist)
         {
-            var tracks = Enumerable.Empty<ITrack>();
-            var nonLibraryFiles = new List<string>();
+            var libraryTracks = playlist.Files.SelectMany(f => GetTracksByAttributeValue(SearchAreas.Filename, f)).ToList();
+            var nonLibraryFiles = playlist.Files.Except(libraryTracks.Select(t => t.Song.FileName)).ToList();
 
-            foreach (var file in playlist.Files)
-            {
-                var foundTracks = GetTracksByAttributeValue(SearchAreas.Filename, file);
-
-                if (foundTracks.Count > 0)
-                {
-                    tracks = tracks.Concat(foundTracks);
-                }
-                else
-                {
-                    nonLibraryFiles.Add(file);
-                }
-            }
-
-            tracks = tracks.Concat(nonLibraryFiles.Select(file =>
+            var tracks = nonLibraryFiles.Select(file =>
             {
                 try
                 {
@@ -206,17 +181,11 @@ namespace Dukebox.Library.Repositories
                 {
                     throw new Exception(string.Format("Error while loading track from file '{0}' for playlist {1}", file, ToString()), ex);
                 }
-            }));
+            }).Concat(libraryTracks).ToList();
 
-            return tracks.ToList();
+            return tracks;
         }
-
-        /// <summary>
-        /// Fetch track objects from a playlist of files.
-        /// </summary>
-        /// <param name="playlistFile">The playlist to load files from.</param>
-        /// <returns>A list of tracks </returns>
-        /// <exception cref="Exception">If the directory lookup operation fails.</exception>
+        
         public Playlist GetPlaylistFromFile(string playlistFile)
         {
             if (!File.Exists(playlistFile))

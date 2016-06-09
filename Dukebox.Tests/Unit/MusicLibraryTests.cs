@@ -10,11 +10,9 @@ using Dukebox.Library.Interfaces;
 using Dukebox.Library.Repositories;
 using Dukebox.Tests.Utils;
 using Dukebox.Library.Model;
-using System.Diagnostics;
 
 namespace Dukebox.Tests.Unit
 {
-
     public class MusicLibraryTests
     {
         private readonly LibraryDbMockGenerator _mockDataLoader;
@@ -241,7 +239,47 @@ namespace Dukebox.Tests.Unit
             Assert.True(resultsForKnownSong.Any(), "Failed to get tracks by known song id");
             Assert.False(resultsForMissingSong.Any(), "Incorrectly got results for an unknown song id");
         }
-        
+
+        [Fact]
+        public void GetTracksForDirectory()
+        {
+            var numSamples = 5;
+
+            PrepareSamplesDirectory("samples", numSamples);
+            PrepareSamplesDirectory("samples/samples", numSamples);
+
+            var tracks = _musicLibrary.GetTracksForDirectory("samples", true);
+
+            var tracksReturned = tracks.Any();
+
+            Assert.True(tracksReturned, "Music library failed to get any tracks for directory");
+
+            var trackAreCorrect = tracks.All(t => t.Song.Title == "sample title") && tracks.Count == numSamples * 2;
+
+            Assert.True(trackAreCorrect, "Music library failed to get correct tracks for directory");
+        }
+
+        [Fact]
+        public void GetTracksForPlaylist()
+        {
+            var numSamples = 5;
+
+            var files = PrepareSamplesDirectory("samples", numSamples);
+            var playlist = new Playlist
+            {
+                FilenamesCsv = string.Join(",", files)
+            };
+
+            var tracks = _musicLibrary.GetTracksForPlaylist(playlist);
+            var tracksReturned = tracks.Any();
+
+            Assert.True(tracksReturned, "Music library failed to return any tracks after adding playlist");
+
+            var trackAreCorrect = tracks.All(t => t.Song.Title == "sample title") && tracks.Count == numSamples;
+
+            Assert.True(trackAreCorrect, "Music library failed to return correct tracks after adding playlist");
+        }
+
         [Fact]
         public void AddDirectory()
         {
@@ -355,7 +393,7 @@ namespace Dukebox.Tests.Unit
 
             for (var i = 0; i < numSamples; i++)
             {
-                var newFilePath = string.Format("samples/sample{0}.mp3", i);
+                var newFilePath = Path.Combine(directoryName, string.Format("sample{0}.mp3", i));
 
                 File.Copy("sample.mp3", newFilePath, true);
                 files.Add(newFilePath);

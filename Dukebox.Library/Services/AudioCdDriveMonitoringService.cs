@@ -1,13 +1,13 @@
-﻿using Dukebox.Library.Interfaces;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using Dukebox.Library.Model;
 using System.IO;
-using System.Timers;
-using Dukebox.Audio;
-using log4net;
+using System.Linq;
 using System.Reflection;
+using System.Timers;
+using log4net;
+using Dukebox.Audio;
+using Dukebox.Library.Interfaces;
+using Dukebox.Library.Model;
 
 namespace Dukebox.Library.Services
 {
@@ -39,6 +39,11 @@ namespace Dukebox.Library.Services
                 _pollCdDrivesTimer = new Timer(cdDrivePollingTimeInMs);
                 _pollCdDrivesTimer.Elapsed += (o, e) => PollCdDrives();
             }
+        }
+
+        public List<string> GetAudioCdDrivePaths()
+        {
+            return _cdDrives.Select(di => di.RootDirectory.FullName).ToList();
         }
 
         private List<DriveInfo> GetAudioDrives()
@@ -96,10 +101,7 @@ namespace Dukebox.Library.Services
 
         private void DoAudioCdEjected()
         {
-            if (AudioCdEjected != null)
-            {
-                AudioCdEjected(this, EventArgs.Empty);
-            }
+            AudioCdEjected?.Invoke(this, EventArgs.Empty);
 
             _currentDrive = null;
         }
@@ -142,6 +144,23 @@ namespace Dukebox.Library.Services
 
                 return new List<ITrack>();
             }
+        }
+
+        public bool IsDriveReady(string audioDrivePath)
+        {
+            if (string.IsNullOrEmpty(audioDrivePath))
+            {
+                return false;
+            }
+
+            var drive = _cdDrives.FirstOrDefault(di => string.Equals(di.RootDirectory.FullName, audioDrivePath, StringComparison.OrdinalIgnoreCase));
+
+            if (drive == null)
+            {
+                return false;
+            }
+
+            return drive.IsReady;
         }
     }
 }
