@@ -13,7 +13,7 @@ namespace Dukebox.Tests.Unit
         [Fact]
         public void Artist()
         {
-            var song = new Song { Artist = new Artist { Id = 0, Name = "artist" } };
+            var song = new Song { Artist = new Artist { Id = 0, Name = "artist" }, FileName = "C:/some.mp3" };
             var track = BuildTrack(song);
 
             var artist = track.Artist;
@@ -28,7 +28,7 @@ namespace Dukebox.Tests.Unit
         [Fact]
         public void Album()
         {
-            var song = new Song { Album = new Album { Id = 0, Name = "album" } };
+            var song = new Song { Album = new Album { Id = 0, Name = "album" }, FileName = "C:/some.mp3" };
             var track = BuildTrack(song);
 
             var album = track.Album;
