@@ -83,7 +83,7 @@ namespace Dukebox.Library.Services
 
             for (int i = 0; i < metadata.Tracks.Count; i++)
             {
-                audioMetadata.Add(_audioFileMetadataFactory.BuildAudioFileMetaDataInstance(metadata, i));
+                audioMetadata.Add(_audioFileMetadataFactory.BuildAudioFileMetadataInstance(metadata, i));
             }
 
             return audioMetadata;

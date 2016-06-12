@@ -22,7 +22,7 @@ namespace Dukebox.Tests.Unit
         [Fact]
         public void BuildAudioFileMetdata()
         {
-            var audioFileMetadata = _audioFileMetadataFactory.BuildAudioFileMetaDataInstance(sampleMp3FileName);
+            var audioFileMetadata = _audioFileMetadataFactory.BuildAudioFileMetadataInstance(sampleMp3FileName);
             var metadataWasBuiltCorrectly = audioFileMetadata.HasFutherMetadataTag;
 
             Assert.True(metadataWasBuiltCorrectly, "Metdata was not extracted correctly from audio metadata tag");
@@ -31,7 +31,7 @@ namespace Dukebox.Tests.Unit
         [Fact]
         public void AlbumArtTest()
         {
-            var audioFileMetadata = _audioFileMetadataFactory.BuildAudioFileMetaDataInstance(sampleMp3FileName);
+            var audioFileMetadata = _audioFileMetadataFactory.BuildAudioFileMetadataInstance(sampleMp3FileName);
 
             var hasAlbumArt = audioFileMetadata.HasAlbumArt;
 
@@ -65,7 +65,7 @@ namespace Dukebox.Tests.Unit
         [Fact]
         public void Album()
         {
-            var audioFileMetadata = _audioFileMetadataFactory.BuildAudioFileMetaDataInstance(sampleMp3FileName);
+            var audioFileMetadata = _audioFileMetadataFactory.BuildAudioFileMetadataInstance(sampleMp3FileName);
             var album = audioFileMetadata.Album;
 
             var albumIsCorrect = !string.IsNullOrEmpty(album) && (album == "sample album");
@@ -76,7 +76,7 @@ namespace Dukebox.Tests.Unit
         [Fact]
         public void Artist()
         {
-            var audioFileMetadata = _audioFileMetadataFactory.BuildAudioFileMetaDataInstance(sampleMp3FileName);
+            var audioFileMetadata = _audioFileMetadataFactory.BuildAudioFileMetadataInstance(sampleMp3FileName);
             var artist = audioFileMetadata.Artist;
 
             var artistIsCorrect = !string.IsNullOrEmpty(artist) && (artist == "sample artist");
@@ -87,7 +87,7 @@ namespace Dukebox.Tests.Unit
         [Fact]
         public void Length()
         {
-            var audioFileMetadata = _audioFileMetadataFactory.BuildAudioFileMetaDataInstance(sampleMp3FileName);
+            var audioFileMetadata = _audioFileMetadataFactory.BuildAudioFileMetadataInstance(sampleMp3FileName);
 
             var audioLength = audioFileMetadata.Length;
             var audioLengthIsCorrect = audioLength == 153;
@@ -98,7 +98,7 @@ namespace Dukebox.Tests.Unit
         [Fact]
         public void Title()
         {
-            var audioFileMetadata = _audioFileMetadataFactory.BuildAudioFileMetaDataInstance(sampleMp3FileName);
+            var audioFileMetadata = _audioFileMetadataFactory.BuildAudioFileMetadataInstance(sampleMp3FileName);
             var title = audioFileMetadata.Title;
 
             var titleIsCorrect = !string.IsNullOrEmpty(title) && (title == "sample title");

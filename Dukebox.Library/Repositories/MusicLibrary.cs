@@ -264,7 +264,7 @@ namespace Dukebox.Library.Repositories
         {
             return filesToAdd.AsParallel().WithDegreeOfParallelism(concurrencyLimit).Select(f =>
             {
-                var metadataTuple = new Tuple<string, IAudioFileMetadata>(f, _audioFileMetadataFactory.BuildAudioFileMetaDataInstance(f));
+                var metadataTuple = new Tuple<string, IAudioFileMetadata>(f, _audioFileMetadataFactory.BuildAudioFileMetadataInstance(f));
 
                 Task.Run(() => progressHandler?.Invoke(this, new AudioFileImportedEventArgs
                 {
@@ -345,7 +345,7 @@ namespace Dukebox.Library.Repositories
 
                 if (metadata == null)
                 {
-                    metadata = _audioFileMetadataFactory.BuildAudioFileMetaDataInstance(filename);
+                    metadata = _audioFileMetadataFactory.BuildAudioFileMetadataInstance(filename);
                 }
 
                 var artist = await GetArtistForTag(metadata);

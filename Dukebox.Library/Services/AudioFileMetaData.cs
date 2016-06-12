@@ -18,9 +18,7 @@ namespace Dukebox.Library.Services
             "Unable to get audio length: there is no metadata tag for audio file '{0}', defaulting to 0";
 
         private static readonly ILog logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-
-        #region Metadata properties
-                
+                        
         private readonly long _dbAlbumId;
         private readonly int _trackLength;
         private readonly bool _hasAlbumArt;
@@ -57,8 +55,6 @@ namespace Dukebox.Library.Services
         }
 
         public Dictionary<string, List<string>> ExtendedMetadata { get; private set; }
-
-        #endregion
 
         public AudioFileMetadata(string audioFilePath, string title, string artist, string album, int trackLength, 
             Dictionary<string, List<string>> extendedMetadata, bool hasFutherMetadataTag, bool hasAlbumArt, long dbAlbumId)

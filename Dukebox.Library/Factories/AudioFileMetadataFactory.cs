@@ -28,7 +28,7 @@ namespace Dukebox.Library.Factories
             _audioCdService = audioCdService;
         }
 
-        public IAudioFileMetadata BuildAudioFileMetaDataInstance(CdMetadata cdMetadata, int trackNumber)
+        public IAudioFileMetadata BuildAudioFileMetadataInstance(CdMetadata cdMetadata, int trackNumber)
         {
             var title = cdMetadata.Tracks[trackNumber];
             var artist = cdMetadata.Artist;
@@ -37,7 +37,7 @@ namespace Dukebox.Library.Factories
             return new AudioFileMetadata(string.Empty, title, artist, album, 0, null, false, false, 0);
         }
 
-        public IAudioFileMetadata BuildAudioFileMetaDataInstance(string audioFilePath, long albumId = -1)
+        public IAudioFileMetadata BuildAudioFileMetadataInstance(string audioFilePath, long albumId = -1)
         {
             var dbAlbumId = albumId;
             var trackLength = 0;

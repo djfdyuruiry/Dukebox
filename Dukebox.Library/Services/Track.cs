@@ -40,7 +40,7 @@ namespace Dukebox.Library.Services
             {
                 if (_metadata == null)
                 {
-                    _metadata = _audioFileMetadataFactory.BuildAudioFileMetaDataInstance(Song.FileName);
+                    _metadata = _audioFileMetadataFactory.BuildAudioFileMetadataInstance(Song.FileName);
                 }
 
                 return _metadata;
