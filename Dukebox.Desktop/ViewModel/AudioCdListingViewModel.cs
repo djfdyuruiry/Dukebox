@@ -145,7 +145,7 @@ namespace Dukebox.Desktop.ViewModel
         {
             Tracks = _audioCdDriveMonitor.IsDriveReady(audioCdDrivePath) ? 
                 _musicLibrary.GetTracksForDirectory(audioCdDrivePath, false) : 
-                Tracks = new List<ITrack>();
+                new List<ITrack>();
         }
 
         private void DoPlayCd()

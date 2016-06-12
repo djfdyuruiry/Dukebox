@@ -13,7 +13,8 @@ namespace Dukebox.Audio.Services
         private static readonly ILog logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private static readonly List<Key> keysToRegister = new List<Key> { Key.MediaPlayPause, Key.MediaNextTrack, Key.MediaPreviousTrack, Key.MediaStop };
 
-        private HotKeyManager _hotKeyManager;
+        private readonly HotKeyManager _hotKeyManager;
+
         private bool _hotKeysRegistered;
 
         public event EventHandler PlayPausePressed;

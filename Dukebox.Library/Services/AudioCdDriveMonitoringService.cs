@@ -23,8 +23,8 @@ namespace Dukebox.Library.Services
         private readonly List<DriveInfo> _cdDrives;
         private DriveInfo _currentDrive;
 
-        public event EventHandler<AudioCdDriveEventArguments> AudioCdInsertedOnLoad;
-        public event EventHandler<AudioCdDriveEventArguments> AudioCdInserted;
+        public event EventHandler<AudioCdDriveEventArgs> AudioCdInsertedOnLoad;
+        public event EventHandler<AudioCdDriveEventArgs> AudioCdInserted;
         public event EventHandler AudioCdEjected;
 
         public AudioCdDriveMonitoringService(IMusicLibrary musicLibrary, AudioFileFormats audioFileFormats)
@@ -84,7 +84,7 @@ namespace Dukebox.Library.Services
                 DoAudioCdEjected();
             }
 
-            var firstReadyCdDrive = _cdDrives.Where(d => d.IsReady && d != _currentDrive).FirstOrDefault();
+            var firstReadyCdDrive = _cdDrives.FirstOrDefault(d => d.IsReady && d != _currentDrive);
 
             if (firstReadyCdDrive == null)
             {
@@ -115,7 +115,7 @@ namespace Dukebox.Library.Services
                 return;
             }
 
-            var args = new AudioCdDriveEventArguments
+            var args = new AudioCdDriveEventArgs
             {
                 DriveDirectory = _currentDrive.RootDirectory.FullName,
                 CdTracks = tracks

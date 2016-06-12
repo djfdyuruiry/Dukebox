@@ -7,7 +7,7 @@ namespace Dukebox.Configuration
     public class DukeboxSettings : IDukeboxSettings
     {
         // Fetch the settings object from foreign assembly.
-        private KeyValueConfigurationCollection _settings;
+        private readonly KeyValueConfigurationCollection _settings;
         
         public DukeboxSettings()
         {

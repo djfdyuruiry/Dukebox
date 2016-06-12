@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.IO;
+using System.Threading.Tasks;
 using Xunit;
 using Dukebox.Audio.Services;
 using Dukebox.Tests.Utils;
@@ -36,7 +37,7 @@ namespace Dukebox.Tests.Integration
         }
 
         [Fact]
-        public async void ConvertCdaFileToMp3()
+        public async Task ConvertCdaFileToMp3()
         {
 
             var audioConverter = new AudioConverterService();

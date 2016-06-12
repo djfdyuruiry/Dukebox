@@ -11,7 +11,7 @@ namespace Dukebox.Tests.Integration
 {
     public class CdMetadataServiceTests
     {
-        private ICdMetadataService _cdMetadataService;
+        private readonly ICdMetadataService _cdMetadataService;
 
         public CdMetadataServiceTests()
         {

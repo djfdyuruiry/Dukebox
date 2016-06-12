@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
 using Dukebox.Configuration.Interfaces;
@@ -86,7 +87,7 @@ namespace Dukebox.Library.Services
 
         public override string ToString()
         {
-            var trackFormat = _settings.TrackDisplayFormat.ToLower();
+            var trackFormat = _settings.TrackDisplayFormat.ToLower(CultureInfo.InvariantCulture);
 
             if (Artist == null)
             {

@@ -50,7 +50,7 @@ namespace Dukebox.Library.Services
             if (albumInfoMatch != null)
             {
                 var ablumIdx = albumInfoMatch.Index;
-                album = entries.Substring(ablumIdx, entries.Substring(ablumIdx).IndexOf("\r")).Split('=').LastOrDefault().Split('/').LastOrDefault();
+                album = entries.Substring(ablumIdx, entries.Substring(ablumIdx).IndexOf("\r", StringComparison.Ordinal)).Split('=').LastOrDefault().Split('/').LastOrDefault();
                 album = album.Substring(1);
             }
 
@@ -60,7 +60,7 @@ namespace Dukebox.Library.Services
             if (albumInfoMatch != null)
             {
                 var artistIdx = albumInfoMatch.Index;
-                artist = entries.Substring(artistIdx, entries.Substring(artistIdx).IndexOf("\r")).Split('=').LastOrDefault().Split('/').FirstOrDefault();
+                artist = entries.Substring(artistIdx, entries.Substring(artistIdx).IndexOf("\r", StringComparison.Ordinal)).Split('=').LastOrDefault().Split('/').FirstOrDefault();
                 artist = artist.Substring(0, artist.Length - 1);
             }
 

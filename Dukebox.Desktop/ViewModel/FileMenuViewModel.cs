@@ -130,10 +130,7 @@ namespace Dukebox.Desktop.ViewModel
 
         private void ImportStep(ProgressMonitorViewModel viewModel, AudioFileImportedEventArgs fileImportedArgs, ref int filesAdded)
         {
-            if (viewModel.MaximumProgressValue != (fileImportedArgs.TotalFilesThisImport * 2))
-            {
-                viewModel.MaximumProgressValue = (fileImportedArgs.TotalFilesThisImport * 2);
-            }
+            viewModel.MaximumProgressValue = (fileImportedArgs.TotalFilesThisImport * 2);
 
             var percentComplete = (filesAdded / ((float)fileImportedArgs.TotalFilesThisImport / 100)) / 2;
 

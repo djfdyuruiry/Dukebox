@@ -6,8 +6,8 @@ namespace Dukebox.Library.Interfaces
 {
     public interface IAudioCdDriveMonitoringService
     {
-        event EventHandler<AudioCdDriveEventArguments> AudioCdInsertedOnLoad;
-        event EventHandler<AudioCdDriveEventArguments> AudioCdInserted;
+        event EventHandler<AudioCdDriveEventArgs> AudioCdInsertedOnLoad;
+        event EventHandler<AudioCdDriveEventArgs> AudioCdInserted;
         event EventHandler AudioCdEjected;
         void StartMonitoring();
         List<string> GetAudioCdDrivePaths();

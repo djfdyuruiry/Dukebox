@@ -30,18 +30,23 @@ namespace Dukebox.Desktop.Helper
             selectMp3OutputDialog.Description = mp3OutputBrowserPrompt;
         }
 
-        public static void PlayAudioCd(string audioCdDrivePath, IMusicLibrary _musicLibrary, IAudioPlaylist _audioPlaylist)
+        public static void PlayAudioCd(string audioCdDrivePath, IMusicLibrary musicLibrary, IAudioPlaylist audioPlaylist)
         {
             if (string.IsNullOrEmpty(audioCdDrivePath))
             {
                 return;
             }
 
-            var tracks = _musicLibrary.GetTracksForDirectory(audioCdDrivePath, false);
-            _audioPlaylist.LoadPlaylistFromList(tracks);
+            var tracks = musicLibrary.GetTracksForDirectory(audioCdDrivePath, false);
+            audioPlaylist.LoadPlaylistFromList(tracks);
         }
 
-        public static void RipCdToFolder(IAudioCdRippingService _cdRippingService, string audioCdDrivePath = null)
+        public static void RipCdToFolder(IAudioCdRippingService cdRippingService)
+        {
+            RipCdToFolder(cdRippingService, null);
+        }
+
+        public static void RipCdToFolder(IAudioCdRippingService cdRippingService, string audioCdDrivePath)
         {
 
             var audioCdDrive = audioCdDrivePath ?? BrowseForAudioCdDrive();
@@ -66,7 +71,7 @@ namespace Dukebox.Desktop.Helper
 
             progressViewModel.OnComplete += (o, e) => progressWindow.Dispatcher.InvokeAsync(progressWindow.Hide);
 
-            _cdRippingService.RipCdToFolder(audioCdDrive, selectMp3OutputDialog.SelectedPath, progressViewModel);
+            cdRippingService.RipCdToFolder(audioCdDrive, selectMp3OutputDialog.SelectedPath, progressViewModel);
 
             progressWindow.Show();
         }

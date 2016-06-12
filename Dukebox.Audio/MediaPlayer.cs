@@ -22,7 +22,7 @@ namespace Dukebox.Audio
         private static readonly ILog logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private static readonly MediaPlayerMetadata defaultMetadata = new MediaPlayerMetadata { ArtistName = "Unknown Artist", AlbumName = "Unknown Album", TrackName = "Unknown Song" };
 
-        private IAudioCdService _audioCdService;
+        private readonly IAudioCdService _audioCdService;
 
         /// <summary>
         /// 
@@ -124,11 +124,16 @@ namespace Dukebox.Audio
             _newPosition = -1;
         }
 
+        public void LoadFile(string fileName)
+        {
+            LoadFile(fileName, null);
+        }
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="fileName"></param>
-        public void LoadFile(string fileName, MediaPlayerMetadata mediaPlayerMetadata = null)
+        public void LoadFile(string fileName, MediaPlayerMetadata mediaPlayerMetadata)
         {
             if (string.IsNullOrEmpty(fileName))
             {
@@ -138,7 +143,7 @@ namespace Dukebox.Audio
             {
                 throw new ArgumentException(string.Format("File '{0}' does not exist.", fileName));
             }
-            else if (File.ReadAllBytes(fileName).Count() == 0)
+            else if (!File.ReadAllBytes(fileName).Any())
             {
                 throw new ArgumentException(string.Format("File '{0}' contains no data!", fileName));
             }
@@ -312,7 +317,7 @@ namespace Dukebox.Audio
                     }
                 }
 
-                if (_newPosition != -1)
+                if ((int)_newPosition != -1)
                 {
                     Bass.BASS_ChannelSetPosition(_stream, _newPosition);
                     _newPosition = -1;

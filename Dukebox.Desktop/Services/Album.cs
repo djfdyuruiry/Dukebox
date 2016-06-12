@@ -1,7 +1,7 @@
-﻿using Dukebox.Desktop.Helper;
+﻿using System.Globalization;
+using Dukebox.Desktop.Helper;
 using Dukebox.Library.Interfaces;
 using LibraryAlbum = Dukebox.Library.Model.Album;
-using System.Windows.Media;
 
 namespace Dukebox.Desktop.Services
 {
@@ -44,7 +44,9 @@ namespace Dukebox.Desktop.Services
         {
             var name = album.Data.Name;
 
-            return string.IsNullOrEmpty(name) ? false : name.ToLower().Contains(stringToFind.ToLower());
+            return string.IsNullOrEmpty(name) ? false : 
+                name.ToLower(CultureInfo.InvariantCulture)
+                    .Contains(stringToFind.ToLower(CultureInfo.InvariantCulture));
         }        
     }
 }

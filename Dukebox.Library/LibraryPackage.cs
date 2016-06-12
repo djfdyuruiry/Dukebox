@@ -97,17 +97,17 @@ namespace Dukebox.Library
 
             var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             appDataPath = Path.Combine(appDataPath, appDataFolderName);
-
-            var dbFilePath = Path.Combine(appDataPath, libraryDbFileName);
-
+                        
             if (!Directory.Exists(appDataPath))
             {
                 // create app data directory
                 Directory.CreateDirectory(appDataPath);
             }
 
-#if DEBUG 
-            dbFilePath = "./library.s3db";
+#if !DEBUG 
+            var dbFilePath = Path.Combine(appDataPath, libraryDbFileName);
+#else
+            var dbFilePath = "./library.s3db";
             appDataPath = Environment.CurrentDirectory;
 #endif
 

@@ -1,13 +1,12 @@
-﻿using Dukebox.Library;
-using Dukebox.Library.Interfaces;
-using Dukebox.Library.Model;
-using FakeItEasy;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using FakeItEasy;
+using Dukebox.Library.Interfaces;
+using Dukebox.Library.Model;
 
 namespace Dukebox.Tests.Utils
 {
@@ -17,11 +16,11 @@ namespace Dukebox.Tests.Utils
 
         public readonly List<Album> Albums = new List<Album>
         {
-            new Album { hasAlbumArt = 0, Id = 0, Name = "jupiter" },
-            new Album { hasAlbumArt = 1, Id = 1, Name = "neptune" },
-            new Album { hasAlbumArt = 0, Id = 2, Name = "andromeda" },
-            new Album { hasAlbumArt = 1, Id = 3, Name = "uranus" },
-            new Album { hasAlbumArt = 0, Id = 4, Name = "mars" }
+            new Album { HasAlbumArtBit = 0, Id = 0, Name = "jupiter" },
+            new Album { HasAlbumArtBit = 1, Id = 1, Name = "neptune" },
+            new Album { HasAlbumArtBit = 0, Id = 2, Name = "andromeda" },
+            new Album { HasAlbumArtBit = 1, Id = 3, Name = "uranus" },
+            new Album { HasAlbumArtBit = 0, Id = 4, Name = "mars" }
         };
 
         public readonly List<Artist> Artists = new List<Artist>
@@ -44,7 +43,7 @@ namespace Dukebox.Tests.Utils
         
         public IMusicLibraryDbContext DbContextMock { get; private set; }
         
-        public LibraryDbMockGenerator(bool overrideLibraryPackage = true)
+        public LibraryDbMockGenerator()
         {
             DbContextMock = A.Fake<IMusicLibraryDbContext>();
 

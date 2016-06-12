@@ -23,7 +23,7 @@ namespace Dukebox.Tests.Unit
             {
                 Directory.Delete(cachePath);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // do nothing
             }
@@ -39,7 +39,7 @@ namespace Dukebox.Tests.Unit
 
             try
             {
-                var albumArtCache = new AlbumArtCacheService(settings);
+                new AlbumArtCacheService(settings);
             }
             catch (Exception ex)
             {
@@ -68,7 +68,7 @@ namespace Dukebox.Tests.Unit
             var albumArtFileInfo = new FileInfo(albumArtPath);
             var albumArtValid = albumArtFileInfo.Length > 0;
 
-            Assert.True(albumAdded, "Album art image added to cache was empty");
+            Assert.True(albumArtValid, "Album art image added to cache was empty");
         }
 
         [Fact]

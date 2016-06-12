@@ -36,8 +36,12 @@ namespace Dukebox.Library.Factories
 
             return new AudioFileMetadata(string.Empty, title, artist, album, 0, null, false, false, 0);
         }
+        public IAudioFileMetadata BuildAudioFileMetadataInstance(string audioFilePath)
+        {
+            return BuildAudioFileMetadataInstance(audioFilePath, -1);
+        }
 
-        public IAudioFileMetadata BuildAudioFileMetadataInstance(string audioFilePath, long albumId = -1)
+        public IAudioFileMetadata BuildAudioFileMetadataInstance(string audioFilePath, long albumId)
         {
             var dbAlbumId = albumId;
             var trackLength = 0;
