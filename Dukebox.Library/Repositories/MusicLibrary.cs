@@ -477,7 +477,16 @@ namespace Dukebox.Library.Repositories
                 return existingSong;
             }
 
-            var newSong = new Song() { FileName = filename, Title = metadata.Title, Album = albumObj, Artist = artistObj };
+            var extendedMetadataJson = JsonConvert.SerializeObject(metadata.ExtendedMetadata);
+            var newSong = new Song()
+            {
+                FileName = filename, 
+                Title = metadata.Title,
+                Album = albumObj,
+                Artist = artistObj,
+                ExtendedMetadataJson = extendedMetadataJson,
+                LengthInSeconds = metadata.Length
+            };
             
             logger.DebugFormat("Title for file '{0}': {1}", newSong.FileName, newSong.Title);
             
