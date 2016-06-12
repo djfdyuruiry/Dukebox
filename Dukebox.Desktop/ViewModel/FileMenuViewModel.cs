@@ -29,8 +29,8 @@ namespace Dukebox.Desktop.ViewModel
         private readonly IAudioPlaylist _audioPlaylist;
         private readonly TrackFactory _trackFactory;
 
-        private OpenFileDialog _selectFileDialog;
-        private FolderBrowserDialog _selectFolderDialog;
+        private readonly OpenFileDialog _selectFileDialog;
+        private readonly FolderBrowserDialog _selectFolderDialog;
 
         public ICommand PlayFile { get; private set; }
         public ICommand PlayFolder { get; private set; }
@@ -39,11 +39,11 @@ namespace Dukebox.Desktop.ViewModel
         public ICommand ImportLibrary { get; private set; }
         public ICommand Exit { get; private set; }
 
-        public FileMenuViewModel(IMusicLibrary musicLibrary, IAudioPlaylist audioPlaylist, AudioFileFormats audioFileFormats, IDukeboxSettings settings) : base()
+        public FileMenuViewModel(IMusicLibrary musicLibrary, IAudioPlaylist audioPlaylist, AudioFileFormats audioFileFormats, TrackFactory trackFactory) : base()
         {
             _musicLibrary = musicLibrary;
             _audioPlaylist = audioPlaylist;
-            _trackFactory = new TrackFactory(settings);
+            _trackFactory = trackFactory;
 
             _selectFileDialog = new OpenFileDialog();
             _selectFolderDialog = new FolderBrowserDialog();

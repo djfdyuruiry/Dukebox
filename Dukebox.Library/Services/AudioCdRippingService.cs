@@ -8,7 +8,6 @@ using Un4seen.Bass.Misc;
 using Dukebox.Audio.Interfaces;
 using Dukebox.Library.Factories;
 using Dukebox.Library.Interfaces;
-using Dukebox.Configuration.Interfaces;
 
 namespace Dukebox.Library.Services
 {
@@ -22,12 +21,12 @@ namespace Dukebox.Library.Services
         private readonly IAudioConverterService _audioConverterService;
         private readonly TrackFactory _trackFactory;
 
-        public AudioCdRippingService(ICdMetadataService cdMetadataService, IAudioConverterService audioConverterService, IDukeboxSettings settings)
+        public AudioCdRippingService(ICdMetadataService cdMetadataService, IAudioConverterService audioConverterService, TrackFactory trackFactory)
         {
             _cdMetadataService = cdMetadataService;
             _audioConverterService = audioConverterService;
 
-            _trackFactory = new TrackFactory(settings);
+            _trackFactory = trackFactory;
         }
         
         /// <summary>

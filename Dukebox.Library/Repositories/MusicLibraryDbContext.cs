@@ -1,11 +1,10 @@
 using System.Data.Entity;
 using System.Data.Entity.Validation;
 using System.Diagnostics;
-using System.Threading.Tasks;
 using log4net;
+using Newtonsoft.Json;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
-using Newtonsoft.Json;
 
 namespace Dukebox.Library.Repositories
 {
@@ -26,16 +25,6 @@ namespace Dukebox.Library.Repositories
         public virtual DbSet<Artist> Artists { get; set; }
         public virtual DbSet<Playlist> Playlists { get; set; }
         public virtual DbSet<Song> Songs { get; set; }
-        
-        public override int SaveChanges()
-        {
-            return base.SaveChanges();
-        }
-
-        public override Task<int> SaveChangesAsync()
-        {
-            return base.SaveChangesAsync();
-        }
 
         public void LogEntityValidationException(DbEntityValidationException ex)
         {

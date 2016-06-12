@@ -37,6 +37,7 @@ namespace Dukebox.Library.Repositories
         private readonly IDukeboxSettings _settings;
         private readonly AudioFileFormats _audioFormats;
         private readonly IAlbumArtCacheService _albumArtCache;
+        private readonly AudioFileMetadataFactory _audioFileMetadataFactory;
         private readonly TrackFactory _trackFactory;
         private readonly IMusicLibrarySearchService _searchService;
 
@@ -126,8 +127,8 @@ namespace Dukebox.Library.Repositories
 
         #endregion
         
-        public MusicLibrary(IMusicLibraryDbContext libraryDbContext, IDukeboxSettings settings, 
-            IAlbumArtCacheService albumArtCache, AudioFileFormats audioFormats)
+        public MusicLibrary(IMusicLibraryDbContext libraryDbContext, IDukeboxSettings settings, IAlbumArtCacheService albumArtCache, 
+            AudioFileFormats audioFormats, AudioFileMetadataFactory audioFileMetadataFactory, TrackFactory trackFactory)
         {
             _dbContextMutex = new SemaphoreSlim(1, 1);
 
@@ -135,7 +136,8 @@ namespace Dukebox.Library.Repositories
             _settings = settings;
             _audioFormats = audioFormats;
             _albumArtCache = albumArtCache;
-            _trackFactory = new TrackFactory(_settings);
+            _audioFileMetadataFactory = audioFileMetadataFactory;
+            _trackFactory = trackFactory;
             _searchService = new MusicLibrarySearchService(libraryDbContext, this, _trackFactory, _dbContextMutex);
 
             _allFilesCache = _dukeboxData.Songs.Select(s => s.FileName).ToList();
@@ -262,7 +264,7 @@ namespace Dukebox.Library.Repositories
         {
             return filesToAdd.AsParallel().WithDegreeOfParallelism(concurrencyLimit).Select(f =>
             {
-                var metadataTuple = new Tuple<string, IAudioFileMetadata>(f, AudioFileMetadata.BuildAudioFileMetaData(f));
+                var metadataTuple = new Tuple<string, IAudioFileMetadata>(f, _audioFileMetadataFactory.BuildAudioFileMetadataInstance(f));
 
                 Task.Run(() => progressHandler?.Invoke(this, new AudioFileImportedEventArgs
                 {
@@ -343,7 +345,7 @@ namespace Dukebox.Library.Repositories
 
                 if (metadata == null)
                 {
-                    metadata = AudioFileMetadata.BuildAudioFileMetaData(filename);
+                    metadata = _audioFileMetadataFactory.BuildAudioFileMetadataInstance(filename);
                 }
 
                 var artist = await GetArtistForTag(metadata);
@@ -475,7 +477,16 @@ namespace Dukebox.Library.Repositories
                 return existingSong;
             }
 
-            var newSong = new Song() { FileName = filename, Title = metadata.Title, Album = albumObj, Artist = artistObj };
+            var extendedMetadataJson = JsonConvert.SerializeObject(metadata.ExtendedMetadata);
+            var newSong = new Song()
+            {
+                FileName = filename, 
+                Title = metadata.Title,
+                Album = albumObj,
+                Artist = artistObj,
+                ExtendedMetadataJson = extendedMetadataJson,
+                LengthInSeconds = metadata.Length
+            };
             
             logger.DebugFormat("Title for file '{0}': {1}", newSong.FileName, newSong.Title);
             

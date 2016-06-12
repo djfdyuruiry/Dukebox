@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Dukebox.Library.Interfaces
 {
@@ -12,13 +9,13 @@ namespace Dukebox.Library.Interfaces
         string AudioFilePath { get; }
         string Title { get; set; }
         string Album { get; set; }
-        Image AlbumArt { get; }
         string Artist { get; set; }
+        int Length { get; }
         bool HasAlbumArt { get; }
         bool HasFutherMetadataTag { get; }
-        bool IsEmpty { get; }
-        int Length { get; }
-        Image GetAlbumArt(Action<Image> beforeStreamClosedCallback = null);
+        Dictionary<string, List<string>> ExtendedMetadata { get; }
+        Image GetAlbumArt();
+        Image GetAlbumArt(Action<Image> beforeStreamClosedCallback);
         string SaveAlbumArtToTempFile();
     }
 }

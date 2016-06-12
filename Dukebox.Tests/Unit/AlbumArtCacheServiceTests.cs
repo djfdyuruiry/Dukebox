@@ -158,7 +158,7 @@ namespace Dukebox.Tests.Unit
             albumObj.Id = albumId;
 
             A.CallTo(() => metadata.HasAlbumArt).Returns(true);
-            A.CallTo(() => metadata.AlbumArt).Returns(blankImage);
+            A.CallTo(() => metadata.GetAlbumArt()).Returns(blankImage);
             A.CallTo(() => metadata.GetAlbumArt(A<Action<Image>>.Ignored)).Invokes(e =>
             {
                 var action = e.Arguments[0] as Action<Image>;
