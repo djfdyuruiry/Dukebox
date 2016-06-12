@@ -1,6 +1,8 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
 using FakeItEasy;
 using Xunit;
 using Dukebox.Library.Factories;
@@ -104,6 +106,17 @@ namespace Dukebox.Tests.Unit
             var titleIsCorrect = !string.IsNullOrEmpty(title) && (title == "sample title");
 
             Assert.True(titleIsCorrect, "Title name extracted was incorrect");
+        }
+
+        [Fact]
+        public void ExtendedMetadata()
+        {
+            var audioFileMetadata = _audioFileMetadataFactory.BuildAudioFileMetadataInstance(sampleMp3FileName);
+            var extendedMetadata = audioFileMetadata.ExtendedMetadata;
+
+            var extendedMetadataIsCorrect = extendedMetadata.Any() && string.Equals(extendedMetadata["Year"]?.First(), "2016", StringComparison.Ordinal);
+
+            Assert.True(extendedMetadataIsCorrect, "Extended metadata extracted was incorrect");
         }
     }
 }
