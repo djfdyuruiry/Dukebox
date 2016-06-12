@@ -9,6 +9,7 @@ using Dukebox.Library.Interfaces;
 using Dukebox.Library.Services;
 using Dukebox.Tests.Utils;
 using Dukebox.Configuration.Interfaces;
+using Dukebox.Library.Factories;
 
 namespace Dukebox.Tests.Integration
 {
@@ -37,12 +38,14 @@ namespace Dukebox.Tests.Integration
         [Fact]
         public async void RipAudioCd()
         {
-            var metadataService = new CdMetadataService(new AudioCdService());
+            var audioCdService = new AudioCdService();
+            var metadataService = new CdMetadataService(audioCdService);
             var audioConverterService = new AudioConverterService();
-            var musicLibrary = A.Fake<IMusicLibrary>();
             var settings = A.Fake<IDukeboxSettings>();
+            var audioFileMetadataFactory = new AudioFileMetadataFactory(metadataService, audioCdService);
+            var trackFactory = new TrackFactory(settings, audioFileMetadataFactory);
 
-            var audioRipper = new AudioCdRippingService(metadataService, audioConverterService, settings);
+            var audioRipper = new AudioCdRippingService(metadataService, audioConverterService, trackFactory);
             var viewUpdater = A.Fake<ICdRipViewUpdater>();
 
             await audioRipper.RipCdToFolder(AudioCdTestConstants.CdDrivePath, _audioDir, viewUpdater);

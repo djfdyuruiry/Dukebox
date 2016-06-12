@@ -11,6 +11,7 @@ using Dukebox.Library.Helper;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Services;
 using Dukebox.Library.Repositories;
+using Dukebox.Library.Factories;
 
 namespace Dukebox.Library
 {
@@ -30,7 +31,8 @@ namespace Dukebox.Library
             container.RegisterSingleton<IMusicLibraryDbContext>(() => new MusicLibraryDbContext());
             container.RegisterSingleton(() => GetMusicLibraryInstance(container));
             container.RegisterSingleton<IAudioCdDriveMonitoringService, AudioCdDriveMonitoringService>();
-            container.Register<IAudioFileMetadata, AudioFileMetadata>();
+            container.RegisterSingleton<AudioFileMetadataFactory, AudioFileMetadataFactory>();
+            container.RegisterSingleton<TrackFactory, TrackFactory>();
 
             var assemblies = new List<Assembly> {Assembly.GetAssembly(typeof(AudioPackage))};
 
@@ -70,7 +72,8 @@ namespace Dukebox.Library
                 EnsureLocalEnvironmentValid();
 
                 var musicLibrary = new MusicLibrary(container.GetInstance<IMusicLibraryDbContext>(), container.GetInstance<IDukeboxSettings>(),
-                    container.GetInstance<IAlbumArtCacheService>(), container.GetInstance<AudioFileFormats>());
+                    container.GetInstance<IAlbumArtCacheService>(), container.GetInstance<AudioFileFormats>(), 
+                    container.GetInstance<AudioFileMetadataFactory>(), container.GetInstance<TrackFactory>());
 
                 return musicLibrary;
             }

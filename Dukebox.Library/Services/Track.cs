@@ -1,26 +1,21 @@
 ﻿using System;
-using System.Reflection;
-using log4net;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
 using Dukebox.Configuration.Interfaces;
+using Dukebox.Library.Factories;
 
 namespace Dukebox.Library.Services
 {
-    /// <summary>
-    /// An audio track, with source information and
-    /// metadata properties.
-    /// </summary>
     public class Track : ITrack
     {
-        private static readonly ILog logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private readonly IDukeboxSettings _settings;
+        private readonly AudioFileMetadataFactory _audioFileMetadataFactory;
 
-        private IDukeboxSettings _settings;
-        private IMusicLibrary _musicLibrary;
+        private readonly Album _album;
+        private readonly Artist _artist;
+
         private IAudioFileMetadata _metadata;
-        private Album _album;
-        private Artist _artist;
-        
+
         public Song Song { get; private set; }
         
         public Artist Artist
@@ -45,14 +40,19 @@ namespace Dukebox.Library.Services
             {
                 if (_metadata == null)
                 {
-                    _metadata = AudioFileMetadata.BuildAudioFileMetaData(Song.FileName);
+                    _metadata = _audioFileMetadataFactory.BuildAudioFileMetaDataInstance(Song.FileName);
                 }
 
                 return _metadata;
             }
         }
 
-        public Track(Song song, IDukeboxSettings settings, IAudioFileMetadata audioFileMetadata = null)
+        public Track(Song song, IDukeboxSettings settings, AudioFileMetadataFactory audioFileMetadataFactory) : 
+            this(song, settings, audioFileMetadataFactory, null)
+        {            
+        }
+
+        public Track(Song song, IDukeboxSettings settings, AudioFileMetadataFactory audioFileMetadataFactory, IAudioFileMetadata audioFileMetadata)
         {
             if (song == null)
             {
@@ -60,6 +60,7 @@ namespace Dukebox.Library.Services
             }
 
             _settings = settings;
+            _audioFileMetadataFactory = audioFileMetadataFactory;
 
             Song = song;
             _album = Song.Album ?? new Album { Id = -1 };

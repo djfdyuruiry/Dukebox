@@ -11,30 +11,35 @@ using Dukebox.Library.Repositories;
 using Dukebox.Tests.Utils;
 using Dukebox.Library.Model;
 using Dukebox.Configuration.Interfaces;
+using Dukebox.Library.Factories;
+using Dukebox.Audio.Interfaces;
+using System.Threading.Tasks;
 
 namespace Dukebox.Tests.Unit
 {
     public class MusicLibraryTests
     {
         private readonly LibraryDbMockGenerator _mockDataLoader;
-        private readonly IMusicLibraryDbContext _musicLibraryDbContext;
         private readonly MusicLibrary _musicLibrary;
 
         public MusicLibraryTests()
         {
             _mockDataLoader = new LibraryDbMockGenerator();
-            _musicLibraryDbContext = _mockDataLoader.DbContextMock;
+
+            var musicLibraryDbContext = _mockDataLoader.DbContextMock;
 
             var settings = A.Fake<IDukeboxSettings>();
             var albumArtCache = A.Fake<IAlbumArtCacheService>();
             var audioFormats = new AudioFileFormats();
+            var audioFileMetadataFactory = new AudioFileMetadataFactory(A.Fake<ICdMetadataService>(), A.Fake<IAudioCdService>());
+            var trackFactory = new TrackFactory(settings, audioFileMetadataFactory);
 
             A.CallTo(() => settings.AddDirectoryConcurrencyLimit).Returns(5);
 
             audioFormats.SupportedFormats.Add(".mp3");
 
-            _musicLibrary = new MusicLibrary(_musicLibraryDbContext, settings, albumArtCache, audioFormats);
-
+            _musicLibrary = new MusicLibrary(musicLibraryDbContext, settings, albumArtCache, audioFormats, 
+                audioFileMetadataFactory, trackFactory);
         }
         
         [Fact]
@@ -300,7 +305,7 @@ namespace Dukebox.Tests.Unit
         }
 
         [Fact]
-        public async void AddFile()
+        public async Task AddFile()
         {
             var sampleFileName = "new_sample.mp3";
             var songTitle = "Unique Song Title $%3£$";
@@ -328,7 +333,7 @@ namespace Dukebox.Tests.Unit
         }
 
         [Fact]
-        public async void AddPlaylistFile()
+        public async Task AddPlaylistFile()
         {
             var jplFileName = "sample_playlist.jpl";
             var numSamples = 5;
@@ -353,11 +358,10 @@ namespace Dukebox.Tests.Unit
         }
 
         [Fact]
-        public async void AddPlaylist()
+        public async Task AddPlaylist()
         {
             var playlistName = "magical music";
             var files = new List<string> { "samples/music.mp3", "samples/music1.mp3", "samples/music2.mp3", "samples/music3.mp3" };
-            var maxPlaylistId = _musicLibrary.OrderedPlaylists.Max(p => p.Id);
 
             await _musicLibrary.AddPlaylist(playlistName, files);
 
@@ -374,7 +378,7 @@ namespace Dukebox.Tests.Unit
         }
         
         [Fact]
-        public async void RemoveTrack()
+        public async Task RemoveTrack()
         {
             var tracks = _musicLibrary.SearchForTracks("wish you were here", new List<SearchAreas> { SearchAreas.Song });
             var track = tracks.First();

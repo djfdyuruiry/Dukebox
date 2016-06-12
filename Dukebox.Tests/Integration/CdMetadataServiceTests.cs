@@ -50,7 +50,7 @@ namespace Dukebox.Tests.Integration
 
             var metadataIsEmpty = metadata.Any();
 
-            Assert.True(metadataIsEmpty, string.Format("No metadata was found for the Audio CD ({0})", AudioCdTestConstants.CheckDriveMessage));
+            Assert.False(metadataIsEmpty, string.Format("No metadata was found for the Audio CD ({0})", AudioCdTestConstants.CheckDriveMessage));
 
             var metadataCount = metadata.Count;
             var audioCdTrackCount = Directory.EnumerateFiles(AudioCdTestConstants.CdDrivePath).Count();

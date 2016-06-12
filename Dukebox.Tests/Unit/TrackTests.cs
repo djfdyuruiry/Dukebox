@@ -3,6 +3,9 @@ using Xunit;
 using Dukebox.Library.Model;
 using Dukebox.Library.Services;
 using Dukebox.Configuration.Interfaces;
+using Dukebox.Library.Interfaces;
+using Dukebox.Audio.Interfaces;
+using Dukebox.Library.Factories;
 
 namespace Dukebox.Tests.Unit
 {
@@ -57,7 +60,9 @@ namespace Dukebox.Tests.Unit
 
             A.CallTo(() => settings.TrackDisplayFormat).Returns("{artist} - {title}");
 
-            return new Track(song, settings);
+            var audioFileMetadataFactory = new AudioFileMetadataFactory(A.Fake<ICdMetadataService>(), A.Fake<IAudioCdService>());
+
+            return new Track(song, settings, audioFileMetadataFactory);
         }
     }
 }
