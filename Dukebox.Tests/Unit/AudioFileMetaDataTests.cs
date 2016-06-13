@@ -14,6 +14,7 @@ namespace Dukebox.Tests.Unit
     public class AudioFileMetaDataTests
     {
         private const string sampleMp3FileName = "sample.mp3";
+        private const string sampleForEditingMp3FileName = "sample_for_editing.mp3";
         private readonly AudioFileMetadataFactory _audioFileMetadataFactory;
 
         public AudioFileMetaDataTests()
@@ -117,6 +118,29 @@ namespace Dukebox.Tests.Unit
             var extendedMetadataIsCorrect = extendedMetadata.Any() && string.Equals(extendedMetadata["Year"]?.First(), "2016", StringComparison.Ordinal);
 
             Assert.True(extendedMetadataIsCorrect, "Extended metadata extracted was incorrect");
+        }
+
+        [Fact]
+        public void SaveMetadataToFileTag()
+        {
+            File.Copy(sampleMp3FileName, sampleForEditingMp3FileName, true);
+            var audioFileMetadata = _audioFileMetadataFactory.BuildAudioFileMetadataInstance(sampleForEditingMp3FileName);
+
+            var newTitle = "UnqiueTitle";
+            var newArtist = "UniqueArtist";
+            var newAlbum = "UnqiueAlbum";
+
+            audioFileMetadata.Title = newTitle;
+            audioFileMetadata.Artist = newArtist;
+            audioFileMetadata.Album = newAlbum;
+
+            audioFileMetadata.SaveMetadataToFileTag();
+
+            audioFileMetadata = _audioFileMetadataFactory.BuildAudioFileMetadataInstance(sampleForEditingMp3FileName);
+
+            var metadataCorrect = audioFileMetadata.Title == newTitle && audioFileMetadata.Artist == newArtist && audioFileMetadata.Album == newAlbum;
+
+            Assert.True(metadataCorrect, "Failed to save and retrieve correct audio file metadata");
         }
     }
 }

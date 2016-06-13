@@ -150,5 +150,35 @@ namespace Dukebox.Library.Services
                 throw new Exception(string.Format("Error saving album art to temporary file from audio file at path '{0}'", AudioFilePath), ex);
             }
         }
+
+        public void SaveMetadataToFileTag()
+        {
+            try
+            {
+                using (var fileStream = new FileStream(AudioFilePath, FileMode.Open))
+                {
+                    var tagFile = TagLib.File.Create(new StreamFileAbstraction(AudioFilePath, fileStream, fileStream));
+
+                    var tag = tagFile.Tag;
+
+                    if (tag == null || tag.IsEmpty)
+                    {
+                        tag = tagFile.GetTag(TagTypes.AllTags, true);
+                    }
+
+                    tag.Title = Title;
+                    tag.Performers = new string[] { Artist };
+                    tag.Album = Album;
+
+                    tagFile.Save();
+
+                    logger.InfoFormat("Successfully updated metadata tag in file '{0}'", AudioFilePath);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error(string.Format("Error while creating or updating metadata tag in file '{0}'", AudioFilePath), ex);
+            }
+        }
     }
 }
