@@ -11,7 +11,7 @@ using Dukebox.Library.Model;
 
 namespace Dukebox.Library.Services
 {
-    public class AudioCdDriveMonitoringService : IAudioCdDriveMonitoringService
+    public class AudioCdDriveMonitoringService : IAudioCdDriveMonitoringService, IDisposable
     {
         private const double cdDrivePollingTimeInMs = 1000;
         private static readonly ILog logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
@@ -161,6 +161,20 @@ namespace Dukebox.Library.Services
             }
 
             return drive.IsReady;
+        }
+
+        protected virtual void Dispose(bool cleanAllResources)
+        {
+            if (cleanAllResources)
+            {
+                _pollCdDrivesTimer.Dispose();
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }

@@ -25,10 +25,8 @@ namespace Dukebox.Library.Repositories
     /// allows you to fetch temporary models of audio files from directories 
     /// and playlists.
     /// </summary>
-    public class MusicLibrary : IMusicLibrary
+    public class MusicLibrary : IMusicLibrary, IDisposable
     {
-        private const int defaultAddDirectoryConcurrencyLimit = 10;
-        private const string addDirectoryConcurrencyLimitConfigKey = "addDirectoryConcurrencyLimit";
         private static readonly ILog logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         
         private readonly SemaphoreSlim _dbContextMutex;
@@ -761,5 +759,19 @@ namespace Dukebox.Library.Repositories
         }
 
         #endregion
+
+        protected virtual void Dispose(bool cleanAllResources)
+        {
+            if (cleanAllResources)
+            {
+                _dbContextMutex.Dispose();
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
     }
 }

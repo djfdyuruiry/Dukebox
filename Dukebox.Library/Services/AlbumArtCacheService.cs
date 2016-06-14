@@ -36,10 +36,6 @@ namespace Dukebox.Library.Services
                 var expandedPath = Environment.ExpandEnvironmentVariables(configPath);
                 var absolutePath = Path.GetFullPath(expandedPath);
 
-#if DEBUG
-                absolutePath = CheckDebugSetup();
-#endif
-
                 if (!Directory.Exists(absolutePath))
                 {
                     Directory.CreateDirectory(absolutePath);
@@ -52,23 +48,6 @@ namespace Dukebox.Library.Services
                 logger.Error("Error building album art cache path.", ex);
                 throw;
             }
-        }
-
-        private static string CheckDebugSetup()
-        {
-            var absolutePath = Path.Combine(Environment.CurrentDirectory, "albumArtCache");
-
-            if (!debugSetupComplete)
-            {
-                if (Directory.Exists(absolutePath))
-                {
-                    Directory.Delete(absolutePath, true);
-                }
-
-                debugSetupComplete = true;
-            }
-
-            return absolutePath;  
         }
 
         public void AddAlbumToCache(Album album, IAudioFileMetadata metadata)

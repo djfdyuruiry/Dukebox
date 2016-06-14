@@ -12,7 +12,6 @@ namespace Dukebox.Audio
 {
     public class AudioPackage : IPackage
     {
-        private static readonly ILog logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static Container container;
 
         public static bool ExecutingForUnitTests { get; set; }

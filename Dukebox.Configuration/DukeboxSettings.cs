@@ -1,6 +1,8 @@
 ﻿using System.Configuration;
 using Dukebox.Configuration.Helper;
 using Dukebox.Configuration.Interfaces;
+using System.IO;
+using System;
 
 namespace Dukebox.Configuration
 {
@@ -8,7 +10,9 @@ namespace Dukebox.Configuration
     {
         // Fetch the settings object from foreign assembly.
         private readonly KeyValueConfigurationCollection _settings;
-        
+        private bool _albumArtdebugSetupComplete;
+
+
         public DukeboxSettings()
         {
             var configMap = new ExeConfigurationFileMap();
@@ -34,9 +38,31 @@ namespace Dukebox.Configuration
         {
             get
             {
+#if DEBUG
+                return ArtCacheDebugSetup();
+#endif
+
                 return _settings["albumArtCachePath"].Value;
             }
         }
+                
+        private string ArtCacheDebugSetup()
+        {
+            var absolutePath = Path.Combine(Environment.CurrentDirectory, "albumArtCache");
+
+            if (!_albumArtdebugSetupComplete)
+            {
+                if (Directory.Exists(absolutePath))
+                {
+                    Directory.Delete(absolutePath, true);
+                }
+
+                _albumArtdebugSetupComplete = true;
+            }
+
+            return absolutePath;
+        }
+
 
         public string BassAddOnsPath
         {

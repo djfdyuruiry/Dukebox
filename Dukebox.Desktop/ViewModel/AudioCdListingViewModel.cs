@@ -16,8 +16,6 @@ namespace Dukebox.Desktop.ViewModel
     {
         private const string loadAudioCdPromptFormat = "A new Audio CD ({0}) has been detected, would you like to play it?";
         private const string audioCdDriveIsNotReadyErrorMsg = "Audio drive is not ready, check a working Audio CD is in the drive.";
-
-        private static readonly ILog logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         
         private readonly IMusicLibrary _musicLibrary;
         private readonly IAudioPlaylist _audioPlaylist;

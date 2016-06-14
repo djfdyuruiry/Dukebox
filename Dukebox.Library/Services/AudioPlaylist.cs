@@ -20,8 +20,6 @@ namespace Dukebox.Library.Services
     /// </summary>
     public class AudioPlaylist : IAudioPlaylist
     {
-        private static readonly ILog logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-
         private readonly IMusicLibrary _musicLibrary;
         private readonly IMediaPlayer _mediaPlayer;
 
@@ -527,13 +525,18 @@ namespace Dukebox.Library.Services
             _playlistManagerThread?.Join();
         }
 
-        /// <summary>
-        /// Dispose of event handlers and current
-        /// track index mutex.
-        /// </summary>
+        protected virtual void Dispose(bool cleanAllResources)
+        {
+            if (cleanAllResources)
+            {
+                _currentTrackIndexMutex.Dispose();
+            }
+        }
+
         public void Dispose()
         {
-            _currentTrackIndexMutex.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }

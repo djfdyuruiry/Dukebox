@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using FakeItEasy;
 using Newtonsoft.Json;
@@ -11,7 +12,7 @@ using Dukebox.Library.Services;
 
 namespace Dukebox.Tests.Unit
 {
-    public class AudioPlaylistTests
+    public class AudioPlaylistTests : IDisposable
     {
         private const string sampleMp3FileName = "sample.mp3";
 
@@ -160,6 +161,20 @@ namespace Dukebox.Tests.Unit
             _audioPlaylist.StopPlaylistPlayback();
 
             A.CallTo(() => _mediaPlayer.StopAudio()).MustHaveHappened();
+        }
+
+        protected virtual void Dispose(bool cleanAllResources)
+        {
+            if (cleanAllResources)
+            {
+                _audioPlaylist.Dispose();
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }
