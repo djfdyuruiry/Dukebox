@@ -6,6 +6,7 @@ using Dukebox.Desktop.Helper;
 using Dukebox.Desktop.Interfaces;
 using Dukebox.Library.Interfaces;
 using System.Windows;
+using System.Globalization;
 
 namespace Dukebox.Desktop.ViewModel
 {
@@ -15,7 +16,7 @@ namespace Dukebox.Desktop.ViewModel
         
         private List<ITrack> _tracks;
         private string _searchText;
-        private ListSearchHelper<ITrack> _listSearchHelper;
+        private readonly ListSearchHelper<ITrack> _listSearchHelper;
 
         public List<ITrack> Tracks
         {
@@ -81,7 +82,8 @@ namespace Dukebox.Desktop.ViewModel
             _audioPlaylist = audioPlaylist;
             _listSearchHelper = new ListSearchHelper<ITrack>
             {
-                FilterLambda = (t, s) => t.ToString().ToLower().Contains(s.ToLower())
+                FilterLambda = (t, s) => t.ToString().ToLower(CultureInfo.InvariantCulture)
+                    .Contains(s.ToLower(CultureInfo.InvariantCulture))
             };
 
             _audioPlaylist.TrackListModified += (o, e) => RefreshTracks();

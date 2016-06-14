@@ -19,14 +19,16 @@ namespace Dukebox.Library.Model
         [StringLength(2147483647)]
         [Column("name")]
         public string Name { get; set; }
-        public int hasAlbumArt { get; set; }
+
+        [Column("hasAlbumArt")]
+        public int HasAlbumArtBit { get; set; }
 
         public virtual ICollection<Song> Songs { get; set; }
         public bool HasAlbumArt
         {
             get
             {
-                return hasAlbumArt == 0 ? false : true;
+                return HasAlbumArtBit == 0 ? false : true;
             }
         }
 

@@ -11,7 +11,7 @@ using Dukebox.Library.Model;
 
 namespace Dukebox.Library.Services
 {
-    public class AudioCdDriveMonitoringService : IAudioCdDriveMonitoringService
+    public class AudioCdDriveMonitoringService : IAudioCdDriveMonitoringService, IDisposable
     {
         private const double cdDrivePollingTimeInMs = 1000;
         private static readonly ILog logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
@@ -23,8 +23,8 @@ namespace Dukebox.Library.Services
         private readonly List<DriveInfo> _cdDrives;
         private DriveInfo _currentDrive;
 
-        public event EventHandler<AudioCdDriveEventArguments> AudioCdInsertedOnLoad;
-        public event EventHandler<AudioCdDriveEventArguments> AudioCdInserted;
+        public event EventHandler<AudioCdDriveEventArgs> AudioCdInsertedOnLoad;
+        public event EventHandler<AudioCdDriveEventArgs> AudioCdInserted;
         public event EventHandler AudioCdEjected;
 
         public AudioCdDriveMonitoringService(IMusicLibrary musicLibrary, AudioFileFormats audioFileFormats)
@@ -84,7 +84,7 @@ namespace Dukebox.Library.Services
                 DoAudioCdEjected();
             }
 
-            var firstReadyCdDrive = _cdDrives.Where(d => d.IsReady && d != _currentDrive).FirstOrDefault();
+            var firstReadyCdDrive = _cdDrives.FirstOrDefault(d => d.IsReady && d != _currentDrive);
 
             if (firstReadyCdDrive == null)
             {
@@ -115,7 +115,7 @@ namespace Dukebox.Library.Services
                 return;
             }
 
-            var args = new AudioCdDriveEventArguments
+            var args = new AudioCdDriveEventArgs
             {
                 DriveDirectory = _currentDrive.RootDirectory.FullName,
                 CdTracks = tracks
@@ -161,6 +161,20 @@ namespace Dukebox.Library.Services
             }
 
             return drive.IsReady;
+        }
+
+        protected virtual void Dispose(bool cleanAllResources)
+        {
+            if (cleanAllResources)
+            {
+                _pollCdDrivesTimer.Dispose();
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }

@@ -1,16 +1,12 @@
-﻿using Dukebox.Desktop.Helper;
-using Dukebox.Desktop.Interfaces;
-using Dukebox.Desktop.Model;
-using Dukebox.Library;
-using Dukebox.Library.Interfaces;
-using Dukebox.Library.Services;
-using GalaSoft.MvvmLight.Command;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Input;
+using GalaSoft.MvvmLight.Command;
+using Dukebox.Desktop.Helper;
+using Dukebox.Desktop.Interfaces;
+using Dukebox.Desktop.Model;
+using Dukebox.Library.Interfaces;
 
 namespace Dukebox.Desktop.ViewModel
 {
@@ -18,9 +14,9 @@ namespace Dukebox.Desktop.ViewModel
     {
         private readonly IMusicLibrary _musicLibrary;
         private readonly IAudioPlaylist _audioPlaylist;
+        private readonly ListSearchHelper<ITrack> _listSearchHelper;
 
         private List<ITrack> _tracks;
-        private ListSearchHelper<ITrack> _listSearchHelper;
         private string _searchText;
 
         public ICommand ClearSearch { get; private set; }
@@ -88,7 +84,8 @@ namespace Dukebox.Desktop.ViewModel
             _listSearchHelper = new ListSearchHelper<ITrack>
             {
                 Items = _tracks,
-                FilterLambda = (t, s) => t.ToString().ToLower().Contains(s.ToLower())
+                FilterLambda = (t, s) => t.ToString().ToLower(CultureInfo.InvariantCulture)
+                .Contains(s.ToLower(CultureInfo.InvariantCulture))
             };
 
             ClearSearch = new RelayCommand(() => SearchText = string.Empty);

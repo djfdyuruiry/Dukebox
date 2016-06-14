@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using FakeItEasy;
 using Xunit;
 using Dukebox.Audio.Services;
@@ -36,7 +37,7 @@ namespace Dukebox.Tests.Integration
         }
 
         [Fact]
-        public async void RipAudioCd()
+        public async Task RipAudioCd()
         {
             var audioCdService = new AudioCdService();
             var metadataService = new CdMetadataService(audioCdService);

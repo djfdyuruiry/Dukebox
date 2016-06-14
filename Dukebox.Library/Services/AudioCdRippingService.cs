@@ -68,16 +68,6 @@ namespace Dukebox.Library.Services
                         await _audioConverterService.ConvertCdaFileToMp3(inFiles[trackIdx], outFile,
                             new BaseEncoder.ENCODEFILEPROC((a, b) => CdRippingProgressMonitor(viewUpdater, a, b, t, numTracks, trackIdx)), true);
 
-                        // Save the track metadata details to the MP3 file. BROKEN as of rev. 25   
-                        /*                 
-                        Track mp3Track = MusicLibrary.GetInstance().GetTrackFromFile(outFile);
-                        mp3Track.Metadata.Album = t.Metadata.Album;
-                        mp3Track.Metadata.Artist = t.Metadata.Artist;
-                        mp3Track.Metadata.Title = t.Metadata.Title;
-
-                        mp3Track.Metadata.CommitChangesToFile();
-                         */
-
                         viewUpdater.ResetProgressBar();
                     }
                     catch (Exception ex)

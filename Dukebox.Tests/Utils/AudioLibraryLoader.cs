@@ -6,7 +6,7 @@ using Dukebox.Library.Helper;
 
 namespace Dukebox.Tests.Utils
 {
-    public class AudioLibraryLoader
+    public static class AudioLibraryLoader
     {
         public static DukeboxInitialisationHelper LoadBass()
         {

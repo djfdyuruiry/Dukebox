@@ -1,8 +1,8 @@
-﻿using Dukebox.Audio.Interfaces;
-using log4net;
-using System;
+﻿using System;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using Dukebox.Audio.Interfaces;
 
 namespace Dukebox.Audio.Services
 {
@@ -13,7 +13,7 @@ namespace Dukebox.Audio.Services
             var driveLetterAsString = char.ToLower(driveLetter).ToString();
             
             var drives = DriveInfo.GetDrives().Where(d => d.DriveType == DriveType.CDRom).ToArray();
-            var drive = drives.FirstOrDefault(d => d.Name.ToLower().StartsWith(driveLetterAsString));
+            var drive = drives.FirstOrDefault(d => d.Name.ToLower(CultureInfo.InvariantCulture).StartsWith(driveLetterAsString));
 
             // Drive does not exist or is not a CD drive.
             if (drive == null)
@@ -29,7 +29,7 @@ namespace Dukebox.Audio.Services
         public bool IsAudioCd(char driveLetter)
         {
             var driveLetterAsString = char.ToLower(driveLetter).ToString();
-            var drive = DriveInfo.GetDrives().FirstOrDefault(d => d.Name.ToLower().StartsWith(driveLetterAsString));
+            var drive = DriveInfo.GetDrives().FirstOrDefault(d => d.Name.ToLower(CultureInfo.InvariantCulture).StartsWith(driveLetterAsString));
             var result = false;
 
             if (!drive.IsReady)

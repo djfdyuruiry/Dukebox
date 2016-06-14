@@ -6,6 +6,7 @@ using log4net;
 using Un4seen.Bass;
 using Dukebox.Audio;
 using Dukebox.Configuration.Interfaces;
+using System.Text;
 
 namespace Dukebox.Library.Helper
 {
@@ -32,14 +33,12 @@ namespace Dukebox.Library.Helper
 
         public void InitaliseAudioLibrary()
         {
-            var bassPluginsLoaded = new Dictionary<int, string>();
-
             // Register freeware license details.
             BassNet.Registration(_settings.BassLicenseEmail, _settings.BassLicenseKey);
 
             // Load BASS library with default output device and add-on DLLs.           
             var bassInit = Bass.BASS_Init(-1, 44100, BASSInit.BASS_DEVICE_DEFAULT, IntPtr.Zero);
-            bassPluginsLoaded = Bass.BASS_PluginLoadDirectory(_settings.BassAddOnsPath);
+            var bassPluginsLoaded = Bass.BASS_PluginLoadDirectory(_settings.BassAddOnsPath);
 
             // Make sure the BASS library initalised correctly and plugins where loaded successfully.
             if (!bassInit || bassPluginsLoaded == null)
@@ -65,14 +64,15 @@ namespace Dukebox.Library.Helper
         private void LogBassPluginsLoaded(Dictionary<int, string> bassPluginsLoaded)
         {
             // Log bass add-ons found.
-            var logData = bassPluginsLoaded.Count() + "Bass add-on DLLs found (Format => {$handle, $name}): ";
+            var logStreamBuilder = new StringBuilder();
+            logStreamBuilder.AppendFormat("{0} {1}", bassPluginsLoaded.Count, "Bass add-on DLLs found (Format => {$handle, $name}): ");
 
             foreach (KeyValuePair<int, string> kvp in bassPluginsLoaded)
             {
-                logData += string.Format("{{{0},{1}}} ", kvp.Key, kvp.Value);
+                logStreamBuilder.AppendFormat("{{{0},{1}}} ", kvp.Key, kvp.Value);
             }
 
-            logger.Info(logData);
+            logger.Info(logStreamBuilder.ToString());
         }
 
         /// <summary>

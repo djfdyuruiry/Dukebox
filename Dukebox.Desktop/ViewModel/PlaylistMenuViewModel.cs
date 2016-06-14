@@ -1,24 +1,23 @@
-﻿using GalaSoft.MvvmLight.Command;
+﻿using System;
 using System.Windows.Forms;
 using System.Windows.Input;
 using OpenFileDialog = System.Windows.Forms.OpenFileDialog;
-using SaveFileDialog = System.Windows.Forms.SaveFileDialog;
+using SaveFileDialog = System.Windows.Forms.SaveFileDialog;using GalaSoft.MvvmLight.Command;
 using Dukebox.Desktop.Interfaces;
 using Dukebox.Library.Interfaces;
-
 namespace Dukebox.Desktop.ViewModel
 {
-    public class PlaylistMenuViewModel : ViewModelBase, IPlaylistMenuViewModel
+    public class PlaylistMenuViewModel : ViewModelBase, IPlaylistMenuViewModel, IDisposable
     {
         public const string PlaylistFileFilter = "Playlist Files |*.jpl";
-
-        private bool _saveToFileEnabled;
-
+        
         private readonly IMusicLibrary _musicLibrary;
         private readonly IAudioPlaylist _audioPlaylist;
 
-        private OpenFileDialog _selectFileDialog;
-        private SaveFileDialog _saveFileDialog;
+        private readonly OpenFileDialog _selectFileDialog;
+        private readonly SaveFileDialog _saveFileDialog;
+
+        private bool _saveToFileEnabled;
 
         public ICommand Clear { get; private set; }
         public ICommand LoadFromFile { get; private set; }
@@ -99,6 +98,21 @@ namespace Dukebox.Desktop.ViewModel
             var fileName = _selectFileDialog.FileName;
 
             _musicLibrary.AddPlaylistFiles(fileName);
+        }
+
+        protected virtual void Dispose(bool cleanAllResources)
+        {
+            if (cleanAllResources)
+            {
+                _saveFileDialog.Dispose();
+                _selectFileDialog.Dispose();
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }
