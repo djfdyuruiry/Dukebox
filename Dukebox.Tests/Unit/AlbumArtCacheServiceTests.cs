@@ -17,11 +17,11 @@ namespace Dukebox.Tests.Unit
     {
         private const string cachePath = "./cache";
 
-        public AlbumArtCacheServiceTests()
+        static AlbumArtCacheServiceTests()
         {
             try
             {
-                Directory.Delete(cachePath);
+                Directory.Delete(cachePath, true);
             }
             catch (Exception)
             {
@@ -56,9 +56,9 @@ namespace Dukebox.Tests.Unit
             A.CallTo(() => settings.AlbumArtCachePath).Returns(cachePath);
 
             var albumArtCache = new AlbumArtCacheService(settings);
-            var albumId = 0;
+            var albumId = 99;
 
-            AddDummyImageToAlbumArtCache(albumArtCache, 0, albumId);
+            AddDummyImageToAlbumArtCache(albumArtCache, albumId);
 
             var albumArtPath = Path.Combine(cachePath, albumId.ToString());
             var albumAdded = File.Exists(albumArtPath);
@@ -78,9 +78,9 @@ namespace Dukebox.Tests.Unit
             A.CallTo(() => settings.AlbumArtCachePath).Returns(cachePath);
 
             var albumArtCache = new AlbumArtCacheService(settings);
-            var albumId = 0;
+            var albumId = 66;
 
-            AddDummyImageToAlbumArtCache(albumArtCache, 0, albumId);
+            AddDummyImageToAlbumArtCache(albumArtCache, albumId);
 
             var existingAlbumArtFound = albumArtCache.CheckCacheForAlbum(albumId);
 
@@ -98,9 +98,9 @@ namespace Dukebox.Tests.Unit
             A.CallTo(() => settings.AlbumArtCachePath).Returns(cachePath);
 
             var albumArtCache = new AlbumArtCacheService(settings);
-            var albumId = 0;
+            var albumId = 55;
 
-            var image = AddDummyImageToAlbumArtCache(albumArtCache, 0, albumId);
+            var image = AddDummyImageToAlbumArtCache(albumArtCache, albumId);
 
             var returnedImage = albumArtCache.GetAlbumArtFromCache(albumId);
             var imageLength = 0;
@@ -130,40 +130,37 @@ namespace Dukebox.Tests.Unit
             A.CallTo(() => settings.AlbumArtCachePath).Returns(cachePath);
 
             var albumArtCache = new AlbumArtCacheService(settings);
-            var albumIds = new List<long> { 0, 2, 3, 5 };
+            var albumIds = new List<long> { 11, 22, 33, 44 };
 
-            AddDummyImageToAlbumArtCache(albumArtCache, 0, albumIds[0]);
-            AddDummyImageToAlbumArtCache(albumArtCache, 0, albumIds[1]);
-            AddDummyImageToAlbumArtCache(albumArtCache, 0, albumIds[2]);
-            AddDummyImageToAlbumArtCache(albumArtCache, 0, albumIds[3]);
+            albumIds.ForEach(id => AddDummyImageToAlbumArtCache(albumArtCache, id));
 
             var idsInCache = albumArtCache.GetAlbumIdsFromCache();
 
             albumIds.Sort();
             idsInCache.Sort();
 
-            var idsReturnedAreSameToAddedAlbums = idsInCache.SequenceEqual(albumIds);
+            var idsReturnedAreSameToAddedAlbums = idsInCache.Intersect(albumIds).SequenceEqual(albumIds);
 
             Assert.True(idsReturnedAreSameToAddedAlbums, "Album art IDs returned by cache are not equal to those added to the cache");
         }
 
-        private Image AddDummyImageToAlbumArtCache(IAlbumArtCacheService albumArtCache, long songId, long albumId)
+        private Image AddDummyImageToAlbumArtCache(IAlbumArtCacheService albumArtCache, long albumId)
         {
-            var songToAdd = new Song();
             var albumObj = new Album();
             var metadata = A.Fake<IAudioFileMetadata>();
             var blankImage = new Bitmap(128, 128, PixelFormat.Format32bppRgb);
-
-            songToAdd.Id = songId;
+            
             albumObj.Id = albumId;
 
             A.CallTo(() => metadata.HasAlbumArt).Returns(true);
             A.CallTo(() => metadata.GetAlbumArt()).Returns(blankImage);
-            A.CallTo(() => metadata.GetAlbumArt(A<Action<Image>>.Ignored)).Invokes(e =>
+            A.CallTo(() => metadata.GetAlbumArt(A<Action<Image>>.Ignored)).WithAnyArguments().Invokes(e =>
             {
                 var action = e.Arguments[0] as Action<Image>;
                 action(blankImage);
             });
+
+            File.Delete(Path.Combine(cachePath, albumId.ToString()));
 
             albumArtCache.AddAlbumToCache(albumObj, metadata);
 
