@@ -346,8 +346,12 @@ namespace Dukebox.Library.Repositories
 
             Task.Run(() => completeHandler?.Invoke(this, filesAdded));
         }
-
         public async Task<Song> AddFile(string filename)
+        {
+            return await AddFile(filename, null);
+        }
+
+        public async Task<Song> AddFile(string filename, IAudioFileMetadata metadata)
         {
             if (!File.Exists(filename))
             {
@@ -454,7 +458,7 @@ namespace Dukebox.Library.Repositories
                     return existingAlbum;
                 }
 
-                var newAlbum = new Album() { Name = tag.Album, hasAlbumArt = tag.HasAlbumArt ? 1 : 0 };
+                var newAlbum = new Album() { Name = tag.Album, HasAlbumArtBit = tag.HasAlbumArt ? 1 : 0 };
 
                 logger.DebugFormat("New album: {0}", newAlbum.Name);
 
