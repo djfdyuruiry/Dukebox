@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Windows.Input;
 using GalaSoft.MvvmLight.Command;
@@ -15,9 +16,9 @@ namespace Dukebox.Desktop.ViewModel
     {
         private readonly IMusicLibrary _musicLibrary;
         private readonly IAudioPlaylist _audioPlaylist;
+        private readonly ListSearchHelper<Services.Album> _listSearchHelper;
 
         private List<Services.Album> _albums;
-        private ListSearchHelper<Services.Album> _listSearchHelper;
         private string _searchText;
 
         public string SearchText
@@ -68,7 +69,7 @@ namespace Dukebox.Desktop.ViewModel
             {
                 FilterLambda = Services.Album.ContainsString,
                 SortResults = true,
-                SortLambda = (a) => a.Data.Name.ToLower()
+                SortLambda = (a) => a.Data.Name.ToLower(CultureInfo.InvariantCulture)
             };
 
             _musicLibrary.AlbumAdded += (o, e) => LoadAlbumsFromLibrary();

@@ -1,4 +1,5 @@
 ﻿using System;
+using Dukebox.Library.Model;
 
 namespace Dukebox.Library.Interfaces
 {
@@ -9,7 +10,7 @@ namespace Dukebox.Library.Interfaces
         int ProgressBarValue { get; set; }
 
         event EventHandler OnResetProgressBar;
-        event EventHandler<string> OnNotificationUpdate;
+        event EventHandler<GenericEventArgs<string>> OnNotificationUpdate;
         event EventHandler OnComplete;
 
         void ResetProgressBar();

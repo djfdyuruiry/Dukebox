@@ -28,7 +28,7 @@ namespace Dukebox.Desktop.Helper
                 throw new InvalidDataException("Name property of value parameter is null or whitespace");
             }
 
-            var upperFirstLetter = artist.Name.Substring(0, 1).ToUpper();
+            var upperFirstLetter = artist.Name.Substring(0, 1).ToUpper(CultureInfo.InvariantCulture);
             var filename = validArtistCardCharacterRegex.IsMatch(upperFirstLetter) ? upperFirstLetter : unknownArtistCardFilename;
             var file = string.Format("{0}.png", filename);
 

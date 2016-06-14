@@ -20,12 +20,12 @@ namespace Dukebox.Library.Services
     /// </summary>
     public class AudioPlaylist : IAudioPlaylist
     {
-        private static readonly ILog logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-
         private readonly IMusicLibrary _musicLibrary;
         private readonly IMediaPlayer _mediaPlayer;
-        
+
         #region Playback management fields
+
+        private readonly Mutex _currentTrackIndexMutex;
 
         /// <summary>
         /// Main thread for playlist playback.
@@ -45,17 +45,13 @@ namespace Dukebox.Library.Services
         /// index in Tracks collection?
         /// </summary>
         private bool _back;
-        /// <summary>
-        /// Mutex that controls access to the current track
-        /// index.
-        /// </summary>
-        private Mutex _currentTrackIndexMutex;
 
         #endregion
 
         #region Playback management fields
 
-        private Stack<int> _previousTracks;
+        private readonly Stack<int> _previousTracks;
+
         private int _lastTrack;
 
         #endregion
@@ -403,7 +399,7 @@ namespace Dukebox.Library.Services
             }
             else if (Shuffle && (!_back || _previousTracks.Count < 2)) // Pick random track for playback.
             {
-                int nextTrack = random.Next(Tracks.Count);
+                var nextTrack = random.Next(Tracks.Count);
 
                 while (nextTrack == GetCurrentTrackIndex())
                 {
@@ -417,9 +413,9 @@ namespace Dukebox.Library.Services
             }
             else if (Shuffle && _back) // Play last played track.
             {
-                int nextTrack = _previousTracks.Pop();
-                nextTrack = _previousTracks.Pop();
+                 _previousTracks.Pop();
 
+                var nextTrack = _previousTracks.Pop();
                 SetCurrentTrackIndex(nextTrack);
 
                 _back = false;
@@ -466,19 +462,24 @@ namespace Dukebox.Library.Services
             SetCurrentTrackIndex(0);
         }
 
-        /// <summary>
-        /// Replace the current playlist tracks with those
-        /// found in the given playlist file.
-        /// </summary>
-        public int LoadPlaylistFromFile(string filename, bool startPlayback = true)
+        public int LoadPlaylistFromFile(string filename)
+        {
+            return LoadPlaylistFromFile(filename, true);
+        }
+
+        public int LoadPlaylistFromFile(string filename, bool startPlayback)
         {
             var playlist = _musicLibrary.GetPlaylistFromFile(filename);
             var tracks = _musicLibrary.GetTracksForPlaylist(playlist);
 
             return LoadPlaylistFromList(tracks, startPlayback);
         }
+        public int LoadPlaylistFromList(List<ITrack> tracks)
+        {
+            return LoadPlaylistFromList(tracks, true);
+        }
 
-        public int LoadPlaylistFromList(List<ITrack> tracks, bool startPlayback = true)
+        public int LoadPlaylistFromList(List<ITrack> tracks, bool startPlayback)
         {
             ClearPlaylist();
 
@@ -498,11 +499,16 @@ namespace Dukebox.Library.Services
             Tracks.Clear();
         }
 
+        public void SavePlaylistToFile(string filename)
+        {
+            SavePlaylistToFile(filename, false);
+        }
+
         /// <summary>
         /// Export a JSON playlist file ('.jpl') that represents
         /// the current list of tracks loaded.
         /// </summary>
-        public void SavePlaylistToFile(string filename, bool overwriteFile = false)
+        public void SavePlaylistToFile(string filename, bool overwriteFile)
         {
             if (File.Exists(filename) && !overwriteFile)
             {
@@ -519,13 +525,18 @@ namespace Dukebox.Library.Services
             _playlistManagerThread?.Join();
         }
 
-        /// <summary>
-        /// Dispose of event handlers and current
-        /// track index mutex.
-        /// </summary>
+        protected virtual void Dispose(bool cleanAllResources)
+        {
+            if (cleanAllResources)
+            {
+                _currentTrackIndexMutex.Dispose();
+            }
+        }
+
         public void Dispose()
         {
-            _currentTrackIndexMutex.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }

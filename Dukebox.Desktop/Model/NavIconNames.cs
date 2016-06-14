@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Dukebox.Desktop.Model
 {
-    public class NavIconNames
+    public static class NavIconNames
     {
         public const string CurrentlyPlaying = "CurrentlyPlayingNavIcon";
         public const string Library = "LibraryNavIcon";

@@ -19,7 +19,7 @@ using Dukebox.Configuration.Interfaces;
 
 namespace Dukebox.Desktop.ViewModel
 {
-    public class FileMenuViewModel : ViewModelBase, IFileMenuViewModel
+    public class FileMenuViewModel : ViewModelBase, IFileMenuViewModel, IDisposable
     {
         public const string FolderBrowserPrompt = "Select folder to load music files from";
         public const string AddToLibraryHeader = "Importing audio files into the library...";
@@ -130,10 +130,7 @@ namespace Dukebox.Desktop.ViewModel
 
         private void ImportStep(ProgressMonitorViewModel viewModel, AudioFileImportedEventArgs fileImportedArgs, ref int filesAdded)
         {
-            if (viewModel.MaximumProgressValue != (fileImportedArgs.TotalFilesThisImport * 2))
-            {
-                viewModel.MaximumProgressValue = (fileImportedArgs.TotalFilesThisImport * 2);
-            }
+            viewModel.MaximumProgressValue = (fileImportedArgs.TotalFilesThisImport * 2);
 
             var percentComplete = (filesAdded / ((float)fileImportedArgs.TotalFilesThisImport / 100)) / 2;
 
@@ -143,6 +140,21 @@ namespace Dukebox.Desktop.ViewModel
             viewModel.StatusText = string.Format(@"{0} '{1}'", fileImportedArgs.Status, Path.GetFileName(fileImportedArgs.FileAdded));
 
             Interlocked.Increment(ref filesAdded);
+        }
+
+        protected virtual void Dispose(bool cleanAllResources)
+        {
+            if (cleanAllResources)
+            {
+                _selectFileDialog.Dispose();
+                _selectFolderDialog.Dispose();
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }

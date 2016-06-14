@@ -13,9 +13,9 @@ namespace Dukebox.Desktop.ViewModel
 {
     public class HelpMenuViewModel : ViewModelBase, IHelpMenuViewModel
     {
-        private string _assemblyName;
-        private string _assemblyVersion;
-        private string _copyright;
+        private readonly string _assemblyName;
+        private readonly string _assemblyVersion;
+        private readonly string _copyright;
 
         public ICommand About { get; private set; }
 

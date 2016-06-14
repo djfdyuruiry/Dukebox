@@ -1,6 +1,6 @@
-﻿using Dukebox.Desktop.ViewModel;
+﻿using System;
 using Dukebox.Library.Interfaces;
-using System;
+using Dukebox.Library.Model;
 
 namespace Dukebox.Desktop.ViewModel
 {
@@ -42,39 +42,30 @@ namespace Dukebox.Desktop.ViewModel
             }
         }
 
-        public event EventHandler<string> OnNotificationUpdate;
+        public event EventHandler<GenericEventArgs<string>> OnNotificationUpdate;
         public event EventHandler OnResetProgressBar;
         public event EventHandler OnComplete;
 
         public CdRippingProgressMonitorViewModel()
             : base()
         {
-            OnNotificationUpdate += (o, s) => StatusText = s;
+            OnNotificationUpdate += (o, s) => StatusText = s.Data;
             OnResetProgressBar += (o, e) => CurrentProgressValue = 0;
         }
 
         public void NotificationUpdate(string notification)
         {
-            if (OnNotificationUpdate != null)
-            {
-                OnNotificationUpdate(this, notification);
-            }
+            OnNotificationUpdate?.Invoke(this, new GenericEventArgs<string> { Data = notification });
         }
 
         public void ResetProgressBar()
         {
-            if (OnResetProgressBar != null)
-            {
-                OnResetProgressBar(this, EventArgs.Empty);
-            }
+            OnResetProgressBar?.Invoke(this, EventArgs.Empty);
         }
 
         public void Complete()
         {
-            if (OnComplete != null)
-            {
-                OnComplete(this, EventArgs.Empty);
-            }
+            OnComplete?.Invoke(this, EventArgs.Empty);
         }
     }
 }

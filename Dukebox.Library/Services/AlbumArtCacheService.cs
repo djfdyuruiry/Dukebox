@@ -15,7 +15,7 @@ namespace Dukebox.Library.Services
     public class AlbumArtCacheService : IAlbumArtCacheService
     {
         private static readonly ILog logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-        private static bool debugSetup;
+        private static bool debugSetupComplete;
 
         private readonly IDukeboxSettings _settings;
         private string _cachePath;
@@ -36,20 +36,6 @@ namespace Dukebox.Library.Services
                 var expandedPath = Environment.ExpandEnvironmentVariables(configPath);
                 var absolutePath = Path.GetFullPath(expandedPath);
 
-#if DEBUG
-                if (!debugSetup)
-                {
-                    absolutePath = Path.Combine(Environment.CurrentDirectory, "albumArtCache");
-
-                    if (Directory.Exists(absolutePath))
-                    {
-                        Directory.Delete(absolutePath, true);
-                    }
-
-                    debugSetup = true;
-                }
-#endif
-
                 if (!Directory.Exists(absolutePath))
                 {
                     Directory.CreateDirectory(absolutePath);
@@ -60,7 +46,7 @@ namespace Dukebox.Library.Services
             catch (Exception ex)
             {
                 logger.Error("Error building album art cache path.", ex);
-                throw ex;
+                throw;
             }
         }
 

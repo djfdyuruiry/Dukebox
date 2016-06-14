@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Windows.Input;
 using GalaSoft.MvvmLight.Command;
 using Dukebox.Desktop.Helper;
 using Dukebox.Desktop.Interfaces;
 using Dukebox.Desktop.Model;
-using Dukebox.Library;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
 
@@ -12,12 +12,12 @@ namespace Dukebox.Desktop.ViewModel
 {
     public class ArtistListingViewModel : ViewModelBase, IArtistListingViewModel, ISearchControlViewModel
     {
+        private readonly ListSearchHelper<Artist> _listSearchHelper;
+        private readonly IAudioPlaylist _audioPlaylist;
         private readonly IMusicLibrary _musicLibrary;
 
         private List<Artist> _artists;
-        private ListSearchHelper<Artist> _listSearchHelper;
         private string _searchText;
-        private readonly IAudioPlaylist _audioPlaylist;
 
         public string SearchText
         {
@@ -66,9 +66,9 @@ namespace Dukebox.Desktop.ViewModel
 
             _listSearchHelper = new ListSearchHelper<Artist>
             {
-                FilterLambda = (a, s) => a.Name.ToLower().Contains(s.ToLower()),
+                FilterLambda = (a, s) => a.Name.ToLower(CultureInfo.InvariantCulture).Contains(s.ToLower(CultureInfo.InvariantCulture)),
                 SortResults = true,
-                SortLambda = (a) => a.Name.ToLower()
+                SortLambda = (a) => a.Name.ToLower(CultureInfo.InvariantCulture)
             };
 
             _musicLibrary.ArtistAdded += (o, e) => RefreshArtistsFromLibrary();

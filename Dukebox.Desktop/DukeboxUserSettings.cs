@@ -5,7 +5,7 @@ namespace Dukebox.Desktop
 {
     public class DukeboxUserSettings : IDukeboxUserSettings
     {
-        private Settings _settings;
+        private readonly Settings _settings;
 
         public bool Shuffle 
         {
