@@ -7,6 +7,7 @@ using log4net;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
 using Dukebox.Library.Factories;
+using System.Data.Entity;
 
 namespace Dukebox.Library.Services
 {
@@ -54,10 +55,18 @@ namespace Dukebox.Library.Services
         public List<ITrack> SearchForTracks(string searchTerm, List<SearchAreas> searchAreas)
         {
             var stopwatch = Stopwatch.StartNew();
+            DbSet<Song> songs;
 
-            _dbContextMutex.Wait();
-            var songs = _dukeboxData.Songs;
-            _dbContextMutex.Release();
+            try
+            {
+                _dbContextMutex.Wait();
+                songs = _dukeboxData.Songs;
+            }
+            finally
+            {
+                _dbContextMutex.Release();
+            }
+
 
             var matchingSongs = Enumerable.Empty<Song>();
 
@@ -113,10 +122,17 @@ namespace Dukebox.Library.Services
         public List<ITrack> GetTracksByAttributeValue(SearchAreas attribute, string attributeValue)
         {
             var stopwatch = Stopwatch.StartNew();
+            DbSet<Song> songs;
 
-            _dbContextMutex.Wait();
-            var songs = _dukeboxData.Songs;
-            _dbContextMutex.Release();
+            try
+            { 
+                _dbContextMutex.Wait();
+                songs = _dukeboxData.Songs;
+            }
+            finally
+            {
+                _dbContextMutex.Release();
+            }
 
             var matchingSongs = Enumerable.Empty<Song>();
 
@@ -189,12 +205,18 @@ namespace Dukebox.Library.Services
         public List<ITrack> GetTracksByAttributeId(SearchAreas attribute, long attributeId)
         {
             var stopwatch = Stopwatch.StartNew();
-
             var searchAreas = new List<SearchAreas>();
+            DbSet<Song> songs;
 
-            _dbContextMutex.Wait();
-            var songs = _dukeboxData.Songs;
-            _dbContextMutex.Release();
+            try
+            { 
+                _dbContextMutex.Wait();
+                songs = _dukeboxData.Songs;
+            }
+            finally
+            {
+                _dbContextMutex.Release();
+            }
 
             var matchingSongs = Enumerable.Empty<Song>();
 
