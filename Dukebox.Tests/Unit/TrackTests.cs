@@ -6,6 +6,7 @@ using Dukebox.Configuration.Interfaces;
 using Dukebox.Library.Interfaces;
 using Dukebox.Audio.Interfaces;
 using Dukebox.Library.Factories;
+using System.IO;
 
 namespace Dukebox.Tests.Unit
 {
@@ -52,6 +53,31 @@ namespace Dukebox.Tests.Unit
             var trackStringIsCorrect = trackString == "artist - song";
 
             Assert.True(trackStringIsCorrect, string.Format("Track string was incorrect for current track details (track string: '{0}')", trackString));
+        }
+
+        [Fact]
+        public void SaveMetadataChangesToDisk()
+        {
+            var saveChangesMp3FileName = string.Format("{0}._saveChangesTest_.mp3", AudioFileMetaDataTests.SampleMp3FileName);
+            var audioFileMetadataFactory = new AudioFileMetadataFactory(A.Fake<ICdMetadataService>(), A.Fake<IAudioCdService>());
+            var newArtistName = "funky artist";
+            var newAlbumName = "funky album";
+            var newTitle = "funky title";
+
+            File.Copy(AudioFileMetaDataTests.SampleMp3FileName, saveChangesMp3FileName, true);
+
+            var song = new Song { Artist = new Artist { Id = 0, Name = "artist" }, FileName = saveChangesMp3FileName, Title = "song" };
+            var track = BuildTrack(song);
+
+            track.Song.Title = newTitle;
+            track.Album.Name = newAlbumName;
+            track.Artist.Name = newArtistName;
+
+            var audioFileMetadata = audioFileMetadataFactory.BuildAudioFileMetadataInstance(saveChangesMp3FileName);
+
+            var metadataCorrect = audioFileMetadata.Title == newTitle && audioFileMetadata.Artist == newArtistName && audioFileMetadata.Album == newAlbumName;
+
+            Assert.True(metadataCorrect, "Failed to automatically save correct audio file metadata to disk on property update");
         }
 
         private Track BuildTrack(Song song)

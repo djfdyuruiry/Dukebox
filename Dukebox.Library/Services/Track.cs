@@ -72,6 +72,7 @@ namespace Dukebox.Library.Services
             if (song.Id == -1)
             {
                 Song.Title = Metadata.Title;
+                Song.ExtendedMetadata = Metadata.ExtendedMetadata;
             }
 
             if (_album.Id == -1)
@@ -83,6 +84,19 @@ namespace Dukebox.Library.Services
             {
                 _artist.Name = Metadata.Artist;
             }
+
+            Song.TitleUpdated += (o, e) => SaveMetadataChangesToDisk();
+            Artist.NameUpdated += (o, e) => SaveMetadataChangesToDisk();
+            Album.NameUpdated += (o, e) => SaveMetadataChangesToDisk();
+        }
+
+        private void SaveMetadataChangesToDisk()
+        {
+            Metadata.Album = Album.Name;
+            Metadata.Artist = Artist.Name;
+            Metadata.Title = Song.Title;
+
+            Metadata.SaveMetadataToFileTag();
         }
 
         public override string ToString()
