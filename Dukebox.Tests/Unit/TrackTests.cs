@@ -86,7 +86,7 @@ namespace Dukebox.Tests.Unit
             track.Album.Name = newAlbumName;
             track.Artist.Name = newArtistName;
 
-            signalEvent.WaitOne(100);
+            signalEvent.WaitOne(500);
 
             var audioFileMetadata = audioFileMetadataFactory.BuildAudioFileMetadataInstance(saveChangesMp3FileName);
 
