@@ -17,6 +17,7 @@ namespace Dukebox.Library.Interfaces
         event EventHandler ArtistCacheRefreshed;
         event EventHandler PlaylistCacheRefreshed;
         event EventHandler CachesRefreshed;
+        event EventHandler DatabaseChangesSaved;
         event EventHandler<NotifyCollectionChangedEventArgs> RecentlyPlayedListModified;
         List<Album> OrderedAlbums { get; }
         List<Artist> OrderedArtists { get; }
@@ -46,5 +47,6 @@ namespace Dukebox.Library.Interfaces
         Task<List<ITrack>> AddPlaylistFiles(string filename);
         Task<Playlist> AddPlaylist(string name, IEnumerable<string> filenames);
         Task RemoveTrack(ITrack track);
+        Task SaveDbChanges();
     }
 }

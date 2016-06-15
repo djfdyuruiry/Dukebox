@@ -1,15 +1,21 @@
-using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
+using System.Collections.ObjectModel;
 
 namespace Dukebox.Library.Model
 {
     [Table("songs")]
     public class Song
     {
+        private string _title;
         private string _extendedMetadataJson;
         private Dictionary<string, List<string>> _extendedMetadata;
+
+        public event EventHandler TitleUpdated;
 
         [Column("id")]
         public long Id { get; set; }
@@ -22,7 +28,23 @@ namespace Dukebox.Library.Model
         [Required]
         [StringLength(2147483647)]
         [Column("title")]
-        public string Title { get; set; }
+        public string Title
+        {
+            get
+            {
+                return _title;
+            }
+            set
+            {
+                var newTitle = _title != value;
+                _title = value;
+
+                if (newTitle)
+                {
+                    TitleUpdated?.Invoke(this, EventArgs.Empty);
+                }
+            }
+        }
 
         [Column("lengthInSeconds")]
         public long LengthInSeconds { get; set; }
@@ -55,6 +77,8 @@ namespace Dukebox.Library.Model
         [ForeignKey("ArtistId")]
         public virtual Artist Artist { get; set; }
 
+        public ObservableCollection<KeyValuePair<string, List<string>>> ObservableExtendedMetadata { get; private set; }
+
         public Dictionary<string, List<string>> ExtendedMetadata
         {
             get
@@ -66,13 +90,18 @@ namespace Dukebox.Library.Model
 
                 return _extendedMetadata;
             }
+            set
+            {
+                _extendedMetadata = value;
+                ExtendedMetadataJson = JsonConvert.SerializeObject(_extendedMetadata);
+            }
         }
 
         private void RefreshExtendedMetadata()
         {
-            _extendedMetadata = string.IsNullOrEmpty(_extendedMetadataJson) ?
+            _extendedMetadata = (string.IsNullOrEmpty(_extendedMetadataJson) ?
                 new Dictionary<string, List<string>>() :
-                JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(_extendedMetadataJson);
+                JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(_extendedMetadataJson));
         }
 
         public override string ToString()
