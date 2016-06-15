@@ -29,10 +29,11 @@ namespace Dukebox.Tests.Unit
             var musicLibraryDbContext = _mockDataLoader.DbContextMock;
 
             var settings = A.Fake<IDukeboxSettings>();
+            var musicLibraryQueueService = A.Fake<IMusicLibraryQueueService>();
             var albumArtCache = A.Fake<IAlbumArtCacheService>();
             var audioFormats = new AudioFileFormats();
             var audioFileMetadataFactory = new AudioFileMetadataFactory(A.Fake<ICdMetadataService>(), A.Fake<IAudioCdService>());
-            var trackFactory = new TrackFactory(settings, audioFileMetadataFactory);
+            var trackFactory = new TrackFactory(settings, musicLibraryQueueService, audioFileMetadataFactory);
 
             A.CallTo(() => settings.AddDirectoryConcurrencyLimit).Returns(5);
 

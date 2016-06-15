@@ -52,6 +52,7 @@ namespace Dukebox.Library.Repositories
         public event EventHandler ArtistCacheRefreshed;
         public event EventHandler PlaylistCacheRefreshed;
         public event EventHandler CachesRefreshed;
+        public event EventHandler DatabaseChangesSaved;
         public event EventHandler<NotifyCollectionChangedEventArgs> RecentlyPlayedListModified;
 
         #region Views on music library data
@@ -579,12 +580,14 @@ namespace Dukebox.Library.Repositories
             return null;
         }
 
-        private async void SaveDbChanges()
+        public async Task SaveDbChanges()
         {
             try
             {
                 await _dbContextMutex.WaitAsync();
                 await _dukeboxData.SaveChangesAsync();
+
+                DatabaseChangesSaved?.Invoke(this, EventArgs.Empty);
             }
             catch (DbEntityValidationException ex)
             {
@@ -603,23 +606,22 @@ namespace Dukebox.Library.Repositories
 
         public async Task RemoveTrack (ITrack track)
         {
+            if (track == null)
+            {
+                throw new ArgumentNullException("track");
+            }
+
             try
             { 
-                if (track == null)
-                {
-                    throw new ArgumentNullException("track");
-                }
-
                 await _dbContextMutex.WaitAsync();
-
                 _dukeboxData.Songs.Remove(track.Song);
-
-                await _dukeboxData.SaveChangesAsync();
             }
             finally
             {
                 _dbContextMutex.Release();
             }
+
+            await _dukeboxData.SaveChangesAsync();
         }
 
         /// <summary>

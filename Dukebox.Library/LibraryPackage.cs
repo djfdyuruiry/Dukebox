@@ -30,6 +30,7 @@ namespace Dukebox.Library
             container.RegisterSingleton<IAudioPlaylist, AudioPlaylist>();
             container.RegisterSingleton<IMusicLibraryDbContext>(() => new MusicLibraryDbContext());
             container.RegisterSingleton(() => GetMusicLibraryInstance(container));
+            container.RegisterSingleton<IMusicLibraryQueueService, MusicLibraryQueueService>();
             container.RegisterSingleton<IAudioCdDriveMonitoringService, AudioCdDriveMonitoringService>();
             container.RegisterSingleton<AudioFileMetadataFactory, AudioFileMetadataFactory>();
             container.RegisterSingleton<TrackFactory, TrackFactory>();

@@ -43,8 +43,9 @@ namespace Dukebox.Tests.Integration
             var metadataService = new CdMetadataService(audioCdService);
             var audioConverterService = new AudioConverterService();
             var settings = A.Fake<IDukeboxSettings>();
+            var musicLibraryQueueService = A.Fake<IMusicLibraryQueueService>();
             var audioFileMetadataFactory = new AudioFileMetadataFactory(metadataService, audioCdService);
-            var trackFactory = new TrackFactory(settings, audioFileMetadataFactory);
+            var trackFactory = new TrackFactory(settings, musicLibraryQueueService, audioFileMetadataFactory);
 
             var audioRipper = new AudioCdRippingService(metadataService, audioConverterService, trackFactory);
             var viewUpdater = A.Fake<ICdRipViewUpdater>();
