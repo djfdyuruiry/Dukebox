@@ -54,9 +54,7 @@ namespace Dukebox.Library.Factories
 
             try
             {
-                var fileInfo = new FileInfo(audioFilePath);
-
-                if (string.Equals(fileInfo.Extension, ".cda", StringComparison.OrdinalIgnoreCase))
+                if (Path.GetExtension(audioFilePath).Equals(".cda", StringComparison.OrdinalIgnoreCase))
                 {
                     LoadDetailsFromCddbServer(audioFilePath, ref title, ref artist, ref album);
                     LoadMissingTrackDetailsFromFileName(audioFilePath, ref title, ref artist, ref album);

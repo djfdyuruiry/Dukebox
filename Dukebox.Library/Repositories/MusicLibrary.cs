@@ -154,7 +154,10 @@ namespace Dukebox.Library.Repositories
             _audioFormats = audioFormats;
             _albumArtCache = albumArtCache;
             _audioFileMetadataFactory = audioFileMetadataFactory;
+
             _trackFactory = trackFactory;
+            _trackFactory.MusicLibraryQueueService = new MusicLibraryQueueService(this);
+
             _searchService = new MusicLibrarySearchService(libraryDbContext, this, _trackFactory, _dbContextMutex);
 
             _allFilesCache = _dukeboxData.Songs.Select(s => s.FileName).ToList();

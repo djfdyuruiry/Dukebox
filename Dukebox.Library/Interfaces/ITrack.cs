@@ -10,6 +10,7 @@ namespace Dukebox.Library.Interfaces
         Artist Artist { get; }
         IAudioFileMetadata Metadata { get; }
         Song Song { get; }
+        void CopyDetailsToAudioMetadata(IAudioFileMetadata metadata);
         string ToString();
     }
 }

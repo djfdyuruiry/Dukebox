@@ -169,9 +169,14 @@ namespace Dukebox.Library.Services
 
                     if (tag == null || tag.IsEmpty)
                     {
-                        tag = tagFile.GetTag(TagTypes.AllTags, true);
+                        tag = tagFile.GetTag(TagTypes.Id3v2, true);
                     }
 
+                    if (tag == null)
+                    {
+                        throw new Exception("Audio file type does not support ID3v2 tags");
+                    }
+                    
                     tag.Title = Title;
                     tag.Performers = new string[] { Artist };
                     tag.Album = Album;
