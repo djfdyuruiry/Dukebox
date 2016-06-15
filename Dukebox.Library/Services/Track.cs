@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.IO;
 using System.Threading.Tasks;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
@@ -90,19 +91,19 @@ namespace Dukebox.Library.Services
                 _artist.Name = Metadata.Artist;
             }
 
-            Song.TitleUpdated += (o, e) => SaveMetadataChanges();
-            Artist.NameUpdated += (o, e) => SaveMetadataChanges();
-            Album.NameUpdated += (o, e) => SaveMetadataChanges();
+            if (!Path.GetExtension(song.FileName).Equals(".cda", StringComparison.OrdinalIgnoreCase))
+            {
+                Song.TitleUpdated += (o, e) => SaveMetadataChanges();
+                Artist.NameUpdated += (o, e) => SaveMetadataChanges();
+                Album.NameUpdated += (o, e) => SaveMetadataChanges();
+            }
         }
 
         private void SaveMetadataChanges()
         {
             Task.Run(() =>
             {
-                Metadata.Album = Album.Name;
-                Metadata.Artist = Artist.Name;
-                Metadata.Title = Song.Title;
-
+                CopyDetailsToAudioMetadata(Metadata);
                 Metadata.SaveMetadataToFileTag();
 
                 if (Song.Id != -1 || Artist.Id != -1 || Album.Id != -1)
@@ -112,6 +113,13 @@ namespace Dukebox.Library.Services
 
                 MetadataChangesSaved?.Invoke(this, EventArgs.Empty);
             });
+        }
+
+        public void CopyDetailsToAudioMetadata(IAudioFileMetadata metadata)
+        {
+            metadata.Album = Album.Name;
+            metadata.Artist = Artist.Name;
+            metadata.Title = Song.Title;
         }
 
         public override string ToString()
