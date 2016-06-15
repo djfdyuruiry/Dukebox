@@ -105,7 +105,10 @@ namespace Dukebox.Library.Services
 
                 Metadata.SaveMetadataToFileTag();
 
-                _musicLibraryQueueService.QueueMusicLibrarySaveChanges();
+                if (Song.Id != -1 || Artist.Id != -1 || Album.Id != -1)
+                {
+                    _musicLibraryQueueService.QueueMusicLibrarySaveChanges();
+                }
 
                 MetadataChangesSaved?.Invoke(this, EventArgs.Empty);
             });
