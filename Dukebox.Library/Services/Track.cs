@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Threading.Tasks;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
 using Dukebox.Configuration.Interfaces;
@@ -10,12 +11,15 @@ namespace Dukebox.Library.Services
     public class Track : ITrack
     {
         private readonly IDukeboxSettings _settings;
+        private readonly IMusicLibraryQueueService _musicLibraryQueueService;
         private readonly AudioFileMetadataFactory _audioFileMetadataFactory;
 
         private readonly Album _album;
         private readonly Artist _artist;
 
         private IAudioFileMetadata _metadata;
+
+        public event EventHandler MetadataChangesSaved;
 
         public Song Song { get; private set; }
         
@@ -48,12 +52,12 @@ namespace Dukebox.Library.Services
             }
         }
 
-        public Track(Song song, IDukeboxSettings settings, AudioFileMetadataFactory audioFileMetadataFactory) : 
-            this(song, settings, audioFileMetadataFactory, null)
+        public Track(Song song, IDukeboxSettings settings, IMusicLibraryQueueService musicLibraryQueueService, AudioFileMetadataFactory audioFileMetadataFactory) : 
+            this(song, settings, musicLibraryQueueService, audioFileMetadataFactory, null)
         {            
         }
 
-        public Track(Song song, IDukeboxSettings settings, AudioFileMetadataFactory audioFileMetadataFactory, IAudioFileMetadata audioFileMetadata)
+        public Track(Song song, IDukeboxSettings settings, IMusicLibraryQueueService musicLibraryQueueService, AudioFileMetadataFactory audioFileMetadataFactory, IAudioFileMetadata audioFileMetadata)
         {
             if (song == null)
             {
@@ -61,6 +65,7 @@ namespace Dukebox.Library.Services
             }
 
             _settings = settings;
+            _musicLibraryQueueService = musicLibraryQueueService;
             _audioFileMetadataFactory = audioFileMetadataFactory;
 
             Song = song;
@@ -85,18 +90,25 @@ namespace Dukebox.Library.Services
                 _artist.Name = Metadata.Artist;
             }
 
-            Song.TitleUpdated += (o, e) => SaveMetadataChangesToDisk();
-            Artist.NameUpdated += (o, e) => SaveMetadataChangesToDisk();
-            Album.NameUpdated += (o, e) => SaveMetadataChangesToDisk();
+            Song.TitleUpdated += (o, e) => SaveMetadataChanges();
+            Artist.NameUpdated += (o, e) => SaveMetadataChanges();
+            Album.NameUpdated += (o, e) => SaveMetadataChanges();
         }
 
-        private void SaveMetadataChangesToDisk()
+        private void SaveMetadataChanges()
         {
-            Metadata.Album = Album.Name;
-            Metadata.Artist = Artist.Name;
-            Metadata.Title = Song.Title;
+            Task.Run(() =>
+            {
+                Metadata.Album = Album.Name;
+                Metadata.Artist = Artist.Name;
+                Metadata.Title = Song.Title;
 
-            Metadata.SaveMetadataToFileTag();
+                Metadata.SaveMetadataToFileTag();
+
+                _musicLibraryQueueService.QueueMusicLibrarySaveChanges();
+
+                MetadataChangesSaved?.Invoke(this, EventArgs.Empty);
+            });
         }
 
         public override string ToString()

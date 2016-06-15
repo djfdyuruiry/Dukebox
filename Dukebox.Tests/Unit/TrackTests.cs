@@ -1,4 +1,6 @@
-﻿using FakeItEasy;
+﻿using System.IO;
+using System.Threading;
+using FakeItEasy;
 using Xunit;
 using Dukebox.Library.Model;
 using Dukebox.Library.Services;
@@ -6,7 +8,6 @@ using Dukebox.Configuration.Interfaces;
 using Dukebox.Library.Interfaces;
 using Dukebox.Audio.Interfaces;
 using Dukebox.Library.Factories;
-using System.IO;
 
 namespace Dukebox.Tests.Unit
 {
@@ -68,10 +69,24 @@ namespace Dukebox.Tests.Unit
 
             var song = new Song { Artist = new Artist { Id = 0, Name = "artist" }, FileName = saveChangesMp3FileName, Title = "song" };
             var track = BuildTrack(song);
+            var signalEvent = new ManualResetEvent(false);
+            var numChangesSaved = 0;
+
+            track.MetadataChangesSaved += (o, e) =>
+            {
+                if (numChangesSaved == 2)
+                {
+                    signalEvent.Set();
+                }
+
+                numChangesSaved++;
+            };
 
             track.Song.Title = newTitle;
             track.Album.Name = newAlbumName;
             track.Artist.Name = newArtistName;
+
+            signalEvent.WaitOne(100);
 
             var audioFileMetadata = audioFileMetadataFactory.BuildAudioFileMetadataInstance(saveChangesMp3FileName);
 
@@ -83,12 +98,13 @@ namespace Dukebox.Tests.Unit
         private Track BuildTrack(Song song)
         {
             var settings = A.Fake<IDukeboxSettings>();
+            var musicLibraryQueueService = A.Fake<IMusicLibraryQueueService>();
 
             A.CallTo(() => settings.TrackDisplayFormat).Returns("{artist} - {title}");
 
             var audioFileMetadataFactory = new AudioFileMetadataFactory(A.Fake<ICdMetadataService>(), A.Fake<IAudioCdService>());
 
-            return new Track(song, settings, audioFileMetadataFactory);
+            return new Track(song, settings, musicLibraryQueueService, audioFileMetadataFactory);
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Threading;
 using log4net;
 using TagLib;
 using Dukebox.Library.Interfaces;
@@ -22,6 +23,7 @@ namespace Dukebox.Library.Services
         private readonly long _dbAlbumId;
         private readonly int _trackLength;
         private readonly bool _hasAlbumArt;
+        private readonly SemaphoreSlim _saveMetadataSemaphore;
 
         public string AudioFilePath { get; private set; }
 
@@ -72,6 +74,8 @@ namespace Dukebox.Library.Services
 
             _hasAlbumArt = hasAlbumArt;
             _dbAlbumId = dbAlbumId;
+
+            _saveMetadataSemaphore = new SemaphoreSlim(1, 1);
         }
 
         public Image GetAlbumArt()
@@ -155,6 +159,8 @@ namespace Dukebox.Library.Services
         {
             try
             {
+                _saveMetadataSemaphore.Wait();
+
                 using (var fileStream = new FileStream(AudioFilePath, FileMode.Open))
                 {
                     var tagFile = TagLib.File.Create(new StreamFileAbstraction(AudioFilePath, fileStream, fileStream));
@@ -178,6 +184,10 @@ namespace Dukebox.Library.Services
             catch (Exception ex)
             {
                 logger.Error(string.Format("Error while creating or updating metadata tag in file '{0}'", AudioFilePath), ex);
+            }
+            finally
+            {
+                _saveMetadataSemaphore.Release();
             }
         }
     }
