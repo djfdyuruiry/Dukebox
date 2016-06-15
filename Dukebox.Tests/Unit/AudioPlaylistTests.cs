@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using FakeItEasy;
 using Newtonsoft.Json;
 using Xunit;
@@ -12,55 +13,39 @@ using Dukebox.Library.Services;
 
 namespace Dukebox.Tests.Unit
 {
-    public class AudioPlaylistTests : IDisposable
+    public class AudioPlaylistTests
     {
         private const string sampleMp3FileName = "sample.mp3";
-
-        private readonly AudioPlaylist _audioPlaylist;
-        private readonly IMediaPlayer _mediaPlayer;
-        private readonly IMusicLibrary _musicLibrary;
-        private readonly ITrack _track;
-
-        private bool _mediaPlayerIsPlaying = false;
-
-        public AudioPlaylistTests()
-        {
-            _musicLibrary = A.Fake<IMusicLibrary>();
-            _mediaPlayer = A.Fake<IMediaPlayer>();
-
-            A.CallTo(() => _mediaPlayer.LoadFile(A<string>.Ignored, A<MediaPlayerMetadata>.Ignored)).Invokes((o) =>_mediaPlayerIsPlaying = true);
-            A.CallTo(() => _mediaPlayer.Playing).ReturnsLazily(e => _mediaPlayerIsPlaying);
-
-            _audioPlaylist = new AudioPlaylist(_musicLibrary, _mediaPlayer);
-            _track = A.Fake<ITrack>();
-
-            A.CallTo(() => _track.Song).Returns(new Song { FileName = sampleMp3FileName });
-
-            _audioPlaylist.Tracks.Add(_track);
-        }
-        
+                
         [Fact]
         public void ClearPlaylist()
         {
-            A.CallTo(() => _mediaPlayer.Finished).Returns(true);
+            var audioPlaylistTuple = PrepareAudioPlaylistFakes();
+            var audioPlaylist = audioPlaylistTuple.Item1;
+            var mediaPlayer = audioPlaylistTuple.Item2;
 
-            _audioPlaylist.StartPlaylistPlayback();
+            A.CallTo(() => mediaPlayer.Finished).Returns(true);
 
-            _audioPlaylist.ClearPlaylist();
+            audioPlaylist.StartPlaylistPlayback();
+            audioPlaylist.ClearPlaylist();
 
-            A.CallTo(() => _mediaPlayer.StopAudio()).MustHaveHappened();
+            A.CallTo(() => mediaPlayer.StopAudio()).MustHaveHappened();
         }
 
         [Fact]
         public void GetCurrentTrackIndex()
         {
-            A.CallTo(() => _mediaPlayer.Finished).Returns(true);
+            var audioPlaylistTuple = PrepareAudioPlaylistFakes();
+            var audioPlaylist = audioPlaylistTuple.Item1;
+            var mediaPlayer = audioPlaylistTuple.Item2;
 
-            _audioPlaylist.StartPlaylistPlayback();
+            A.CallTo(() => mediaPlayer.Finished).Returns(true);
+
+            audioPlaylist.StartPlaylistPlayback();
             
-            _audioPlaylist.StopPlaylistPlayback();
+            audioPlaylist.StopPlaylistPlayback();
 
-            var currentIndex = _audioPlaylist.GetCurrentTrackIndex();
+            var currentIndex = audioPlaylist.GetCurrentTrackIndex();
             var currentIndexIsCorrect = currentIndex == 0;
 
             Assert.True(currentIndexIsCorrect, "Audio playlist reported an incorrect current track index");
@@ -69,39 +54,56 @@ namespace Dukebox.Tests.Unit
         [Fact]
         public void LoadPlaylistFromList()
         {
-            A.CallTo(() => _mediaPlayer.Finished).Returns(true);
-            
-            var count = _audioPlaylist.LoadPlaylistFromList(new List<ITrack> { _track });
-            _audioPlaylist.WaitForPlaybackToFinish();
+            var audioPlaylistTuple = PrepareAudioPlaylistFakes();
+            var audioPlaylist = audioPlaylistTuple.Item1;
+            var mediaPlayer = audioPlaylistTuple.Item2;
+            var track = BuildTrackFake();
+
+            A.CallTo(() => mediaPlayer.Finished).Returns(true);
+
+            var signalEvent = new ManualResetEvent(false);
+
+            mediaPlayer.LoadedTrackFromFile += (o, e) => signalEvent.Set();
+
+            var count = audioPlaylist.LoadPlaylistFromList(new List<ITrack> { track });            
+
+            signalEvent.WaitOne(100);
 
             var countCorrect = count == 1;
 
             Assert.True(countCorrect, "Audio playlist returned incorrect count after loading from track list");
             
-            A.CallTo(() => _mediaPlayer.LoadFile(A<string>.Ignored, A<MediaPlayerMetadata>.Ignored)).WithAnyArguments().MustHaveHappened();
+            A.CallTo(() => mediaPlayer.LoadFile(A<string>.Ignored, A<MediaPlayerMetadata>.Ignored)).WithAnyArguments().MustHaveHappened();
         }
         
         [Fact]
         public void PausePlay()
         {
-            A.CallTo(() => _mediaPlayer.Finished).Returns(true);
+            var audioPlaylistTuple = PrepareAudioPlaylistFakes();
+            var audioPlaylist = audioPlaylistTuple.Item1;
+            var mediaPlayer = audioPlaylistTuple.Item2;
+
+            A.CallTo(() => mediaPlayer.Finished).Returns(true);
             
-            _audioPlaylist.StartPlaylistPlayback();
-            _audioPlaylist.PausePlay();
+            audioPlaylist.StartPlaylistPlayback();
+            audioPlaylist.PausePlay();
 
-            _audioPlaylist.StopPlaylistPlayback();
+            audioPlaylist.StopPlaylistPlayback();
 
-            A.CallTo(() => _mediaPlayer.PausePlayAudio()).MustHaveHappened();
+            A.CallTo(() => mediaPlayer.PausePlayAudio()).MustHaveHappened();
         }
 
         [Fact]
         public void SavePlaylistToFile()
         {
+            var audioPlaylistTuple = PrepareAudioPlaylistFakes();
+            var audioPlaylist = audioPlaylistTuple.Item1;
+
             var playlistFile = "playlist.jpl";
 
             File.Delete(playlistFile);
 
-            _audioPlaylist.SavePlaylistToFile(playlistFile);
+            audioPlaylist.SavePlaylistToFile(playlistFile);
 
             var playlistFileGenerated = File.Exists(playlistFile);
 
@@ -118,63 +120,108 @@ namespace Dukebox.Tests.Unit
         [Fact]
         public void SkipToTrack()
         {
-            A.CallTo(() => _mediaPlayer.Finished).Returns(true);
-            
-            _audioPlaylist.SkipToTrack(0);
+            var audioPlaylistTuple = PrepareAudioPlaylistFakes();
+            var audioPlaylist = audioPlaylistTuple.Item1;
+            var mediaPlayer = audioPlaylistTuple.Item2;
 
-            _audioPlaylist.WaitForPlaybackToFinish();
+            A.CallTo(() => mediaPlayer.Finished).Returns(true);
 
-            A.CallTo(() => _mediaPlayer.LoadFile(A<string>.Ignored, A<MediaPlayerMetadata>.Ignored)).MustHaveHappened();
+            var signalEvent = new ManualResetEvent(false);
+            var numLoads = 0;
+
+            mediaPlayer.LoadedTrackFromFile += (o, e) =>
+            {
+                if (numLoads == 1)
+                {
+                    signalEvent.Set();
+                }
+
+                numLoads++;
+            };
+
+            audioPlaylist.SkipToTrack(0);
+
+            signalEvent.WaitOne(100);
+
+            A.CallTo(() => mediaPlayer.LoadFile(A<string>.Ignored, A<MediaPlayerMetadata>.Ignored)).MustHaveHappened();
         }
 
         [Fact]
         public void StartPlaylistPlayback()
         {
-            A.CallTo(() => _mediaPlayer.Finished).Returns(true);
-            
-            _audioPlaylist.StartPlaylistPlayback();
+            var audioPlaylistTuple = PrepareAudioPlaylistFakes();
+            var audioPlaylist = audioPlaylistTuple.Item1;
+            var mediaPlayer = audioPlaylistTuple.Item2;
 
-            _audioPlaylist.WaitForPlaybackToFinish();
+            A.CallTo(() => mediaPlayer.Finished).Returns(true);
 
-            A.CallTo(() => _mediaPlayer.LoadFile(A<string>.Ignored, A<MediaPlayerMetadata>.Ignored)).MustHaveHappened();
+            var signalEvent = new ManualResetEvent(false);
+
+            mediaPlayer.LoadedTrackFromFile += (o, e) => signalEvent.Set();
+
+            audioPlaylist.StartPlaylistPlayback();
+
+            signalEvent.WaitOne(100);
+
+            A.CallTo(() => mediaPlayer.LoadFile(A<string>.Ignored, A<MediaPlayerMetadata>.Ignored)).MustHaveHappened();
         }
 
         [Fact]
         public void Stop()
         {
-            A.CallTo(() => _mediaPlayer.StopAudio()).Invokes(() => _mediaPlayer.Finished = true);
+            var audioPlaylistTuple = PrepareAudioPlaylistFakes();
+            var audioPlaylist = audioPlaylistTuple.Item1;
+            var mediaPlayer = audioPlaylistTuple.Item2;
+
+            A.CallTo(() => mediaPlayer.StopAudio()).Invokes(() => mediaPlayer.Finished = true);
             
-            _audioPlaylist.StartPlaylistPlayback();
-            _audioPlaylist.Stop();
+            audioPlaylist.StartPlaylistPlayback();
+            audioPlaylist.Stop();
 
-            _audioPlaylist.StopPlaylistPlayback();
+            audioPlaylist.StopPlaylistPlayback();
 
-            A.CallTo(() => _mediaPlayer.StopAudio()).MustHaveHappened();
+            A.CallTo(() => mediaPlayer.StopAudio()).MustHaveHappened();
         }
 
         [Fact]
         public void StopPlaylistPlayback()
         {
-            A.CallTo(() => _mediaPlayer.Finished).Returns(true);
+            var audioPlaylistTuple = PrepareAudioPlaylistFakes();
+            var audioPlaylist = audioPlaylistTuple.Item1;
+            var mediaPlayer = audioPlaylistTuple.Item2;
 
-            _audioPlaylist.StartPlaylistPlayback();
-            _audioPlaylist.StopPlaylistPlayback();
+            A.CallTo(() => mediaPlayer.Finished).Returns(true);
 
-            A.CallTo(() => _mediaPlayer.StopAudio()).MustHaveHappened();
+            audioPlaylist.StartPlaylistPlayback();
+            audioPlaylist.StopPlaylistPlayback();
+
+            A.CallTo(() => mediaPlayer.StopAudio()).MustHaveHappened();
         }
 
-        protected virtual void Dispose(bool cleanAllResources)
+        private Tuple<AudioPlaylist, IMediaPlayer> PrepareAudioPlaylistFakes()
         {
-            if (cleanAllResources)
-            {
-                _audioPlaylist.Dispose();
-            }
+            var musicLibrary = A.Fake<IMusicLibrary>();
+            var mediaPlayer = A.Fake<IMediaPlayer>();
+            var mediaPlayerIsPlaying = false;
+
+            A.CallTo(() => mediaPlayer.LoadFile(A<string>.Ignored, A<MediaPlayerMetadata>.Ignored)).Invokes((o) => mediaPlayerIsPlaying = true);
+            A.CallTo(() => mediaPlayer.Playing).ReturnsLazily(e => mediaPlayerIsPlaying);
+
+            var audioPlaylist = new AudioPlaylist(musicLibrary, mediaPlayer);
+            var track = BuildTrackFake();
+
+            audioPlaylist.Tracks.Add(track);
+
+            return new Tuple<AudioPlaylist, IMediaPlayer> (audioPlaylist, mediaPlayer);
         }
 
-        public void Dispose()
+        private ITrack BuildTrackFake()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
+            var track = A.Fake<ITrack>();
+
+            A.CallTo(() => track.Song).Returns(new Song { FileName = sampleMp3FileName });
+
+            return track;
         }
     }
 }
