@@ -11,6 +11,8 @@ namespace Dukebox.Library.Services
 {
     public class Track : ITrack
     {
+        public static event EventHandler TrackMetadataUpdated;
+
         private readonly IDukeboxSettings _settings;
         private readonly IMusicLibraryQueueService _musicLibraryQueueService;
         private readonly AudioFileMetadataFactory _audioFileMetadataFactory;
@@ -97,6 +99,8 @@ namespace Dukebox.Library.Services
                 Artist.NameUpdated += (o, e) => SaveMetadataChanges();
                 Album.NameUpdated += (o, e) => SaveMetadataChanges();
             }
+
+            MetadataChangesSaved += (o, e) => Task.Run(() => TrackMetadataUpdated?.Invoke(o, e));
         }
 
         private void SaveMetadataChanges()

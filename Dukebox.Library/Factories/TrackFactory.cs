@@ -8,6 +8,8 @@ namespace Dukebox.Library.Factories
 {
     public class TrackFactory
     {
+        public static event EventHandler TrackMetadataUpdated;
+
         private readonly IDukeboxSettings _settings;
         private readonly AudioFileMetadataFactory _audioFileMetadataFactory;
 
@@ -17,6 +19,8 @@ namespace Dukebox.Library.Factories
         {
             _settings = settings;
             _audioFileMetadataFactory = audioFileMetadataFactory;
+
+            Track.TrackMetadataUpdated += (o, e) => TrackMetadataUpdated?.Invoke(o, e); 
         }
 
         public ITrack BuildTrackInstance(Song song)
