@@ -13,20 +13,23 @@
         <Style BasedOn="{StaticResource {x:Type TextBox}}"
                TargetType="TextBox"
                x:Key="MetadataTextBox">
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="BorderBrush" Value="#000000"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate>
-                        <ScrollViewer x:Name="PART_ContentHost"/>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#f2f2f2"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="White"/>
+            <Setter Property="Padding" Value="1,1,1,1"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="TextBox.Background" Value="#f2f2f2"/>
+                    <Setter Property="BorderThickness" Value="1,1,1,1"/>
+                    <Setter Property="BorderBrush" Value="#ffffff"/>
+                    <Setter Property="Border.CornerRadius" Value="8,8,8,8"/>
+                </Trigger>
+                <Trigger Property="IsFocused" Value="True">
+                    <Setter Property="TextBox.Background" Value="#f2f2f2"/>
+                    <Setter Property="BorderThickness" Value="1,1,1,1"/>
+                    <Setter Property="BorderBrush" Value="#ffffff"/>
+                    <Setter Property="Border.CornerRadius" Value="8,8,8,8"/>
+                </Trigger>
+            </Style.Triggers>
         </Style>
     </UserControl.Resources>
     <Grid>
@@ -64,34 +67,53 @@
             <DataGrid.CellStyle>
                 <Style TargetType="DataGridCell">
                     <Setter Property="BorderThickness" Value="5"></Setter>
+                    <Setter Property="Foreground" Value="Black" />
+                    <Style.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" Value="{x:Null}" />
+                            <Setter Property="BorderBrush" Value="{x:Null}" />
+                        </Trigger>
+                    </Style.Triggers>
                 </Style>
             </DataGrid.CellStyle>
             <DataGrid.Columns>
-                <DataGridTemplateColumn Header="Artist" Width="auto" SortMemberPath="Artist.name" CanUserSort="True"  IsReadOnly="{Binding EditingListingsDisabled}">
+                <DataGridTemplateColumn Header="Artist" 
+                                        Width="auto" 
+                                        SortMemberPath="Artist.name" 
+                                        CanUserSort="True"  
+                                        IsReadOnly="{Binding Path=DataContext.EditingListingsDisabled, ElementName=TrackListingControl}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBox Text="{Binding Artist.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                     IsEnabled="{Binding EditingListingsDisabled}" 
+                                     IsReadOnly="{Binding Path=DataContext.EditingListingsDisabled, ElementName=TrackListingControl}" 
                                      Style="{StaticResource MetadataTextBox}">
                             </TextBox> 
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="Album" Width="auto" SortMemberPath="Album.name" CanUserSort="True" IsReadOnly="{Binding EditingListingsDisabled}">
+                <DataGridTemplateColumn Header="Album" 
+                                        Width="auto" 
+                                        SortMemberPath="Album.name" 
+                                        CanUserSort="True" 
+                                        IsReadOnly="{Binding Path=DataContext.EditingListingsDisabled, ElementName=TrackListingControl}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBox Text="{Binding Album.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                     IsEnabled="{Binding EditingListingsDisabled}" 
+                                     IsReadOnly="{Binding Path=DataContext.EditingListingsDisabled, ElementName=TrackListingControl}" 
                                      Style="{StaticResource MetadataTextBox}">
                             </TextBox>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="Title" Width="*" SortMemberPath="Song.title" CanUserSort="True" IsReadOnly="{Binding EditingListingsDisabled}">
+                <DataGridTemplateColumn Header="Title" 
+                                        Width="*" 
+                                        SortMemberPath="Song.title" 
+                                        CanUserSort="True" 
+                                        IsReadOnly="{Binding Path=DataContext.EditingListingsDisabled, ElementName=TrackListingControl}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBox Text="{Binding Song.Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                     IsEnabled="{Binding EditingListingsDisabled}" 
+                                     IsReadOnly="{Binding Path=DataContext.EditingListingsDisabled, ElementName=TrackListingControl}" 
                                      Style="{StaticResource MetadataTextBox}">
                             </TextBox>
                         </DataTemplate>
