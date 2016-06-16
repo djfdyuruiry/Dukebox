@@ -6,6 +6,7 @@ using System.Threading;
 using log4net;
 using TagLib;
 using Dukebox.Library.Interfaces;
+using Dukebox.Library.Model;
 
 namespace Dukebox.Library.Services
 {
@@ -167,14 +168,16 @@ namespace Dukebox.Library.Services
 
                     var tag = tagFile.Tag;
 
-                    if (tag == null || tag.IsEmpty)
-                    {
-                        tag = tagFile.GetTag(TagTypes.Id3v2, true);
-                    }
-
                     if (tag == null)
                     {
-                        throw new Exception("Audio file type does not support ID3v2 tags");
+                        var fileType = Path.GetExtension(AudioFilePath).ToLower();
+
+                        if (!TagTypeMap.FileTypeMap.ContainsKey(fileType))
+                        {
+                            throw new InvalidOperationException(string.Format("TagLib does not support creating tags for files of type '{0}'", fileType));
+                        }
+
+                        tag = tagFile.GetTag(TagTypeMap.FileTypeMap[fileType], true);
                     }
                     
                     tag.Title = Title;
@@ -188,7 +191,7 @@ namespace Dukebox.Library.Services
             }
             catch (Exception ex)
             {
-                logger.Error(string.Format("Error while creating or updating metadata tag in file '{0}'", AudioFilePath), ex);
+                logger.Warn(string.Format("Error while creating or updating metadata tag in file '{0}'", AudioFilePath), ex);
             }
             finally
             {
