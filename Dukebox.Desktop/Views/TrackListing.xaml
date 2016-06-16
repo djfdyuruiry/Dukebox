@@ -9,6 +9,26 @@
              d:DesignHeight="592" d:DesignWidth="1016"
              Background="White"
              Name="TrackListingControl">
+    <UserControl.Resources>
+        <Style BasedOn="{StaticResource {x:Type TextBox}}"
+               TargetType="TextBox"
+               x:Key="MetadataTextBox">
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="BorderBrush" Value="#000000"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <ScrollViewer x:Name="PART_ContentHost"/>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#f2f2f2"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="0.05*"></RowDefinition>
@@ -50,7 +70,9 @@
                 <DataGridTemplateColumn Header="Artist" Width="auto" SortMemberPath="Artist.name" CanUserSort="True"  IsReadOnly="{Binding EditingListingsDisabled}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBox Text="{Binding Artist.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding EditingListingsDisabled}">
+                            <TextBox Text="{Binding Artist.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                     IsEnabled="{Binding EditingListingsDisabled}" 
+                                     Style="{StaticResource MetadataTextBox}">
                             </TextBox> 
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -58,7 +80,9 @@
                 <DataGridTemplateColumn Header="Album" Width="auto" SortMemberPath="Album.name" CanUserSort="True" IsReadOnly="{Binding EditingListingsDisabled}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBox Text="{Binding Album.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding EditingListingsDisabled}">
+                            <TextBox Text="{Binding Album.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                     IsEnabled="{Binding EditingListingsDisabled}" 
+                                     Style="{StaticResource MetadataTextBox}">
                             </TextBox>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -66,7 +90,9 @@
                 <DataGridTemplateColumn Header="Title" Width="*" SortMemberPath="Song.title" CanUserSort="True" IsReadOnly="{Binding EditingListingsDisabled}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBox Text="{Binding Song.Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding EditingListingsDisabled}">
+                            <TextBox Text="{Binding Song.Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                     IsEnabled="{Binding EditingListingsDisabled}" 
+                                     Style="{StaticResource MetadataTextBox}">
                             </TextBox>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
