@@ -145,6 +145,7 @@
     <Compile Include="Interfaces\ICdRipViewUpdater.cs" />
     <Compile Include="Interfaces\ITrack.cs" />
     <Compile Include="Interfaces\IMusicLibraryDbContext.cs" />
+    <Compile Include="Model\TagTypeMap.cs" />
     <Compile Include="Model\GenericEventArgs.cs" />
     <Compile Include="Repositories\MusicLibraryDbContext.cs" />
     <Compile Include="LibraryPackage.cs" />
