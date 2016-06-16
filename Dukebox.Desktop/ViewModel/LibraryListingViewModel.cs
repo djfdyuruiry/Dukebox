@@ -49,7 +49,7 @@ namespace Dukebox.Desktop.ViewModel
         {
             get
             { 
-                return false; 
+                return true; 
             }
         }
         public bool SearchEnabled

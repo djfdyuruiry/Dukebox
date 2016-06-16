@@ -50,24 +50,24 @@
                 <DataGridTemplateColumn Header="Artist" Width="auto" SortMemberPath="Artist.name" CanUserSort="True"  IsReadOnly="{Binding EditingListingsDisabled}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Artist.Name}">
-                            </TextBlock> 
+                            <TextBox Text="{Binding Artist.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding EditingListingsDisabled}">
+                            </TextBox> 
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTemplateColumn Header="Album" Width="auto" SortMemberPath="Album.name" CanUserSort="True" IsReadOnly="{Binding EditingListingsDisabled}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Album.Name}">
-                            </TextBlock>
+                            <TextBox Text="{Binding Album.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding EditingListingsDisabled}">
+                            </TextBox>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTemplateColumn Header="Title" Width="*" SortMemberPath="Song.title" CanUserSort="True" IsReadOnly="{Binding EditingListingsDisabled}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Song.Title}">
-                            </TextBlock>
+                            <TextBox Text="{Binding Song.Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding EditingListingsDisabled}">
+                            </TextBox>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
