@@ -43,7 +43,7 @@ namespace Dukebox.Tests.Unit
             musicLibraryQueueService.QueueMusicLibrarySaveChanges();
             musicLibraryQueueService.QueueMusicLibrarySaveChanges();
 
-            signalEvent.WaitOne(275);
+            signalEvent.WaitOne(1000);
 
             var oneDatabaseSaveCallWasMade = numDatabaseSaves == 1;
 
