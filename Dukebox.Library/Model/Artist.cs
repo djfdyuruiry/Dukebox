@@ -32,13 +32,19 @@ namespace Dukebox.Library.Model
             }
             set
             {
-                var newTitle = _name != value;
+                UpdateName(value);
+            }
+        }
+
+        private void UpdateName(string value)
+        {
+            var newTitle = _name == null || !_name.Equals(value, StringComparison.Ordinal);
+
+            if (newTitle)
+            {
                 _name = value;
 
-                if (newTitle)
-                {
-                    NameUpdated?.Invoke(this, EventArgs.Empty);
-                }
+                NameUpdated?.Invoke(this, EventArgs.Empty);
             }
         }
 

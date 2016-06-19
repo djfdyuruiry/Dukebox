@@ -261,8 +261,7 @@ namespace Dukebox.Library.Repositories
                 return;
             }
 
-            SaveDbChanges();
-            RefreshCaches();
+            SaveDbChanges(false);
 
             AddAlbumArtToCache(albumsWithMetadata, concurrencyLimit);
             
@@ -583,12 +582,31 @@ namespace Dukebox.Library.Repositories
             return null;
         }
 
-        public async Task SaveDbChanges()
+        public async Task SaveDbChanges(bool reconcileDatabaseEdits)
         {
             try
             {
                 await _dbContextMutex.WaitAsync();
+
+                if (reconcileDatabaseEdits)
+                {
+                    ReconcileDatabaseEdits();
+                }
+
                 await _dukeboxData.SaveChangesAsync();
+
+                if (reconcileDatabaseEdits)
+                {
+                    var albumsWithoutSongs = _dukeboxData.Albums.ToList().Where(a => a.Songs == null || !a.Songs.Any()).ToList();
+                    var artistsWithoutSongs = _dukeboxData.Artists.ToList().Where(a => a.Songs == null || !a.Songs.Any()).ToList();
+
+                    _dukeboxData.Albums.RemoveRange(albumsWithoutSongs);
+                    _dukeboxData.Artists.RemoveRange(artistsWithoutSongs);
+
+                    await _dukeboxData.SaveChangesAsync();
+
+                    CallMetadataAndCompleteHandlers(null, 0);
+                }
 
                 DatabaseChangesSaved?.Invoke(this, EventArgs.Empty);
             }
@@ -605,6 +623,44 @@ namespace Dukebox.Library.Repositories
             {
                 _dbContextMutex.Release();
             }
+
+            RefreshCaches();
+        }
+
+        private void ReconcileDatabaseEdits()
+        {
+
+            // reconcile renamed artists with matching DB entities
+            var renamedArtists = _dukeboxData.Songs.Select(s => s.Artist).Where(a => a != null & a.Id == 0L).ToList();
+            renamedArtists.ForEach(ra =>
+            {
+                var matchingArtist = _allArtistsCache.FirstOrDefault(a => a.Name.Equals(ra.Name, StringComparison.Ordinal));
+
+                if (matchingArtist != null)
+                {
+                    foreach (var song in ra.Songs)
+                    {
+                        song.Artist = matchingArtist;
+                        song.ArtistId = matchingArtist.Id;
+                    }
+                }
+            });
+
+            // reconcile renamed albums with matching DB entities
+            var renamedAlbums = _dukeboxData.Songs.Select(s => s.Album).Where(a => a.Id == 0L).ToList();
+            renamedAlbums.ForEach(ra =>
+            {
+                var matchingAlbum = _allAlbumsCache.FirstOrDefault(a => a.Name.Equals(ra.Name, StringComparison.Ordinal));
+
+                if (matchingAlbum != null)
+                {
+                    foreach (var song in ra.Songs)
+                    {
+                        song.Album = matchingAlbum;
+                        song.AlbumId = matchingAlbum.Id;
+                    }
+                }
+            });
         }
 
         public async Task RemoveTrack (ITrack track)

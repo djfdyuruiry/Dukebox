@@ -1,6 +1,6 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Globalization;
-using System.IO;
 using System.Threading.Tasks;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
@@ -22,6 +22,7 @@ namespace Dukebox.Library.Services
 
         private IAudioFileMetadata _metadata;
 
+        public event PropertyChangedEventHandler PropertyChanged;
         public event EventHandler MetadataChangesSaved;
 
         public Song Song { get; private set; }
@@ -33,7 +34,27 @@ namespace Dukebox.Library.Services
                 return Song.Artist ?? _artist;
             }
         }
-        
+
+        public string ArtistName
+        {
+            get
+            {
+                return Artist.Name;
+            }
+            set
+            {
+                bool newValue = !Artist.Name.Equals(value, StringComparison.Ordinal);
+
+                if (newValue)
+                {
+                    Song.Artist = new Artist { Name = value };
+                    SaveMetadataChanges();
+
+                    //OnPropertyChanged("ArtistName");
+                }
+            }
+        }
+
         public Album Album
         {
             get
@@ -41,7 +62,27 @@ namespace Dukebox.Library.Services
                 return Song.Album ?? _album;
             }
         }
-        
+
+        public string AlbumName
+        {
+            get
+            {
+                return Album.Name;
+            }
+            set
+            {
+                bool newValue = !Album.Name.Equals(value, StringComparison.Ordinal);
+
+                if (newValue)
+                {
+                    Song.Album = new Album { Name = value };
+                    SaveMetadataChanges();
+
+                    //OnPropertyChanged("AlbumName");
+                }
+            }
+        }
+
         public IAudioFileMetadata Metadata 
         {
             get
@@ -93,27 +134,24 @@ namespace Dukebox.Library.Services
                 _artist.Name = Metadata.Artist;
             }
 
-            if (!Path.GetExtension(song.FileName).Equals(".cda", StringComparison.OrdinalIgnoreCase))
-            {
-                Song.TitleUpdated += (o, e) => SaveMetadataChanges();
-                Artist.NameUpdated += (o, e) => SaveMetadataChanges();
-                Album.NameUpdated += (o, e) => SaveMetadataChanges();
-            }
-
+            Song.TitleUpdated += (o, e) => SaveMetadataChanges();
+            
             MetadataChangesSaved += (o, e) => Task.Run(() => TrackMetadataUpdated?.Invoke(o, e));
         }
 
         private void SaveMetadataChanges()
         {
+            if (Song.IsAudioCdTrack)
+            {
+                return;
+            }
+
             Task.Run(() =>
             {
                 CopyDetailsToAudioMetadata(Metadata);
                 Metadata.SaveMetadataToFileTag();
 
-                if (Song.Id != -1 || Artist.Id != -1 || Album.Id != -1)
-                {
-                    _musicLibraryQueueService.QueueMusicLibrarySaveChanges();
-                }
+                _musicLibraryQueueService.QueueMusicLibrarySaveChanges();
 
                 MetadataChangesSaved?.Invoke(this, EventArgs.Empty);
             });
@@ -152,6 +190,10 @@ namespace Dukebox.Library.Services
             trackFormat = trackFormat.Replace("{title}", Song.Title);
 
             return trackFormat;
+        }
+        protected void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Threading.Tasks;
+using System.IO;
 using Newtonsoft.Json;
-using System.Collections.ObjectModel;
 
 namespace Dukebox.Library.Model
 {
@@ -36,11 +36,11 @@ namespace Dukebox.Library.Model
             }
             set
             {
-                var newTitle = _title != value;
-                _title = value;
+                var newTitle = _title == null || !_title.Equals(value, StringComparison.Ordinal);
 
                 if (newTitle)
                 {
+                    _title = value;
                     TitleUpdated?.Invoke(this, EventArgs.Empty);
                 }
             }
@@ -94,6 +94,14 @@ namespace Dukebox.Library.Model
             {
                 _extendedMetadata = value;
                 ExtendedMetadataJson = JsonConvert.SerializeObject(_extendedMetadata);
+            }
+        }
+
+        public bool IsAudioCdTrack
+        {
+            get
+            {
+                return Path.GetExtension(FileName).Equals(".cda", StringComparison.OrdinalIgnoreCase);
             }
         }
 

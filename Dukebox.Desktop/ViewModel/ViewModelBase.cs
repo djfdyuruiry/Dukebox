@@ -11,6 +11,7 @@ namespace Dukebox.Desktop.ViewModel
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         } 
+
         protected void SendNotificationMessage(string message)
         {
             var messageObj = new NotificationMessage(this, message);

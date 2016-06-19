@@ -15,7 +15,7 @@ namespace Dukebox.Tests.Unit
         {
             _musicLibrary = A.Fake<IMusicLibrary>();
 
-            A.CallTo(() => _musicLibrary.SaveDbChanges()).ReturnsLazily(() =>
+            A.CallTo(() => _musicLibrary.SaveDbChanges(true)).ReturnsLazily(() =>
             {
                 _musicLibrary.DatabaseChangesSaved += Raise.WithEmpty();
                 return Task.FromResult(true);

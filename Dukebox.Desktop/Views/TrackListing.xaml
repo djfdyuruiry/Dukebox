@@ -84,10 +84,23 @@
                                         IsReadOnly="{Binding Path=DataContext.EditingListingsDisabled, ElementName=TrackListingControl}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBox Text="{Binding Artist.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                     IsReadOnly="{Binding Path=DataContext.EditingListingsDisabled, ElementName=TrackListingControl}" 
-                                     Style="{StaticResource MetadataTextBox}">
-                            </TextBox> 
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"></RowDefinition>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Row="0" 
+                                           Grid.Column="0" 
+                                           Visibility="{Binding ElementName=TrackListingControl, Path=DataContext.EditingListingsDisabled, Converter={StaticResource ReverseBoolToVisibilityConverter}}" 
+                                           Text="{Binding ArtistName}"/>
+                                <TextBox Grid.Row="0" 
+                                         Grid.Column="0"  
+                                         Visibility="{Binding ElementName=TrackListingControl, Path=DataContext.EditingListingsDisabled, Converter={StaticResource BoolToVisibilityConverter}}" 
+                                         Text="{Binding ArtistName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                         Style="{StaticResource MetadataTextBox}"/>
+                            </Grid>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -98,10 +111,23 @@
                                         IsReadOnly="{Binding Path=DataContext.EditingListingsDisabled, ElementName=TrackListingControl}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBox Text="{Binding Album.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                     IsReadOnly="{Binding Path=DataContext.EditingListingsDisabled, ElementName=TrackListingControl}" 
-                                     Style="{StaticResource MetadataTextBox}">
-                            </TextBox>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"></RowDefinition>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Row="0" 
+                                           Grid.Column="0" 
+                                           Visibility="{Binding ElementName=TrackListingControl, Path=DataContext.EditingListingsDisabled, Converter={StaticResource ReverseBoolToVisibilityConverter}}" 
+                                           Text="{Binding AlbumName}"/>
+                                <TextBox Grid.Row="0" 
+                                         Grid.Column="0"  
+                                         Visibility="{Binding ElementName=TrackListingControl, Path=DataContext.EditingListingsDisabled, Converter={StaticResource BoolToVisibilityConverter}}" 
+                                         Text="{Binding AlbumName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                         Style="{StaticResource MetadataTextBox}"/>
+                            </Grid>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -112,10 +138,23 @@
                                         IsReadOnly="{Binding Path=DataContext.EditingListingsDisabled, ElementName=TrackListingControl}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBox Text="{Binding Song.Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                     IsReadOnly="{Binding Path=DataContext.EditingListingsDisabled, ElementName=TrackListingControl}" 
-                                     Style="{StaticResource MetadataTextBox}">
-                            </TextBox>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"></RowDefinition>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Row="0" 
+                                           Grid.Column="0" 
+                                           Visibility="{Binding ElementName=TrackListingControl, Path=DataContext.EditingListingsDisabled, Converter={StaticResource ReverseBoolToVisibilityConverter}}" 
+                                           Text="{Binding Song.Title}"/>
+                                <TextBox Grid.Row="0" 
+                                         Grid.Column="0"  
+                                         Visibility="{Binding ElementName=TrackListingControl, Path=DataContext.EditingListingsDisabled, Converter={StaticResource BoolToVisibilityConverter}}" 
+                                         Text="{Binding Song.Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                         Style="{StaticResource MetadataTextBox}"/>
+                            </Grid>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>

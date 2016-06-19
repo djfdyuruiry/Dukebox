@@ -160,6 +160,11 @@ namespace Dukebox.Library.Services
         {
             try
             {
+                if (Path.GetExtension(AudioFilePath).Equals(".cda", StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new InvalidOperationException(string.Format("Attempted to create a tag for CD track '{0}'", AudioFilePath));
+                }
+
                 _saveMetadataSemaphore.Wait();
 
                 using (var fileStream = new FileStream(AudioFilePath, FileMode.Open))

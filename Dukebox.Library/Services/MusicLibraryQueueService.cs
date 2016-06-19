@@ -63,7 +63,7 @@ namespace Dukebox.Library.Services
                 _timerMutex.Release();
             }
 
-            await _musicLibrary.SaveDbChanges();
+            await _musicLibrary.SaveDbChanges(true);
         }
     }
 }

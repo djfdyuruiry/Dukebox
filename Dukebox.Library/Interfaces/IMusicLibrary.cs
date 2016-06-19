@@ -47,6 +47,6 @@ namespace Dukebox.Library.Interfaces
         Task<List<ITrack>> AddPlaylistFiles(string filename);
         Task<Playlist> AddPlaylist(string name, IEnumerable<string> filenames);
         Task RemoveTrack(ITrack track);
-        Task SaveDbChanges();
+        Task SaveDbChanges(bool reconcileDatabaseEdits);
     }
 }
