@@ -50,7 +50,7 @@ namespace Dukebox.Tests.Unit
         }
 
         [Fact]
-        public void AddSongToCache()
+        public void AddAlbumArtToCache()
         {
             var settings = A.Fake<IDukeboxSettings>();
             A.CallTo(() => settings.AlbumArtCachePath).Returns(cachePath);
