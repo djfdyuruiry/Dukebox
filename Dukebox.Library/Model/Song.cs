@@ -12,8 +12,6 @@ namespace Dukebox.Library.Model
     {
         private string _extendedMetadataJson;
         private Dictionary<string, List<string>> _extendedMetadata;
-        private Artist _artist;
-        private Album _album;
 
         [Column("id")]
         public long Id { get; set; }
@@ -76,12 +74,7 @@ namespace Dukebox.Library.Model
         {
             get
             {
-                if (_artist == null)
-                {
-                    _artist = new Artist(ArtistName);
-                }
-
-                return _artist;
+                return new Artist(ArtistName);
             }
         }
 
@@ -89,12 +82,7 @@ namespace Dukebox.Library.Model
         {
             get
             {
-                if (_album == null)
-                {
-                    _album = new Album(AlbumName);
-                }
-
-                return _album;
+                return new Album(AlbumName);
             }
         }
 

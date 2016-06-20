@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using GalaSoft.MvvmLight.Command;
@@ -7,6 +8,7 @@ using Dukebox.Desktop.Helper;
 using Dukebox.Desktop.Interfaces;
 using Dukebox.Desktop.Model;
 using Dukebox.Library.Interfaces;
+using Dukebox.Desktop.Services;
 
 namespace Dukebox.Desktop.ViewModel
 {
@@ -15,8 +17,7 @@ namespace Dukebox.Desktop.ViewModel
         private readonly IMusicLibrary _musicLibrary;
         private readonly IAudioPlaylist _audioPlaylist;
         private readonly ListSearchHelper<ITrack> _listSearchHelper;
-
-        private List<ITrack> _tracks;
+        
         private string _searchText;
 
         public ICommand ClearSearch { get; private set; }
@@ -35,18 +36,11 @@ namespace Dukebox.Desktop.ViewModel
                 OnPropertyChanged("SearchText");
             }
         }
-        public List<ITrack> Tracks
+        public List<TrackWrapper> Tracks
         {
             get
             {
-                return _listSearchHelper.FilteredItems;
-            }
-            private set
-            {
-                _tracks = value;
-
-                _listSearchHelper.Items = _tracks;
-                OnPropertyChanged("Tracks");
+                return _listSearchHelper.FilteredItems.Select(t => new TrackWrapper(_musicLibrary, t)).ToList();
             }
         }
 
@@ -79,11 +73,9 @@ namespace Dukebox.Desktop.ViewModel
         {
             _musicLibrary = musicLibrary;
             _audioPlaylist = audioPlaylist;
-            _tracks = new List<ITrack>();
 
             _listSearchHelper = new ListSearchHelper<ITrack>
             {
-                Items = _tracks,
                 FilterLambda = (t, s) => t.ToString().ToLower(CultureInfo.InvariantCulture)
                 .Contains(s.ToLower(CultureInfo.InvariantCulture))
             };
@@ -97,7 +89,7 @@ namespace Dukebox.Desktop.ViewModel
 
         private void DoLoadTrack(ITrack track)
         {
-            _audioPlaylist.LoadPlaylistFromList(_tracks);
+            _audioPlaylist.LoadPlaylistFromList(_listSearchHelper.FilteredItems);
             _audioPlaylist.SkipToTrack(track);
 
             SendNotificationMessage(NotificationMessages.AudioPlaylistLoadedNewTracks);
@@ -105,7 +97,8 @@ namespace Dukebox.Desktop.ViewModel
 
         public void RefreshRecentlyPlayedFromLibrary()
         {
-            Tracks = _musicLibrary.RecentlyPlayedAsList;
+            _listSearchHelper.Items = _musicLibrary.RecentlyPlayedAsList;
+            OnPropertyChanged("Tracks");
         }
 
         private void DoSearch()

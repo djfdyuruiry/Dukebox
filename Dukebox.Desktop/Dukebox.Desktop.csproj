@@ -179,6 +179,7 @@
     <Compile Include="Model\NotificationMessages.cs" />
     <Compile Include="Services\Album.cs" />
     <Compile Include="Model\NavIconNames.cs" />
+    <Compile Include="Services\TrackWrapper.cs" />
     <Compile Include="ViewModel\CdRippingProgressMonitorViewModel.cs" />
     <Compile Include="ViewModel\AlbumListingViewModel.cs" />
     <Compile Include="Interfaces\IMainWindowViewModel.cs" />
