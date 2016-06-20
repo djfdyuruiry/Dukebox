@@ -174,8 +174,6 @@
     <Compile Include="Model\SearchAreas.cs" />
     <Compile Include="Interfaces\IAudioFileMetaData.cs" />
     <Compile Include="Interfaces\IMusicLibrarySearchService.cs" />
-    <Compile Include="Interfaces\IMusicLibraryQueueService.cs" />
-    <Compile Include="Services\MusicLibraryQueueService.cs" />
     <Compile Include="Services\MusicLibrarySearchService.cs" />
     <Compile Include="Services\Track.cs" />
     <Compile Include="Model\Song.cs" />

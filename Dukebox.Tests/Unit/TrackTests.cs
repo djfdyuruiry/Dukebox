@@ -69,16 +69,6 @@ namespace Dukebox.Tests.Unit
             var signalEvent = new ManualResetEvent(false);
             var numChangesSaved = 0;
 
-            track.MetadataChangesSaved += (o, e) =>
-            {
-                if (numChangesSaved == 2)
-                {
-                    signalEvent.Set();
-                }
-
-                numChangesSaved++;
-            };
-
             track.Song.Title = newTitle;
             track.AlbumName = newAlbumName;
             track.ArtistName = newArtistName;
@@ -95,13 +85,12 @@ namespace Dukebox.Tests.Unit
         private Track BuildTrack(Song song)
         {
             var settings = A.Fake<IDukeboxSettings>();
-            var musicLibraryQueueService = A.Fake<IMusicLibraryQueueService>();
 
             A.CallTo(() => settings.TrackDisplayFormat).Returns("{artist} - {title}");
 
             var audioFileMetadataFactory = new AudioFileMetadataFactory(A.Fake<ICdMetadataService>(), A.Fake<IAudioCdService>());
 
-            return new Track(song, settings, musicLibraryQueueService, audioFileMetadataFactory);
+            return new Track(song, settings, audioFileMetadataFactory);
         }
     }
 }

@@ -10,9 +10,7 @@ namespace Dukebox.Library.Factories
     {
         private readonly IDukeboxSettings _settings;
         private readonly AudioFileMetadataFactory _audioFileMetadataFactory;
-
-        public IMusicLibraryQueueService MusicLibraryQueueService { get; set; }
-
+        
         public TrackFactory(IDukeboxSettings settings, AudioFileMetadataFactory audioFileMetadataFactory)
         {
             _settings = settings;
@@ -31,7 +29,7 @@ namespace Dukebox.Library.Factories
                 throw new ArgumentException("Cannot build track instance with a null song instance");
             }
 
-            return new Track(song, _settings, MusicLibraryQueueService, _audioFileMetadataFactory, audioFileMetadata);
+            return new Track(song, _settings, _audioFileMetadataFactory, audioFileMetadata);
         }
 
         public ITrack BuildTrackInstance(string fileName)

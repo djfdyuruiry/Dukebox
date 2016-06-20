@@ -156,7 +156,6 @@ namespace Dukebox.Library.Repositories
             _audioFileMetadataFactory = audioFileMetadataFactory;
 
             _trackFactory = trackFactory;
-            _trackFactory.MusicLibraryQueueService = new MusicLibraryQueueService(this);
 
             _searchService = new MusicLibrarySearchService(libraryDbContext, this, _trackFactory, _dbContextMutex);
 
@@ -261,7 +260,7 @@ namespace Dukebox.Library.Repositories
                 return;
             }
 
-            SaveDbChanges(false);
+            SaveDbChanges();
 
             AddAlbumArtToCache(albumsWithMetadata, concurrencyLimit);
             
@@ -515,7 +514,7 @@ namespace Dukebox.Library.Repositories
             return null;
         }
 
-        public async Task SaveDbChanges(bool reconcileDatabaseEdits)
+        public async Task SaveDbChanges()
         {
             try
             {

@@ -11,14 +11,9 @@ namespace Dukebox.Library.Services
     public class Track : ITrack
     {
         private readonly IDukeboxSettings _settings;
-        private readonly IMusicLibraryQueueService _musicLibraryQueueService;
         private readonly AudioFileMetadataFactory _audioFileMetadataFactory;
         
-        private readonly Artist _artist;
-
         private IAudioFileMetadata _metadata;
-        
-        public event EventHandler MetadataChangesSaved;
 
         public Song Song { get; private set; }
         
@@ -75,12 +70,12 @@ namespace Dukebox.Library.Services
             }
         }
 
-        public Track(Song song, IDukeboxSettings settings, IMusicLibraryQueueService musicLibraryQueueService, AudioFileMetadataFactory audioFileMetadataFactory) : 
-            this(song, settings, musicLibraryQueueService, audioFileMetadataFactory, null)
+        public Track(Song song, IDukeboxSettings settings, AudioFileMetadataFactory audioFileMetadataFactory) : 
+            this(song, settings, audioFileMetadataFactory, null)
         {            
         }
 
-        public Track(Song song, IDukeboxSettings settings, IMusicLibraryQueueService musicLibraryQueueService, AudioFileMetadataFactory audioFileMetadataFactory, IAudioFileMetadata audioFileMetadata)
+        public Track(Song song, IDukeboxSettings settings, AudioFileMetadataFactory audioFileMetadataFactory, IAudioFileMetadata audioFileMetadata)
         {
             if (song == null)
             {
@@ -88,7 +83,6 @@ namespace Dukebox.Library.Services
             }
 
             _settings = settings;
-            _musicLibraryQueueService = musicLibraryQueueService;
             _audioFileMetadataFactory = audioFileMetadataFactory;
 
             Song = song;
@@ -111,8 +105,16 @@ namespace Dukebox.Library.Services
                 Song.ArtistName = Metadata.Artist;
             }
         }
+        
 
-        private void SaveMetadataChanges()
+        public void CopyDetailsToAudioMetadata(IAudioFileMetadata metadata)
+        {
+            metadata.Album = Album.Name;
+            metadata.Artist = Artist.Name;
+            metadata.Title = Song.Title;
+        }
+
+        public void SyncMetadata(IMusicLibrary musicLibrayToUpdate)
         {
             if (Song.IsAudioCdTrack)
             {
@@ -124,17 +126,8 @@ namespace Dukebox.Library.Services
                 CopyDetailsToAudioMetadata(Metadata);
                 Metadata.SaveMetadataToFileTag();
 
-                _musicLibraryQueueService.QueueMusicLibrarySaveChanges();
-
-                MetadataChangesSaved?.Invoke(this, EventArgs.Empty);
+                musicLibrayToUpdate.SaveDbChanges();
             });
-        }
-
-        public void CopyDetailsToAudioMetadata(IAudioFileMetadata metadata)
-        {
-            metadata.Album = Album.Name;
-            metadata.Artist = Artist.Name;
-            metadata.Title = Song.Title;
         }
 
         public override string ToString()
