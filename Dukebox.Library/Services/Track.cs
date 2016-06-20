@@ -123,9 +123,7 @@ namespace Dukebox.Library.Services
 
             Task.Run(() =>
             {
-                CopyDetailsToAudioMetadata(Metadata);
-                Metadata.SaveMetadataToFileTag();
-
+                Metadata.SaveMetadataToFileTag(() => CopyDetailsToAudioMetadata(Metadata));
                 musicLibrayToUpdate.SaveDbChanges();
             });
         }

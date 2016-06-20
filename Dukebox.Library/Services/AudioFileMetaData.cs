@@ -155,8 +155,13 @@ namespace Dukebox.Library.Services
                 throw new Exception(string.Format("Error saving album art to temporary file from audio file at path '{0}'", AudioFilePath), ex);
             }
         }
-
+        
         public void SaveMetadataToFileTag()
+        {
+            SaveMetadataToFileTag(null);
+        }
+
+        public void SaveMetadataToFileTag(Action atomicUpdateAction)
         {
             try
             {
@@ -166,6 +171,8 @@ namespace Dukebox.Library.Services
                 }
 
                 _saveMetadataSemaphore.Wait();
+
+                atomicUpdateAction?.Invoke();
 
                 using (var fileStream = new FileStream(AudioFilePath, FileMode.Open))
                 {
