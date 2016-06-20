@@ -76,8 +76,7 @@ namespace Dukebox.Library.Services
 
             try
             {
-                var albumHash = album.Id;
-                var path = Path.Combine(_cachePath, albumHash);
+                var path = Path.Combine(_cachePath, albumId);
 
                 metadata.GetAlbumArt(i => { i.Save(path); });
 
@@ -95,9 +94,9 @@ namespace Dukebox.Library.Services
                 }
 
                 stopwatch.Stop();
-                logger.InfoFormat("Added album with id {0} into album art cache.", albumHash);
+                logger.InfoFormat("Added album with id {0} into album art cache.", albumId);
                 logger.DebugFormat("Adding album into album art cache took {0}ms. Album id: {1}",
-                    stopwatch.ElapsedMilliseconds, albumHash);
+                    stopwatch.ElapsedMilliseconds, albumId);
 
                 Task.Run(() => AlbumAdded?.Invoke(this, EventArgs.Empty));
             }
