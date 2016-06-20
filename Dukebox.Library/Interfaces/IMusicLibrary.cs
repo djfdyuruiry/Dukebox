@@ -24,21 +24,17 @@ namespace Dukebox.Library.Interfaces
         List<Playlist> OrderedPlaylists { get; }
         ObservableCollection<ITrack> RecentlyPlayed { get; }
         List<ITrack> RecentlyPlayedAsList { get; }
-        Album GetAlbumById(long? albumId);
         int GetAlbumCount();
-        Artist GetArtistById(long? artistId);
         int GetArtistCount();
         Playlist GetPlaylistById(long? playlistId);
         int GetPlaylistCount();
         Playlist GetPlaylistFromFile(string playlistFile);
-        List<ITrack> GetTracksForArtist(Artist artist);
-        List<ITrack> GetTracksForAlbum(Album album);
-        List<ITrack> GetTracksForArtist(long artistId);
-        List<ITrack> GetTracksForAlbum(long albumId);
+        List<ITrack> GetTracksForArtist(string artistName);
+        List<ITrack> GetTracksForAlbum(string albumName);
         List<ITrack> SearchForTracks(string searchTerm, List<SearchAreas> searchAreas);
         List<ITrack> SearchForTracksInArea(SearchAreas attribute, string nameOrTitle);
         List<ITrack> GetTracksByAttributeValue(SearchAreas attribute, string nameOrTitle);
-        List<ITrack> GetTracksByAttributeId(SearchAreas attribute, long attributeId);
+        List<ITrack> GetTracksByAttributeId(SearchAreas attribute, string attributeId);
         List<ITrack> GetTracksForDirectory(string directory, bool subDirectories);
         List<ITrack> GetTracksForPlaylist(Playlist playlist);
         Task<Song> AddFile(string filename);

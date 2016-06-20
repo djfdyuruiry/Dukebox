@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.IO;
@@ -11,49 +10,25 @@ namespace Dukebox.Library.Model
     [Table("songs")]
     public class Song
     {
-        private string _title;
         private string _extendedMetadataJson;
         private Dictionary<string, List<string>> _extendedMetadata;
-
-        public event EventHandler TitleUpdated;
+        private Artist _artist;
+        private Album _album;
 
         [Column("id")]
         public long Id { get; set; }
 
         [Required]
-        [StringLength(2147483647)]
         [Column("fileName")]
         public string FileName { get; set; }
 
         [Required]
-        [StringLength(2147483647)]
         [Column("title")]
-        public string Title
-        {
-            get
-            {
-                return _title;
-            }
-            set
-            {
-                var newTitle = _title == null || !_title.Equals(value, StringComparison.Ordinal);
+        public string Title { get; set; }
 
-                if (newTitle)
-                {
-                    _title = value;
-                    TitleUpdated?.Invoke(this, EventArgs.Empty);
-                }
-            }
-        }
-
+        [Required]
         [Column("lengthInSeconds")]
         public long LengthInSeconds { get; set; }
-
-        [Column("albumId")]
-        public long? AlbumId { get; set; }
-
-        [Column("artistId")]
-        public long? ArtistId { get; set; }
 
         [Column("extendedMetadataJson")]
         public virtual string ExtendedMetadataJson
@@ -71,13 +46,13 @@ namespace Dukebox.Library.Model
             }
         }
 
-        [ForeignKey("AlbumId")]
-        public virtual Album Album { get; set; }
+        [Required]
+        [Column("artistName")]
+        public virtual string ArtistName { get; set; }
 
-        [ForeignKey("ArtistId")]
-        public virtual Artist Artist { get; set; }
-
-        public ObservableCollection<KeyValuePair<string, List<string>>> ObservableExtendedMetadata { get; private set; }
+        [Required]
+        [Column("albumName")]
+        public virtual string AlbumName { get; set; }
 
         public Dictionary<string, List<string>> ExtendedMetadata
         {
@@ -94,6 +69,32 @@ namespace Dukebox.Library.Model
             {
                 _extendedMetadata = value;
                 ExtendedMetadataJson = JsonConvert.SerializeObject(_extendedMetadata);
+            }
+        }
+
+        public Artist Artist
+        {
+            get
+            {
+                if (_artist == null)
+                {
+                    _artist = new Artist(ArtistName);
+                }
+
+                return _artist;
+            }
+        }
+
+        public Album Album
+        {
+            get
+            {
+                if (_album == null)
+                {
+                    _album = new Album(AlbumName);
+                }
+
+                return _album;
             }
         }
 
@@ -114,10 +115,7 @@ namespace Dukebox.Library.Model
 
         public override string ToString()
         {
-            var displayTitle = string.IsNullOrEmpty(Title) ? "Unknown Title" : Title;
-            var displayArtist = string.IsNullOrEmpty(Artist?.Name) ? "Unknown Artist" : Artist?.Name;
-
-            return string.Format("{0} - {1}", displayArtist, displayTitle);
+            return string.Format("{0} - {1}", ArtistName, Title);
         }
     }
 }

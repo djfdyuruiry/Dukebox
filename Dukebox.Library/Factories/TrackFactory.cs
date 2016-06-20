@@ -8,8 +8,6 @@ namespace Dukebox.Library.Factories
 {
     public class TrackFactory
     {
-        public static event EventHandler TrackMetadataUpdated;
-
         private readonly IDukeboxSettings _settings;
         private readonly AudioFileMetadataFactory _audioFileMetadataFactory;
 
@@ -19,8 +17,6 @@ namespace Dukebox.Library.Factories
         {
             _settings = settings;
             _audioFileMetadataFactory = audioFileMetadataFactory;
-
-            Track.TrackMetadataUpdated += (o, e) => TrackMetadataUpdated?.Invoke(o, e); 
         }
 
         public ITrack BuildTrackInstance(Song song)
@@ -50,7 +46,7 @@ namespace Dukebox.Library.Factories
                 throw new ArgumentException("Cannot build track instance with a null or empty file name");
             }
 
-            var song = new Song() { Id = -1, AlbumId = -1, ArtistId = -1, FileName = fileName };
+            var song = new Song() { Id = -1, FileName = fileName };
 
             return BuildTrackInstance(song, audioFileMetadata);
         }

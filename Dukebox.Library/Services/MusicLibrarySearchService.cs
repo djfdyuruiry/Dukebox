@@ -7,7 +7,6 @@ using log4net;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
 using Dukebox.Library.Factories;
-using System.Data.Entity;
 
 namespace Dukebox.Library.Services
 {
@@ -54,55 +53,54 @@ namespace Dukebox.Library.Services
         /// <returns>A list of tracks that match the given search criteria.</returns>
         public List<ITrack> SearchForTracks(string searchTerm, List<SearchAreas> searchAreas)
         {
-            var stopwatch = Stopwatch.StartNew();
-            DbSet<Song> songs;
+            var matchingSongs = Enumerable.Empty<Song>();
+            Stopwatch stopwatch = null;
 
             try
             {
                 _dbContextMutex.Wait();
-                songs = _dukeboxData.Songs;
+
+                stopwatch = Stopwatch.StartNew();
+                var songs = _dukeboxData.Songs;
+
+                if (string.IsNullOrWhiteSpace(searchTerm))
+                {
+                    return songs.ToList().Select(s => _trackFactory.BuildTrackInstance(s)).ToList();
+                }
+
+                searchTerm = searchTerm.ToLower();
+                searchAreas = searchAreas ?? new List<SearchAreas>();
+
+                if (searchAreas.Contains(SearchAreas.All))
+                {
+                    AddSearchAreasToList(searchAreas);
+                }
+
+                if (searchAreas.Contains(SearchAreas.Album))
+                {
+                    var matchingAlbums = GetMatchingAttributeIds(SearchAreas.Album, searchTerm);
+                    matchingSongs = matchingSongs.Concat(songs.Where(s => matchingAlbums.Contains(s.AlbumName)));
+                }
+
+                if (searchAreas.Contains(SearchAreas.Artist))
+                {
+                    var matchingArtists = GetMatchingAttributeIds(SearchAreas.Artist, searchTerm);
+                    matchingSongs = matchingSongs.Concat(songs.Where(s => matchingArtists.Contains(s.ArtistName)));
+                }
+
+                if (searchAreas.Contains(SearchAreas.Song))
+                {
+                    matchingSongs = matchingSongs.Concat(songs.Where(s => s.Title.ToLower().Contains(searchTerm)));
+                }
+
+                if (searchAreas.Contains(SearchAreas.Filename))
+                {
+                    matchingSongs = matchingSongs.Concat(songs.Where(s => s.FileName.ToLower().Contains(searchTerm)));
+                }
             }
             finally
             {
                 _dbContextMutex.Release();
-            }
-
-
-            var matchingSongs = Enumerable.Empty<Song>();
-
-            if (string.IsNullOrWhiteSpace(searchTerm))
-            {
-                return songs.ToList().Select(s => _trackFactory.BuildTrackInstance(s)).ToList();
-            }
-
-            searchTerm = searchTerm.ToLower();
-            searchAreas = searchAreas ?? new List<SearchAreas>();
-
-            if (searchAreas.Contains(SearchAreas.All))
-            {
-                AddSearchAreasToList(searchAreas);
-            }
-
-            if (searchAreas.Contains(SearchAreas.Album))
-            {
-                var matchingAlbums = GetMatchingAttributeIds(SearchAreas.Album, searchTerm);
-                matchingSongs = matchingSongs.Concat(songs.Where(s => s.AlbumId.HasValue ? matchingAlbums.Contains(s.AlbumId.Value) : false));
-            }
-
-            if (searchAreas.Contains(SearchAreas.Artist))
-            {
-                var matchingArtists = GetMatchingAttributeIds(SearchAreas.Artist, searchTerm);
-                matchingSongs = matchingSongs.Concat(songs.Where(t => t.ArtistId.HasValue ? matchingArtists.Contains(t.ArtistId.Value) : false));
-            }
-
-            if (searchAreas.Contains(SearchAreas.Song))
-            {
-                matchingSongs = matchingSongs.Concat(songs.Where(s => s.Title.ToLower().Contains(searchTerm)));
-            }
-
-            if (searchAreas.Contains(SearchAreas.Filename))
-            {
-                matchingSongs = matchingSongs.Concat(songs.Where(s => s.FileName.ToLower().Contains(searchTerm)));
             }
 
 
@@ -121,43 +119,42 @@ namespace Dukebox.Library.Services
 
         public List<ITrack> GetTracksByAttributeValue(SearchAreas attribute, string attributeValue)
         {
-            var stopwatch = Stopwatch.StartNew();
-            DbSet<Song> songs;
+            var matchingSongs = Enumerable.Empty<Song>();
+            var lowerAttributeValue = attributeValue.ToLower();
+            Stopwatch stopwatch = null;
 
             try
             { 
                 _dbContextMutex.Wait();
-                songs = _dukeboxData.Songs;
+
+                stopwatch = Stopwatch.StartNew();
+                var songs = _dukeboxData.Songs;
+
+                if (attribute == SearchAreas.Album)
+                {
+                    var matchingAlbums = GetMatchingAttributeIds(SearchAreas.Album, lowerAttributeValue, true);
+                    matchingSongs = matchingSongs.Concat(songs.Where(s => matchingAlbums.Contains(s.AlbumName)));
+                }
+
+                if (attribute == SearchAreas.Artist)
+                {
+                    var matchingArtists = GetMatchingAttributeIds(SearchAreas.Artist, lowerAttributeValue, true);
+                    matchingSongs = matchingSongs.Concat(songs.Where(s => matchingArtists.Contains(s.ArtistName)));
+                }
+
+                if (attribute == SearchAreas.Song)
+                {
+                    matchingSongs = matchingSongs.Concat(songs.Where(s => s.Title.ToLower().Equals(lowerAttributeValue)));
+                }
+
+                if (attribute == SearchAreas.Filename)
+                {
+                    matchingSongs = matchingSongs.Concat(songs.Where(s => s.FileName.ToLower().Equals(lowerAttributeValue)));
+                }
             }
             finally
             {
                 _dbContextMutex.Release();
-            }
-
-            var matchingSongs = Enumerable.Empty<Song>();
-
-            var lowerAttributeValue = attributeValue.ToLower();
-
-            if (attribute == SearchAreas.Album)
-            {
-                var matchingAlbums = GetMatchingAttributeIds(SearchAreas.Album, lowerAttributeValue, true);
-                matchingSongs = matchingSongs.Concat(songs.Where(s => s.AlbumId.HasValue ? matchingAlbums.Contains(s.AlbumId.Value) : false));
-            }
-
-            if (attribute == SearchAreas.Artist)
-            {
-                var matchingArtists = GetMatchingAttributeIds(SearchAreas.Artist, lowerAttributeValue, true);
-                matchingSongs = matchingSongs.Concat(songs.Where(t => t.ArtistId.HasValue ? matchingArtists.Contains(t.ArtistId.Value) : false));
-            }
-
-            if (attribute == SearchAreas.Song)
-            {
-                matchingSongs = matchingSongs.Concat(songs.Where(s => s.Title.ToLower().Equals(lowerAttributeValue)));
-            }
-
-            if (attribute == SearchAreas.Filename)
-            {
-                matchingSongs = matchingSongs.Concat(songs.Where(s => s.FileName.ToLower().Equals(lowerAttributeValue)));
             }
 
             stopwatch.Stop();
@@ -167,32 +164,32 @@ namespace Dukebox.Library.Services
             return matchingSongs.Count() < 1 ? new List<ITrack>() : matchingSongs.ToList().Select(s => _trackFactory.BuildTrackInstance(s)).ToList();
         }
 
-        private IEnumerable<long> GetMatchingAttributeIds(SearchAreas attribute, string searchTerm, bool exactMatch = false)
+        private IEnumerable<string> GetMatchingAttributeIds(SearchAreas attribute, string searchTerm, bool exactMatch = false)
         {
             if (attribute == SearchAreas.Album)
             {
                 if (exactMatch)
                 {
-                    return _musicLibrary.OrderedAlbums.Where(a => a.ToString().ToLower().Equals(searchTerm)).Select(a => a.Id);
+                    return _musicLibrary.OrderedAlbums.Where(a => a.Name.ToLower().Equals(searchTerm)).Select(a => a.Name);
                 }
                 else
                 {
-                    return _musicLibrary.OrderedAlbums.Where(a => a.ToString().ToLower().Contains(searchTerm)).Select(a => a.Id);
+                    return _musicLibrary.OrderedAlbums.Where(a => a.Name.ToLower().Contains(searchTerm)).Select(a => a.Name);
                 }
             }
             else if (attribute == SearchAreas.Artist)
             {
                 if (exactMatch)
                 {
-                    return _musicLibrary.OrderedArtists.Where(a => a.ToString().ToLower().Equals(searchTerm)).Select(a => a.Id);
+                    return _musicLibrary.OrderedArtists.Where(a => a.Name.ToLower().Equals(searchTerm)).Select(a => a.Name);
                 }
                 else
                 {
-                    return _musicLibrary.OrderedArtists.Where(a => a.ToString().ToLower().Contains(searchTerm)).Select(a => a.Id);
+                    return _musicLibrary.OrderedArtists.Where(a => a.Name.ToLower().Contains(searchTerm)).Select(a => a.Name);
                 }
             }
 
-            return Enumerable.Empty<long>();
+            return Enumerable.Empty<string>();
         }
 
         /// <summary>
@@ -202,51 +199,52 @@ namespace Dukebox.Library.Services
         /// <param name="attribute">The attribute type to select.</param>
         /// <param name="attributeId">The id of the attribute.</param>
         /// <returns>A list of tracks that match the given attribute keypair.</returns>
-        public List<ITrack> GetTracksByAttributeId(SearchAreas attribute, long attributeId)
+        public List<ITrack> GetTracksByAttributeId(SearchAreas attribute, string attributeId)
         {
-            var stopwatch = Stopwatch.StartNew();
+            Stopwatch stopwatch = null;
             var searchAreas = new List<SearchAreas>();
-            DbSet<Song> songs;
+
+            var matchingSongs = Enumerable.Empty<Song>();
 
             try
             { 
                 _dbContextMutex.Wait();
-                songs = _dukeboxData.Songs;
+
+                stopwatch = Stopwatch.StartNew();
+                var songs = _dukeboxData.Songs;
+
+                if (attribute == SearchAreas.Filename)
+                {
+                    throw new InvalidOperationException("The filename search attribute is not supported when looking up tracks by attribute id");
+                }
+
+                if (attribute == SearchAreas.All)
+                {
+                    AddSearchAreasToList(searchAreas);
+                }
+                else
+                {
+                    searchAreas.Add(attribute);
+                }
+
+                if (searchAreas.Contains(SearchAreas.Album))
+                {
+                    matchingSongs = matchingSongs.Concat(songs.Where(s => s.AlbumName == attributeId));
+                }
+
+                if (searchAreas.Contains(SearchAreas.Artist))
+                {
+                    matchingSongs = matchingSongs.Concat(songs.Where(s => s.ArtistName == attributeId));
+                }
+
+                if (searchAreas.Contains(SearchAreas.Song))
+                {
+                    matchingSongs = matchingSongs.Concat(songs.Where(s => s.Id.ToString() == attributeId));
+                }
             }
             finally
             {
                 _dbContextMutex.Release();
-            }
-
-            var matchingSongs = Enumerable.Empty<Song>();
-
-            if (attribute == SearchAreas.Filename)
-            {
-                throw new InvalidOperationException("The filename search attribute is not supported when looking up tracks by attribute id");
-            }
-
-            if (attribute == SearchAreas.All)
-            {
-                AddSearchAreasToList(searchAreas);
-            }
-            else
-            {
-                searchAreas.Add(attribute);
-            }
-
-            if (searchAreas.Contains(SearchAreas.Album))
-            {
-                matchingSongs = matchingSongs.Concat(songs.Where(s => s.AlbumId != null ? s.AlbumId == attributeId : false));
-            }
-
-            if (searchAreas.Contains(SearchAreas.Artist))
-            {
-                matchingSongs = matchingSongs.Concat(songs.Where(s => s.ArtistId != null ? s.ArtistId == attributeId : false));
-            }
-
-            if (searchAreas.Contains(SearchAreas.Song))
-            {
-                matchingSongs = matchingSongs.Concat(songs.Where(s => s.Id == attributeId));
             }
 
             stopwatch.Stop();

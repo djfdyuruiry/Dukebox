@@ -87,11 +87,11 @@ namespace Dukebox.Desktop.ViewModel
             {
                 if (nm.IsArtist)
                 {
-                    Tracks = _musicLibrary.GetTracksForArtist(nm.Id);
+                    Tracks = _musicLibrary.GetTracksForArtist(nm.Name);
                 }
                 else
                 {
-                    Tracks = _musicLibrary.GetTracksForAlbum(nm.Id);
+                    Tracks = _musicLibrary.GetTracksForAlbum(nm.Name);
                 }
             });
         }

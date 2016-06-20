@@ -1,10 +1,9 @@
 ﻿using System;
-using System.ComponentModel;
 using Dukebox.Library.Model;
 
 namespace Dukebox.Library.Interfaces
 {
-    public interface ITrack : INotifyPropertyChanged
+    public interface ITrack
     {
         event EventHandler MetadataChangesSaved;
         Album Album { get; }

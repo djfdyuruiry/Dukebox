@@ -138,6 +138,7 @@
   <ItemGroup>
     <Compile Include="Factories\AudioFileMetadataFactory.cs" />
     <Compile Include="Factories\TrackFactory.cs" />
+    <Compile Include="Helper\Md5HashGenerator.cs" />
     <Compile Include="Model\Album.cs" />
     <Compile Include="Model\Artist.cs" />
     <Compile Include="Helper\DukeboxInitialisationHelper.cs" />

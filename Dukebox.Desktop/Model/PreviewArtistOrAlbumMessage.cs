@@ -2,7 +2,7 @@
 {
     public class PreviewArtistOrAlbumMessage
     {
-        public long Id { get; set; }
+        public string Name { get; set; }
         public bool IsArtist { get; set; }
         public bool IsAlbum { get; set; }
     }

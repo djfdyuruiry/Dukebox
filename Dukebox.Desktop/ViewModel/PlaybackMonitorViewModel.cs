@@ -165,7 +165,8 @@ namespace Dukebox.Desktop.ViewModel
             _mediaPlayer.TrackResumed += (o, e) => PlayPauseImage = ImageResources.PauseImage;
 
             // reflect metadata changes in UI
-            TrackFactory.TrackMetadataUpdated += (o, e) => UpdateTrackDisplay(o as ITrack);
+            // TODO: replace with message handler
+            //TrackFactory.TrackMetadataUpdated += (o, e) => UpdateTrackDisplay(o as ITrack);
         }
 
         private void SetupPlaybackControlCommands()
@@ -233,13 +234,13 @@ namespace Dukebox.Desktop.ViewModel
 
         private void LoadNewTrackAlbumArtIfPresent(NewTrackLoadedEventArgs newTrackArgs)
         {
-            var albumId = newTrackArgs.Track.Album?.Id;
+            var albumId = newTrackArgs.Track.Album.Id;
             
             try
             {
-                if (albumId.HasValue && _albumArtCache.CheckCacheForAlbum(albumId.Value))
+                if (_albumArtCache.CheckCacheForAlbum(albumId))
                 {
-                    var albumArtCachedImagePath = _albumArtCache.GetAlbumArtPathFromCache(albumId.Value);
+                    var albumArtCachedImagePath = _albumArtCache.GetAlbumArtPathFromCache(albumId);
                     UpdateAlbumArt(albumArtCachedImagePath);
 
                     return;
