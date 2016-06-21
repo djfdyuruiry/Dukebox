@@ -1,14 +1,15 @@
-﻿using System.Data.Entity;
-using Dukebox.Library.Model;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Data.Entity;
 using System.Data.Entity.Validation;
+using System.Threading.Tasks;
+using Dukebox.Library.Model;
 
 namespace Dukebox.Library.Interfaces
 {
     public interface IMusicLibraryDbContext
     {
-        DbSet<Album> Albums { get; set; }
-        DbSet<Artist> Artists { get; set; }
+        List<Album> Albums { get; }
+        List<Artist> Artists { get; }
         DbSet<Playlist> Playlists { get; set; }
         DbSet<Song> Songs { get; set; }
         int SaveChanges();

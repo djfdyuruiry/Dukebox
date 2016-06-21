@@ -17,8 +17,7 @@ namespace Dukebox.Desktop.ViewModel
         private readonly IMusicLibrary _musicLibrary;
         private readonly IAudioPlaylist _audioPlaylist;
         private readonly ListSearchHelper<Services.Album> _listSearchHelper;
-
-        private List<Services.Album> _albums;
+        
         private string _searchText;
 
         public string SearchText
@@ -51,8 +50,7 @@ namespace Dukebox.Desktop.ViewModel
             }
             private set
             {
-                _albums = value;
-                _listSearchHelper.Items = _albums;
+                _listSearchHelper.Items = value;
                 SearchText = string.Empty;
 
                 OnPropertyChanged("Albums");
@@ -91,7 +89,7 @@ namespace Dukebox.Desktop.ViewModel
 
         private void DoLoadAlbum(Album album)
         {
-            var tracks = _musicLibrary.GetTracksForAlbum((LibraryAlbum)album.Data);
+            var tracks = _musicLibrary.GetTracksForAlbum((album.Data as LibraryAlbum).Name);
             _audioPlaylist.LoadPlaylistFromList(tracks);
 
             SendNotificationMessage(NotificationMessages.AudioPlaylistLoadedNewTracks);

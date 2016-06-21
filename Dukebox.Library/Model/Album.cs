@@ -1,57 +1,21 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Threading.Tasks;
+using Dukebox.Library.Helper;
 
 namespace Dukebox.Library.Model
 {
-    [Table("albums")]
     public class Album
     {
-        private string _name;
-
-        public event EventHandler NameUpdated;
-
-        public Album()
-        {
-            Songs = new HashSet<Song>();
-        }
-
-        [Column("id")]
-        public long Id { get; set; }
-
-        [Required]
-        [StringLength(2147483647)]
-        [Column("name")]
-        public string Name
+        public string Name { get; private set; }
+        public string Id
         {
             get
             {
-                return _name;
-            }
-            set
-            {
-                var newTitle = _name != value;
-                _name = value;
-
-                if (newTitle)
-                {
-                    NameUpdated?.Invoke(this, EventArgs.Empty);
-                }
+                return Md5HashGenerator.GenerateMd5Hash(Name);
             }
         }
 
-        [Column("hasAlbumArt")]
-        public int HasAlbumArtBit { get; set; }
-
-        public virtual ICollection<Song> Songs { get; set; }
-        public bool HasAlbumArt
+        public Album (string name)
         {
-            get
-            {
-                return HasAlbumArtBit == 0 ? false : true;
-            }
+            Name = string.IsNullOrEmpty(name) ? "Unknown Album" : name;
         }
 
         public override string ToString()

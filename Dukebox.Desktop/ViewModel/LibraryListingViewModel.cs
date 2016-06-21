@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Input;
+using System.Windows;
 using GalaSoft.MvvmLight.Command;
 using Dukebox.Desktop.Interfaces;
 using Dukebox.Desktop.Model;
+using Dukebox.Desktop.Services;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
-using System.Windows;
 
 namespace Dukebox.Desktop.ViewModel
 {
@@ -33,23 +35,18 @@ namespace Dukebox.Desktop.ViewModel
                 OnPropertyChanged("SearchText");
             }
         }
-        public List<ITrack> Tracks 
+        public List<TrackWrapper> Tracks 
         { 
             get 
             {
-                return _tracks;
-            }
-            private set
-            {
-                _tracks = value;
-                OnPropertyChanged("Tracks");
+                return _tracks.Select(t => new TrackWrapper(_musicLibrary, t)).ToList();
             }
         }
         public bool EditingListingsDisabled
         {
             get
             { 
-                return false; 
+                return true; 
             }
         }
         public bool SearchEnabled
@@ -100,7 +97,8 @@ namespace Dukebox.Desktop.ViewModel
 
         private void DoSearch()
         {
-            Tracks = _musicLibrary.SearchForTracksInArea(SearchAreas.All, SearchText);
+            _tracks = _musicLibrary.SearchForTracksInArea(SearchAreas.All, SearchText);
+            OnPropertyChanged("Tracks");
         }
     }
 }

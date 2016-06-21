@@ -199,7 +199,7 @@ namespace Dukebox.Library.Factories
             try
             {
                 var artwork = tag.Pictures;
-                hasAlbumArt = artwork?[0] != null;
+                hasAlbumArt = artwork.Any();
             }
             catch (Exception ex)
             {

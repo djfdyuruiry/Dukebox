@@ -1,7 +1,5 @@
-﻿using Dukebox.Library.Model;
-using Dukebox.Library.Services;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Dukebox.Library.Model;
 
 namespace Dukebox.Library.Interfaces
 {

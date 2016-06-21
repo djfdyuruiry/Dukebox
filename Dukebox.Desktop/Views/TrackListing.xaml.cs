@@ -1,18 +1,7 @@
-﻿using Dukebox.Desktop.Interfaces;
-using Dukebox.Library.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
+﻿using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using Dukebox.Desktop.Interfaces;
+using Dukebox.Desktop.Services;
 
 namespace Dukebox.Desktop.Views
 {
@@ -31,10 +20,10 @@ namespace Dukebox.Desktop.Views
 
             if (row != null)
             {
-                var item = row.Item;
+                var item = row.Item as TrackWrapper;
                 var trackListingViewModel = DataContext as ITrackListingViewModel;
 
-                trackListingViewModel?.LoadTrack?.Execute(item);
+                trackListingViewModel?.LoadTrack?.Execute(item.Data);
             }
         }
     }

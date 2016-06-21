@@ -16,20 +16,20 @@ namespace Dukebox.Tests.Utils
 
         public readonly List<Album> Albums = new List<Album>
         {
-            new Album { HasAlbumArtBit = 0, Id = 0, Name = "jupiter" },
-            new Album { HasAlbumArtBit = 1, Id = 1, Name = "neptune" },
-            new Album { HasAlbumArtBit = 0, Id = 2, Name = "andromeda" },
-            new Album { HasAlbumArtBit = 1, Id = 3, Name = "uranus" },
-            new Album { HasAlbumArtBit = 0, Id = 4, Name = "mars" }
+            new Album("jupiter"),
+            new Album("neptune"),
+            new Album("andromeda"),
+            new Album("uranus"),
+            new Album("mars")
         };
 
         public readonly List<Artist> Artists = new List<Artist>
         {
-            new Artist { Id = 0, Name = "spike" },
-            new Artist { Id = 1, Name = "buzz" },
-            new Artist { Id = 2, Name = "specter" },
-            new Artist { Id = 3, Name = "professor" },
-            new Artist { Id = 4, Name = "katy" }
+            new Artist("spike"),
+            new Artist("buzz"),
+            new Artist("specter"),
+            new Artist("professor"),
+            new Artist("katy")
         };
 
         public readonly List<Playlist> Playlists = new List<Playlist>
@@ -63,8 +63,8 @@ namespace Dukebox.Tests.Utils
                         FileName = Mp3FilePath,
                         Title = "wish you were here",
                         LengthInSeconds = 120,
-                        AlbumId = album.Id,
-                        ArtistId = artist.Id
+                        AlbumName = album.Name,
+                        ArtistName = artist.Name
                     });
 
                     songId++;
@@ -76,17 +76,8 @@ namespace Dukebox.Tests.Utils
 
         private void WireUpMockData()
         {
-            var albums = A.Fake<DbSet<Album>>(o => o.Implements(typeof(IQueryable<Album>))
-                .Implements(typeof(IDbAsyncEnumerable<Album>)))
-                .SetupData(Albums);
-
-            A.CallTo(() => DbContextMock.Albums).Returns(albums);
-
-            var artists = A.Fake<DbSet<Artist>>(o => o.Implements(typeof(IQueryable<Artist>))
-                .Implements(typeof(IDbAsyncEnumerable<Artist>)))
-                .SetupData(Artists);
-
-            A.CallTo(() => DbContextMock.Artists).Returns(artists);
+            A.CallTo(() => DbContextMock.Albums).Returns(Albums);
+            A.CallTo(() => DbContextMock.Artists).Returns(Artists);
 
             var playlists = A.Fake<DbSet<Playlist>>(o => o.Implements(typeof(IQueryable<Playlist>))
                             .Implements(typeof(IDbAsyncEnumerable<Playlist>)))

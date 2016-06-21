@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.Validation;
 using System.Diagnostics;
@@ -5,6 +6,7 @@ using log4net;
 using Newtonsoft.Json;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
+using System.Linq;
 
 namespace Dukebox.Library.Repositories
 {
@@ -21,8 +23,22 @@ namespace Dukebox.Library.Repositories
             Database.Log = (s) => Debug.WriteLine(s);
         }
 
-        public virtual DbSet<Album> Albums { get; set; }
-        public virtual DbSet<Artist> Artists { get; set; }
+        public List<Album> Albums
+        {
+            get
+            {
+                return Songs.Select(s => s.AlbumName).Distinct().ToList().Select(a => new Album(a)).ToList();
+            }
+        }
+        
+        public List<Artist> Artists
+        {
+            get
+            {
+                return Songs.Select(s => s.ArtistName).Distinct().ToList().Select(a => new Artist(a)).ToList();
+            }
+        }
+
         public virtual DbSet<Playlist> Playlists { get; set; }
         public virtual DbSet<Song> Songs { get; set; }
 

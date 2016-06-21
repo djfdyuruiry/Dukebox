@@ -156,7 +156,6 @@ namespace Dukebox.Library.Repositories
             _audioFileMetadataFactory = audioFileMetadataFactory;
 
             _trackFactory = trackFactory;
-            _trackFactory.MusicLibraryQueueService = new MusicLibraryQueueService(this);
 
             _searchService = new MusicLibrarySearchService(libraryDbContext, this, _trackFactory, _dbContextMutex);
 
@@ -262,7 +261,6 @@ namespace Dukebox.Library.Repositories
             }
 
             SaveDbChanges();
-            RefreshCaches();
 
             AddAlbumArtToCache(albumsWithMetadata, concurrencyLimit);
             
@@ -331,7 +329,7 @@ namespace Dukebox.Library.Repositories
         {
             albumsWithMetadata = albumsWithMetadata
                 .Where(at => at.Item1 != null && (at.Item2?.HasAlbumArt).HasValue && (at.Item2?.HasAlbumArt).Value)
-                .GroupBy(at => at.Item1.Id)
+                .GroupBy(at => at.Item1.Name)
                 .Select(g => g.First())
                 .ToList();
 
@@ -371,12 +369,60 @@ namespace Dukebox.Library.Repositories
             {
                 metadata = _audioFileMetadataFactory.BuildAudioFileMetadataInstance(filename);
             }
-
-            var artist = await GetArtistForTag(metadata);
-            var album = await GetAlbumForTag(metadata);
-            var newSong = await BuildSongFromMetadata(filename, metadata, artist, album);
+            
+            var newSong = await BuildSongFromMetadata(filename, metadata);
 
             return newSong;
+        }
+        
+        private async Task<Song> BuildSongFromMetadata(string filename, IAudioFileMetadata metadata)
+        {
+            try
+            {
+                await _dbContextMutex.WaitAsync();
+                var existingSongFile = _allFilesCache.FirstOrDefault(f => f.Equals(filename, StringComparison.CurrentCulture));
+
+                if (existingSongFile != null)
+                {
+                    var existingSong = _dukeboxData.Songs.FirstOrDefault(s => s.FileName.Equals(existingSongFile, StringComparison.CurrentCulture));
+
+                    logger.WarnFormat("Not adding song from file '{0}' as a song with that filename already exists in the database", filename);
+                    return existingSong;
+                }
+
+                var extendedMetadataJson = JsonConvert.SerializeObject(metadata.ExtendedMetadata);
+                var newSong = new Song()
+                {
+                    FileName = filename, 
+                    Title = metadata.Title,
+                    ArtistName = metadata.Artist,
+                    AlbumName = metadata.Album,
+                    ExtendedMetadataJson = extendedMetadataJson,
+                    LengthInSeconds = metadata.Length
+                };
+            
+                logger.DebugFormat("Title for file '{0}': {1} [artist = '{2}', album = '{3}']", 
+                    newSong.FileName, newSong.Title, newSong.Artist, newSong.Album);
+            
+                if(string.IsNullOrEmpty(newSong.Title))
+                {
+                    var errMsg = string.Format("Title for file '{0}' is null or empty", filename);
+
+                    logger.Error(errMsg);
+                    throw new InvalidDataException(errMsg);
+                }
+                    
+                _dukeboxData.Songs.Add(newSong);
+                _allFilesCache.Add(filename);
+
+                logger.InfoFormat("New song: {0}.", filename);
+
+                return newSong;
+            }
+            finally
+            {
+                _dbContextMutex.Release();
+            }
         }
 
         /// <summary>
@@ -409,121 +455,6 @@ namespace Dukebox.Library.Repositories
                 var filesAdded = addFilesTasks.Select(t => t.Result).Where(s => s != null).Select(s => _trackFactory.BuildTrackInstance(s)).ToList();
                 return filesAdded;
             });
-        }
-        
-        private async Task<Artist> GetArtistForTag(IAudioFileMetadata tag)
-        {
-            if (string.IsNullOrWhiteSpace(tag.Artist))
-            {
-                return null;
-            }
-
-            try
-            {
-                await _dbContextMutex.WaitAsync();
-                var existingArtist = OrderedArtists.FirstOrDefault(a => a.Name.Equals(tag.Artist, StringComparison.CurrentCulture));
-
-                if (existingArtist != null)
-                {
-                    logger.WarnFormat("Not adding artist with name '{0}' as an artist with the same name already exists in the database", tag.Artist);
-                    return existingArtist;
-                }
-
-                var newArtist = new Artist() { Name = tag.Artist };
-
-                logger.DebugFormat("New artist: {0}", newArtist.Name);
-
-                _dukeboxData.Artists.Add(newArtist);
-                _allArtistsCache.Add(newArtist);
-
-                return newArtist;
-            }
-            finally
-            {
-                _dbContextMutex.Release();
-            }
-        }
-
-        private async Task<Album> GetAlbumForTag(IAudioFileMetadata tag)
-        {
-            if (string.IsNullOrWhiteSpace(tag.Album))
-            {
-                return null;
-            }
-
-            try
-            {
-                await _dbContextMutex.WaitAsync();
-                var existingAlbum = OrderedAlbums.FirstOrDefault(a => a.Name.Equals(tag.Album, StringComparison.CurrentCulture));
-
-                if (existingAlbum != null)
-                {
-                    logger.WarnFormat("Not adding album with name '{0}' as another album with the same name already exists in the database", tag.Album);
-                    return existingAlbum;
-                }
-
-                var newAlbum = new Album() { Name = tag.Album, HasAlbumArtBit = tag.HasAlbumArt ? 1 : 0 };
-
-                logger.DebugFormat("New album: {0}", newAlbum.Name);
-
-                _dukeboxData.Albums.Add(newAlbum);
-                _allAlbumsCache.Add(newAlbum);
-
-                return newAlbum;
-            }
-            finally
-            {
-                _dbContextMutex.Release();
-            }
-        }
-        
-        private async Task<Song> BuildSongFromMetadata(string filename, IAudioFileMetadata metadata, Artist artistObj, Album albumObj)
-        {
-            try
-            {
-                await _dbContextMutex.WaitAsync();
-                var existingSongFile = _allFilesCache.FirstOrDefault(f => f.Equals(filename, StringComparison.CurrentCulture));
-
-                if (existingSongFile != null)
-                {
-                    var existingSong = _dukeboxData.Songs.FirstOrDefault(s => s.FileName.Equals(existingSongFile, StringComparison.CurrentCulture));
-
-                    logger.WarnFormat("Not adding song from file '{0}' as a song with that filename already exists in the database", filename);
-                    return existingSong;
-                }
-
-                var extendedMetadataJson = JsonConvert.SerializeObject(metadata.ExtendedMetadata);
-                var newSong = new Song()
-                {
-                    FileName = filename, 
-                    Title = metadata.Title,
-                    Album = albumObj,
-                    Artist = artistObj,
-                    ExtendedMetadataJson = extendedMetadataJson,
-                    LengthInSeconds = metadata.Length
-                };
-            
-                logger.DebugFormat("Title for file '{0}': {1}", newSong.FileName, newSong.Title);
-            
-                if(string.IsNullOrEmpty(newSong.Title))
-                {
-                    var errMsg = string.Format("Title for file '{0}' is null or empty", filename);
-
-                    logger.Error(errMsg);
-                    throw new InvalidDataException(errMsg);
-                }
-                    
-                _dukeboxData.Songs.Add(newSong);
-                _allFilesCache.Add(filename);
-
-                logger.InfoFormat("New song: {0}.", filename);
-
-                return newSong;
-            }
-            finally
-            {
-                _dbContextMutex.Release();
-            }
         }
 
         public async Task<Playlist> AddPlaylist(string name, IEnumerable<string> filenames)
@@ -605,6 +536,8 @@ namespace Dukebox.Library.Repositories
             {
                 _dbContextMutex.Release();
             }
+
+            RefreshCaches();
         }
 
         public async Task RemoveTrack (ITrack track)
@@ -665,80 +598,50 @@ namespace Dukebox.Library.Repositories
 
         #region Library Lookups
         
-        public List<ITrack> GetTracksForArtist(Artist artist)
+        public List<ITrack> GetTracksForArtist(string artistName)
         {
-            return artist?.Songs?.Select(s => _trackFactory.BuildTrackInstance(s)).ToList() ?? new List<ITrack>();
-        }
-
-        public List<ITrack> GetTracksForAlbum(Album album)
-        {
-            return album?.Songs?.Select(s => _trackFactory.BuildTrackInstance(s)).ToList() ?? new List<ITrack>();
-        }
-
-        public List<ITrack> GetTracksForArtist(long artistId)
-        {
-            var artist = OrderedArtists.FirstOrDefault(a => a.Id == artistId);
-
-            if (artist == null)
+            try
             {
-                throw new Exception(string.Format("Artist with ID {0} cannot be found in the database", artistId));
-            }
+                _dbContextMutex.Wait();
 
-            return GetTracksForArtist(artist);
+                return _dukeboxData.Songs
+                    .Where(s => s.ArtistName == artistName)
+                    .ToList()
+                    .Select(s => _trackFactory.BuildTrackInstance(s))
+                    .ToList();
+            }
+            finally
+            {
+                _dbContextMutex.Release();
+            }
         }
 
-        public List<ITrack> GetTracksForAlbum(long albumId)
+        public List<ITrack> GetTracksForAlbum(string albumName)
         {
-            var album = OrderedAlbums.First(a => a.Id == albumId);
-
-            if (album == null)
+            try
             {
-                throw new Exception(string.Format("Album with ID {0} cannot be found in the database", albumId));
+                _dbContextMutex.Wait();
+
+                return _dukeboxData.Songs
+                    .Where(s => s.AlbumName == albumName)
+                    .ToList()
+                    .Select(s => _trackFactory.BuildTrackInstance(s))
+                    .ToList();
             }
-
-            return GetTracksForAlbum(album);
-        }
-
-        public Artist GetArtistById(long? artistId)
-        {
-            var stopwatch = Stopwatch.StartNew();
-            var artist = _dukeboxData.Artists.Where(a => a.Id == artistId).FirstOrDefault();
-
-            stopwatch.Stop();
-
-            if (artist == null)
+            finally
             {
-                throw new Exception(string.Format("No artist with the id '{0}' was found in the database.", artistId));
+                _dbContextMutex.Release();
             }
-
-            logger.DebugFormat("Look up for artist with id '{0}' took {1}ms.", artistId, stopwatch.ElapsedMilliseconds);
-            return artist;
         }
 
         public int GetArtistCount()
         {
-            return _dukeboxData.Artists.Count();
-        }
-
-        public Album GetAlbumById(long? albumId)
-        {
-            var stopwatch = Stopwatch.StartNew();
-            var album = _dukeboxData.Albums.Where(a => a.Id == albumId).FirstOrDefault();
-
-            stopwatch.Stop();
-
-            if (album == null)
-            {
-                throw new Exception(string.Format("No album with the id '{0}' was found in the database.", albumId));
-            }
-
-            logger.DebugFormat("Look up for album with id '{0}' took {1}ms.", albumId, stopwatch.ElapsedMilliseconds);
-            return album;
+            return OrderedArtists.Count;
         }
 
         public int GetAlbumCount()
         {
-            return _dukeboxData.Albums.Count();
+            return OrderedAlbums.Count;
         }
 
         public Playlist GetPlaylistById(long? playlistId)
@@ -759,7 +662,16 @@ namespace Dukebox.Library.Repositories
 
         public int GetPlaylistCount()
         {
-            return _dukeboxData.Playlists.Count();
+            try
+            {
+                _dbContextMutex.Wait();
+
+                return _dukeboxData.Playlists.Count();
+            }
+            finally
+            {
+                _dbContextMutex.Release();
+            }
         }
 
         #endregion
@@ -780,7 +692,7 @@ namespace Dukebox.Library.Repositories
         {
             return _searchService.GetTracksByAttributeValue(attribute, attributeValue);
         }
-        public List<ITrack> GetTracksByAttributeId(SearchAreas attribute, long attributeId)
+        public List<ITrack> GetTracksByAttributeId(SearchAreas attribute, string attributeId)
         {
             return _searchService.GetTracksByAttributeId(attribute, attributeId);
         }

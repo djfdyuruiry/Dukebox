@@ -1,35 +1,29 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Windows.Input;
+using System.Windows;
 using GalaSoft.MvvmLight.Command;
 using Dukebox.Desktop.Helper;
 using Dukebox.Desktop.Interfaces;
+using Dukebox.Desktop.Services;
 using Dukebox.Library.Interfaces;
-using System.Windows;
-using System.Globalization;
 
 namespace Dukebox.Desktop.ViewModel
 {
     public class CurrentlyPlayingListingViewModel : ViewModelBase, ITrackListingViewModel, ISearchControlViewModel
     {
         private readonly IAudioPlaylist _audioPlaylist;
+        private readonly IMusicLibrary _musicLibrary;
         
-        private List<ITrack> _tracks;
         private string _searchText;
         private readonly ListSearchHelper<ITrack> _listSearchHelper;
 
-        public List<ITrack> Tracks
+        public List<TrackWrapper> Tracks
         {
             get
             {
-                return _listSearchHelper.FilteredItems;
-            }
-            private set
-            {
-                _tracks = value;
-
-                _listSearchHelper.Items = _tracks;
-                OnPropertyChanged("Tracks");
+                return _listSearchHelper.FilteredItems.Select(t => new TrackWrapper(_musicLibrary, t)).ToList();
             }
         }
 
@@ -61,7 +55,7 @@ namespace Dukebox.Desktop.ViewModel
         {
             get
             {
-                return false;
+                return true;
             }
         }
 
@@ -77,9 +71,10 @@ namespace Dukebox.Desktop.ViewModel
 
         public ICommand LoadTrack { get; private set; }
 
-        public CurrentlyPlayingListingViewModel(IAudioPlaylist audioPlaylist) : base()
+        public CurrentlyPlayingListingViewModel(IAudioPlaylist audioPlaylist, IMusicLibrary musicLibrary) : base()
         {
             _audioPlaylist = audioPlaylist;
+            _musicLibrary = musicLibrary;
             _listSearchHelper = new ListSearchHelper<ITrack>
             {
                 FilterLambda = (t, s) => t.ToString().ToLower(CultureInfo.InvariantCulture)
@@ -96,7 +91,8 @@ namespace Dukebox.Desktop.ViewModel
 
         private void RefreshTracks()
         {
-            Tracks = _audioPlaylist.Tracks.ToList();
+            _listSearchHelper.Items = _audioPlaylist.Tracks.ToList();
+            OnPropertyChanged("Tracks");
         }
 
         private void DoLoadTrack(ITrack track)

@@ -1,13 +1,4 @@
-﻿using Dukebox.Desktop.Helper;
-using Dukebox.Desktop.Interfaces;
-using Dukebox.Library;
-using GalaSoft.MvvmLight.Ioc;
-using SimpleInjector;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
+﻿using Dukebox.Desktop.Interfaces;
 
 namespace Dukebox.Desktop.ViewModel
 {

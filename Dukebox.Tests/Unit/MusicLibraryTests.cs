@@ -56,15 +56,19 @@ namespace Dukebox.Tests.Unit
 
             Assert.True(albumCountCorrect, "Album count returned was incorrect");
 
-            var albumIdsReturned = new List<long>();
+            var albumsReturned = new List<string>();
             Exception fetchByIdException = null;
 
             try
             {
                 _mockDataLoader.Albums.ForEach(a =>
                 {
-                    var album = _musicLibrary.GetAlbumById(a.Id);
-                    albumIdsReturned.Add(album.Id);
+                    var album = _musicLibrary.OrderedAlbums.FirstOrDefault(la => la.Name.Equals(a.Name));
+
+                    if (album != null)
+                    {
+                        albumsReturned.Add(album.Name);
+                    }
                 });
             }
             catch (Exception ex)
@@ -74,12 +78,12 @@ namespace Dukebox.Tests.Unit
 
             Assert.Null(fetchByIdException);
 
-            albumIdsReturned.Sort();
+            albumsReturned.Sort();
 
-            var mockAlbumsIds = _mockDataLoader.Albums.OrderBy(a => a.Id).Select(a => a.Id);
-            var allAblumsRetured = albumIdsReturned.SequenceEqual(mockAlbumsIds);
+            var mockAlbums = _mockDataLoader.Albums.Select(a => a.Name).OrderBy(a => a);
+            var allAblumsRetured = albumsReturned.SequenceEqual(mockAlbums.OrderBy(a => a));
 
-            Assert.True(allAblumsRetured, "Failed to return all albums by ID");
+            Assert.True(allAblumsRetured, "Failed to return all albums by name");
         }
 
         [Fact]
@@ -87,8 +91,8 @@ namespace Dukebox.Tests.Unit
         {
             var artists = _musicLibrary.OrderedArtists;
 
-            var mockOrderedArtistNames = _mockDataLoader.Artists.OrderBy(a => a.Name).Select(a => a.Name);
-            var allArtistsReturned = artists.Select(a => a.Name).SequenceEqual(mockOrderedArtistNames);
+            var mockOrderedArtistNames = _mockDataLoader.Artists.Select(a => a.Name).OrderBy(a => a);
+            var allArtistsReturned = artists.Select(a => a.Name).SequenceEqual(mockOrderedArtistNames.OrderBy(a => a));
 
             Assert.True(allArtistsReturned, "Failed to return all artists from the database");
 
@@ -96,15 +100,19 @@ namespace Dukebox.Tests.Unit
 
             Assert.True(artistCountCorrect, "Artist count returned was incorrect");
 
-            var artistIdsReturned = new List<long>();
+            var artistsReturned = new List<string>();
             Exception fetchByIdException = null;
 
             try
             {
                 _mockDataLoader.Artists.ForEach(a =>
                 {
-                    var artist = _musicLibrary.GetArtistById(a.Id);
-                    artistIdsReturned.Add(artist.Id);
+                    var artist = _musicLibrary.OrderedArtists.FirstOrDefault(la => la.Name.Equals(a.Name));
+
+                    if (artist != null)
+                    {
+                        artistsReturned.Add(artist.Name);
+                    }
                 });
             }
             catch (Exception ex)
@@ -114,12 +122,12 @@ namespace Dukebox.Tests.Unit
 
             Assert.Null(fetchByIdException);
 
-            artistIdsReturned.Sort();
+            artistsReturned.Sort();
 
-            var mockArtistIds = _mockDataLoader.Artists.OrderBy(a => a.Id).Select(a => a.Id);
-            var allArtistsRetured = artistIdsReturned.SequenceEqual(mockArtistIds);
+            var mockArtists = _mockDataLoader.Artists.Select(a => a.Name).OrderBy(a => a);
+            var allArtistsRetured = artistsReturned.SequenceEqual(mockArtists.OrderBy(a => a));
 
-            Assert.True(allArtistsRetured, "Failed to return all artists by ID");
+            Assert.True(allArtistsRetured, "Failed to return all artists by name");
         }
 
         [Fact]
@@ -227,20 +235,20 @@ namespace Dukebox.Tests.Unit
         [Fact]
         public void GetTrackByAttributeId()
         {
-            var resultsForKnownAlbum = _musicLibrary.GetTracksByAttributeId(SearchAreas.Album, 0);
-            var resultsForMissingAlbum = _musicLibrary.GetTracksByAttributeId(SearchAreas.Album, 5);
+            var resultsForKnownAlbum = _musicLibrary.GetTracksByAttributeId(SearchAreas.Album, "jupiter");
+            var resultsForMissingAlbum = _musicLibrary.GetTracksByAttributeId(SearchAreas.Album, "crazypants");
 
             Assert.True(resultsForKnownAlbum.Any(), "Failed to get tracks by known album id");
             Assert.False(resultsForMissingAlbum.Any(), "Incorrectly got results for an unknown album id");
 
-            var resultsForKnownArtist = _musicLibrary.GetTracksByAttributeId(SearchAreas.Artist, 0);
-            var resultsForMissingArtist = _musicLibrary.GetTracksByAttributeId(SearchAreas.Artist, 5);
+            var resultsForKnownArtist = _musicLibrary.GetTracksByAttributeId(SearchAreas.Artist, "spike");
+            var resultsForMissingArtist = _musicLibrary.GetTracksByAttributeId(SearchAreas.Artist, "crazierpants");
 
             Assert.True(resultsForKnownArtist.Any(), "Failed to get tracks by known artist id");
             Assert.False(resultsForMissingArtist.Any(), "Incorrectly got results for an unknown artist id");
 
-            var resultsForKnownSong = _musicLibrary.GetTracksByAttributeId(SearchAreas.Song, 0);
-            var resultsForMissingSong = _musicLibrary.GetTracksByAttributeId(SearchAreas.Song, 25);
+            var resultsForKnownSong = _musicLibrary.GetTracksByAttributeId(SearchAreas.Song, "0");
+            var resultsForMissingSong = _musicLibrary.GetTracksByAttributeId(SearchAreas.Song, "25");
 
             Assert.True(resultsForKnownSong.Any(), "Failed to get tracks by known song id");
             Assert.False(resultsForMissingSong.Any(), "Incorrectly got results for an unknown song id");
@@ -385,7 +393,7 @@ namespace Dukebox.Tests.Unit
 
             await _musicLibrary.RemoveTrack(track);
 
-            tracks = _musicLibrary.GetTracksByAttributeId(SearchAreas.Song, track.Song.Id);
+            tracks = _musicLibrary.GetTracksByAttributeId(SearchAreas.Song, track.Song.Id.ToString());
             var trackDeleted = !tracks.Any();
 
             Assert.True(trackDeleted, "Music library failed to delete track");

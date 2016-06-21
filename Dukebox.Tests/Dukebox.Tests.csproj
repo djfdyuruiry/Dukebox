@@ -136,7 +136,6 @@
     <Compile Include="Integration\AudioCdRippingServiceTests.cs" />
     <Compile Include="Integration\AudioCdServiceTests.cs" />
     <Compile Include="Unit\AudioPlaylistTests.cs" />
-    <Compile Include="Unit\MusicLibraryQueueServiceTests.cs" />
     <Compile Include="Unit\TrackTests.cs" />
     <Compile Include="Utils\AudioCdTestConstants.cs" />
     <Compile Include="Integration\AudioConverterServiceTests.cs" />

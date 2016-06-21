@@ -1,14 +1,13 @@
 ﻿using System.Collections.Generic;
-using System.Reflection;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
-using log4net;
 using GalaSoft.MvvmLight.Command;
 using Dukebox.Desktop.Interfaces;
 using Dukebox.Library.Interfaces;
 using Dukebox.Desktop.Model;
 using Dukebox.Desktop.Helper;
-using System.Linq;
+using Dukebox.Desktop.Services;
 
 namespace Dukebox.Desktop.ViewModel
 {
@@ -27,24 +26,25 @@ namespace Dukebox.Desktop.ViewModel
 
         public ICommand ClearSearch { get; private set; }
         public string SearchText { get; set; }
-        public List<ITrack> Tracks
+        public List<TrackWrapper> Tracks
         {
             get
             {
-                return _tracks;
+                return _tracks.Select(t => new TrackWrapper(_musicLibrary, t)).ToList();
             }
-            private set
-            {
-                _tracks = value;
-                OnPropertyChanged("Tracks");
-            }
+        }
+
+        private void UpdateTracks(List<ITrack> tracks)
+        {
+            _tracks = tracks;
+            OnPropertyChanged("Tracks");
         }
 
         public bool EditingListingsDisabled
         {
             get 
             { 
-                return true; 
+                return false; 
             }
         }
         public bool SearchEnabled
@@ -96,17 +96,17 @@ namespace Dukebox.Desktop.ViewModel
 
             _audioCdDriveMonitor.AudioCdInsertedOnLoad += (o, e) =>
             {
-                Tracks = e.CdTracks;
+                UpdateTracks(e.CdTracks);
                 SelectedAudioCdDrivePath = e.DriveDirectory;
             };
             _audioCdDriveMonitor.AudioCdInserted += (o, e) =>
             {
-                Tracks = e.CdTracks;
+                UpdateTracks(e.CdTracks);
                 OfferToLoadCd(e.DriveDirectory);
             };
-            _audioCdDriveMonitor.AudioCdEjected += (o, e) => Tracks = new List<ITrack>();
+            _audioCdDriveMonitor.AudioCdEjected += (o, e) => UpdateTracks(new List<ITrack>());
 
-            Tracks = new List<ITrack>();
+            UpdateTracks(new List<ITrack>());
             LoadTrack = new RelayCommand<ITrack>(DoLoadTrack);
 
             AudioCdDrivePaths = _audioCdDriveMonitor.GetAudioCdDrivePaths();
@@ -125,7 +125,7 @@ namespace Dukebox.Desktop.ViewModel
 
             if (response == MessageBoxResult.Yes)
             {
-                _audioPlaylist.LoadPlaylistFromList(Tracks);
+                _audioPlaylist.LoadPlaylistFromList(_tracks);
 
                 SendNotificationMessage(NotificationMessages.AudioPlaylistLoadedNewTracks);
             }
@@ -133,7 +133,7 @@ namespace Dukebox.Desktop.ViewModel
 
         private void DoLoadTrack(ITrack track)
         {
-            _audioPlaylist.LoadPlaylistFromList(Tracks);
+            _audioPlaylist.LoadPlaylistFromList(_tracks);
             _audioPlaylist.SkipToTrack(track);
 
             SendNotificationMessage(NotificationMessages.AudioPlaylistLoadedNewTracks);
@@ -141,9 +141,9 @@ namespace Dukebox.Desktop.ViewModel
 
         private void AttemptToLoadCdTracks(string audioCdDrivePath)
         {
-            Tracks = _audioCdDriveMonitor.IsDriveReady(audioCdDrivePath) ? 
+            UpdateTracks(_audioCdDriveMonitor.IsDriveReady(audioCdDrivePath) ? 
                 _musicLibrary.GetTracksForDirectory(audioCdDrivePath, false) : 
-                new List<ITrack>();
+                new List<ITrack>());
         }
 
         private void DoPlayCd()

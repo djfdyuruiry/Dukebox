@@ -1,6 +1,8 @@
-﻿using GalaSoft.MvvmLight.Command;
+﻿using System;
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using GalaSoft.MvvmLight.Command;
 using MediaPlayer = Dukebox.Audio.MediaPlayer;
 using Dukebox.Audio.Interfaces;
 using Dukebox.Audio.Model;
@@ -8,11 +10,7 @@ using Dukebox.Desktop.Helper;
 using Dukebox.Desktop.Interfaces;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
-using System.Windows;
-using System;
-using System.Windows.Media.Imaging;
-using System.Windows.Threading;
-using System.Diagnostics;
+using Dukebox.Library.Factories;
 
 namespace Dukebox.Desktop.ViewModel
 {
@@ -36,6 +34,7 @@ namespace Dukebox.Desktop.ViewModel
         private ImageSource _playPauseImage;
         private string _albumArtUri;
         private ImageSource _albumArtImage;
+        private string _currentlyLoadedFile;
 
         public string Artist
         {
@@ -164,6 +163,10 @@ namespace Dukebox.Desktop.ViewModel
             _mediaPlayer.StartPlayingTrack += (o, e) => PlayPauseImage = ImageResources.PauseImage;
             _mediaPlayer.TrackPaused += (o, e) => PlayPauseImage = ImageResources.PlayImage;
             _mediaPlayer.TrackResumed += (o, e) => PlayPauseImage = ImageResources.PauseImage;
+
+            // reflect metadata changes in UI
+            // TODO: replace with message handler
+            //TrackFactory.TrackMetadataUpdated += (o, e) => UpdateTrackDisplay(o as ITrack);
         }
 
         private void SetupPlaybackControlCommands()
@@ -206,17 +209,38 @@ namespace Dukebox.Desktop.ViewModel
             Artist = trackLoadedArgs.Metadata.ArtistName;
             Track = trackLoadedArgs.Metadata.TrackName;
             Album = trackLoadedArgs.Metadata.AlbumName;
+
+            _currentlyLoadedFile = trackLoadedArgs.FileName;
+        }
+
+        private void UpdateTrackDisplay(ITrack track)
+        {
+            if (_currentlyLoadedFile != track.Song.FileName)
+            {
+                return;
+            }
+
+            LoadedTrackFromFile(new TrackLoadedFromFileEventArgs
+            {
+                FileName = track.Song.FileName,
+                Metadata = new MediaPlayerMetadata
+                {
+                    TrackName = track.Song.Title,
+                    ArtistName = track.Artist.Name,
+                    AlbumName = track.Album.Name
+                }
+            });
         }
 
         private void LoadNewTrackAlbumArtIfPresent(NewTrackLoadedEventArgs newTrackArgs)
         {
-            var albumId = newTrackArgs.Track.Album?.Id;
+            var albumId = newTrackArgs.Track.Album.Id;
             
             try
             {
-                if (albumId.HasValue && _albumArtCache.CheckCacheForAlbum(albumId.Value))
+                if (_albumArtCache.CheckCacheForAlbum(albumId))
                 {
-                    var albumArtCachedImagePath = _albumArtCache.GetAlbumArtPathFromCache(albumId.Value);
+                    var albumArtCachedImagePath = _albumArtCache.GetAlbumArtPathFromCache(albumId);
                     UpdateAlbumArt(albumArtCachedImagePath);
 
                     return;

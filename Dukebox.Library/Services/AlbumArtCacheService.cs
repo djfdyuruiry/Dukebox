@@ -4,10 +4,10 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using log4net;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
-using System.Threading.Tasks;
 using Dukebox.Configuration.Interfaces;
 
 namespace Dukebox.Library.Services
@@ -15,7 +15,6 @@ namespace Dukebox.Library.Services
     public class AlbumArtCacheService : IAlbumArtCacheService
     {
         private static readonly ILog logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-        private static bool debugSetupComplete;
 
         private readonly IDukeboxSettings _settings;
         private string _cachePath;
@@ -77,8 +76,7 @@ namespace Dukebox.Library.Services
 
             try
             {
-                var albumIdString = album.Id.ToString();
-                var path = Path.Combine(_cachePath, albumIdString);
+                var path = Path.Combine(_cachePath, albumId);
 
                 metadata.GetAlbumArt(i => { i.Save(path); });
 
@@ -96,9 +94,9 @@ namespace Dukebox.Library.Services
                 }
 
                 stopwatch.Stop();
-                logger.InfoFormat("Added album with id {0} into album art cache.", albumIdString);
+                logger.InfoFormat("Added album with id {0} into album art cache.", albumId);
                 logger.DebugFormat("Adding album into album art cache took {0}ms. Album id: {1}",
-                    stopwatch.ElapsedMilliseconds, albumIdString);
+                    stopwatch.ElapsedMilliseconds, albumId);
 
                 Task.Run(() => AlbumAdded?.Invoke(this, EventArgs.Empty));
             }
@@ -108,11 +106,11 @@ namespace Dukebox.Library.Services
             }
         }
 
-        public bool CheckCacheForAlbum(long albumId)
+        public bool CheckCacheForAlbum(string albumId)
         {
             try
             {
-                var path = Path.Combine(_cachePath, albumId.ToString());
+                var path = Path.Combine(_cachePath, albumId);
                 return File.Exists(path);
             }
             catch (Exception ex)
@@ -122,7 +120,7 @@ namespace Dukebox.Library.Services
             }
         }
 
-        public Image GetAlbumArtFromCache(long albumId)
+        public Image GetAlbumArtFromCache(string albumId)
         {
             try
             {
@@ -141,7 +139,7 @@ namespace Dukebox.Library.Services
             }
         }
 
-        public string GetAlbumArtPathFromCache(long albumId)
+        public string GetAlbumArtPathFromCache(string albumId)
         {
             try
             {
@@ -159,7 +157,7 @@ namespace Dukebox.Library.Services
             }
         }
 
-        private string GetPathToCachedAlbumArt(long albumId)
+        private string GetPathToCachedAlbumArt(string albumId)
         {
             if (!CheckCacheForAlbum(albumId))
             {
@@ -171,11 +169,10 @@ namespace Dukebox.Library.Services
             return path;
         }
 
-        public List<long> GetAlbumIdsFromCache()
+        public List<string> GetAlbumIdsFromCache()
         {
             var ids = Directory.EnumerateFiles(_cachePath)
                 .Select(f => Path.GetFileNameWithoutExtension(f))
-                .Select(f => long.Parse(f))
                 .ToList();
 
             return ids;

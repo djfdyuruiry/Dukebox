@@ -18,5 +18,6 @@ namespace Dukebox.Library.Interfaces
         Image GetAlbumArt(Action<Image> beforeStreamClosedCallback);
         string SaveAlbumArtToTempFile();
         void SaveMetadataToFileTag();
+        void SaveMetadataToFileTag(Action atomicUpdateAction); 
     }
 }

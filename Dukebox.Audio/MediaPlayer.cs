@@ -129,10 +129,6 @@ namespace Dukebox.Audio
             LoadFile(fileName, null);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="fileName"></param>
         public void LoadFile(string fileName, MediaPlayerMetadata mediaPlayerMetadata)
         {
             if (string.IsNullOrEmpty(fileName))
@@ -142,10 +138,6 @@ namespace Dukebox.Audio
             else if (!File.Exists(fileName))
             {
                 throw new ArgumentException(string.Format("File '{0}' does not exist.", fileName));
-            }
-            else if (!File.ReadAllBytes(fileName).Any())
-            {
-                throw new ArgumentException(string.Format("File '{0}' contains no data!", fileName));
             }
 
             if (_stream != 0)

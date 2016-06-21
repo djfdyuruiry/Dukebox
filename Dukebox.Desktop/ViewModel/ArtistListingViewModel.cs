@@ -86,7 +86,7 @@ namespace Dukebox.Desktop.ViewModel
 
         private void DoLoadArtist(Artist artist)
         {
-            var tracks = _musicLibrary.GetTracksForArtist(artist);
+            var tracks = _musicLibrary.GetTracksForArtist(artist.Name);
             _audioPlaylist.LoadPlaylistFromList(tracks);
 
             SendNotificationMessage(NotificationMessages.AudioPlaylistLoadedNewTracks);

@@ -1,15 +1,13 @@
-﻿using Dukebox.Desktop.Interfaces;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Dukebox.Library.Interfaces;
 using System.Windows;
 using System.Windows.Input;
 using GalaSoft.MvvmLight.Command;
-using Dukebox.Desktop.Model;
 using GalaSoft.MvvmLight.Messaging;
+using Dukebox.Desktop.Interfaces;
+using Dukebox.Desktop.Model;
+using Dukebox.Desktop.Services;
+using Dukebox.Library.Interfaces;
 
 namespace Dukebox.Desktop.ViewModel
 {
@@ -56,17 +54,18 @@ namespace Dukebox.Desktop.ViewModel
             }
         }
 
-        public List<ITrack> Tracks
+        public List<TrackWrapper> Tracks
         {
             get
             {
-                return _tracks;
+                return _tracks.Select(t => new TrackWrapper(_musicLibrary, t)).ToList();
             }
-            private set
-            {
-                _tracks = value;
-                OnPropertyChanged("Tracks");
-            }
+        }
+
+        private void UpdateTracks(List<ITrack> tracks)
+        {
+            _tracks = tracks;
+            OnPropertyChanged("Tracks");
         }
 
         public TrackListingPreviewViewModel(IAudioPlaylist audioPlaylist, IMusicLibrary musicLibrary)
@@ -87,11 +86,11 @@ namespace Dukebox.Desktop.ViewModel
             {
                 if (nm.IsArtist)
                 {
-                    Tracks = _musicLibrary.GetTracksForArtist(nm.Id);
+                    UpdateTracks(_musicLibrary.GetTracksForArtist(nm.Name));
                 }
                 else
                 {
-                    Tracks = _musicLibrary.GetTracksForAlbum(nm.Id);
+                    UpdateTracks(_musicLibrary.GetTracksForAlbum(nm.Name));
                 }
             });
         }
