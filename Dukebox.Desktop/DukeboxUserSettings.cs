@@ -1,4 +1,6 @@
-﻿using Dukebox.Desktop.Interfaces;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Dukebox.Desktop.Interfaces;
 using Dukebox.Desktop.Properties;
 
 namespace Dukebox.Desktop
@@ -11,11 +13,11 @@ namespace Dukebox.Desktop
         {
             get
             {
-                return bool.Parse(_settings.shuffle);
+                return _settings.shuffle;
             }
             set
             {
-                _settings.shuffle = value.ToString();
+                _settings.shuffle = value;
                 _settings.Save();
             }
         }
@@ -24,11 +26,11 @@ namespace Dukebox.Desktop
         {
             get
             {
-                return bool.Parse(_settings.repeat);
+                return _settings.repeat;
             }
             set
             {
-                _settings.repeat = value.ToString();
+                _settings.repeat = value;
                 _settings.Save();
             }
         }
@@ -37,18 +39,31 @@ namespace Dukebox.Desktop
         {
             get
             {
-                return bool.Parse(_settings.repeatAll);
+                return _settings.repeatAll;
             }
             set
             {
-                _settings.repeatAll = value.ToString();
+                _settings.repeatAll = value;
+                _settings.Save();
+            }
+        }
+
+        public List<string> ExtendedMetadataColumnsToShow
+        {
+            get
+            {
+                return _settings.extendedMetadataColumnsToShow.Split(',').ToList();
+            }
+            set
+            {
+                _settings.extendedMetadataColumnsToShow = string.Join(",", value.ToArray());
                 _settings.Save();
             }
         }
 
         public DukeboxUserSettings()
         {
-            _settings = Dukebox.Desktop.Properties.Settings.Default;
+            _settings = Settings.Default;
         }
     }
 }

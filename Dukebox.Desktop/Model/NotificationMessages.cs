@@ -12,5 +12,6 @@ namespace Dukebox.Desktop.Model
         public const string LoadingFinished = "LoadingFinished";
         public const string LoadingScreenShouldHide = "LoadingScreenShouldHide";
         public const string LoadingScreenShouldClose = "LoadingScreenShouldClose";
+        public const string TrackListingDataGridColumnsUpdated = "TrackListingDataGridColumnsUpdated";
     }
 }

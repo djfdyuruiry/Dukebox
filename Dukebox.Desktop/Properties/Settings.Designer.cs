@@ -26,9 +26,9 @@ namespace Dukebox.Desktop.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public string shuffle {
+        public bool shuffle {
             get {
-                return ((string)(this["shuffle"]));
+                return ((bool)(this["shuffle"]));
             }
             set {
                 this["shuffle"] = value;
@@ -38,9 +38,9 @@ namespace Dukebox.Desktop.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public string repeat {
+        public bool repeat {
             get {
-                return ((string)(this["repeat"]));
+                return ((bool)(this["repeat"]));
             }
             set {
                 this["repeat"] = value;
@@ -50,12 +50,24 @@ namespace Dukebox.Desktop.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public string repeatAll {
+        public bool repeatAll {
             get {
-                return ((string)(this["repeatAll"]));
+                return ((bool)(this["repeatAll"]));
             }
             set {
                 this["repeatAll"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Year")]
+        public string extendedMetadataColumnsToShow {
+            get {
+                return ((string)(this["extendedMetadataColumnsToShow"]));
+            }
+            set {
+                this["extendedMetadataColumnsToShow"] = value;
             }
         }
     }

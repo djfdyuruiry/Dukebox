@@ -14,7 +14,7 @@ namespace Dukebox.Desktop
         {
             InitializeComponent();
 
-            (DataContext as IMainWindowViewModel).ShowLoadingScreen.Execute(null);
+            (DataContext as IMainWindowViewModel)?.ShowLoadingScreen?.Execute(null);
 
             Messenger.Default.Register<NotificationMessage>(this, (nm) =>
             {

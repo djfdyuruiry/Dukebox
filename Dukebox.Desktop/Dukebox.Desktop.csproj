@@ -156,6 +156,7 @@
     </ApplicationDefinition>
     <Compile Include="DesktopContainer.cs" />
     <Compile Include="DukeboxUserSettings.cs" />
+    <Compile Include="Factories\DukeboxUserSettingsFactory.cs" />
     <Compile Include="Helper\AudioCdHelper.cs" />
     <Compile Include="Helper\ReverseBoolToVisibilityConverter.cs" />
     <Compile Include="Interfaces\IAudioDriveListingViewModel.cs" />
