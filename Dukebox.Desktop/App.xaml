@@ -8,10 +8,10 @@
              xmlns:d1p1="http://schemas.openxmlformats.org/markup-compatibility/2006">
     <Application.Resources>
         <ViewModelLocator xmlns="clr-namespace:Dukebox.Desktop.ViewModel" x:Key="ViewModelLocator" d:IsDataSource="True"/>
-        <BoolToVisibilityConverter xmlns="clr-namespace:Dukebox.Desktop.Helper" x:Key="BoolToVisibilityConverter" />
-        <ReverseBoolToVisibilityConverter xmlns="clr-namespace:Dukebox.Desktop.Helper" x:Key="ReverseBoolToVisibilityConverter" />
-        <ArtistToCardPathConverter xmlns="clr-namespace:Dukebox.Desktop.Helper" x:Key="ArtistToCardPathConverter" />
-        <ShowTrackListingToHeightConverter xmlns="clr-namespace:Dukebox.Desktop.Helper" x:Key="ShowTrackListingToHeightConverter" />
-        <ListDictionaryKeyToValueConverter xmlns="clr-namespace:Dukebox.Desktop.Helper" x:Key="ListDictionaryKeyToValueConverter" />
+        <ArtistToCardPathConverter xmlns="clr-namespace:Dukebox.Desktop.Converters" x:Key="ArtistToCardPathConverter" />
+        <BoolToVisibilityConverter xmlns="clr-namespace:Dukebox.Desktop.Converters" x:Key="BoolToVisibilityConverter" />
+        <ListDictionaryKeyToValueConverter xmlns="clr-namespace:Dukebox.Desktop.Converters" x:Key="ListDictionaryKeyToValueConverter" />
+        <ReverseBoolToVisibilityConverter xmlns="clr-namespace:Dukebox.Desktop.Converters" x:Key="ReverseBoolToVisibilityConverter" />
+        <ShowTrackListingToHeightConverter xmlns="clr-namespace:Dukebox.Desktop.Converters" x:Key="ShowTrackListingToHeightConverter" />
     </Application.Resources>
 </Application>

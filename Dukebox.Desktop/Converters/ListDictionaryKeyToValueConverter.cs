@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Windows.Data;
 
-namespace Dukebox.Desktop.Helper
+namespace Dukebox.Desktop.Converters
 {
     public class ListDictionaryKeyToValueConverter : IValueConverter
     {

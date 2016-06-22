@@ -24,7 +24,6 @@ namespace Dukebox.Desktop.ViewModel
         private readonly IAudioPlaylist _audioPlaylist;
         private readonly IGlobalMultimediaHotKeyService _globalHotKeyService;
         private readonly IAlbumArtCacheService _albumArtCache;
-        private readonly ImageToImageSourceConverter _imageToImageSourceConverter;
 
         private string _artist;
         private string _track;
@@ -133,14 +132,12 @@ namespace Dukebox.Desktop.ViewModel
         public ICommand ForwardCommand { get; private set; }
 
         public PlaybackMonitorViewModel(IMediaPlayer mediaPlayer, IAudioPlaylist audioPlaylist,
-            IGlobalMultimediaHotKeyService globalHotKeyService, IAlbumArtCacheService albumArtCache,
-            ImageToImageSourceConverter imageToImageSourceConverter) : base()
+            IGlobalMultimediaHotKeyService globalHotKeyService, IAlbumArtCacheService albumArtCache) : base()
         {
             _mediaPlayer = mediaPlayer;
             _audioPlaylist = audioPlaylist;
             _globalHotKeyService = globalHotKeyService;
             _albumArtCache = albumArtCache;
-            _imageToImageSourceConverter = imageToImageSourceConverter;
 
             UpdateAlbumArt(ImageResources.DefaultAlbumArtUri);
             PlayPauseImage = ImageResources.PlayImage;

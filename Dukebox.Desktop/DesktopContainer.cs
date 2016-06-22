@@ -49,9 +49,6 @@ namespace Dukebox.Desktop
             container.RegisterSingleton<RecentlyPlayedListingViewModel>();
             container.RegisterSingleton<AudioCdViewModel>();
 
-            // helpers
-            container.RegisterSingleton<ImageToImageSourceConverter>();
-
             // services
             container.Register<Album>();
 
