@@ -158,6 +158,7 @@
     <Compile Include="DukeboxUserSettings.cs" />
     <Compile Include="Factories\DukeboxUserSettingsFactory.cs" />
     <Compile Include="Helper\AudioCdHelper.cs" />
+    <Compile Include="Helper\ListDictionaryKeyToValueConverter.cs" />
     <Compile Include="Helper\ReverseBoolToVisibilityConverter.cs" />
     <Compile Include="Interfaces\IAudioDriveListingViewModel.cs" />
     <Compile Include="Model\PreviewArtistOrAlbumMessage.cs" />

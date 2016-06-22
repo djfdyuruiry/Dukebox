@@ -37,11 +37,11 @@ namespace Dukebox.Desktop.Services
         {
             get
             {
-                return Data.Song.Title;
+                return Data.Title;
             }
             set
             {
-                Data.Song.Title = value;
+                Data.Title = value;
                 OnPropertyChanged("Title");
 
                 PropagateTrackChanges();
@@ -52,11 +52,11 @@ namespace Dukebox.Desktop.Services
         {
             get
             {
-                return Data.Artist.Name;
+                return Data.ArtistName;
             }
             set
             {
-                Data.Song.ArtistName = value;
+                Data.ArtistName = value;
                 OnPropertyChanged("ArtistName");
 
                 PropagateTrackChanges();
@@ -67,11 +67,11 @@ namespace Dukebox.Desktop.Services
         {
             get
             {
-                return Data.Album.Name;
+                return Data.AlbumName;
             }
             set
             {
-                Data.Song.AlbumName = value;
+                Data.AlbumName = value;
                 OnPropertyChanged("AlbumName");
 
                 PropagateTrackChanges();
@@ -82,11 +82,11 @@ namespace Dukebox.Desktop.Services
         {
             get
             {
-                return Data.Song.ExtendedMetadata;
+                return Data.ExtendedMetadata;
             }
             set
             {
-                Data.Song.ExtendedMetadata = value;
+                Data.ExtendedMetadata = value;
                 OnPropertyChanged("ExtendedMetadata");
 
                 PropagateTrackChanges();

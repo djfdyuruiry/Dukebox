@@ -12,5 +12,6 @@
         <ReverseBoolToVisibilityConverter xmlns="clr-namespace:Dukebox.Desktop.Helper" x:Key="ReverseBoolToVisibilityConverter" />
         <ArtistToCardPathConverter xmlns="clr-namespace:Dukebox.Desktop.Helper" x:Key="ArtistToCardPathConverter" />
         <ShowTrackListingToHeightConverter xmlns="clr-namespace:Dukebox.Desktop.Helper" x:Key="ShowTrackListingToHeightConverter" />
+        <ListDictionaryKeyToValueConverter xmlns="clr-namespace:Dukebox.Desktop.Helper" x:Key="ListDictionaryKeyToValueConverter" />
     </Application.Resources>
 </Application>
