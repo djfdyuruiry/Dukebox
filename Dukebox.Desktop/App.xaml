@@ -5,7 +5,8 @@
              StartupUri="MainWindow.xaml" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              d1p1:Ignorable="d" 
-             xmlns:d1p1="http://schemas.openxmlformats.org/markup-compatibility/2006">
+             xmlns:d1p1="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             ShutdownMode="OnMainWindowClose">
     <Application.Resources>
         <ViewModelLocator xmlns="clr-namespace:Dukebox.Desktop.ViewModel" x:Key="ViewModelLocator" d:IsDataSource="True"/>
         <ArtistToCardPathConverter xmlns="clr-namespace:Dukebox.Desktop.Converters" x:Key="ArtistToCardPathConverter" />

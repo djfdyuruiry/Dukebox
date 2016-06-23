@@ -161,6 +161,9 @@
     <Compile Include="Converters\ListDictionaryKeyToValueConverter.cs" />
     <Compile Include="Converters\ReverseBoolToVisibilityConverter.cs" />
     <Compile Include="Interfaces\IAudioDriveListingViewModel.cs" />
+    <Compile Include="Interfaces\IMetadataColumnsSettingsViewModel.cs" />
+    <Compile Include="Interfaces\ISettingsMenuViewModel.cs" />
+    <Compile Include="Model\ExtendedMetadataColumnSetting.cs" />
     <Compile Include="Model\PreviewArtistOrAlbumMessage.cs" />
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
     <Compile Include="Converters\ArtistToCardPathConverter.cs" />
@@ -198,6 +201,7 @@
     <Compile Include="Interfaces\IPlaybackMenuViewModel.cs" />
     <Compile Include="Interfaces\IPlaylistMenuViewModel.cs" />
     <Compile Include="ViewModel\LoadingScreenViewModel.cs" />
+    <Compile Include="ViewModel\MetadataColumnsSettingsViewModel.cs" />
     <Compile Include="ViewModel\PlaybackMenuViewModel.cs" />
     <Compile Include="ViewModel\PlaybackMonitorViewModel.cs" />
     <Compile Include="ViewModel\PlaylistMenuViewModel.cs" />
@@ -206,6 +210,7 @@
     <Compile Include="ViewModel\LibraryListingViewModel.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />
     <Compile Include="ViewModel\TrackListingPreviewViewModel.cs" />
+    <Compile Include="ViewModel\SettingsMenuViewModel.cs" />
     <Compile Include="ViewModel\ViewModelBase.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
     <Compile Include="Views\AlbumListing.xaml.cs">
@@ -216,6 +221,9 @@
     </Compile>
     <Compile Include="Views\AudioCdListing.xaml.cs">
       <DependentUpon>AudioCdListing.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\MetadataColumnsSettings.xaml.cs">
+      <DependentUpon>MetadataColumnsSettings.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\PlaybackMonitor.xaml.cs">
       <DependentUpon>PlaybackMonitor.xaml</DependentUpon>
@@ -259,6 +267,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\AudioCdListing.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\MetadataColumnsSettings.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

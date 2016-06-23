@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Dukebox.Desktop.Interfaces;
 using Dukebox.Desktop.Properties;
@@ -52,7 +53,7 @@ namespace Dukebox.Desktop
         {
             get
             {
-                return _settings.extendedMetadataColumnsToShow.Split(',').ToList();
+                return _settings.extendedMetadataColumnsToShow.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList();
             }
             set
             {

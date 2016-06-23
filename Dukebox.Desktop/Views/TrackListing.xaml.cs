@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml;
@@ -19,6 +20,7 @@ namespace Dukebox.Desktop.Views
     public partial class TrackListing : UserControl
     {
         private const string tracksDataGridElementName = "TrackListingsGrid";
+        private readonly List<string> _columnsToKeep = new List<string> { "Artist", "Album", "Title" };
 
         private readonly IDukeboxUserSettings _settings; 
         private readonly DataGrid _tracksDataGrid;
@@ -54,10 +56,23 @@ namespace Dukebox.Desktop.Views
         {
             var extendedMetadataColumns = _settings.ExtendedMetadataColumnsToShow;
 
-            var columnsToRemove = _tracksDataGrid.Columns.Where(c => extendedMetadataColumns.Contains(c.Header.ToString())).ToList();
+            var columnsToRemove = _tracksDataGrid.Columns
+                .Where(c =>
+                {
+                    var headerName = c.Header.ToString();
+
+                    return !_columnsToKeep.Contains(headerName) &&
+                        !extendedMetadataColumns.Contains(headerName);
+                })
+                .ToList();            
+
             columnsToRemove.ForEach(c => _tracksDataGrid.Columns.Remove(c));
 
-            extendedMetadataColumns.ForEach(AddMetadataColumnToGrid);
+            var columnsToAdd = extendedMetadataColumns
+                .Where(ec => !_tracksDataGrid.Columns.Any(c => c.Header.ToString().Equals(ec)))
+                .ToList();
+
+            columnsToAdd.ForEach(AddMetadataColumnToGrid);
 
             ResizeMetadataColumns();
         }
@@ -68,6 +83,7 @@ namespace Dukebox.Desktop.Views
 
             newColumn.Header = metadataName;
             newColumn.SortMemberPath = null;
+            newColumn.DisplayIndex = _tracksDataGrid.Columns.Count;
 
             _tracksDataGrid.Columns.Add(newColumn);
         }

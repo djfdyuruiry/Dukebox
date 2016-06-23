@@ -10,7 +10,6 @@ using Dukebox.Desktop.Helper;
 using Dukebox.Desktop.Interfaces;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
-using Dukebox.Library.Factories;
 
 namespace Dukebox.Desktop.ViewModel
 {

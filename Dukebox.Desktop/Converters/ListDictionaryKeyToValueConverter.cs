@@ -13,7 +13,7 @@ namespace Dukebox.Desktop.Converters
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            _extendedMetadata = value as Dictionary<string, List<string>>;
+            _extendedMetadata = _extendedMetadata ?? value as Dictionary<string, List<string>>;
             _metadataField = parameter as string;
 
             if (_extendedMetadata == null)
@@ -27,7 +27,7 @@ namespace Dukebox.Desktop.Converters
 
             if (!_extendedMetadata.ContainsKey(_metadataField))
             {
-                return "-";
+                return string.Empty;
             }
 
             var extendedMetadataValue = _extendedMetadata[_metadataField];
@@ -45,7 +45,12 @@ namespace Dukebox.Desktop.Converters
                 throw new InvalidOperationException("Parameter 'value' was not of type string");
             }
 
-            _extendedMetadata[_metadataField] = stringValue.Split(',').Select(s => s.Trim(' ')).ToList();
+            if(!string.IsNullOrEmpty(stringValue))
+            {
+                _extendedMetadata[_metadataField] = stringValue.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Select(s => s.Trim(' '))
+                    .ToList();
+            }
 
             return Binding.DoNothing;
         }

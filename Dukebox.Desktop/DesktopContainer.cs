@@ -32,6 +32,7 @@ namespace Dukebox.Desktop
             // window view model
             container.RegisterSingleton<ILoadingScreenViewModel, LoadingScreenViewModel>();
             container.RegisterSingleton<IMainWindowViewModel, MainWindowViewModel>();
+            container.RegisterSingleton<IMetadataColumnsSettingsViewModel, MetadataColumnsSettingsViewModel>();
 
             // menu view models
             container.RegisterSingleton<IFileMenuViewModel, FileMenuViewModel>();
@@ -39,6 +40,7 @@ namespace Dukebox.Desktop
             container.RegisterSingleton<IPlaybackMenuViewModel, PlaybackMenuViewModel>();
             container.RegisterSingleton<IPlaylistMenuViewModel, PlaylistMenuViewModel>();
             container.RegisterSingleton<IHelpMenuViewModel, HelpMenuViewModel>();
+            container.RegisterSingleton<ISettingsMenuViewModel, SettingsMenuViewModel>();
 
             // screen view models
             container.RegisterSingleton<IPlaybackMonitorViewModel, PlaybackMonitorViewModel>();
