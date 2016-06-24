@@ -26,19 +26,19 @@ namespace Dukebox.Tests.Unit
         {
             _mockDataLoader = new LibraryDbMockGenerator();
 
-            var musicLibraryDbContext = _mockDataLoader.DbContextMock;
-
+            var dbContextFactory = A.Fake<IMusicLibraryDbContextFactory>();   
             var settings = A.Fake<IDukeboxSettings>();
             var albumArtCache = A.Fake<IAlbumArtCacheService>();
             var audioFormats = new AudioFileFormats();
             var audioFileMetadataFactory = new AudioFileMetadataFactory(A.Fake<ICdMetadataService>(), A.Fake<IAudioCdService>());
             var trackFactory = new TrackFactory(settings, audioFileMetadataFactory);
 
+            A.CallTo(() => dbContextFactory.GetInstance()).Returns(_mockDataLoader.DbContextMock);
             A.CallTo(() => settings.AddDirectoryConcurrencyLimit).Returns(5);
 
             audioFormats.SupportedFormats.Add(".mp3");
 
-            _musicLibrary = new MusicLibrary(musicLibraryDbContext, settings, albumArtCache, audioFormats, 
+            _musicLibrary = new MusicLibrary(dbContextFactory, settings, albumArtCache, audioFormats, 
                 audioFileMetadataFactory, trackFactory);
         }
         
@@ -327,7 +327,7 @@ namespace Dukebox.Tests.Unit
             A.CallTo(() => audioMetadata.HasFutherMetadataTag).Returns(false);
             A.CallTo(() => audioMetadata.HasAlbumArt).Returns(false);
 
-            await _musicLibrary.AddFile(trackFile.FullName, audioMetadata);
+            _musicLibrary.AddFile(trackFile.FullName, audioMetadata);
 
             var tracks = _musicLibrary.SearchForTracks(songTitle, new List<SearchAreas> { SearchAreas.Song });
             var tracksReturned = tracks.Any();
