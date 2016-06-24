@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
-using Dukebox.Library.Interfaces;
-using Dukebox.Library.Model;
 using Dukebox.Configuration.Interfaces;
 using Dukebox.Library.Factories;
+using Dukebox.Library.Interfaces;
+using Dukebox.Library.Model;
 
 namespace Dukebox.Library.Services
 {
@@ -57,6 +59,30 @@ namespace Dukebox.Library.Services
             }
         }
 
+        public string Title
+        {
+            get
+            {
+                return Song.Title;
+            }
+            set
+            {
+                Song.Title = value;
+            }
+        }
+
+        public Dictionary<string, List<string>> ExtendedMetadata
+        {
+            get
+            {
+                return Song.ExtendedMetadata.Any() ? Song.ExtendedMetadata : Metadata.ExtendedMetadata;
+            }
+            set
+            {
+                Song.ExtendedMetadata = value;
+            }
+        }
+
         public IAudioFileMetadata Metadata 
         {
             get
@@ -105,14 +131,6 @@ namespace Dukebox.Library.Services
                 Song.ArtistName = Metadata.Artist;
             }
         }
-        
-
-        public void CopyDetailsToAudioMetadata(IAudioFileMetadata metadata)
-        {
-            metadata.Album = Album.Name;
-            metadata.Artist = Artist.Name;
-            metadata.Title = Song.Title;
-        }
 
         public void SyncMetadata(IMusicLibrary musicLibrayToUpdate)
         {
@@ -126,6 +144,13 @@ namespace Dukebox.Library.Services
                 Metadata.SaveMetadataToFileTag(() => CopyDetailsToAudioMetadata(Metadata));
                 musicLibrayToUpdate.SaveDbChanges();
             });
+        }
+        
+        public void CopyDetailsToAudioMetadata(IAudioFileMetadata metadata)
+        {
+            metadata.Album = Album.Name;
+            metadata.Artist = Artist.Name;
+            metadata.Title = Song.Title;
         }
 
         public override string ToString()

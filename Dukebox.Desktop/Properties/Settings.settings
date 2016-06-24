@@ -2,14 +2,17 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Dukebox.Desktop.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="shuffle" Type="System.String" Scope="User">
+    <Setting Name="shuffle" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="repeat" Type="System.String" Scope="User">
+    <Setting Name="repeat" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="repeatAll" Type="System.String" Scope="User">
+    <Setting Name="repeatAll" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="extendedMetadataColumnsToShow" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Year</Value>
     </Setting>
   </Settings>
 </SettingsFile>

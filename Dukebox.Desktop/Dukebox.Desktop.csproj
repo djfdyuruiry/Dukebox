@@ -154,19 +154,24 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Converters\CamelCaseToSentanceCaseConverter.cs" />
     <Compile Include="DesktopContainer.cs" />
     <Compile Include="DukeboxUserSettings.cs" />
+    <Compile Include="Factories\DukeboxUserSettingsFactory.cs" />
     <Compile Include="Helper\AudioCdHelper.cs" />
-    <Compile Include="Helper\ReverseBoolToVisibilityConverter.cs" />
+    <Compile Include="Converters\ListDictionaryKeyToValueConverter.cs" />
+    <Compile Include="Converters\ReverseBoolToVisibilityConverter.cs" />
     <Compile Include="Interfaces\IAudioDriveListingViewModel.cs" />
+    <Compile Include="Interfaces\IMetadataColumnsSettingsViewModel.cs" />
+    <Compile Include="Interfaces\ISettingsMenuViewModel.cs" />
+    <Compile Include="Model\ExtendedMetadataColumnSetting.cs" />
     <Compile Include="Model\PreviewArtistOrAlbumMessage.cs" />
-    <Compile Include="Helper\BoolToVisibilityConverter.cs" />
-    <Compile Include="Helper\ArtistToCardPathConverter.cs" />
+    <Compile Include="Converters\BoolToVisibilityConverter.cs" />
+    <Compile Include="Converters\ArtistToCardPathConverter.cs" />
     <Compile Include="Helper\ImageResourceLoader.cs" />
     <Compile Include="Helper\ImageResources.cs" />
-    <Compile Include="Helper\ImageToImageSourceConverter.cs" />
     <Compile Include="Helper\ListSearchHelper.cs" />
-    <Compile Include="Helper\ShowTrackListingToHeightConverter.cs" />
+    <Compile Include="Converters\ShowTrackListingToHeightConverter.cs" />
     <Compile Include="Interfaces\IDukeboxUserSettings.cs" />
     <Compile Include="Interfaces\IArtistListingViewModel.cs" />
     <Compile Include="Interfaces\ILoadingScreenViewModel.cs" />
@@ -197,6 +202,7 @@
     <Compile Include="Interfaces\IPlaybackMenuViewModel.cs" />
     <Compile Include="Interfaces\IPlaylistMenuViewModel.cs" />
     <Compile Include="ViewModel\LoadingScreenViewModel.cs" />
+    <Compile Include="ViewModel\MetadataColumnsSettingsViewModel.cs" />
     <Compile Include="ViewModel\PlaybackMenuViewModel.cs" />
     <Compile Include="ViewModel\PlaybackMonitorViewModel.cs" />
     <Compile Include="ViewModel\PlaylistMenuViewModel.cs" />
@@ -205,6 +211,7 @@
     <Compile Include="ViewModel\LibraryListingViewModel.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />
     <Compile Include="ViewModel\TrackListingPreviewViewModel.cs" />
+    <Compile Include="ViewModel\SettingsMenuViewModel.cs" />
     <Compile Include="ViewModel\ViewModelBase.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
     <Compile Include="Views\AlbumListing.xaml.cs">
@@ -215,6 +222,9 @@
     </Compile>
     <Compile Include="Views\AudioCdListing.xaml.cs">
       <DependentUpon>AudioCdListing.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\MetadataColumnsSettings.xaml.cs">
+      <DependentUpon>MetadataColumnsSettings.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\PlaybackMonitor.xaml.cs">
       <DependentUpon>PlaybackMonitor.xaml</DependentUpon>
@@ -258,6 +268,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\AudioCdListing.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\MetadataColumnsSettings.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

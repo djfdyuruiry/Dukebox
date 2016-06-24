@@ -62,6 +62,14 @@ namespace Dukebox.Desktop.ViewModel
             }
         }
 
+        public ISettingsMenuViewModel SettingsMenuViewModel
+        {
+            get
+            {
+                return DesktopContainer.GetInstance<ISettingsMenuViewModel>();
+            }
+        }       
+
         // screen view models
         public IPlaybackMonitorViewModel IPlaybackMonitor
         {
@@ -125,6 +133,14 @@ namespace Dukebox.Desktop.ViewModel
             {
                 return DesktopContainer.GetInstance<AudioCdViewModel>();
             }
-        }        
+        } 
+        
+        public IMetadataColumnsSettingsViewModel IMetadataColumnsSettingsViewModel
+        {
+            get
+            {
+                return DesktopContainer.GetInstance<IMetadataColumnsSettingsViewModel>();
+            }
+        }
     }
 }

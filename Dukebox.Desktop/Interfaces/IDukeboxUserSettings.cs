@@ -1,9 +1,12 @@
-﻿namespace Dukebox.Desktop.Interfaces
+﻿using System.Collections.Generic;
+
+namespace Dukebox.Desktop.Interfaces
 {
     public interface IDukeboxUserSettings
     {
         bool Repeat { get; set; }
         bool RepeatAll { get; set; }
         bool Shuffle { get; set; }
+        List<string> ExtendedMetadataColumnsToShow { get; set; }
     }
 }
