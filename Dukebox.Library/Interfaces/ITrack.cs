@@ -12,7 +12,7 @@ namespace Dukebox.Library.Interfaces
         string Title { get; set; }
         Dictionary<string, List<string>> ExtendedMetadata { get; set; }
         IAudioFileMetadata Metadata { get; }
-        Song Song { get; }
+        Song Song { get; set; }
         void CopyDetailsToAudioMetadata(IAudioFileMetadata metadata);
         void SyncMetadata(IMusicLibrary musicLibrayToUpdate);
         string ToString();

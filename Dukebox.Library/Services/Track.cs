@@ -17,7 +17,7 @@ namespace Dukebox.Library.Services
         
         private IAudioFileMetadata _metadata;
 
-        public Song Song { get; private set; }
+        public Song Song { get; set; }
         
         public Artist Artist
         {
@@ -142,7 +142,7 @@ namespace Dukebox.Library.Services
             Task.Run(() =>
             {
                 Metadata.SaveMetadataToFileTag(() => CopyDetailsToAudioMetadata(Metadata));
-                musicLibrayToUpdate.SaveDbChanges();
+                musicLibrayToUpdate.SaveSongChanges(Song);
             });
         }
         
