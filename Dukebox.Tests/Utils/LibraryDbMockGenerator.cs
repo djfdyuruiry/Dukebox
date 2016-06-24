@@ -90,6 +90,9 @@ namespace Dukebox.Tests.Utils
                     .SetupData(Songs);
 
             A.CallTo(() => DbContextMock.Songs).Returns(songs);
+
+            A.CallTo(() => DbContextMock.SynchronisedAddSong(A<Song>.Ignored))
+                .Invokes(e => songs.Add(e.Arguments[0] as Song));
         }
     }
 }

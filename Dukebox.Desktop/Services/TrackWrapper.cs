@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using Dukebox.Library.Interfaces;
+using Dukebox.Library.Model;
 
 namespace Dukebox.Desktop.Services
 {
     public class TrackWrapper : INotifyPropertyChanged
     {
-        private static event EventHandler<string> TrackInstanceChanged; 
+        private static event EventHandler<Song> TrackInstanceChanged; 
         
         private readonly IMusicLibrary _musicLibrary;
 
@@ -23,8 +24,10 @@ namespace Dukebox.Desktop.Services
 
             TrackInstanceChanged += (o, e) =>
             {
-                if (o != this && e == Data.Song.FileName)
+                if (o != this && e.FileName == Data.Song.FileName)
                 {
+                    Data.Song = e;
+
                     OnPropertyChanged("Title");
                     OnPropertyChanged("ArtistName");
                     OnPropertyChanged("AlbumName");
@@ -97,7 +100,7 @@ namespace Dukebox.Desktop.Services
         {
             Data.SyncMetadata(_musicLibrary);
 
-            TrackInstanceChanged?.Invoke(this, Data.Song.FileName);
+            TrackInstanceChanged?.Invoke(this, Data.Song);
         }
 
         protected void OnPropertyChanged(string propertyName)

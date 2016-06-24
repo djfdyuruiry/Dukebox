@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading;
 using log4net;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
@@ -14,17 +13,14 @@ namespace Dukebox.Library.Services
     {
         private static readonly ILog logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        private readonly IMusicLibraryDbContext _dukeboxData;
+        private readonly IMusicLibraryDbContextFactory _dbContextFactory;
         private readonly IMusicLibrary _musicLibrary;
         private readonly TrackFactory _trackFactory;
-        private readonly SemaphoreSlim _dbContextMutex;
 
-        public MusicLibrarySearchService(IMusicLibraryDbContext dukeboxData, IMusicLibrary musicLibrary, 
-            TrackFactory trackFactory, SemaphoreSlim dbContextMutex)
+        public MusicLibrarySearchService(IMusicLibraryDbContextFactory dbContextFactory, IMusicLibrary musicLibrary, TrackFactory trackFactory)
         {
-            _dukeboxData = dukeboxData;
+            _dbContextFactory = dbContextFactory;
             _musicLibrary = musicLibrary;
-            _dbContextMutex = dbContextMutex;
 
             _trackFactory = trackFactory;
         }
@@ -54,14 +50,12 @@ namespace Dukebox.Library.Services
         public List<ITrack> SearchForTracks(string searchTerm, List<SearchAreas> searchAreas)
         {
             var matchingSongs = Enumerable.Empty<Song>();
-            Stopwatch stopwatch = null;
+            Stopwatch stopwatch;
 
-            try
+            using (var dukeboxData = _dbContextFactory.GetInstance())
             {
-                _dbContextMutex.Wait();
-
                 stopwatch = Stopwatch.StartNew();
-                var songs = _dukeboxData.Songs;
+                var songs = dukeboxData.Songs;
 
                 if (string.IsNullOrWhiteSpace(searchTerm))
                 {
@@ -97,19 +91,14 @@ namespace Dukebox.Library.Services
                 {
                     matchingSongs = matchingSongs.Concat(songs.Where(s => s.FileName.ToLower().Contains(searchTerm)));
                 }
+
+                stopwatch.Stop();
+                var searchAreasString = searchAreas.Select(sa => Enum.GetName(typeof(SearchAreas), sa)).Aggregate((c, n) => c + ", " + n);
+                logger.DebugFormat("Getting tracks by attribute(s) '{0}' where name or title contain '{1}' took {2}ms and returned {3} results.",
+                    searchAreasString, searchTerm, stopwatch.ElapsedMilliseconds, matchingSongs.Count());
             }
-            finally
-            {
-                _dbContextMutex.Release();
-            }
 
-
-            stopwatch.Stop();
-            var searchAreasString = searchAreas.Select(sa => Enum.GetName(typeof(SearchAreas), sa)).Aggregate((c, n) => c + ", " + n);
-            logger.DebugFormat("Getting tracks by attribute(s) '{0}' where name or title contain '{1}' took {2}ms and returned {3} results.",
-                searchAreasString, searchTerm, stopwatch.ElapsedMilliseconds, matchingSongs.Count());
-
-            return matchingSongs.Count() < 1 ? new List<ITrack>() : matchingSongs.ToList().Select(s => _trackFactory.BuildTrackInstance(s)).ToList();
+            return !matchingSongs.Any() ? new List<ITrack>() : matchingSongs.ToList().Select(s => _trackFactory.BuildTrackInstance(s)).ToList();
         }
 
         public List<ITrack> SearchForTracksInArea(SearchAreas attribute, string nameOrTitle)
@@ -121,14 +110,12 @@ namespace Dukebox.Library.Services
         {
             var matchingSongs = Enumerable.Empty<Song>();
             var lowerAttributeValue = attributeValue.ToLower();
-            Stopwatch stopwatch = null;
+            Stopwatch stopwatch;
 
-            try
-            { 
-                _dbContextMutex.Wait();
-
+            using (var dukeboxData = _dbContextFactory.GetInstance())
+            {
                 stopwatch = Stopwatch.StartNew();
-                var songs = _dukeboxData.Songs;
+                var songs = dukeboxData.Songs;
 
                 if (attribute == SearchAreas.Album)
                 {
@@ -152,16 +139,12 @@ namespace Dukebox.Library.Services
                     matchingSongs = matchingSongs.Concat(songs.Where(s => s.FileName.ToLower().Equals(lowerAttributeValue)));
                 }
             }
-            finally
-            {
-                _dbContextMutex.Release();
-            }
 
             stopwatch.Stop();
             logger.DebugFormat("Getting tracks by attribute(s) '{0}' where name or title equal '{1}' took {2}ms and returned {3} results.",
                 attribute, lowerAttributeValue, stopwatch.ElapsedMilliseconds, matchingSongs.Count());
 
-            return matchingSongs.Count() < 1 ? new List<ITrack>() : matchingSongs.ToList().Select(s => _trackFactory.BuildTrackInstance(s)).ToList();
+            return !matchingSongs.Any() ? new List<ITrack>() : matchingSongs.ToList().Select(s => _trackFactory.BuildTrackInstance(s)).ToList();
         }
 
         private IEnumerable<string> GetMatchingAttributeIds(SearchAreas attribute, string searchTerm, bool exactMatch = false)
@@ -201,17 +184,14 @@ namespace Dukebox.Library.Services
         /// <returns>A list of tracks that match the given attribute keypair.</returns>
         public List<ITrack> GetTracksByAttributeId(SearchAreas attribute, string attributeId)
         {
-            Stopwatch stopwatch = null;
             var searchAreas = new List<SearchAreas>();
-
             var matchingSongs = Enumerable.Empty<Song>();
+            Stopwatch stopwatch;
 
-            try
-            { 
-                _dbContextMutex.Wait();
-
+            using (var dukeboxData = _dbContextFactory.GetInstance())
+            {
                 stopwatch = Stopwatch.StartNew();
-                var songs = _dukeboxData.Songs;
+                var songs = dukeboxData.Songs;
 
                 if (attribute == SearchAreas.Filename)
                 {
@@ -242,16 +222,12 @@ namespace Dukebox.Library.Services
                     matchingSongs = matchingSongs.Concat(songs.Where(s => s.Id.ToString() == attributeId));
                 }
             }
-            finally
-            {
-                _dbContextMutex.Release();
-            }
 
             stopwatch.Stop();
             logger.DebugFormat("Getting tracks by attribute {0} and value {1} took {2}ms and returned {3} results.",
                 Enum.GetName(typeof(SearchAreas), attribute), attributeId, stopwatch.ElapsedMilliseconds, matchingSongs.Count());
 
-            return matchingSongs.Count() < 1 ? new List<ITrack>() : matchingSongs.Select(s => _trackFactory.BuildTrackInstance(s)).ToList();
+            return !matchingSongs.Any() ? new List<ITrack>() : matchingSongs.Select(s => _trackFactory.BuildTrackInstance(s)).ToList();
         }
     }
 }
