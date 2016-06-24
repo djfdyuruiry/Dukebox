@@ -7,8 +7,8 @@
         mc:Ignorable="d"
         Title="Dukebox - Track Columns Settings" 
         Icon="..\app.ico"
-        Height="320" 
-        Width="400"
+        Height="400" 
+        Width="450"
         WindowStartupLocation="CenterOwner"
         DataContext="{Binding IMetadataColumnsSettingsViewModel, Source={StaticResource ViewModelLocator}}">    
     <Window.Resources>
@@ -36,7 +36,7 @@
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding IsEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                        <TextBlock Text="{Binding ColumnName}"/>
+                        <TextBlock Text="{Binding ColumnName, Converter={StaticResource CamelCaseToSentanceCaseConverter}}"/>
                     </CheckBox>
                 </DataTemplate>
             </ListBox.ItemTemplate>

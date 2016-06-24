@@ -14,5 +14,6 @@
         <ListDictionaryKeyToValueConverter xmlns="clr-namespace:Dukebox.Desktop.Converters" x:Key="ListDictionaryKeyToValueConverter" />
         <ReverseBoolToVisibilityConverter xmlns="clr-namespace:Dukebox.Desktop.Converters" x:Key="ReverseBoolToVisibilityConverter" />
         <ShowTrackListingToHeightConverter xmlns="clr-namespace:Dukebox.Desktop.Converters" x:Key="ShowTrackListingToHeightConverter" />
+        <CamelCaseToSentanceCaseConverter xmlns="clr-namespace:Dukebox.Desktop.Converters" x:Key="CamelCaseToSentanceCaseConverter" /> 
     </Application.Resources>
 </Application>

@@ -154,6 +154,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Converters\CamelCaseToSentanceCaseConverter.cs" />
     <Compile Include="DesktopContainer.cs" />
     <Compile Include="DukeboxUserSettings.cs" />
     <Compile Include="Factories\DukeboxUserSettingsFactory.cs" />
