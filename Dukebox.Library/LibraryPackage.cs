@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
 using log4net;
 using SimpleInjector;
@@ -17,8 +16,6 @@ namespace Dukebox.Library
 {
     public class LibraryPackage : IPackage
     {
-        private const string appDataFolderName = "Dukebox";
-        private const string libraryDbFileName = "library.s3db";
 
         private static readonly ILog logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         
@@ -28,8 +25,8 @@ namespace Dukebox.Library
             container.RegisterSingleton<ICdMetadataService, CdMetadataService>();
             container.RegisterSingleton<IAudioCdRippingService, AudioCdRippingService>();
             container.RegisterSingleton<IAudioPlaylist, AudioPlaylist>();
-            container.RegisterSingleton<IMusicLibraryDbContext>(() => new MusicLibraryDbContext());
-            container.RegisterSingleton(() => GetMusicLibraryInstance(container));
+            container.RegisterSingleton<IMusicLibraryDbContextFactory, MusicLibraryDbContextFactory>();
+            container.RegisterSingleton<IMusicLibrary, MusicLibrary>();
             container.RegisterSingleton<IAudioCdDriveMonitoringService, AudioCdDriveMonitoringService>();
             container.RegisterSingleton<AudioFileMetadataFactory, AudioFileMetadataFactory>();
             container.RegisterSingleton<TrackFactory, TrackFactory>();
@@ -63,62 +60,6 @@ namespace Dukebox.Library
                 logger.Error(errMsg, ex);
                 throw new Exception(errMsg, ex);
             }
-        }
-
-        private static IMusicLibrary GetMusicLibraryInstance(Container container)
-        {
-            try
-            {
-                EnsureLocalEnvironmentValid();
-
-                var musicLibrary = new MusicLibrary(container.GetInstance<IMusicLibraryDbContext>(), container.GetInstance<IDukeboxSettings>(),
-                    container.GetInstance<IAlbumArtCacheService>(), container.GetInstance<AudioFileFormats>(), 
-                    container.GetInstance<AudioFileMetadataFactory>(), container.GetInstance<TrackFactory>());
-
-                return musicLibrary;
-            }
-            catch (Exception ex)
-            {
-                var errMsg = "Error opening SQLite music library database";
-
-                logger.Error(errMsg, ex);
-                throw new Exception(errMsg, ex);
-            }
-        }
-
-        /// <summary>
-        /// Ensure application data folders are correct and a DB file is present, also populate DB connection string.
-        /// </summary>
-        private static void EnsureLocalEnvironmentValid()
-        {
-            var appDirectoryUri = Assembly.GetExecutingAssembly().CodeBase;
-            var appDirectory = Path.GetDirectoryName(appDirectoryUri.Replace("file:///", string.Empty));
-            var libraryDbFilePath = Path.Combine(appDirectory, libraryDbFileName);
-
-            var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            appDataPath = Path.Combine(appDataPath, appDataFolderName);
-                        
-            if (!Directory.Exists(appDataPath))
-            {
-                // create app data directory
-                Directory.CreateDirectory(appDataPath);
-            }
-
-#if !DEBUG 
-            var dbFilePath = Path.Combine(appDataPath, libraryDbFileName);
-#else
-            var dbFilePath = "./library.s3db";
-            appDataPath = Environment.CurrentDirectory;
-#endif
-
-            if (!File.Exists(dbFilePath))
-            {
-                // create new library DB file
-                File.Copy(libraryDbFilePath, dbFilePath);
-            }
-            
-            // populate database connection string
-            AppDomain.CurrentDomain.SetData("DataDirectory", appDataPath);
         }
 
         public void RegisterServices(Container container)
