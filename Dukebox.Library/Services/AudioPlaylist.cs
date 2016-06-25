@@ -4,13 +4,11 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using log4net;
 using Newtonsoft.Json;
 using Dukebox.Audio.Interfaces;
 using Dukebox.Audio.Model;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
-using System.Diagnostics;
 
 namespace Dukebox.Library.Services
 {

@@ -7,13 +7,6 @@
              mc:Ignorable="d" 
              d:DesignHeight="160" d:DesignWidth="1024"
              DataContext="{Binding IPlaybackMonitor, Source={StaticResource ViewModelLocator}}">
-    <UserControl.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="../Styles/MetroButton.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </UserControl.Resources>
     <Grid Grid.Row="0" Grid.Column="0" Background="White">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"></RowDefinition>
@@ -118,39 +111,35 @@
                         <ColumnDefinition Width="auto"></ColumnDefinition>
                     </Grid.ColumnDefinitions>
                     <Button Name="PlayButton" 
-                            MaxWidth="64" 
-                            MaxHeight="64" 
+                            MaxWidth="48" 
+                            MaxHeight="48" 
                             Grid.Row="0" 
                             Grid.Column="0" 
-                            Command="{Binding PlayPauseCommand}"
-                            Style="{StaticResource MetroButton}">
+                            Command="{Binding PlayPauseCommand}">
                         <Image Source="{Binding PlayPauseImage}" />
                     </Button>
                     <Button Name="StopButton" 
-                            MaxWidth="64" 
-                            MaxHeight="64" 
+                            MaxWidth="48" 
+                            MaxHeight="48" 
                             Grid.Row="0" 
                             Grid.Column="1" 
-                            Command="{Binding StopCommand}"
-                            Style="{StaticResource MetroButton}">
+                            Command="{Binding StopCommand}">
                         <Image Source="../Graphics/black_4_audio_stop.png" />
                     </Button>
                     <Button Name="BackButton" 
-                            MaxWidth="64" 
-                            MaxHeight="64" 
+                            MaxWidth="48" 
+                            MaxHeight="48" 
                             Grid.Row="0" 
                             Grid.Column="2" 
-                            Command="{Binding BackCommand}"
-                            Style="{StaticResource MetroButton}">
+                            Command="{Binding BackCommand}">
                         <Image Source="../Graphics/black_4_audio_title_back.png" />
                     </Button>
                     <Button Name="ForwardButton" 
-                            MaxWidth="64" 
-                            MaxHeight="64" 
+                            MaxWidth="48" 
+                            MaxHeight="48" 
                             Grid.Row="0" 
                             Grid.Column="3" 
-                            Command="{Binding ForwardCommand}"
-                            Style="{StaticResource MetroButton}">
+                            Command="{Binding ForwardCommand}">
                         <Image Source="../Graphics/black_4_audio_title_forward.png" />
                     </Button>
                 </Grid>

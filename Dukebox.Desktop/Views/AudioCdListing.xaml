@@ -9,16 +9,9 @@
              d:DesignHeight="592" d:DesignWidth="1016"
              Background="White"
              Name="AudioCdListingControl">
-    <UserControl.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="../Styles/MetroButton.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="0.04*"></RowDefinition>
+            <RowDefinition Height="0.06*"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -37,17 +30,20 @@
                     <RowDefinition Height="*"></RowDefinition>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="0.5*"></ColumnDefinition>
                     <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="0.5*"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
-                <Label Grid.Row="0" Grid.Column="0">CD Drive</Label>
                 <ComboBox Grid.Row="0" 
-                          Grid.Column="1" 
-                          Margin="1" 
+                          Grid.Column="0" 
+                          Margin="2" 
+                          FontSize="14"
                           Name="AudioCdDriveComboBox" 
                           ItemsSource="{Binding AudioCdDrivePaths}"
                           SelectedValue="{Binding SelectedAudioCdDrivePath}"
                           SelectedIndex="0"></ComboBox>
+                <ContentControl Grid.Row="0" Grid.Column="1" VerticalContentAlignment="Center">
+                    <Label FontSize="14" FontWeight="Bold">CD Drive</Label>
+                </ContentControl>
             </Grid>
             <Grid Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right">
                 <Grid.RowDefinitions>
@@ -59,15 +55,17 @@
                 </Grid.ColumnDefinitions>
                 <Button Grid.Row="0" 
                         Grid.Column="0" 
-                        Style="{StaticResource MetroButton}" 
-                        Margin="1" 
+                        Margin="2" 
+                        Padding="4"
+                        FontSize="12"
                         Command="{Binding PlayCd}">
                     Play CD
                 </Button>
                 <Button Grid.Row="0" 
                         Grid.Column="1" 
-                        Style="{StaticResource MetroButton}" 
-                        Margin="1" 
+                        Margin="2" 
+                        Padding="4"
+                        FontSize="12"
                         Command="{Binding RipCd}">
                     Rip CD
                 </Button>
