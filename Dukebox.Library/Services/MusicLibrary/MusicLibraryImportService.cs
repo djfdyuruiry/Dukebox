@@ -175,11 +175,25 @@ namespace Dukebox.Library.Services.MusicLibrary
 
         public Song AddFile(string filename)
         {
+            return AddFile(filename, null);
+        }
+
+        public Song AddFile(string filename, IAudioFileMetadata metadata)
+        {
             using (var dukeboxData = _dbContextFactory.GetInstance())
             {
-                var song = AddFile(dukeboxData, filename);
+                if (_cacheService.FilesCache.Contains(filename))
+                {
+                    return dukeboxData.Songs.First(s => s.FileName.Equals(filename));
+                }
+
+                var song = AddFile(dukeboxData, filename, metadata);
 
                 dukeboxData.SaveChanges();
+
+                _eventService.TriggerEvent(MusicLibraryEvent.SongAdded, song);
+                _eventService.TriggerEvent(MusicLibraryEvent.ArtistAdded, song);
+                _eventService.TriggerEvent(MusicLibraryEvent.AlbumAdded, song);
 
                 return song;
             }
@@ -188,18 +202,6 @@ namespace Dukebox.Library.Services.MusicLibrary
         private Song AddFile(IMusicLibraryDbContext dukeboxData, string filename)
         {
             return AddFile(dukeboxData, filename, null);
-        }
-
-        public Song AddFile(string filename, IAudioFileMetadata metadata)
-        {
-            using (var dukeboxData = _dbContextFactory.GetInstance())
-            {
-                var song = AddFile(dukeboxData, filename, metadata);
-
-                dukeboxData.SaveChanges();
-
-                return song;
-            }
         }
 
         private Song AddFile(IMusicLibraryDbContext dukeboxData, string filename, IAudioFileMetadata metadata)
@@ -219,12 +221,12 @@ namespace Dukebox.Library.Services.MusicLibrary
                 metadata = _audioFileMetadataFactory.BuildAudioFileMetadataInstance(filename);
             }
 
-            var newSong = BuildSongFromMetadata(dukeboxData, filename, metadata);
+            var newSong = AddSongWithMetadataToDb(dukeboxData, filename, metadata);
 
             return newSong;
         }
 
-        private Song BuildSongFromMetadata(IMusicLibraryDbContext dukeboxData, string filename, IAudioFileMetadata metadata)
+        private Song AddSongWithMetadataToDb(IMusicLibraryDbContext dukeboxData, string filename, IAudioFileMetadata metadata)
         {
             var existingSongFile = _cacheService.FilesCache.FirstOrDefault(f => f.Equals(filename, StringComparison.CurrentCulture));
 
@@ -349,6 +351,33 @@ namespace Dukebox.Library.Services.MusicLibrary
             }
 
             return null;
+        }
+
+        public async Task<WatchFolder> AddWatchFolder(WatchFolder watchFolder)
+        {
+            if (watchFolder == null)
+            {
+                throw new ArgumentNullException("watchFolder");
+            }
+            else if (string.IsNullOrWhiteSpace(watchFolder.FolderPath))
+            {
+                throw new ArgumentNullException("watchFolder.FolderPath");
+            }
+
+            using (var dukeboxData = _dbContextFactory.GetInstance())
+            {
+                var existingWatchFolder = dukeboxData.WatchFolders.FirstOrDefault(w => w.FolderPath.Equals(watchFolder.FolderPath));
+
+                if (existingWatchFolder != null)
+                {
+                    return existingWatchFolder;
+                }
+
+                dukeboxData.WatchFolders.Add(watchFolder);
+                await _dbContextFactory.SaveDbChanges(dukeboxData);
+
+                return watchFolder;
+            }
         }
     }
 }

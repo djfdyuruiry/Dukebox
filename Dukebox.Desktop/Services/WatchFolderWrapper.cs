@@ -27,8 +27,9 @@ namespace Dukebox.Desktop.Services
             }
         }
 
-        public WatchFolderWrapper(IMusicLibraryUpdateService updateService)
+        public WatchFolderWrapper(WatchFolder data, IMusicLibraryUpdateService updateService)
         {
+            Data = data;
             _updateService = updateService;
         }
 

@@ -5,6 +5,7 @@
         public static readonly MusicLibraryEvent SongAdded = new MusicLibraryEvent { Name = "SongAdded" };
         public static readonly MusicLibraryEvent ArtistAdded = new MusicLibraryEvent { Name = "ArtistAdded" };
         public static readonly MusicLibraryEvent AlbumAdded = new MusicLibraryEvent { Name = "AlbumAdded" };
+        public static readonly MusicLibraryEvent SongUpdated = new MusicLibraryEvent { Name = "SongUpdated" };
         public static readonly MusicLibraryEvent PlaylistAdded = new MusicLibraryEvent { Name = "PlaylistAdded" };
         public static readonly MusicLibraryEvent AlbumCacheRefreshed = new MusicLibraryEvent { Name = "AlbumCacheRefreshed" };
         public static readonly MusicLibraryEvent ArtistCacheRefreshed = new MusicLibraryEvent { Name = "ArtistCacheRefreshed" };

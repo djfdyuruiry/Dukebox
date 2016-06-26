@@ -43,6 +43,8 @@ namespace Dukebox.Library
             container.RegisterSingleton<IMusicLibraryRepository, MusicLibraryRepository>();
             container.RegisterSingleton<IRecentlyPlayedRepository, RecentlyPlayedRepository>();
 
+            container.RegisterSingleton<IWatchFolderManagerService, WatchFolderManagerService>();
+
             var assemblies = new List<Assembly> { Assembly.GetAssembly(typeof(AudioPackage)) };
 
             container.RegisterPackages(assemblies);

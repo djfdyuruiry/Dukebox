@@ -18,7 +18,8 @@ namespace Dukebox.Desktop.ViewModel
         private List<ITrack> _tracks;
         private readonly IMusicLibraryRepository _musicLibraryRepo;
         private readonly IMusicLibraryUpdateService _musicLibraryUpdateService;
-        
+        private readonly IMusicLibraryEventService _eventService;
+
         public ICommand ClearSearch
         {
             get
@@ -59,7 +60,7 @@ namespace Dukebox.Desktop.ViewModel
         {
             get
             {
-                return _tracks.Select(t => new TrackWrapper(_musicLibraryUpdateService, t)).ToList();
+                return _tracks.Select(t => new TrackWrapper(_musicLibraryUpdateService, _eventService, t)).ToList();
             }
         }
 
@@ -69,11 +70,13 @@ namespace Dukebox.Desktop.ViewModel
             OnPropertyChanged("Tracks");
         }
 
-        public TrackListingPreviewViewModel(IAudioPlaylist audioPlaylist, IMusicLibraryRepository libraryRepo, IMusicLibraryUpdateService updateService)
+        public TrackListingPreviewViewModel(IAudioPlaylist audioPlaylist, IMusicLibraryRepository libraryRepo, 
+            IMusicLibraryUpdateService updateService, IMusicLibraryEventService eventService)
         {
             _audioPlaylist = audioPlaylist;
             _musicLibraryRepo = libraryRepo;
             _musicLibraryUpdateService = updateService;
+            _eventService = eventService;
 
             _tracks = new List<ITrack>();
 

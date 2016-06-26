@@ -12,5 +12,6 @@ namespace Dukebox.Library.Interfaces
         Task AddSupportedFilesInDirectory(string directory, bool subDirectories, Action<object, AudioFileImportedEventArgs> progressHandler, Action<object, int> completeHandler);
         Task<List<ITrack>> AddPlaylistFiles(string filename);
         Task<Playlist> AddPlaylist(string name, IEnumerable<string> filenames);
+        Task<WatchFolder> AddWatchFolder(WatchFolder watchFolder);
     }
 }

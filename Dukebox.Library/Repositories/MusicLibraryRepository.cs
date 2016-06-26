@@ -87,5 +87,13 @@ namespace Dukebox.Library.Repositories
                     .ToList();
             }
         }
+
+        public List<WatchFolder> GetWatchFolders()
+        {
+            using (var dukeboxData = _dbContextFactory.GetInstance())
+            {
+                return dukeboxData.WatchFolders.ToList();
+            }
+        }
     }
 }

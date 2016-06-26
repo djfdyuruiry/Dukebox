@@ -197,6 +197,8 @@
     <Compile Include="Services\Track.cs" />
     <Compile Include="Model\Song.cs" />
     <Compile Include="Services\TrackGeneratorService.cs" />
+    <Compile Include="Services\WatchFolderManagerService.cs" />
+    <Compile Include="Services\WatchFolderService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.Config" />

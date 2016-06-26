@@ -7,7 +7,8 @@ namespace Dukebox.Library.Model
     [Table("watchFolders")]
     public class WatchFolder
     {
-        [Required]
+
+        [Key]
         [Index(IsUnique = true)]
         [Column("folderPath")]
         public string FolderPath { get; set; }

@@ -9,6 +9,7 @@ namespace Dukebox.Library.Interfaces
         event EventHandler ArtistAdded;
         event EventHandler AlbumAdded;
         event EventHandler PlaylistAdded;
+        event EventHandler<Song> SongUpdated;
         event EventHandler AlbumCacheRefreshed;
         event EventHandler ArtistCacheRefreshed;
         event EventHandler PlaylistCacheRefreshed;

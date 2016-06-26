@@ -24,6 +24,8 @@ namespace Dukebox.Desktop.ViewModel
 
         private void ShowWatchFolderSettings()
         {
+            var watchFoldersSettingsWindow = new WatchFolderSettings();
+            watchFoldersSettingsWindow.Show();
         }
     }
 }

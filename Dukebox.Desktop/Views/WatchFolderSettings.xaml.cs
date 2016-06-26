@@ -21,7 +21,14 @@ namespace Dukebox.Desktop.Views
     {
         public WatchFolderSettings()
         {
+            Owner = App.Current.MainWindow;
+
             InitializeComponent();
+        }
+
+        private void CloseWindow(object sender, ExecutedRoutedEventArgs e)
+        {
+            Close();
         }
     }
 }

@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Windows.Input;
-using Dukebox.Library.Model;
+using Dukebox.Desktop.Services;
 
 namespace Dukebox.Desktop.Interfaces
 {
     public interface IWatchFolderSettingsViewModel
     {
-        List<WatchFolder> WatchFolders { get; }
+        List<WatchFolderWrapper> WatchFolders { get; }
         ICommand AddWatchFolder { get; }
         ICommand DeleteWatchFolder { get; }
     }

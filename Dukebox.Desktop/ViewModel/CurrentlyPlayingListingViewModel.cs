@@ -15,7 +15,8 @@ namespace Dukebox.Desktop.ViewModel
     {
         private readonly IAudioPlaylist _audioPlaylist;
         private readonly IMusicLibraryUpdateService _musicLibraryUpdateService;
-        
+        private readonly IMusicLibraryEventService _eventService;
+
         private string _searchText;
         private readonly ListSearchHelper<ITrack> _listSearchHelper;
 
@@ -23,7 +24,7 @@ namespace Dukebox.Desktop.ViewModel
         {
             get
             {
-                return _listSearchHelper.FilteredItems.Select(t => new TrackWrapper(_musicLibraryUpdateService, t)).ToList();
+                return _listSearchHelper.FilteredItems.Select(t => new TrackWrapper(_musicLibraryUpdateService, _eventService, t)).ToList();
             }
         }
 
@@ -71,10 +72,11 @@ namespace Dukebox.Desktop.ViewModel
 
         public ICommand LoadTrack { get; private set; }
 
-        public CurrentlyPlayingListingViewModel(IAudioPlaylist audioPlaylist, IMusicLibraryUpdateService musicLibraryUpdateService) : base()
+        public CurrentlyPlayingListingViewModel(IAudioPlaylist audioPlaylist, IMusicLibraryUpdateService musicLibraryUpdateService, IMusicLibraryEventService eventService) : base()
         {
             _audioPlaylist = audioPlaylist;
             _musicLibraryUpdateService = musicLibraryUpdateService;
+            _eventService = eventService;
             _listSearchHelper = new ListSearchHelper<ITrack>
             {
                 FilterLambda = (t, s) => t.ToString().ToLower(CultureInfo.InvariantCulture)

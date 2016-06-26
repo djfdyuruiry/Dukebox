@@ -53,7 +53,7 @@ namespace Dukebox.Tests.Unit
             _musicLibrarySearchService = new MusicLibrarySearchService(dbContextFactory, trackFactory, _musicLibraryCacheService);
             _musicLibraryImportService = new MusicLibraryImportService(settings, audioFormats, dbContextFactory, audioFileMetadataFactory,
                 trackFactory, _musicLibraryCacheService, eventService, albumArtCache, musicPlaylistGenerator);
-            _musicLibaryUpdateService = new MusicLibraryUpdateService(dbContextFactory);
+            _musicLibaryUpdateService = new MusicLibraryUpdateService(dbContextFactory, eventService);
             _trackGenerator = new TrackGeneratorService(audioFormats, _musicLibrarySearchService, trackFactory);
         }
         

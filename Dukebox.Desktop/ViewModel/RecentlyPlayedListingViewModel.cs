@@ -17,6 +17,7 @@ namespace Dukebox.Desktop.ViewModel
         private readonly IMusicLibraryUpdateService _musicLibraryUpdateService;
         private readonly IRecentlyPlayedRepository _recentlyPlayedRepo;
         private readonly IAudioPlaylist _audioPlaylist;
+        private readonly IMusicLibraryEventService _eventService;
         private readonly ListSearchHelper<ITrack> _listSearchHelper;
         
         private string _searchText;
@@ -41,7 +42,7 @@ namespace Dukebox.Desktop.ViewModel
         {
             get
             {
-                return _listSearchHelper.FilteredItems.Select(t => new TrackWrapper(_musicLibraryUpdateService, t)).ToList();
+                return _listSearchHelper.FilteredItems.Select(t => new TrackWrapper(_musicLibraryUpdateService, _eventService, t)).ToList();
             }
         }
 
@@ -71,11 +72,12 @@ namespace Dukebox.Desktop.ViewModel
         public ICommand LoadTrack { get; private set; }
 
         public RecentlyPlayedListingViewModel(IMusicLibraryUpdateService musicLibraryUpdateService, IRecentlyPlayedRepository recentlyPlayedRepo, 
-            IAudioPlaylist audioPlaylist) : base()
+            IAudioPlaylist audioPlaylist, IMusicLibraryEventService eventService) : base()
         {
             _musicLibraryUpdateService = musicLibraryUpdateService;
             _recentlyPlayedRepo = recentlyPlayedRepo;
             _audioPlaylist = audioPlaylist;
+            _eventService = eventService;
 
             _listSearchHelper = new ListSearchHelper<ITrack>
             {
