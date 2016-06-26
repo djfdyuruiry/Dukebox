@@ -30,14 +30,14 @@ namespace Dukebox.Desktop.Helper
             selectMp3OutputDialog.Description = mp3OutputBrowserPrompt;
         }
 
-        public static void PlayAudioCd(string audioCdDrivePath, IMusicLibrary musicLibrary, IAudioPlaylist audioPlaylist)
+        public static void PlayAudioCd(string audioCdDrivePath, ITrackGeneratorService trackGenerator, IAudioPlaylist audioPlaylist)
         {
             if (string.IsNullOrEmpty(audioCdDrivePath))
             {
                 return;
             }
 
-            var tracks = musicLibrary.GetTracksForDirectory(audioCdDrivePath, false);
+            var tracks = trackGenerator.GetTracksForDirectory(audioCdDrivePath, false);
             audioPlaylist.LoadPlaylistFromList(tracks);
         }
 

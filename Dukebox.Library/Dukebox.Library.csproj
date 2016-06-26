@@ -169,7 +169,6 @@
     <Compile Include="Model\NewTrackLoadedEventArgs.cs" />
     <Compile Include="Model\TrackListAccessEventArgs.cs" />
     <Compile Include="Model\Playlist.cs" />
-    <Compile Include="Interfaces\IMusicLibrary.cs" />
     <Compile Include="Repositories\MusicLibraryRepository.cs" />
     <Compile Include="Repositories\RecentlyPlayedRepository.cs" />
     <Compile Include="Services\AlbumArtCacheService.cs" />

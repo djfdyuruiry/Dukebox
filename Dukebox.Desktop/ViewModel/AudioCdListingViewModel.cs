@@ -16,10 +16,11 @@ namespace Dukebox.Desktop.ViewModel
         private const string loadAudioCdPromptFormat = "A new Audio CD ({0}) has been detected, would you like to play it?";
         private const string audioCdDriveIsNotReadyErrorMsg = "Audio drive is not ready, check a working Audio CD is in the drive.";
         
-        private readonly IMusicLibrary _musicLibrary;
+        private readonly IMusicLibraryUpdateService _musicLibraryUpdateService;
         private readonly IAudioPlaylist _audioPlaylist;
         private readonly IAudioCdDriveMonitoringService _audioCdDriveMonitor;
         private readonly IAudioCdRippingService _cdRippingService;
+        private readonly ITrackGeneratorService _trackGenerator;
 
         private List<ITrack> _tracks;
         private string _selectedAudioCdDrivePath;
@@ -30,7 +31,7 @@ namespace Dukebox.Desktop.ViewModel
         {
             get
             {
-                return _tracks.Select(t => new TrackWrapper(_musicLibrary, t)).ToList();
+                return _tracks.Select(t => new TrackWrapper(_musicLibraryUpdateService, t)).ToList();
             }
         }
 
@@ -86,13 +87,14 @@ namespace Dukebox.Desktop.ViewModel
 
         public ICommand RipCd { get; private set; }
 
-        public AudioCdViewModel(IMusicLibrary musicLibrary, IAudioPlaylist audioPlaylist, 
+        public AudioCdViewModel(IMusicLibraryUpdateService musicLibraryUpdateService, ITrackGeneratorService trackGenerator, IAudioPlaylist audioPlaylist, 
             IAudioCdDriveMonitoringService audioCdDriveMonitor, IAudioCdRippingService cdRippingService) : base()
         {
-            _musicLibrary = musicLibrary;
+            _musicLibraryUpdateService = musicLibraryUpdateService;
             _audioPlaylist = audioPlaylist;
             _audioCdDriveMonitor = audioCdDriveMonitor;
             _cdRippingService = cdRippingService;
+            _trackGenerator = trackGenerator;
 
             _audioCdDriveMonitor.AudioCdInsertedOnLoad += (o, e) =>
             {
@@ -142,7 +144,7 @@ namespace Dukebox.Desktop.ViewModel
         private void AttemptToLoadCdTracks(string audioCdDrivePath)
         {
             UpdateTracks(_audioCdDriveMonitor.IsDriveReady(audioCdDrivePath) ? 
-                _musicLibrary.GetTracksForDirectory(audioCdDrivePath, false) : 
+                _trackGenerator.GetTracksForDirectory(audioCdDrivePath, false) : 
                 new List<ITrack>());
         }
 
@@ -154,7 +156,7 @@ namespace Dukebox.Desktop.ViewModel
                 return;
             }
 
-            AudioCdHelper.PlayAudioCd(SelectedAudioCdDrivePath, _musicLibrary, _audioPlaylist);
+            AudioCdHelper.PlayAudioCd(SelectedAudioCdDrivePath, _trackGenerator, _audioPlaylist);
         }
 
         private void DoRipCd()

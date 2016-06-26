@@ -11,7 +11,7 @@ namespace Dukebox.Desktop.ViewModel
     {
         public const string PlaylistFileFilter = "Playlist Files |*.jpl";
         
-        private readonly IMusicLibrary _musicLibrary;
+        private readonly IMusicLibraryImportService _musicLibraryImportService;
         private readonly IAudioPlaylist _audioPlaylist;
 
         private readonly OpenFileDialog _selectFileDialog;
@@ -37,9 +37,9 @@ namespace Dukebox.Desktop.ViewModel
             }
         }
 
-        public PlaylistMenuViewModel(IMusicLibrary musicLibrary, IAudioPlaylist audioPlaylist) : base()
+        public PlaylistMenuViewModel(IMusicLibraryImportService musicLibraryImportService, IAudioPlaylist audioPlaylist) : base()
         {
-            _musicLibrary = musicLibrary;
+            _musicLibraryImportService = musicLibraryImportService;
             _audioPlaylist = audioPlaylist;
 
             _selectFileDialog = new OpenFileDialog();
@@ -97,7 +97,7 @@ namespace Dukebox.Desktop.ViewModel
 
             var fileName = _selectFileDialog.FileName;
 
-            _musicLibrary.AddPlaylistFiles(fileName);
+            _musicLibraryImportService.AddPlaylistFiles(fileName);
         }
 
         protected virtual void Dispose(bool cleanAllResources)

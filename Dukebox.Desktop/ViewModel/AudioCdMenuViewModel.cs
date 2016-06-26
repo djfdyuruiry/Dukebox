@@ -9,16 +9,16 @@ namespace Dukebox.Desktop.ViewModel
 {
     public class AudioCdMenuViewModel : ViewModelBase, IAudioCdMenuViewModel
     {        
-        private readonly IMusicLibrary _musicLibrary;
+        private readonly ITrackGeneratorService _tracksGenerator;
         private readonly IAudioPlaylist _audioPlaylist;
         private readonly IAudioCdRippingService _cdRippingService;
 
         public ICommand PlayAudioCd { get; private set; }
         public ICommand RipCdToFolder { get; private set; }
 
-        public AudioCdMenuViewModel(IMusicLibrary musicLibrary, IAudioPlaylist audioPlaylist, IAudioCdRippingService cdRippingService) : base()
+        public AudioCdMenuViewModel(ITrackGeneratorService tracksGenerator, IAudioPlaylist audioPlaylist, IAudioCdRippingService cdRippingService) : base()
         {
-            _musicLibrary = musicLibrary;
+            _tracksGenerator = tracksGenerator;
             _audioPlaylist = audioPlaylist;
             _cdRippingService = cdRippingService;
 
@@ -35,7 +35,7 @@ namespace Dukebox.Desktop.ViewModel
                 return;
             }
 
-            AudioCdHelper.PlayAudioCd(audioCdDrivePath, _musicLibrary, _audioPlaylist);
+            AudioCdHelper.PlayAudioCd(audioCdDrivePath, _tracksGenerator, _audioPlaylist);
 
             SendNotificationMessage(NotificationMessages.AudioPlaylistLoadedNewTracks);
         }

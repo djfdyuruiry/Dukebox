@@ -13,8 +13,9 @@ namespace Dukebox.Desktop.ViewModel
 {
     public class LibraryListingViewModel : ViewModelBase, ITrackListingViewModel, ISearchControlViewModel
     {
-        private readonly IMusicLibrary _musicLibrary;
+        private readonly IMusicLibraryUpdateService _musicLibraryUpdateService;
         private readonly IAudioPlaylist _audioPlaylist;
+        private readonly IMusicLibrarySearchService _musicLibrarySearcher;
 
         private List<ITrack> _tracks;
         private string _searchText;
@@ -39,7 +40,7 @@ namespace Dukebox.Desktop.ViewModel
         { 
             get 
             {
-                return _tracks.Select(t => new TrackWrapper(_musicLibrary, t)).ToList();
+                return _tracks.Select(t => new TrackWrapper(_musicLibraryUpdateService, t)).ToList();
             }
         }
         public bool EditingListingsDisabled
@@ -68,12 +69,14 @@ namespace Dukebox.Desktop.ViewModel
         public ICommand LoadTrack { get; private set; }
 
 
-        public LibraryListingViewModel(IMusicLibrary musicLibrary, IAudioPlaylist audioPlaylist) : base()
+        public LibraryListingViewModel(IMusicLibraryUpdateService musicLibraryUpdateService, IMusicLibraryEventService eventService, 
+            IMusicLibrarySearchService musicLibrarySearcher, IAudioPlaylist audioPlaylist) : base()
         {
-            _musicLibrary = musicLibrary;
-            _musicLibrary.SongAdded += (o, e) => RefreshTrackListing();
+            _musicLibraryUpdateService = musicLibraryUpdateService;
+            eventService.SongAdded += (o, e) => RefreshTrackListing();
 
             _audioPlaylist = audioPlaylist;
+            _musicLibrarySearcher = musicLibrarySearcher;
 
             ClearSearch = new RelayCommand(() => SearchText = string.Empty);
             LoadTrack = new RelayCommand<ITrack>(DoLoadTrack);
@@ -97,7 +100,7 @@ namespace Dukebox.Desktop.ViewModel
 
         private void DoSearch()
         {
-            _tracks = _musicLibrary.SearchForTracksInArea(SearchAreas.All, SearchText);
+            _tracks = _musicLibrarySearcher.SearchForTracksInArea(SearchAreas.All, SearchText);
             OnPropertyChanged("Tracks");
         }
     }

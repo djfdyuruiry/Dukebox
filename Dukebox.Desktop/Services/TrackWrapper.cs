@@ -10,15 +10,15 @@ namespace Dukebox.Desktop.Services
     {
         private static event EventHandler<Song> TrackInstanceChanged; 
         
-        private readonly IMusicLibrary _musicLibrary;
+        private readonly IMusicLibraryUpdateService _updateService;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         public ITrack Data { get; private set; }
 
-        public TrackWrapper(IMusicLibrary musicLibrary, ITrack track)
+        public TrackWrapper(IMusicLibraryUpdateService updateService, ITrack track)
         {
-            _musicLibrary = musicLibrary;
+            _updateService = updateService;
 
             Data = track;
 
@@ -98,7 +98,7 @@ namespace Dukebox.Desktop.Services
 
         private void PropagateTrackChanges()
         {
-            Data.SyncMetadata(_musicLibrary);
+            Data.SyncMetadata(_updateService);
 
             TrackInstanceChanged?.Invoke(this, Data.Song);
         }
