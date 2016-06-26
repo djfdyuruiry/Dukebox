@@ -14,7 +14,7 @@ namespace Dukebox.Library.Interfaces
         IAudioFileMetadata Metadata { get; }
         Song Song { get; set; }
         void CopyDetailsToAudioMetadata(IAudioFileMetadata metadata);
-        void SyncMetadata(IMusicLibrary musicLibrayToUpdate);
+        void SyncMetadata(IMusicLibraryUpdateService updateService);
         string ToString();
     }
 }

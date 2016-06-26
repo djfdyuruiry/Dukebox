@@ -16,8 +16,9 @@ namespace Dukebox.Desktop.ViewModel
         private readonly IAudioPlaylist _audioPlaylist;
 
         private List<ITrack> _tracks;
-        private readonly IMusicLibrary _musicLibrary;
-
+        private readonly IMusicLibraryRepository _musicLibraryRepo;
+        private readonly IMusicLibraryUpdateService _musicLibraryUpdateService;
+        
         public ICommand ClearSearch
         {
             get
@@ -58,7 +59,7 @@ namespace Dukebox.Desktop.ViewModel
         {
             get
             {
-                return _tracks.Select(t => new TrackWrapper(_musicLibrary, t)).ToList();
+                return _tracks.Select(t => new TrackWrapper(_musicLibraryUpdateService, t)).ToList();
             }
         }
 
@@ -68,10 +69,11 @@ namespace Dukebox.Desktop.ViewModel
             OnPropertyChanged("Tracks");
         }
 
-        public TrackListingPreviewViewModel(IAudioPlaylist audioPlaylist, IMusicLibrary musicLibrary)
+        public TrackListingPreviewViewModel(IAudioPlaylist audioPlaylist, IMusicLibraryRepository libraryRepo, IMusicLibraryUpdateService updateService)
         {
             _audioPlaylist = audioPlaylist;
-            _musicLibrary = musicLibrary;
+            _musicLibraryRepo = libraryRepo;
+            _musicLibraryUpdateService = updateService;
 
             _tracks = new List<ITrack>();
 
@@ -86,11 +88,11 @@ namespace Dukebox.Desktop.ViewModel
             {
                 if (nm.IsArtist)
                 {
-                    UpdateTracks(_musicLibrary.GetTracksForArtist(nm.Name));
+                    UpdateTracks(_musicLibraryRepo.GetTracksForArtist(nm.Name));
                 }
                 else
                 {
-                    UpdateTracks(_musicLibrary.GetTracksForAlbum(nm.Name));
+                    UpdateTracks(_musicLibraryRepo.GetTracksForAlbum(nm.Name));
                 }
             });
         }

@@ -132,7 +132,7 @@ namespace Dukebox.Library.Services
             }
         }
 
-        public void SyncMetadata(IMusicLibrary musicLibrayToUpdate)
+        public void SyncMetadata(IMusicLibraryUpdateService musicLibrayToUpdate)
         {
             if (Song.IsAudioCdTrack)
             {

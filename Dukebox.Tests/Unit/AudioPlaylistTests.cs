@@ -200,14 +200,16 @@ namespace Dukebox.Tests.Unit
 
         private Tuple<AudioPlaylist, IMediaPlayer> PrepareAudioPlaylistFakes()
         {
-            var musicLibrary = A.Fake<IMusicLibrary>();
+            var recentlyPlayedRepo = A.Fake<IRecentlyPlayedRepository>();
+            var trackGenerator = A.Fake<ITrackGeneratorService>();
+            var playlistGenerator = A.Fake<IPlaylistGeneratorService>();
             var mediaPlayer = A.Fake<IMediaPlayer>();
             var mediaPlayerIsPlaying = false;
 
             A.CallTo(() => mediaPlayer.LoadFile(A<string>.Ignored, A<MediaPlayerMetadata>.Ignored)).Invokes((o) => mediaPlayerIsPlaying = true);
             A.CallTo(() => mediaPlayer.Playing).ReturnsLazily(e => mediaPlayerIsPlaying);
 
-            var audioPlaylist = new AudioPlaylist(musicLibrary, mediaPlayer);
+            var audioPlaylist = new AudioPlaylist(recentlyPlayedRepo, trackGenerator, playlistGenerator, mediaPlayer);
             var track = BuildTrackFake();
 
             audioPlaylist.Tracks.Add(track);

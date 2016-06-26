@@ -14,7 +14,8 @@ namespace Dukebox.Desktop.ViewModel
 {
     public class RecentlyPlayedListingViewModel : ViewModelBase, ITrackListingViewModel, ISearchControlViewModel
     {
-        private readonly IMusicLibrary _musicLibrary;
+        private readonly IMusicLibraryUpdateService _musicLibraryUpdateService;
+        private readonly IRecentlyPlayedRepository _recentlyPlayedRepo;
         private readonly IAudioPlaylist _audioPlaylist;
         private readonly ListSearchHelper<ITrack> _listSearchHelper;
         
@@ -40,7 +41,7 @@ namespace Dukebox.Desktop.ViewModel
         {
             get
             {
-                return _listSearchHelper.FilteredItems.Select(t => new TrackWrapper(_musicLibrary, t)).ToList();
+                return _listSearchHelper.FilteredItems.Select(t => new TrackWrapper(_musicLibraryUpdateService, t)).ToList();
             }
         }
 
@@ -69,9 +70,11 @@ namespace Dukebox.Desktop.ViewModel
 
         public ICommand LoadTrack { get; private set; }
 
-        public RecentlyPlayedListingViewModel(IMusicLibrary musicLibrary, IAudioPlaylist audioPlaylist) : base()
+        public RecentlyPlayedListingViewModel(IMusicLibraryUpdateService musicLibraryUpdateService, IRecentlyPlayedRepository recentlyPlayedRepo, 
+            IAudioPlaylist audioPlaylist) : base()
         {
-            _musicLibrary = musicLibrary;
+            _musicLibraryUpdateService = musicLibraryUpdateService;
+            _recentlyPlayedRepo = recentlyPlayedRepo;
             _audioPlaylist = audioPlaylist;
 
             _listSearchHelper = new ListSearchHelper<ITrack>
@@ -83,7 +86,7 @@ namespace Dukebox.Desktop.ViewModel
             ClearSearch = new RelayCommand(() => SearchText = string.Empty);
             LoadTrack = new RelayCommand<ITrack>(DoLoadTrack);
 
-            _musicLibrary.RecentlyPlayedListModified += (o, e) => RefreshRecentlyPlayedFromLibrary();
+            _recentlyPlayedRepo.RecentlyPlayedListModified += (o, e) => RefreshRecentlyPlayedFromLibrary();
             RefreshRecentlyPlayedFromLibrary();
         }
 
@@ -97,7 +100,7 @@ namespace Dukebox.Desktop.ViewModel
 
         public void RefreshRecentlyPlayedFromLibrary()
         {
-            _listSearchHelper.Items = _musicLibrary.RecentlyPlayedAsList;
+            _listSearchHelper.Items = _recentlyPlayedRepo.RecentlyPlayedAsList;
             OnPropertyChanged("Tracks");
         }
 

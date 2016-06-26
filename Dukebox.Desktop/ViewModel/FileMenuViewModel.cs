@@ -25,9 +25,10 @@ namespace Dukebox.Desktop.ViewModel
         public const string AddToLibraryHeader = "Importing audio files into the library...";
         public const string AddToLibraryTitle = "Library Import";
 
-        private readonly IMusicLibrary _musicLibrary;
+        private readonly IMusicLibraryImportService _musicLibraryImportService;
         private readonly IAudioPlaylist _audioPlaylist;
         private readonly TrackFactory _trackFactory;
+        private readonly ITrackGeneratorService _tracksGenerator;
 
         private readonly OpenFileDialog _selectFileDialog;
         private readonly FolderBrowserDialog _selectFolderDialog;
@@ -39,11 +40,13 @@ namespace Dukebox.Desktop.ViewModel
         public ICommand ImportLibrary { get; private set; }
         public ICommand Exit { get; private set; }
 
-        public FileMenuViewModel(IMusicLibrary musicLibrary, IAudioPlaylist audioPlaylist, AudioFileFormats audioFileFormats, TrackFactory trackFactory) : base()
+        public FileMenuViewModel(IMusicLibraryImportService musicLibraryImportService, ITrackGeneratorService tracksGenerator, IAudioPlaylist audioPlaylist, 
+            AudioFileFormats audioFileFormats, TrackFactory trackFactory) : base()
         {
-            _musicLibrary = musicLibrary;
+            _musicLibraryImportService = musicLibraryImportService;
             _audioPlaylist = audioPlaylist;
             _trackFactory = trackFactory;
+            _tracksGenerator = tracksGenerator;
 
             _selectFileDialog = new OpenFileDialog();
             _selectFolderDialog = new FolderBrowserDialog();
@@ -86,7 +89,7 @@ namespace Dukebox.Desktop.ViewModel
                 return;
             }
             
-            var tracks = _musicLibrary.GetTracksForDirectory(_selectFolderDialog.SelectedPath, false);
+            var tracks = _tracksGenerator.GetTracksForDirectory(_selectFolderDialog.SelectedPath, false);
             _audioPlaylist.LoadPlaylistFromList(tracks);
 
             SendNotificationMessage(NotificationMessages.AudioPlaylistLoadedNewTracks);
@@ -116,7 +119,7 @@ namespace Dukebox.Desktop.ViewModel
 
             try
             {
-                _musicLibrary.AddSupportedFilesInDirectory(pathToAdd, true,
+                _musicLibraryImportService.AddSupportedFilesInDirectory(pathToAdd, true,
                         (o, a) => ImportStep(progressViewModel, a, ref filesAdded),
                         (o, i) => progressWindow.Dispatcher.InvokeAsync(progressWindow.Close));
             }

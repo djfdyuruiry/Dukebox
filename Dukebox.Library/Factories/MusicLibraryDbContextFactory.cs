@@ -6,6 +6,8 @@ using log4net;
 using Newtonsoft.Json;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Repositories;
+using System.Threading.Tasks;
+using Dukebox.Library.Model;
 
 namespace Dukebox.Library.Factories
 {
@@ -16,10 +18,12 @@ namespace Dukebox.Library.Factories
 
         private static readonly ILog logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
+        private readonly IMusicLibraryEventService _eventService;
         private readonly string _dbFilePath;
 
-        public MusicLibraryDbContextFactory()
+        public MusicLibraryDbContextFactory(IMusicLibraryEventService eventService)
         {
+            _eventService = eventService;
             _dbFilePath = CreateDbFileIfMissingAndSetConnectionString();
         }
 
@@ -78,8 +82,26 @@ namespace Dukebox.Library.Factories
                 throw new Exception(errMsg, ex);
             }
         }
+        
+        public async Task SaveDbChanges(IMusicLibraryDbContext dukeboxData)
+        {
+            try
+            {
+                await dukeboxData.SaveChangesAsync();
+                _eventService.TriggerEvent(MusicLibraryEvent.DatabaseChangesSaved);
+            }
+            catch (DbEntityValidationException ex)
+            {
+                logger.Error("Error updating database due to entity validation errors", ex);
+                LogEntityValidationException(ex);
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Error updating database", ex);
+            }
+        }
 
-        public void LogEntityValidationException(DbEntityValidationException ex)
+        private void LogEntityValidationException(DbEntityValidationException ex)
         {
             foreach (var vr in ex.EntityValidationErrors)
             {

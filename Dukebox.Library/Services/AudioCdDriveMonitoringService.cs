@@ -16,7 +16,7 @@ namespace Dukebox.Library.Services
         private const double cdDrivePollingTimeInMs = 1000;
         private static readonly ILog logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        private readonly IMusicLibrary _musicLibrary;
+        private readonly ITrackGeneratorService _trackGenerator;
         private readonly AudioFileFormats _audioFileFormats;
 
         private readonly Timer _pollCdDrivesTimer;
@@ -27,9 +27,9 @@ namespace Dukebox.Library.Services
         public event EventHandler<AudioCdDriveEventArgs> AudioCdInserted;
         public event EventHandler AudioCdEjected;
 
-        public AudioCdDriveMonitoringService(IMusicLibrary musicLibrary, AudioFileFormats audioFileFormats)
+        public AudioCdDriveMonitoringService(ITrackGeneratorService musicLibrary, AudioFileFormats audioFileFormats)
         {
-            _musicLibrary = musicLibrary;
+            _trackGenerator = musicLibrary;
             _audioFileFormats = audioFileFormats;
 
             _cdDrives = GetAudioDrives();
@@ -135,7 +135,7 @@ namespace Dukebox.Library.Services
         {
             try
             {
-                return _musicLibrary.GetTracksForDirectory(_currentDrive.RootDirectory.FullName, false);
+                return _trackGenerator.GetTracksForDirectory(_currentDrive.RootDirectory.FullName, false);
             }
             catch (Exception ex)
             {
