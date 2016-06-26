@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data.Entity;
+using System.Linq;
 using System.Threading.Tasks;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
@@ -25,9 +26,14 @@ namespace Dukebox.Library.Services.MusicLibrary
             using (var dukeboxData = _dbContextFactory.GetInstance())
             {
                 dukeboxData.Songs.Attach(song);
-                dukeboxData.Entry(song).State = EntityState.Modified;
 
-                await _dbContextFactory.SaveDbChanges(dukeboxData);
+                var dbEntity = dukeboxData.Entry(song);
+
+                if (dbEntity != null)
+                {
+                    dbEntity.State = EntityState.Modified;
+                    await _dbContextFactory.SaveDbChanges(dukeboxData);
+                }
             }
         }
 
@@ -40,9 +46,14 @@ namespace Dukebox.Library.Services.MusicLibrary
 
             using (var dukeboxData = _dbContextFactory.GetInstance())
             {
-                dukeboxData.Songs.Attach(track.Song);
-                dukeboxData.Entry(track.Song).State = EntityState.Deleted;
+                var song = dukeboxData.Songs.FirstOrDefault(s => s.Id == track.Song.Id);
 
+                if (song == null)
+                {
+                    return;
+                }
+
+                dukeboxData.Songs.Remove(song);
                 await _dbContextFactory.SaveDbChanges(dukeboxData);
             }
         }

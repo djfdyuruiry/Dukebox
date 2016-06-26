@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
 using System.Diagnostics;
 using System.Linq;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
-using System.Data.Entity.Infrastructure;
 
 namespace Dukebox.Library.Repositories
 {
