@@ -1,11 +1,10 @@
-﻿using System.Data.Entity.Validation;
-using Dukebox.Library.Interfaces;
+﻿using System.Threading.Tasks;
 
 namespace Dukebox.Library.Interfaces
 {
     public interface IMusicLibraryDbContextFactory
     {
         IMusicLibraryDbContext GetInstance();
-        void LogEntityValidationException(DbEntityValidationException ex);
+        Task SaveDbChanges(IMusicLibraryDbContext dukeboxData);
     }
 }

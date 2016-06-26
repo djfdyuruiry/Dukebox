@@ -137,10 +137,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Factories\AudioFileMetadataFactory.cs" />
+    <Compile Include="Interfaces\IMusicLibraryImportService.cs" />
+    <Compile Include="Interfaces\IMusicLibraryUpdateService.cs" />
+    <Compile Include="Interfaces\IMusicLibraryCacheService.cs" />
     <Compile Include="Interfaces\IMusicLibraryDbContextFactory.cs" />
     <Compile Include="Factories\MusicLibraryDbContextFactory.cs" />
     <Compile Include="Factories\TrackFactory.cs" />
     <Compile Include="Helper\Md5HashGenerator.cs" />
+    <Compile Include="Interfaces\IMusicLibraryEventService.cs" />
+    <Compile Include="Interfaces\IMusicLibraryRepository.cs" />
+    <Compile Include="Interfaces\IPlaylistGeneratorService.cs" />
+    <Compile Include="Interfaces\IRecentlyPlayedRepository.cs" />
+    <Compile Include="Interfaces\ITrackGeneratorService.cs" />
     <Compile Include="Model\Album.cs" />
     <Compile Include="Model\Artist.cs" />
     <Compile Include="Helper\DukeboxInitialisationHelper.cs" />
@@ -148,6 +156,7 @@
     <Compile Include="Interfaces\ICdRipViewUpdater.cs" />
     <Compile Include="Interfaces\ITrack.cs" />
     <Compile Include="Interfaces\IMusicLibraryDbContext.cs" />
+    <Compile Include="Model\MusicLibraryEvent.cs" />
     <Compile Include="Model\TagTypeMap.cs" />
     <Compile Include="Model\GenericEventArgs.cs" />
     <Compile Include="Repositories\MusicLibraryDbContext.cs" />
@@ -161,6 +170,8 @@
     <Compile Include="Model\TrackListAccessEventArgs.cs" />
     <Compile Include="Model\Playlist.cs" />
     <Compile Include="Interfaces\IMusicLibrary.cs" />
+    <Compile Include="Repositories\MusicLibraryRepository.cs" />
+    <Compile Include="Repositories\RecentlyPlayedRepository.cs" />
     <Compile Include="Services\AlbumArtCacheService.cs" />
     <Compile Include="Services\AudioCdDriveMonitoringService.cs" />
     <Compile Include="Services\AudioCdRippingService.cs" />
@@ -171,14 +182,19 @@
     <Compile Include="Interfaces\IAudioCdRippingService.cs" />
     <Compile Include="Interfaces\IAudioPlaylist.cs" />
     <Compile Include="Services\AudioPlaylist.cs" />
-    <Compile Include="Repositories\MusicLibrary.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Model\SearchAreas.cs" />
     <Compile Include="Interfaces\IAudioFileMetaData.cs" />
     <Compile Include="Interfaces\IMusicLibrarySearchService.cs" />
-    <Compile Include="Services\MusicLibrarySearchService.cs" />
+    <Compile Include="Services\MusicLibrary\MusicLibraryCacheService.cs" />
+    <Compile Include="Services\MusicLibrary\MusicLibraryImportService.cs" />
+    <Compile Include="Services\MusicLibrary\MusicLibraryUpdateService.cs" />
+    <Compile Include="Services\MusicLibrary\MusicLibraryEventService.cs" />
+    <Compile Include="Services\MusicLibrary\MusicLibrarySearchService.cs" />
+    <Compile Include="Services\PlaylistGeneratorService.cs" />
     <Compile Include="Services\Track.cs" />
     <Compile Include="Model\Song.cs" />
+    <Compile Include="Services\TrackGeneratorService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.Config" />
