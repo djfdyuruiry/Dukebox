@@ -5,5 +5,6 @@ namespace Dukebox.Desktop.Interfaces
     public interface ISettingsMenuViewModel
     {
         ICommand TrackColumnsSettings { get; }
+        ICommand WatchFolderSettings { get; }
     }
 }

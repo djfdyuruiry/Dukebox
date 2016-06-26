@@ -1,0 +1,76 @@
+﻿<Window x:Class="Dukebox.Desktop.Views.WatchFolderSettings"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Dukebox.Desktop.Views"
+        mc:Ignorable="d"
+        Title="Dukebox - Watch Folder Settings" 
+        Icon="..\app.ico"
+        Height="400" 
+        Width="450"
+        WindowStartupLocation="CenterOwner"
+        DataContext="{Binding IWatchFolderSettingsViewModel, Source={StaticResource ViewModelLocator}}">
+    <Window.CommandBindings>
+        <CommandBinding Command="ApplicationCommands.Close"
+                        Executed="CloseWindow"/>
+    </Window.CommandBindings>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="6*"></RowDefinition>
+            <RowDefinition Height=".8*"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <TextBlock Grid.Row="0" Grid.Column="0" TextWrapping="WrapWithOverflow" HorizontalAlignment="Left">
+            You can add, edit and delete watch folders below. 
+            These folders are monitored and new music and file changes will be saved to your libray automatically.
+        </TextBlock>
+        <DataGrid Grid.Row="1" 
+                  Grid.Column="0" 
+                  AutoGenerateColumns="False" 
+                  GridLinesVisibility="None"
+                  Background="White"
+                  CanUserResizeColumns="True"
+                  CanUserReorderColumns="True"
+                  CanUserSortColumns="True"
+                  SelectionMode="Single"
+                  SelectionUnit="FullRow"
+                  Name="WatchFoldersGrid"
+                  ItemsSource="{Binding WatchFolders}"
+                  IsSynchronizedWithCurrentItem="True">
+            <DataGrid.Columns>
+                <DataGridTemplateColumn Header="Path" 
+                                        Width="auto" 
+                                        SortMemberPath="FolderPath" 
+                                        CanUserSort="True">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding FolderPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="" 
+                                        Width="auto" 
+                                        CanUserSort="True"  
+                                        IsReadOnly="True">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Command="{Binding DeleteWatchFolder}" CommandParameter="{Binding}">Delete</Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+        <Button Grid.Row="2" Grid.Column="0" HorizontalAlignment="Right" Margin="3" Command="{Binding AddWatchFolder}">
+            <StackPanel Orientation="Horizontal">
+                <Image Source="../Graphics/ic_playlist_add_48px.png" Width="24" Height="24"/>
+                <Label>Add New Watch Folder</Label>
+            </StackPanel>
+        </Button>
+        <Button Grid.Row="3" Grid.Column="0" Command="ApplicationCommands.Close">OK</Button>
+    </Grid>
+</Window>

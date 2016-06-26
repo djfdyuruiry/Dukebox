@@ -149,6 +149,8 @@
     <Compile Include="Interfaces\IPlaylistGeneratorService.cs" />
     <Compile Include="Interfaces\IRecentlyPlayedRepository.cs" />
     <Compile Include="Interfaces\ITrackGeneratorService.cs" />
+    <Compile Include="Interfaces\IWatchFolderManagerService.cs" />
+    <Compile Include="Interfaces\IWatchFolderService.cs" />
     <Compile Include="Model\Album.cs" />
     <Compile Include="Model\Artist.cs" />
     <Compile Include="Helper\DukeboxInitialisationHelper.cs" />

@@ -164,6 +164,7 @@
     <Compile Include="Interfaces\IAudioDriveListingViewModel.cs" />
     <Compile Include="Interfaces\IMetadataColumnsSettingsViewModel.cs" />
     <Compile Include="Interfaces\ISettingsMenuViewModel.cs" />
+    <Compile Include="Interfaces\IWatchFolderSettingsViewModel.cs" />
     <Compile Include="Model\ExtendedMetadataColumnSetting.cs" />
     <Compile Include="Model\PreviewArtistOrAlbumMessage.cs" />
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
@@ -185,6 +186,7 @@
     <Compile Include="Services\Album.cs" />
     <Compile Include="Model\NavIconNames.cs" />
     <Compile Include="Services\TrackWrapper.cs" />
+    <Compile Include="Services\WatchFolderWrapper.cs" />
     <Compile Include="ViewModel\CdRippingProgressMonitorViewModel.cs" />
     <Compile Include="ViewModel\AlbumListingViewModel.cs" />
     <Compile Include="Interfaces\IMainWindowViewModel.cs" />
@@ -214,6 +216,7 @@
     <Compile Include="ViewModel\SettingsMenuViewModel.cs" />
     <Compile Include="ViewModel\ViewModelBase.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
+    <Compile Include="ViewModel\WatchFolderSettingsViewModel.cs" />
     <Compile Include="Views\AlbumListing.xaml.cs">
       <DependentUpon>AlbumListing.xaml</DependentUpon>
     </Compile>
@@ -237,6 +240,9 @@
     </Compile>
     <Compile Include="Views\TrackListing.xaml.cs">
       <DependentUpon>TrackListing.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\WatchFolderSettings.xaml.cs">
+      <DependentUpon>WatchFolderSettings.xaml</DependentUpon>
     </Compile>
     <Page Include="LoadingScreen.xaml">
       <SubType>Designer</SubType>
@@ -288,6 +294,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\TrackListing.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\WatchFolderSettings.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

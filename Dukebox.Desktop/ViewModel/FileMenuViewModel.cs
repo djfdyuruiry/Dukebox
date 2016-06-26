@@ -26,6 +26,7 @@ namespace Dukebox.Desktop.ViewModel
         public const string AddToLibraryTitle = "Library Import";
 
         private readonly IMusicLibraryImportService _musicLibraryImportService;
+        private readonly IWatchFolderManagerService _watchFolderService;
         private readonly IAudioPlaylist _audioPlaylist;
         private readonly TrackFactory _trackFactory;
         private readonly ITrackGeneratorService _tracksGenerator;
@@ -40,10 +41,12 @@ namespace Dukebox.Desktop.ViewModel
         public ICommand ImportLibrary { get; private set; }
         public ICommand Exit { get; private set; }
 
-        public FileMenuViewModel(IMusicLibraryImportService musicLibraryImportService, ITrackGeneratorService tracksGenerator, IAudioPlaylist audioPlaylist, 
+        public FileMenuViewModel(IMusicLibraryImportService musicLibraryImportService, IWatchFolderManagerService watchFolderService,
+            ITrackGeneratorService tracksGenerator, IAudioPlaylist audioPlaylist, 
             AudioFileFormats audioFileFormats, TrackFactory trackFactory) : base()
         {
             _musicLibraryImportService = musicLibraryImportService;
+            _watchFolderService = watchFolderService;
             _audioPlaylist = audioPlaylist;
             _trackFactory = trackFactory;
             _tracksGenerator = tracksGenerator;
@@ -121,7 +124,11 @@ namespace Dukebox.Desktop.ViewModel
             {
                 _musicLibraryImportService.AddSupportedFilesInDirectory(pathToAdd, true,
                         (o, a) => ImportStep(progressViewModel, a, ref filesAdded),
-                        (o, i) => progressWindow.Dispatcher.InvokeAsync(progressWindow.Close));
+                        (o, i) =>
+                        {
+                            progressWindow.Dispatcher.InvokeAsync(progressWindow.Close);
+                            _watchFolderService.ManageWatchFolder(new WatchFolder { FolderPath = pathToAdd });
+                        });
             }
             catch (Exception ex)
             {
