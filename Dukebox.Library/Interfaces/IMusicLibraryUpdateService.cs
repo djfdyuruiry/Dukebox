@@ -7,5 +7,6 @@ namespace Dukebox.Library.Interfaces
     {
         Task RemoveTrack(ITrack track);
         Task SaveSongChanges(Song song);
+        Task SaveWatchFolderChanges(WatchFolder song);
     }
 }

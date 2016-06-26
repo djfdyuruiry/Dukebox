@@ -54,6 +54,33 @@ namespace Dukebox.Library.Model
         [Column("albumName")]
         public virtual string AlbumName { get; set; }
 
+        [Column("lastScanTimestamp")]
+        public int LastScanTimestamp { get; set; }
+
+        public Artist Artist
+        {
+            get
+            {
+                return new Artist(ArtistName);
+            }
+        }
+
+        public Album Album
+        {
+            get
+            {
+                return new Album(AlbumName);
+            }
+        }
+
+        public DateTime LastScanDateTime
+        {
+            get
+            {
+                return DateTimeOffset.FromUnixTimeSeconds(LastScanTimestamp).DateTime;
+            }
+        }
+
         public Dictionary<string, List<string>> ExtendedMetadata
         {
             get
@@ -69,22 +96,6 @@ namespace Dukebox.Library.Model
             {
                 _extendedMetadata = value;
                 ExtendedMetadataJson = JsonConvert.SerializeObject(_extendedMetadata);
-            }
-        }
-
-        public Artist Artist
-        {
-            get
-            {
-                return new Artist(ArtistName);
-            }
-        }
-
-        public Album Album
-        {
-            get
-            {
-                return new Album(AlbumName);
             }
         }
 

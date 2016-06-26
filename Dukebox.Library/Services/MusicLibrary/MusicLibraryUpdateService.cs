@@ -16,6 +16,27 @@ namespace Dukebox.Library.Services.MusicLibrary
             _dbContextFactory = dbContextFactory;
         }
 
+        public async Task RemoveTrack(ITrack track)
+        {
+            if (track == null)
+            {
+                throw new ArgumentNullException("track");
+            }
+
+            using (var dukeboxData = _dbContextFactory.GetInstance())
+            {
+                var song = dukeboxData.Songs.FirstOrDefault(s => s.Id == track.Song.Id);
+
+                if (song == null)
+                {
+                    return;
+                }
+
+                dukeboxData.Songs.Remove(song);
+                await _dbContextFactory.SaveDbChanges(dukeboxData);
+            }
+        }
+
         public async Task SaveSongChanges(Song song)
         {
             if (song == null)
@@ -37,24 +58,24 @@ namespace Dukebox.Library.Services.MusicLibrary
             }
         }
 
-        public async Task RemoveTrack(ITrack track)
+        public async Task SaveWatchFolderChanges(WatchFolder watchFolder)
         {
-            if (track == null)
+            if (watchFolder == null)
             {
-                throw new ArgumentNullException("track");
+                throw new ArgumentNullException("watchFolder");
             }
 
             using (var dukeboxData = _dbContextFactory.GetInstance())
             {
-                var song = dukeboxData.Songs.FirstOrDefault(s => s.Id == track.Song.Id);
+                dukeboxData.WatchFolders.Attach(watchFolder);
 
-                if (song == null)
+                var dbEntity = dukeboxData.Entry(watchFolder);
+
+                if (dbEntity != null)
                 {
-                    return;
+                    dbEntity.State = EntityState.Modified;
+                    await _dbContextFactory.SaveDbChanges(dukeboxData);
                 }
-
-                dukeboxData.Songs.Remove(song);
-                await _dbContextFactory.SaveDbChanges(dukeboxData);
             }
         }
     }
