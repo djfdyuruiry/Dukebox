@@ -13,10 +13,12 @@ namespace Dukebox.Library.Model
         private string _extendedMetadataJson;
         private Dictionary<string, List<string>> _extendedMetadata;
 
+        [Key]
         [Column("id")]
         public long Id { get; set; }
 
         [Required]
+        [Index(IsUnique = true)]
         [Column("fileName")]
         public string FileName { get; set; }
 
