@@ -8,6 +8,7 @@ namespace Dukebox.Desktop.Interfaces
     {
         List<WatchFolderWrapper> WatchFolders { get; }
         ICommand AddWatchFolder { get; }
+        ICommand UpdateWatchFolder { get; }
         ICommand DeleteWatchFolder { get; }
     }
 }

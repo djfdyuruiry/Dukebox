@@ -36,6 +36,8 @@ namespace Dukebox.Library.Services.MusicLibrary
 
                 dukeboxData.Songs.Remove(song);
                 await _dbContextFactory.SaveDbChanges(dukeboxData);
+
+                _eventService.TriggerSongDeleted(song);
             }
         }
 
@@ -57,6 +59,8 @@ namespace Dukebox.Library.Services.MusicLibrary
 
                 dukeboxData.Songs.Remove(song);
                 await _dbContextFactory.SaveDbChanges(dukeboxData);
+
+                _eventService.TriggerSongDeleted(song);
             }
         }
 
@@ -77,6 +81,8 @@ namespace Dukebox.Library.Services.MusicLibrary
                 {
                     dbEntity.State = EntityState.Modified;
                     await _dbContextFactory.SaveDbChanges(dukeboxData);
+
+                    _eventService.TriggerSongUpdated(song);
                 }
             }
         }
@@ -104,7 +110,8 @@ namespace Dukebox.Library.Services.MusicLibrary
                 song.FileName = fullPath;
 
                 await _dbContextFactory.SaveDbChanges(dukeboxData);
-                _eventService.TriggerEvent(MusicLibraryEvent.SongUpdated, song);
+
+                _eventService.TriggerSongUpdated(song);
 
                 return true;
             }
@@ -127,6 +134,8 @@ namespace Dukebox.Library.Services.MusicLibrary
                 {
                     dbEntity.State = EntityState.Modified;
                     await _dbContextFactory.SaveDbChanges(dukeboxData);
+
+                    _eventService.TriggerWatchFolderUpdated(watchFolder);
                 }
             }
         }
@@ -149,6 +158,8 @@ namespace Dukebox.Library.Services.MusicLibrary
 
                 dukeboxData.WatchFolders.Remove(dbWatchFolder);
                 await _dbContextFactory.SaveDbChanges(dukeboxData);
+
+                _eventService.TriggerWatchFolderDeleted(watchFolder);
             }
         }
     }

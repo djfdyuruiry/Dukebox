@@ -17,7 +17,7 @@ namespace Dukebox.Library.Services
         private readonly IMusicLibraryImportService _importService;
         private readonly IMusicLibraryUpdateService _updateService;
         private readonly IMusicLibraryEventService _eventService;
-        private readonly Task _initalImportTask;
+        private Task _initalImportTask;
 
         private FileSystemWatcher _fileWatcher;
 
@@ -42,12 +42,28 @@ namespace Dukebox.Library.Services
             _eventService = eventService;
 
             _initalImportTask = AddFileChangesSinceLastStart();
+
+            _eventService.WatchFolderUpdated += (o, e) => ReloadServiceIfStarted(e);
         }
 
         private async Task AddFileChangesSinceLastStart()
         {
             await _importService.AddSupportedFilesInDirectory(WatchFolder.FolderPath, true, 
                 null, (o, i) => logger.Info($"Inital import for folder '{WatchFolder.FolderPath}' has completed"));
+        }
+
+        private void ReloadServiceIfStarted(WatchFolder watchFolder)
+        {
+            if (watchFolder != WatchFolder || _fileWatcher == null)
+            {
+                return;
+            }
+
+            StopWatching();
+
+            _initalImportTask = AddFileChangesSinceLastStart();
+
+            StartWatching();
         }
 
         public async Task StartWatching()
@@ -84,7 +100,7 @@ namespace Dukebox.Library.Services
                 _updateService.RemoveSongByFilePath(e.FullPath);
                 var song = _importService.AddFile(e.FullPath);
 
-                _eventService.TriggerEvent(MusicLibraryEvent.SongUpdated, song);
+                _eventService.TriggerSongUpdated(song);
             }, e.FullPath);
         }
 

@@ -8,6 +8,8 @@ using Dukebox.Desktop.Interfaces;
 using Dukebox.Desktop.Model;
 using Dukebox.Desktop.Services;
 using Dukebox.Library.Interfaces;
+using System;
+using Dukebox.Library.Model;
 
 namespace Dukebox.Desktop.ViewModel
 {
@@ -19,6 +21,8 @@ namespace Dukebox.Desktop.ViewModel
         private readonly IMusicLibraryRepository _musicLibraryRepo;
         private readonly IMusicLibraryUpdateService _musicLibraryUpdateService;
         private readonly IMusicLibraryEventService _eventService;
+        private string _trackFilter;
+        private string _trackFilterName;
 
         public ICommand ClearSearch
         {
@@ -82,8 +86,53 @@ namespace Dukebox.Desktop.ViewModel
 
             LoadTrack = new RelayCommand<ITrack>(DoLoadTrack);
 
+            _trackFilter = string.Empty;
+            _trackFilterName = string.Empty;
+
             RegisterMessageHandlers();
+
+            _eventService.SongAdded += (o, e) => ReloadTracksIfNeccessary(e);
+            _eventService.SongDeleted += (o, e) => RemoveTrackIfNeccessary(e);
         }
+
+        private void ReloadTracksIfNeccessary(Song song)
+        {
+            var matchingTrack = Tracks.FirstOrDefault(t => t.Data.Song == song);
+            var songHasMatchingFilter = _trackFilter.Equals("Artist") ? song.Artist.Name.Equals(_trackFilterName) : song.Album.Name.Equals(_trackFilterName);
+
+            if (matchingTrack == null && !songHasMatchingFilter)
+            {
+                return;
+            }
+
+            if (songHasMatchingFilter)
+            {
+                if (_trackFilter == "Artist")
+                {
+                    UpdateTracks(_musicLibraryRepo.GetTracksForArtist(_trackFilterName));
+                }
+                else
+                {
+                    UpdateTracks(_musicLibraryRepo.GetTracksForAlbum(_trackFilterName));
+                }
+            }
+
+            OnPropertyChanged("Tracks");
+        }
+
+        private void RemoveTrackIfNeccessary(Song song)
+        {
+            var matchingTrack = Tracks.FirstOrDefault(t => t.Data.Song == song);
+
+            if (matchingTrack == null)
+            {
+                return;
+            }
+
+            Tracks.Remove(matchingTrack);
+            OnPropertyChanged("Tracks");
+        }
+
 
         private void RegisterMessageHandlers()
         {
@@ -91,12 +140,16 @@ namespace Dukebox.Desktop.ViewModel
             {
                 if (nm.IsArtist)
                 {
+                    _trackFilter = "Artist";
                     UpdateTracks(_musicLibraryRepo.GetTracksForArtist(nm.Name));
                 }
                 else
                 {
+                    _trackFilter = "Album";
                     UpdateTracks(_musicLibraryRepo.GetTracksForAlbum(nm.Name));
                 }
+
+                _trackFilterName = nm.Name;
             });
         }
 

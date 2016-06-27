@@ -75,8 +75,9 @@ namespace Dukebox.Desktop.ViewModel
                 SortLambda = (a) => a.Name.ToLower(CultureInfo.InvariantCulture)
             };
 
-            eventService.ArtistAdded += (o, e) => RefreshArtistsFromLibrary();
-            
+            eventService.ArtistsAdded += (o, e) => RefreshArtistsFromLibrary();
+            eventService.SongDeleted += (o, e) => RefreshArtistsFromLibrary();
+
             LoadArtist = new RelayCommand<Artist>(DoLoadArtist);
             ClearSearch = new RelayCommand(() => SearchText = string.Empty);
 

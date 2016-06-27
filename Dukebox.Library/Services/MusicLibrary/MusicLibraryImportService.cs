@@ -20,17 +20,21 @@ namespace Dukebox.Library.Services.MusicLibrary
         private static readonly ILog logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private readonly IDukeboxSettings _settings;
-        private readonly IMusicLibraryDbContextFactory _dbContextFactory;
         private readonly AudioFileFormats _audioFormats;
+
+        private readonly IMusicLibraryDbContextFactory _dbContextFactory;
         private readonly AudioFileMetadataFactory _audioFileMetadataFactory;
         private readonly TrackFactory _trackFactory;
+
         private readonly IMusicLibraryCacheService _cacheService;
         private readonly IMusicLibraryEventService _eventService;
+        private readonly IMusicLibraryUpdateService _updateService;
         private readonly IAlbumArtCacheService _albumArtCache;
+
         private readonly IPlaylistGeneratorService _playlistGenerator;
 
         public MusicLibraryImportService(IDukeboxSettings settings, AudioFileFormats audioFormats, IMusicLibraryDbContextFactory dbContextFactory,
-            AudioFileMetadataFactory metadataFactory, TrackFactory trackFactory, IMusicLibraryCacheService cacheService,
+            AudioFileMetadataFactory metadataFactory, TrackFactory trackFactory, IMusicLibraryCacheService cacheService, IMusicLibraryUpdateService updateService,
             IMusicLibraryEventService eventService, IAlbumArtCacheService albumCacheServices, IPlaylistGeneratorService playlistGenerator)
         {
             _settings = settings;
@@ -41,6 +45,7 @@ namespace Dukebox.Library.Services.MusicLibrary
             _trackFactory = trackFactory;
 
             _cacheService = cacheService;
+            _updateService = updateService;
             _eventService = eventService;
             _albumArtCache = albumCacheServices;
 
@@ -66,6 +71,7 @@ namespace Dukebox.Library.Services.MusicLibrary
             var concurrencyLimit = _settings.AddDirectoryConcurrencyLimit;
             var allfiles = Directory.GetFiles(@directory, "*.*", subDirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
             var filesToAdd = allfiles.Where(f => !_cacheService.FilesCache.Contains(f) && _audioFormats.FileSupported(f));
+            var filesToRemove = _cacheService.FilesCache.Where(f => f.StartsWith(directory) && !allfiles.Contains(f)).ToList();
             var numFilesToAdd = filesToAdd.Count();
 
             var filesWithMetadata = ExtractMetadataFromFiles(filesToAdd, progressHandler, concurrencyLimit, numFilesToAdd);
@@ -74,6 +80,10 @@ namespace Dukebox.Library.Services.MusicLibrary
             using (var dukeboxData = _dbContextFactory.GetInstance())
             {
                 albumsWithMetadata = AddFilesToDatabaseModel(dukeboxData, filesWithMetadata, concurrencyLimit, progressHandler, numFilesToAdd);
+
+                logger.Info($"Removing {filesToRemove.Count} library song(s) missing (deleted, renamed or moved) from the path '{directory}'");
+                filesToRemove.ForEach(f => _updateService.RemoveSongByFilePath(f));
+
                 _dbContextFactory.SaveDbChanges(dukeboxData);
             }
 
@@ -166,9 +176,9 @@ namespace Dukebox.Library.Services.MusicLibrary
 
         private void CallMetadataAndCompleteHandlers(Action<object, int> completeHandler, int filesAdded)
         {
-            _eventService.TriggerEvent(MusicLibraryEvent.AlbumAdded);
-            _eventService.TriggerEvent(MusicLibraryEvent.ArtistAdded);
-            _eventService.TriggerEvent(MusicLibraryEvent.SongAdded);
+            _eventService.TriggerEvent(MusicLibraryEvent.AlbumsAdded);
+            _eventService.TriggerEvent(MusicLibraryEvent.ArtistsAdded);
+            _eventService.TriggerEvent(MusicLibraryEvent.SongsAdded);
 
             Task.Run(() => completeHandler?.Invoke(this, filesAdded));
         }
@@ -191,9 +201,9 @@ namespace Dukebox.Library.Services.MusicLibrary
 
                 dukeboxData.SaveChanges();
 
-                _eventService.TriggerEvent(MusicLibraryEvent.SongAdded, song);
-                _eventService.TriggerEvent(MusicLibraryEvent.ArtistAdded, song);
-                _eventService.TriggerEvent(MusicLibraryEvent.AlbumAdded, song);
+                _eventService.TriggerSongAdded(song);
+                _eventService.TriggerEvent(MusicLibraryEvent.ArtistsAdded);
+                _eventService.TriggerEvent(MusicLibraryEvent.AlbumsAdded);
 
                 return song;
             }
@@ -341,7 +351,7 @@ namespace Dukebox.Library.Services.MusicLibrary
                 logger.InfoFormat("Added playlist to library: {0}", newPlaylist.Name);
                 logger.DebugFormat("Adding playlist to library took {0}ms. Playlist id: {1}", stopwatch.ElapsedMilliseconds, newPlaylist.Id);
 
-                _eventService.TriggerEvent(MusicLibraryEvent.PlaylistAdded);
+                _eventService.TriggerEvent(MusicLibraryEvent.PlaylistsAdded);
 
                 return newPlaylist;
             }

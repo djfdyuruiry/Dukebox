@@ -44,12 +44,27 @@ namespace Dukebox.Library.Services
             WatchFolders = musicRepo
                 .GetWatchFolders()
                 .Select(w => BuildWatchFolderService(w)).Cast<IWatchFolderService>().ToList();
+
+            _eventService.WatchFolderDeleted += (o, e) => RemoveWatchFolder(e);
+        }
+
+        private void RemoveWatchFolder(WatchFolder watchFolder)
+        {
+            var watchFolderToRemove = WatchFolders.FirstOrDefault(w => w.WatchFolder == watchFolder);
+
+            if (watchFolderToRemove == null)
+            {
+                return;
+            }
+
+            watchFolderToRemove.StopWatching();
+            WatchFolders.Remove(watchFolderToRemove);
         }
 
         public async Task ManageWatchFolder(WatchFolder watchFolder)
         {
             var dbWatchFolder = await _importService.AddWatchFolder(watchFolder);
-            var watchFolderService = BuildWatchFolderService(dbWatchFolder, true);
+            var watchFolderService = BuildWatchFolderService(dbWatchFolder);
 
             logger.Info($"Added folder '{dbWatchFolder.FolderPath}' to database");
 
@@ -59,9 +74,9 @@ namespace Dukebox.Library.Services
             WatchFolders.Add(watchFolderService);
         }
 
-        private WatchFolderService BuildWatchFolderService(WatchFolder watchFolder, bool skipInitalImport = false)
+        private WatchFolderService BuildWatchFolderService(WatchFolder watchFolder)
         {
-            return new WatchFolderService(watchFolder, _audioFormats, _importService, _updateService, _eventService, skipInitalImport);
+            return new WatchFolderService(watchFolder, _audioFormats, _importService, _updateService, _eventService);
         }
 
         public async Task StopManagingWatchFolder(WatchFolder watchFolder)

@@ -1,21 +1,19 @@
-﻿using GalaSoft.MvvmLight.Command;
+﻿
+using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Threading;
 using System.Windows.Forms;
 using System.Windows.Input;
 using Application = System.Windows.Application;
+using GalaSoft.MvvmLight.Command;
 using Dukebox.Audio;
 using Dukebox.Desktop.Interfaces;
+using Dukebox.Desktop.Model;
+using Dukebox.Desktop.Views;
+using Dukebox.Library.Factories;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
-using Dukebox.Library.Services;
-using System.Threading.Tasks;
-using Dukebox.Desktop.Views;
-using System.IO;
-using Dukebox.Desktop.Model;
-using System.Threading;
-using System;
-using Dukebox.Library.Factories;
-using Dukebox.Configuration.Interfaces;
 
 namespace Dukebox.Desktop.ViewModel
 {
@@ -107,28 +105,11 @@ namespace Dukebox.Desktop.ViewModel
                 return;
             }
 
-            var progressWindow = new ProgressMonitor();
-            var progressViewModel = new ProgressMonitorViewModel();
-
-            progressWindow.DataContext = progressViewModel;
-            progressViewModel.Title = AddToLibraryTitle;
-            progressViewModel.HeaderText = AddToLibraryHeader;
-            progressViewModel.StatusText = "Searching for Audio Files...";
-
-            progressWindow.Show();
-
-            var filesAdded = 0;
             var pathToAdd = _selectFolderDialog.SelectedPath;
 
             try
             {
-                _musicLibraryImportService.AddSupportedFilesInDirectory(pathToAdd, true,
-                        (o, a) => ImportStep(progressViewModel, a, ref filesAdded),
-                        (o, i) =>
-                        {
-                            progressWindow.Dispatcher.InvokeAsync(progressWindow.Close);
-                            _watchFolderService.ManageWatchFolder(new WatchFolder { FolderPath = pathToAdd });
-                        });
+                _watchFolderService.ManageWatchFolder(new WatchFolder { FolderPath = pathToAdd });
             }
             catch (Exception ex)
             {

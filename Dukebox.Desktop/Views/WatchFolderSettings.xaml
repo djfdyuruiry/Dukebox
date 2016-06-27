@@ -10,6 +10,7 @@
         Height="400" 
         Width="450"
         WindowStartupLocation="CenterOwner"
+        Name="WatchFolderSettingsWindow"
         DataContext="{Binding IWatchFolderSettingsViewModel, Source={StaticResource ViewModelLocator}}">
     <Window.CommandBindings>
         <CommandBinding Command="ApplicationCommands.Close"
@@ -44,22 +45,32 @@
                   IsSynchronizedWithCurrentItem="True">
             <DataGrid.Columns>
                 <DataGridTemplateColumn Header="Path" 
-                                        Width="auto" 
+                                        Width="*" 
                                         SortMemberPath="FolderPath" 
                                         CanUserSort="True">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBox Text="{Binding FolderPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            <TextBlock Text="{Binding FolderPath, UpdateSourceTrigger=PropertyChanged}"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTemplateColumn Header="" 
-                                        Width="auto" 
+                                        Width="50" 
                                         CanUserSort="True"  
                                         IsReadOnly="True">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Button Command="{Binding DeleteWatchFolder}" CommandParameter="{Binding}">Delete</Button>
+                            <Button Command="{Binding ElementName=WatchFolderSettingsWindow, Path=DataContext.UpdateWatchFolder}" CommandParameter="{Binding}">Edit</Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="" 
+                                        Width="50" 
+                                        CanUserSort="True"  
+                                        IsReadOnly="True">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Command="{Binding ElementName=WatchFolderSettingsWindow, Path=DataContext.DeleteWatchFolder}" CommandParameter="{Binding}">Delete</Button>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>

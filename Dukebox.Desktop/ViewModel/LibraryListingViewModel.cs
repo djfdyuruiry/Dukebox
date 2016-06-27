@@ -78,7 +78,9 @@ namespace Dukebox.Desktop.ViewModel
             _musicLibrarySearcher = musicLibrarySearcher;
             _eventService = eventService;
 
+            _eventService.SongsAdded += (o, e) => RefreshTrackListing();
             _eventService.SongAdded += (o, e) => RefreshTrackListing();
+            _eventService.SongDeleted += (o, e) => RefreshTrackListing();
 
             ClearSearch = new RelayCommand(() => SearchText = string.Empty);
             LoadTrack = new RelayCommand<ITrack>(DoLoadTrack);
