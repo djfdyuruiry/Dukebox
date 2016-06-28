@@ -53,13 +53,13 @@ namespace Dukebox.Library.Services.MusicLibrary
         }
 
         public async Task AddSupportedFilesInDirectory(string directory, bool subDirectories, 
-            Action<object, AudioFileImportedEventArgs> progressHandler, Action<object, int> completeHandler)
+            Action<AudioFileImportedInfo> progressHandler, Action<DirectoryImportReport> completeHandler)
         {
             await Task.Run(() => DoAddSupportedFilesInDirectory(directory, subDirectories, progressHandler, completeHandler));
         }
 
-        private void DoAddSupportedFilesInDirectory(string directory, bool subDirectories, 
-            Action<object, AudioFileImportedEventArgs> progressHandler, Action<object, int> completeHandler)
+        private void DoAddSupportedFilesInDirectory(string directory, bool subDirectories,
+            Action<AudioFileImportedInfo> progressHandler, Action<DirectoryImportReport> completeHandler)
         {
             if (!Directory.Exists(directory))
             {
@@ -87,12 +87,19 @@ namespace Dukebox.Library.Services.MusicLibrary
                 _dbContextFactory.SaveDbChanges(dukeboxData);
             }
 
-            var filesAdded = albumsWithMetadata.Count;
+            var numFilesAdded = albumsWithMetadata.Count;
+            var numMissingFilesRemoved = filesToRemove.Count;
+            var importReport = new DirectoryImportReport
+            {
+                DirectoryPath = directory,
+                NumberOfFilesAdded = numFilesAdded,
+                NumberOfMissingFilesRemoved = numMissingFilesRemoved
+            };
 
             if (!albumsWithMetadata.Any())
             {
                 logger.WarnFormat("No new supported files were found in directory '{0}'", directory);
-                Task.Run(() => completeHandler(this, filesAdded));
+                Task.Run(() => completeHandler?.Invoke(importReport));
                 return;
             }
 
@@ -100,28 +107,28 @@ namespace Dukebox.Library.Services.MusicLibrary
 
             stopwatch.Stop();
 
-            logger.InfoFormat("Added {0} tracks from directory: {1}", filesAdded, directory);
+            logger.InfoFormat("Added {0} tracks from directory: {1}", numFilesAdded, directory);
             logger.DebugFormat("Adding {0} tracks to library from a directory took {1}ms. Directory path: {2} (Sub-directories searched: {3})",
-                filesAdded, stopwatch.ElapsedMilliseconds, directory, subDirectories);
+                numFilesAdded, stopwatch.ElapsedMilliseconds, directory, subDirectories);
 
-            CallMetadataAndCompleteHandlers(completeHandler, filesAdded);
+            CallMetadataAndCompleteHandlers(completeHandler, importReport);
 
-            if (numFilesToAdd > filesAdded)
+            if (numFilesToAdd > numFilesAdded)
             {
                 logger.WarnFormat("Not all files found in directory '{0}' were added to the database [{1}/{2} files added]",
-                    directory, filesAdded, numFilesToAdd);
+                    directory, numFilesAdded, numFilesToAdd);
             }
         }
 
-        private List<Tuple<string, IAudioFileMetadata>> ExtractMetadataFromFiles(IEnumerable<string> filesToAdd, 
-            Action<object, AudioFileImportedEventArgs> progressHandler,
+        private List<Tuple<string, IAudioFileMetadata>> ExtractMetadataFromFiles(IEnumerable<string> filesToAdd,
+            Action<AudioFileImportedInfo> progressHandler,
             int concurrencyLimit, int numFilesToAdd)
         {
             return filesToAdd.AsParallel().WithDegreeOfParallelism(concurrencyLimit).Select(f =>
             {
                 var metadataTuple = new Tuple<string, IAudioFileMetadata>(f, _audioFileMetadataFactory.BuildAudioFileMetadataInstance(f));
 
-                Task.Run(() => progressHandler?.Invoke(this, new AudioFileImportedEventArgs
+                Task.Run(() => progressHandler?.Invoke(new AudioFileImportedInfo
                 {
                     JustProcessing = true,
                     FileAdded = f,
@@ -134,7 +141,7 @@ namespace Dukebox.Library.Services.MusicLibrary
 
         private List<Tuple<Album, IAudioFileMetadata>> AddFilesToDatabaseModel(IMusicLibraryDbContext dukeboxData, 
             List<Tuple<string, IAudioFileMetadata>> filesWithMetadata,
-            int concurrencyLimit, Action<object, AudioFileImportedEventArgs> progressHandler, int numFilesToAdd)
+            int concurrencyLimit, Action<AudioFileImportedInfo> progressHandler, int numFilesToAdd)
         {
             return filesWithMetadata.AsParallel().WithDegreeOfParallelism(concurrencyLimit).Select(fileWithMetdata =>
             {
@@ -142,7 +149,7 @@ namespace Dukebox.Library.Services.MusicLibrary
                 {
                     var song = AddFile(dukeboxData, fileWithMetdata.Item1, fileWithMetdata.Item2);
 
-                    Task.Run(() => progressHandler?.Invoke(this, new AudioFileImportedEventArgs
+                    Task.Run(() => progressHandler?.Invoke(new AudioFileImportedInfo
                     {
                         JustProcessing = false,
                         FileAdded = fileWithMetdata.Item1,
@@ -174,13 +181,13 @@ namespace Dukebox.Library.Services.MusicLibrary
             }).ToList();
         }
 
-        private void CallMetadataAndCompleteHandlers(Action<object, int> completeHandler, int filesAdded)
+        private void CallMetadataAndCompleteHandlers(Action<DirectoryImportReport> completeHandler, DirectoryImportReport importReport)
         {
             _eventService.TriggerEvent(MusicLibraryEvent.AlbumsAdded);
             _eventService.TriggerEvent(MusicLibraryEvent.ArtistsAdded);
             _eventService.TriggerEvent(MusicLibraryEvent.SongsAdded);
 
-            Task.Run(() => completeHandler?.Invoke(this, filesAdded));
+            Task.Run(() => completeHandler?.Invoke(importReport));
         }
 
         public Song AddFile(string filename)

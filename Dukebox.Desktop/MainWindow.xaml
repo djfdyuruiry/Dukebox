@@ -204,6 +204,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"></RowDefinition>
                         <RowDefinition Height="{Binding ShowTrackListingPreview, Converter={StaticResource ShowTrackListingToHeightConverter}}"></RowDefinition>
+                        <RowDefinition Height=".04*"></RowDefinition>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"></ColumnDefinition> 
@@ -235,6 +236,11 @@
                     <ContentControl Grid.Row="1" Grid.Column="0" Visibility="{Binding ShowTrackListingPreview}">
                         <DukeboxViews:TrackListing DataContext="{Binding TrackListingPreview, Source={StaticResource ViewModelLocator}}">
                         </DukeboxViews:TrackListing>
+                    </ContentControl>
+                    <ContentControl Grid.Row="2" Grid.Column="0">
+                        <StackPanel HorizontalAlignment="Right">
+                            <TextBlock FontSize="14" Text="{Binding ImportReportText}" Padding="5"></TextBlock>
+                        </StackPanel>
                     </ContentControl>
                 </Grid>
             </Grid>

@@ -158,10 +158,13 @@
     <Compile Include="Interfaces\ICdRipViewUpdater.cs" />
     <Compile Include="Interfaces\ITrack.cs" />
     <Compile Include="Interfaces\IMusicLibraryDbContext.cs" />
+    <Compile Include="Model\DirectoryImportReport.cs" />
     <Compile Include="Model\MusicLibraryEvent.cs" />
     <Compile Include="Model\TagTypeMap.cs" />
     <Compile Include="Model\GenericEventArgs.cs" />
     <Compile Include="Model\WatchFolder.cs" />
+    <Compile Include="Model\WatchFolderEvent.cs" />
+    <Compile Include="Model\WatchFolderEventType.cs" />
     <Compile Include="Repositories\MusicLibraryDbContext.cs" />
     <Compile Include="LibraryPackage.cs" />
     <Compile Include="Model\AlbumArtCacheOperations.cs" />

@@ -21,7 +21,8 @@ namespace Dukebox.Library.Services
 
         private FileSystemWatcher _fileWatcher;
 
-        public event EventHandler FileEventProcessed;
+        public event EventHandler<DirectoryImportReport> ImportCompleted;
+        public event EventHandler<AudioFileImportedInfo> FileEventProcessed;
 
         public WatchFolder WatchFolder { get; private set; }
 
@@ -49,7 +50,18 @@ namespace Dukebox.Library.Services
         private async Task AddFileChangesSinceLastStart()
         {
             await _importService.AddSupportedFilesInDirectory(WatchFolder.FolderPath, true, 
-                null, (o, i) => logger.Info($"Inital import for folder '{WatchFolder.FolderPath}' has completed"));
+                afi =>
+                {
+                    if (afi.JustProcessing)
+                    {
+                        Task.Run(() => FileEventProcessed?.Invoke(this, afi));
+                    }
+                },  
+                dir =>
+                {
+                    Task.Run(() => ImportCompleted?.Invoke(this, dir));
+                    logger.Info($"Inital import for folder '{WatchFolder.FolderPath}' has completed");
+                });
         }
 
         private void ReloadServiceIfStarted(WatchFolder watchFolder)
@@ -90,7 +102,7 @@ namespace Dukebox.Library.Services
             SafeFileActionInvoke(() =>
             {
                 _importService.AddFile(e.FullPath);
-            }, e.FullPath);
+            }, e);
         }
 
         private void ProcessChangedFileEvent(FileSystemEventArgs e)
@@ -101,7 +113,7 @@ namespace Dukebox.Library.Services
                 var song = _importService.AddFile(e.FullPath);
 
                 _eventService.TriggerSongUpdated(song);
-            }, e.FullPath);
+            }, e);
         }
 
         private void ProcessRenamedFileEvent(RenamedEventArgs e)
@@ -120,7 +132,7 @@ namespace Dukebox.Library.Services
                 {
                     _importService.AddFile(e.FullPath);
                 }                
-            }, e.FullPath, false);
+            }, e, false);
         }
 
         private void ProcessDeletedFileEvent(FileSystemEventArgs e)
@@ -128,31 +140,35 @@ namespace Dukebox.Library.Services
             SafeFileActionInvoke(() =>
             {
                 _updateService.RemoveSongByFilePath(e.FullPath);
-            }, e.FullPath);
+            }, e);
         }
         
-        private void SafeFileActionInvoke(Action actionToInvoke, string filePath)
+        private void SafeFileActionInvoke(Action actionToInvoke, FileSystemEventArgs eventArgs)
         {
-            SafeFileActionInvoke(actionToInvoke, filePath, true);
+            SafeFileActionInvoke(actionToInvoke, eventArgs, true);
         }
 
-        private void SafeFileActionInvoke(Action actionToInvoke, string filePath, bool doFileTypeCheck)
+        private void SafeFileActionInvoke(Action actionToInvoke, FileSystemEventArgs eventArgs, bool doFileTypeCheck)
         {
 
             try
             {
-                if (doFileTypeCheck && !_audioFormats.FileSupported(filePath))
+                if (doFileTypeCheck && !_audioFormats.FileSupported(eventArgs.FullPath))
                 {
                     return;
                 }
 
                 actionToInvoke?.Invoke();
 
-                Task.Run(() => FileEventProcessed?.Invoke(this, EventArgs.Empty));
+                Task.Run(() => FileEventProcessed?.Invoke(this, new AudioFileImportedInfo
+                {
+                    FileAdded = eventArgs.FullPath,
+                    TotalFilesThisImport = 1
+                }));
             }
             catch (Exception ex)
             {
-                logger.Error($"Error while processing event for file '{filePath}' from watch folder '{WatchFolder.FolderPath}'", ex);
+                logger.Error($"Error while processing event for file '{eventArgs.FullPath}' from watch folder '{WatchFolder.FolderPath}'", ex);
             }
         }
 

@@ -7,7 +7,7 @@ namespace Dukebox.Library.Interfaces
 {
     public interface IWatchFolderManagerService
     {
-        event EventHandler WatchFolderServiceProcessedEvent;
+        event EventHandler<WatchFolderEvent> WatchFolderServiceProcessedEvent;
         List<IWatchFolderService> WatchFolders { get; }
         WatchFolder LastWatchFolderUpdated { get; }
         Task ManageWatchFolder(WatchFolder watchFolder);

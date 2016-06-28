@@ -119,7 +119,7 @@ namespace Dukebox.Desktop.ViewModel
             }
         }
 
-        private void ImportStep(ProgressMonitorViewModel viewModel, AudioFileImportedEventArgs fileImportedArgs, ref int filesAdded)
+        private void ImportStep(ProgressMonitorViewModel viewModel, AudioFileImportedInfo fileImportedArgs, ref int filesAdded)
         {
             viewModel.MaximumProgressValue = (fileImportedArgs.TotalFilesThisImport * 2);
 

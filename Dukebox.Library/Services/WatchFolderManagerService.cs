@@ -19,7 +19,7 @@ namespace Dukebox.Library.Services
         private readonly AudioFileFormats _audioFormats;
         private readonly IMusicLibraryEventService _eventService;
 
-        public event EventHandler WatchFolderServiceProcessedEvent;
+        public event EventHandler<WatchFolderEvent> WatchFolderServiceProcessedEvent;
 
         public List<IWatchFolderService> WatchFolders { get; private set; }
         public WatchFolder LastWatchFolderUpdated
@@ -68,7 +68,17 @@ namespace Dukebox.Library.Services
 
             logger.Info($"Added folder '{dbWatchFolder.FolderPath}' to database");
 
-            watchFolderService.FileEventProcessed += (o, e) => WatchFolderServiceProcessedEvent?.Invoke(this, EventArgs.Empty);
+            watchFolderService.FileEventProcessed += (o, e) => WatchFolderServiceProcessedEvent?.Invoke(this, new WatchFolderEvent
+            {
+                EventType = WatchFolderEventType.AudioFileImport,
+                AudioFileImportInfo = e
+            });
+            watchFolderService.ImportCompleted += (o, e) => WatchFolderServiceProcessedEvent?.Invoke(this, new WatchFolderEvent
+            {
+                EventType = WatchFolderEventType.DirectoryImport,
+                ImportReport = e
+            });
+
             watchFolderService.StartWatching();
 
             WatchFolders.Add(watchFolderService);
