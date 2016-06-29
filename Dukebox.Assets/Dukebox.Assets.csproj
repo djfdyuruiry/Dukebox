@@ -261,7 +261,7 @@
     <None Include="x86BASS\OptimFROG.dll" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="library.s3db">
+    <None Include="library_v0.9.s3db">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

@@ -14,7 +14,7 @@ namespace Dukebox.Library.Factories
     public class MusicLibraryDbContextFactory : IMusicLibraryDbContextFactory
     {
         private const string appDataFolderName = "Dukebox";
-        private const string libraryDbFileName = "library.s3db";
+        private const string libraryDbFileName = "library_v0.9.s3db";
 
         private static readonly ILog logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
