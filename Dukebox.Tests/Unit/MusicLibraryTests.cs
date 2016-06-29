@@ -51,9 +51,9 @@ namespace Dukebox.Tests.Unit
             _musicLibraryCacheService = new MusicLibraryCacheService(dbContextFactory, eventService);
             _musicLibraryRepo = new MusicLibraryRepository(dbContextFactory, trackFactory, _musicLibraryCacheService);
             _musicLibrarySearchService = new MusicLibrarySearchService(dbContextFactory, trackFactory, _musicLibraryCacheService);
+            _musicLibaryUpdateService = new MusicLibraryUpdateService(dbContextFactory, eventService);
             _musicLibraryImportService = new MusicLibraryImportService(settings, audioFormats, dbContextFactory, audioFileMetadataFactory,
-                trackFactory, _musicLibraryCacheService, eventService, albumArtCache, musicPlaylistGenerator);
-            _musicLibaryUpdateService = new MusicLibraryUpdateService(dbContextFactory);
+                trackFactory, _musicLibraryCacheService, _musicLibaryUpdateService, eventService, albumArtCache, musicPlaylistGenerator);
             _trackGenerator = new TrackGeneratorService(audioFormats, _musicLibrarySearchService, trackFactory);
         }
         

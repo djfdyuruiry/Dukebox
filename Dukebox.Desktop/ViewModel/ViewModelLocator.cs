@@ -142,5 +142,13 @@ namespace Dukebox.Desktop.ViewModel
                 return DesktopContainer.GetInstance<IMetadataColumnsSettingsViewModel>();
             }
         }
+
+        public IWatchFolderSettingsViewModel IWatchFolderSettingsViewModel
+        {
+            get
+            {
+                return DesktopContainer.GetInstance<IWatchFolderSettingsViewModel>();
+            }
+        }
     }
 }

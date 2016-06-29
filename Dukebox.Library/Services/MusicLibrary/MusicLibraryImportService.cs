@@ -20,17 +20,21 @@ namespace Dukebox.Library.Services.MusicLibrary
         private static readonly ILog logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private readonly IDukeboxSettings _settings;
-        private readonly IMusicLibraryDbContextFactory _dbContextFactory;
         private readonly AudioFileFormats _audioFormats;
+
+        private readonly IMusicLibraryDbContextFactory _dbContextFactory;
         private readonly AudioFileMetadataFactory _audioFileMetadataFactory;
         private readonly TrackFactory _trackFactory;
+
         private readonly IMusicLibraryCacheService _cacheService;
         private readonly IMusicLibraryEventService _eventService;
+        private readonly IMusicLibraryUpdateService _updateService;
         private readonly IAlbumArtCacheService _albumArtCache;
+
         private readonly IPlaylistGeneratorService _playlistGenerator;
 
         public MusicLibraryImportService(IDukeboxSettings settings, AudioFileFormats audioFormats, IMusicLibraryDbContextFactory dbContextFactory,
-            AudioFileMetadataFactory metadataFactory, TrackFactory trackFactory, IMusicLibraryCacheService cacheService,
+            AudioFileMetadataFactory metadataFactory, TrackFactory trackFactory, IMusicLibraryCacheService cacheService, IMusicLibraryUpdateService updateService,
             IMusicLibraryEventService eventService, IAlbumArtCacheService albumCacheServices, IPlaylistGeneratorService playlistGenerator)
         {
             _settings = settings;
@@ -41,6 +45,7 @@ namespace Dukebox.Library.Services.MusicLibrary
             _trackFactory = trackFactory;
 
             _cacheService = cacheService;
+            _updateService = updateService;
             _eventService = eventService;
             _albumArtCache = albumCacheServices;
 
@@ -48,13 +53,13 @@ namespace Dukebox.Library.Services.MusicLibrary
         }
 
         public async Task AddSupportedFilesInDirectory(string directory, bool subDirectories, 
-            Action<object, AudioFileImportedEventArgs> progressHandler, Action<object, int> completeHandler)
+            Action<AudioFileImportedInfo> progressHandler, Action<DirectoryImportReport> completeHandler)
         {
             await Task.Run(() => DoAddSupportedFilesInDirectory(directory, subDirectories, progressHandler, completeHandler));
         }
 
-        private void DoAddSupportedFilesInDirectory(string directory, bool subDirectories, 
-            Action<object, AudioFileImportedEventArgs> progressHandler, Action<object, int> completeHandler)
+        private void DoAddSupportedFilesInDirectory(string directory, bool subDirectories,
+            Action<AudioFileImportedInfo> progressHandler, Action<DirectoryImportReport> completeHandler)
         {
             if (!Directory.Exists(directory))
             {
@@ -66,6 +71,7 @@ namespace Dukebox.Library.Services.MusicLibrary
             var concurrencyLimit = _settings.AddDirectoryConcurrencyLimit;
             var allfiles = Directory.GetFiles(@directory, "*.*", subDirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
             var filesToAdd = allfiles.Where(f => !_cacheService.FilesCache.Contains(f) && _audioFormats.FileSupported(f));
+            var filesToRemove = _cacheService.FilesCache.Where(f => f.StartsWith(directory) && !allfiles.Contains(f)).ToList();
             var numFilesToAdd = filesToAdd.Count();
 
             var filesWithMetadata = ExtractMetadataFromFiles(filesToAdd, progressHandler, concurrencyLimit, numFilesToAdd);
@@ -74,15 +80,26 @@ namespace Dukebox.Library.Services.MusicLibrary
             using (var dukeboxData = _dbContextFactory.GetInstance())
             {
                 albumsWithMetadata = AddFilesToDatabaseModel(dukeboxData, filesWithMetadata, concurrencyLimit, progressHandler, numFilesToAdd);
+
+                logger.Info($"Removing {filesToRemove.Count} library song(s) missing (deleted, renamed or moved) from the path '{directory}'");
+                filesToRemove.ForEach(f => _updateService.RemoveSongByFilePath(f));
+
                 _dbContextFactory.SaveDbChanges(dukeboxData);
             }
 
-            var filesAdded = albumsWithMetadata.Count;
+            var numFilesAdded = albumsWithMetadata.Count;
+            var numMissingFilesRemoved = filesToRemove.Count;
+            var importReport = new DirectoryImportReport
+            {
+                DirectoryPath = directory,
+                NumberOfFilesAdded = numFilesAdded,
+                NumberOfMissingFilesRemoved = numMissingFilesRemoved
+            };
 
             if (!albumsWithMetadata.Any())
             {
                 logger.WarnFormat("No new supported files were found in directory '{0}'", directory);
-                Task.Run(() => completeHandler(this, filesAdded));
+                Task.Run(() => completeHandler?.Invoke(importReport));
                 return;
             }
 
@@ -90,28 +107,28 @@ namespace Dukebox.Library.Services.MusicLibrary
 
             stopwatch.Stop();
 
-            logger.InfoFormat("Added {0} tracks from directory: {1}", filesAdded, directory);
+            logger.InfoFormat("Added {0} tracks from directory: {1}", numFilesAdded, directory);
             logger.DebugFormat("Adding {0} tracks to library from a directory took {1}ms. Directory path: {2} (Sub-directories searched: {3})",
-                filesAdded, stopwatch.ElapsedMilliseconds, directory, subDirectories);
+                numFilesAdded, stopwatch.ElapsedMilliseconds, directory, subDirectories);
 
-            CallMetadataAndCompleteHandlers(completeHandler, filesAdded);
+            CallMetadataAndCompleteHandlers(completeHandler, importReport);
 
-            if (numFilesToAdd > filesAdded)
+            if (numFilesToAdd > numFilesAdded)
             {
                 logger.WarnFormat("Not all files found in directory '{0}' were added to the database [{1}/{2} files added]",
-                    directory, filesAdded, numFilesToAdd);
+                    directory, numFilesAdded, numFilesToAdd);
             }
         }
 
-        private List<Tuple<string, IAudioFileMetadata>> ExtractMetadataFromFiles(IEnumerable<string> filesToAdd, 
-            Action<object, AudioFileImportedEventArgs> progressHandler,
+        private List<Tuple<string, IAudioFileMetadata>> ExtractMetadataFromFiles(IEnumerable<string> filesToAdd,
+            Action<AudioFileImportedInfo> progressHandler,
             int concurrencyLimit, int numFilesToAdd)
         {
             return filesToAdd.AsParallel().WithDegreeOfParallelism(concurrencyLimit).Select(f =>
             {
                 var metadataTuple = new Tuple<string, IAudioFileMetadata>(f, _audioFileMetadataFactory.BuildAudioFileMetadataInstance(f));
 
-                Task.Run(() => progressHandler?.Invoke(this, new AudioFileImportedEventArgs
+                Task.Run(() => progressHandler?.Invoke(new AudioFileImportedInfo
                 {
                     JustProcessing = true,
                     FileAdded = f,
@@ -124,7 +141,7 @@ namespace Dukebox.Library.Services.MusicLibrary
 
         private List<Tuple<Album, IAudioFileMetadata>> AddFilesToDatabaseModel(IMusicLibraryDbContext dukeboxData, 
             List<Tuple<string, IAudioFileMetadata>> filesWithMetadata,
-            int concurrencyLimit, Action<object, AudioFileImportedEventArgs> progressHandler, int numFilesToAdd)
+            int concurrencyLimit, Action<AudioFileImportedInfo> progressHandler, int numFilesToAdd)
         {
             return filesWithMetadata.AsParallel().WithDegreeOfParallelism(concurrencyLimit).Select(fileWithMetdata =>
             {
@@ -132,7 +149,7 @@ namespace Dukebox.Library.Services.MusicLibrary
                 {
                     var song = AddFile(dukeboxData, fileWithMetdata.Item1, fileWithMetdata.Item2);
 
-                    Task.Run(() => progressHandler?.Invoke(this, new AudioFileImportedEventArgs
+                    Task.Run(() => progressHandler?.Invoke(new AudioFileImportedInfo
                     {
                         JustProcessing = false,
                         FileAdded = fileWithMetdata.Item1,
@@ -164,22 +181,36 @@ namespace Dukebox.Library.Services.MusicLibrary
             }).ToList();
         }
 
-        private void CallMetadataAndCompleteHandlers(Action<object, int> completeHandler, int filesAdded)
+        private void CallMetadataAndCompleteHandlers(Action<DirectoryImportReport> completeHandler, DirectoryImportReport importReport)
         {
-            _eventService.TriggerEvent(MusicLibraryEvent.AlbumAdded);
-            _eventService.TriggerEvent(MusicLibraryEvent.ArtistAdded);
-            _eventService.TriggerEvent(MusicLibraryEvent.SongAdded);
+            _eventService.TriggerEvent(MusicLibraryEvent.AlbumsAdded);
+            _eventService.TriggerEvent(MusicLibraryEvent.ArtistsAdded);
+            _eventService.TriggerEvent(MusicLibraryEvent.SongsAdded);
 
-            Task.Run(() => completeHandler?.Invoke(this, filesAdded));
+            Task.Run(() => completeHandler?.Invoke(importReport));
         }
 
         public Song AddFile(string filename)
         {
+            return AddFile(filename, null);
+        }
+
+        public Song AddFile(string filename, IAudioFileMetadata metadata)
+        {
             using (var dukeboxData = _dbContextFactory.GetInstance())
             {
-                var song = AddFile(dukeboxData, filename);
+                if (_cacheService.FilesCache.Contains(filename))
+                {
+                    return dukeboxData.Songs.First(s => s.FileName.Equals(filename));
+                }
+
+                var song = AddFile(dukeboxData, filename, metadata);
 
                 dukeboxData.SaveChanges();
+
+                _eventService.TriggerSongAdded(song);
+                _eventService.TriggerEvent(MusicLibraryEvent.ArtistsAdded);
+                _eventService.TriggerEvent(MusicLibraryEvent.AlbumsAdded);
 
                 return song;
             }
@@ -188,18 +219,6 @@ namespace Dukebox.Library.Services.MusicLibrary
         private Song AddFile(IMusicLibraryDbContext dukeboxData, string filename)
         {
             return AddFile(dukeboxData, filename, null);
-        }
-
-        public Song AddFile(string filename, IAudioFileMetadata metadata)
-        {
-            using (var dukeboxData = _dbContextFactory.GetInstance())
-            {
-                var song = AddFile(dukeboxData, filename, metadata);
-
-                dukeboxData.SaveChanges();
-
-                return song;
-            }
         }
 
         private Song AddFile(IMusicLibraryDbContext dukeboxData, string filename, IAudioFileMetadata metadata)
@@ -219,12 +238,12 @@ namespace Dukebox.Library.Services.MusicLibrary
                 metadata = _audioFileMetadataFactory.BuildAudioFileMetadataInstance(filename);
             }
 
-            var newSong = BuildSongFromMetadata(dukeboxData, filename, metadata);
+            var newSong = AddSongWithMetadataToDb(dukeboxData, filename, metadata);
 
             return newSong;
         }
 
-        private Song BuildSongFromMetadata(IMusicLibraryDbContext dukeboxData, string filename, IAudioFileMetadata metadata)
+        private Song AddSongWithMetadataToDb(IMusicLibraryDbContext dukeboxData, string filename, IAudioFileMetadata metadata)
         {
             var existingSongFile = _cacheService.FilesCache.FirstOrDefault(f => f.Equals(filename, StringComparison.CurrentCulture));
 
@@ -339,7 +358,7 @@ namespace Dukebox.Library.Services.MusicLibrary
                 logger.InfoFormat("Added playlist to library: {0}", newPlaylist.Name);
                 logger.DebugFormat("Adding playlist to library took {0}ms. Playlist id: {1}", stopwatch.ElapsedMilliseconds, newPlaylist.Id);
 
-                _eventService.TriggerEvent(MusicLibraryEvent.PlaylistAdded);
+                _eventService.TriggerEvent(MusicLibraryEvent.PlaylistsAdded);
 
                 return newPlaylist;
             }
@@ -349,6 +368,33 @@ namespace Dukebox.Library.Services.MusicLibrary
             }
 
             return null;
+        }
+
+        public async Task<WatchFolder> AddWatchFolder(WatchFolder watchFolder)
+        {
+            if (watchFolder == null)
+            {
+                throw new ArgumentNullException("watchFolder");
+            }
+            else if (string.IsNullOrWhiteSpace(watchFolder.FolderPath))
+            {
+                throw new ArgumentNullException("watchFolder.FolderPath");
+            }
+
+            using (var dukeboxData = _dbContextFactory.GetInstance())
+            {
+                var existingWatchFolder = dukeboxData.WatchFolders.FirstOrDefault(w => w.FolderPath.Equals(watchFolder.FolderPath));
+
+                if (existingWatchFolder != null)
+                {
+                    return existingWatchFolder;
+                }
+
+                dukeboxData.WatchFolders.Add(watchFolder);
+                await _dbContextFactory.SaveDbChanges(dukeboxData);
+
+                return watchFolder;
+            }
         }
     }
 }

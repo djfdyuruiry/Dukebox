@@ -16,24 +16,37 @@ namespace Dukebox.Desktop.Services
 
         public ITrack Data { get; private set; }
 
-        public TrackWrapper(IMusicLibraryUpdateService updateService, ITrack track)
+        public TrackWrapper(IMusicLibraryUpdateService updateService, IMusicLibraryEventService eventService, ITrack track)
         {
             _updateService = updateService;
 
             Data = track;
 
-            TrackInstanceChanged += (o, e) =>
-            {
-                if (o != this && e.FileName == Data.Song.FileName)
-                {
-                    Data.Song = e;
+            eventService.SongUpdated += FireTrackChangedIfNeeded;
+            TrackInstanceChanged += CheckForTrackChanges;
+        }
 
-                    OnPropertyChanged("Title");
-                    OnPropertyChanged("ArtistName");
-                    OnPropertyChanged("AlbumName");
-                    OnPropertyChanged("ExtendedMetadata");
-                }
-            };
+        private void FireTrackChangedIfNeeded(object sender, Song e)
+        {
+            if (e.FileName.Equals(Data.Song.FileName))
+            {
+                TrackInstanceChanged?.Invoke(this, e);
+            }
+        }
+
+        private void CheckForTrackChanges(object sender, Song e)
+        {
+            if (sender == this || e.FileName != Data.Song.FileName)
+            {
+                return;
+            }
+
+            Data.Song = e;
+
+            OnPropertyChanged("Title");
+            OnPropertyChanged("ArtistName");
+            OnPropertyChanged("AlbumName");
+            OnPropertyChanged("ExtendedMetadata");
         }
 
         public string Title
@@ -99,8 +112,6 @@ namespace Dukebox.Desktop.Services
         private void PropagateTrackChanges()
         {
             Data.SyncMetadata(_updateService);
-
-            TrackInstanceChanged?.Invoke(this, Data.Song);
         }
 
         protected void OnPropertyChanged(string propertyName)

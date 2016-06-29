@@ -1,12 +1,10 @@
-﻿using System;
-
-namespace Dukebox.Library.Model
+﻿namespace Dukebox.Library.Model
 {
     /// <summary>
     /// Arguments in the event of an audio file being imported
     /// or being pre-processed.
     /// </summary>
-    public class AudioFileImportedEventArgs : EventArgs
+    public class AudioFileImportedInfo
     {
         /// <summary>
         /// Is the track going through pre-processing?

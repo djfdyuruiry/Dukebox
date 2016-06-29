@@ -1,21 +1,19 @@
-﻿using GalaSoft.MvvmLight.Command;
+﻿
+using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Threading;
 using System.Windows.Forms;
 using System.Windows.Input;
 using Application = System.Windows.Application;
+using GalaSoft.MvvmLight.Command;
 using Dukebox.Audio;
 using Dukebox.Desktop.Interfaces;
+using Dukebox.Desktop.Model;
+using Dukebox.Desktop.Views;
+using Dukebox.Library.Factories;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
-using Dukebox.Library.Services;
-using System.Threading.Tasks;
-using Dukebox.Desktop.Views;
-using System.IO;
-using Dukebox.Desktop.Model;
-using System.Threading;
-using System;
-using Dukebox.Library.Factories;
-using Dukebox.Configuration.Interfaces;
 
 namespace Dukebox.Desktop.ViewModel
 {
@@ -26,6 +24,7 @@ namespace Dukebox.Desktop.ViewModel
         public const string AddToLibraryTitle = "Library Import";
 
         private readonly IMusicLibraryImportService _musicLibraryImportService;
+        private readonly IWatchFolderManagerService _watchFolderService;
         private readonly IAudioPlaylist _audioPlaylist;
         private readonly TrackFactory _trackFactory;
         private readonly ITrackGeneratorService _tracksGenerator;
@@ -40,10 +39,12 @@ namespace Dukebox.Desktop.ViewModel
         public ICommand ImportLibrary { get; private set; }
         public ICommand Exit { get; private set; }
 
-        public FileMenuViewModel(IMusicLibraryImportService musicLibraryImportService, ITrackGeneratorService tracksGenerator, IAudioPlaylist audioPlaylist, 
+        public FileMenuViewModel(IMusicLibraryImportService musicLibraryImportService, IWatchFolderManagerService watchFolderService,
+            ITrackGeneratorService tracksGenerator, IAudioPlaylist audioPlaylist, 
             AudioFileFormats audioFileFormats, TrackFactory trackFactory) : base()
         {
             _musicLibraryImportService = musicLibraryImportService;
+            _watchFolderService = watchFolderService;
             _audioPlaylist = audioPlaylist;
             _trackFactory = trackFactory;
             _tracksGenerator = tracksGenerator;
@@ -104,24 +105,11 @@ namespace Dukebox.Desktop.ViewModel
                 return;
             }
 
-            var progressWindow = new ProgressMonitor();
-            var progressViewModel = new ProgressMonitorViewModel();
-
-            progressWindow.DataContext = progressViewModel;
-            progressViewModel.Title = AddToLibraryTitle;
-            progressViewModel.HeaderText = AddToLibraryHeader;
-            progressViewModel.StatusText = "Searching for Audio Files...";
-
-            progressWindow.Show();
-
-            var filesAdded = 0;
             var pathToAdd = _selectFolderDialog.SelectedPath;
 
             try
             {
-                _musicLibraryImportService.AddSupportedFilesInDirectory(pathToAdd, true,
-                        (o, a) => ImportStep(progressViewModel, a, ref filesAdded),
-                        (o, i) => progressWindow.Dispatcher.InvokeAsync(progressWindow.Close));
+                _watchFolderService.ManageWatchFolder(new WatchFolder { FolderPath = pathToAdd });
             }
             catch (Exception ex)
             {
@@ -131,7 +119,7 @@ namespace Dukebox.Desktop.ViewModel
             }
         }
 
-        private void ImportStep(ProgressMonitorViewModel viewModel, AudioFileImportedEventArgs fileImportedArgs, ref int filesAdded)
+        private void ImportStep(ProgressMonitorViewModel viewModel, AudioFileImportedInfo fileImportedArgs, ref int filesAdded)
         {
             viewModel.MaximumProgressValue = (fileImportedArgs.TotalFilesThisImport * 2);
 

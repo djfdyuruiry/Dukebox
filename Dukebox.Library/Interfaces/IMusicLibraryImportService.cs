@@ -9,8 +9,9 @@ namespace Dukebox.Library.Interfaces
     {
         Song AddFile(string filename);
         Song AddFile(string filename, IAudioFileMetadata metadata);
-        Task AddSupportedFilesInDirectory(string directory, bool subDirectories, Action<object, AudioFileImportedEventArgs> progressHandler, Action<object, int> completeHandler);
+        Task AddSupportedFilesInDirectory(string directory, bool subDirectories, Action<AudioFileImportedInfo> progressHandler, Action<DirectoryImportReport> completeHandler);
         Task<List<ITrack>> AddPlaylistFiles(string filename);
         Task<Playlist> AddPlaylist(string name, IEnumerable<string> filenames);
+        Task<WatchFolder> AddWatchFolder(WatchFolder watchFolder);
     }
 }

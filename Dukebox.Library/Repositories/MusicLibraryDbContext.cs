@@ -41,6 +41,7 @@ namespace Dukebox.Library.Repositories
 
         public virtual DbSet<Playlist> Playlists { get; set; }
         public virtual DbSet<Song> Songs { get; set; }
+        public virtual DbSet<WatchFolder> WatchFolders { get; set; }
 
         public new DbEntityEntry Entry(object entity)
         {

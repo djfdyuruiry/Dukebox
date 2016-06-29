@@ -21,6 +21,7 @@ namespace Dukebox.Desktop.ViewModel
         private readonly IAudioCdDriveMonitoringService _audioCdDriveMonitor;
         private readonly IAudioCdRippingService _cdRippingService;
         private readonly ITrackGeneratorService _trackGenerator;
+        private readonly IMusicLibraryEventService _eventService;
 
         private List<ITrack> _tracks;
         private string _selectedAudioCdDrivePath;
@@ -31,7 +32,7 @@ namespace Dukebox.Desktop.ViewModel
         {
             get
             {
-                return _tracks.Select(t => new TrackWrapper(_musicLibraryUpdateService, t)).ToList();
+                return _tracks.Select(t => new TrackWrapper(_musicLibraryUpdateService, _eventService, t)).ToList();
             }
         }
 
@@ -88,13 +89,14 @@ namespace Dukebox.Desktop.ViewModel
         public ICommand RipCd { get; private set; }
 
         public AudioCdViewModel(IMusicLibraryUpdateService musicLibraryUpdateService, ITrackGeneratorService trackGenerator, IAudioPlaylist audioPlaylist, 
-            IAudioCdDriveMonitoringService audioCdDriveMonitor, IAudioCdRippingService cdRippingService) : base()
+            IAudioCdDriveMonitoringService audioCdDriveMonitor, IAudioCdRippingService cdRippingService, IMusicLibraryEventService eventService) : base()
         {
             _musicLibraryUpdateService = musicLibraryUpdateService;
             _audioPlaylist = audioPlaylist;
             _audioCdDriveMonitor = audioCdDriveMonitor;
             _cdRippingService = cdRippingService;
             _trackGenerator = trackGenerator;
+            _eventService = eventService;
 
             _audioCdDriveMonitor.AudioCdInsertedOnLoad += (o, e) =>
             {

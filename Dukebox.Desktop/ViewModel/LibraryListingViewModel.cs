@@ -16,6 +16,7 @@ namespace Dukebox.Desktop.ViewModel
         private readonly IMusicLibraryUpdateService _musicLibraryUpdateService;
         private readonly IAudioPlaylist _audioPlaylist;
         private readonly IMusicLibrarySearchService _musicLibrarySearcher;
+        private readonly IMusicLibraryEventService _eventService;
 
         private List<ITrack> _tracks;
         private string _searchText;
@@ -40,7 +41,7 @@ namespace Dukebox.Desktop.ViewModel
         { 
             get 
             {
-                return _tracks.Select(t => new TrackWrapper(_musicLibraryUpdateService, t)).ToList();
+                return _tracks.Select(t => new TrackWrapper(_musicLibraryUpdateService, _eventService, t)).ToList();
             }
         }
         public bool EditingListingsDisabled
@@ -73,10 +74,13 @@ namespace Dukebox.Desktop.ViewModel
             IMusicLibrarySearchService musicLibrarySearcher, IAudioPlaylist audioPlaylist) : base()
         {
             _musicLibraryUpdateService = musicLibraryUpdateService;
-            eventService.SongAdded += (o, e) => RefreshTrackListing();
-
             _audioPlaylist = audioPlaylist;
             _musicLibrarySearcher = musicLibrarySearcher;
+            _eventService = eventService;
+
+            _eventService.SongsAdded += (o, e) => RefreshTrackListing();
+            _eventService.SongAdded += (o, e) => RefreshTrackListing();
+            _eventService.SongDeleted += (o, e) => RefreshTrackListing();
 
             ClearSearch = new RelayCommand(() => SearchText = string.Empty);
             LoadTrack = new RelayCommand<ITrack>(DoLoadTrack);

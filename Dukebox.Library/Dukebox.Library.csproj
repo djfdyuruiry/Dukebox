@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Dukebox.Library</RootNamespace>
     <AssemblyName>Dukebox.Library</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
@@ -149,6 +149,8 @@
     <Compile Include="Interfaces\IPlaylistGeneratorService.cs" />
     <Compile Include="Interfaces\IRecentlyPlayedRepository.cs" />
     <Compile Include="Interfaces\ITrackGeneratorService.cs" />
+    <Compile Include="Interfaces\IWatchFolderManagerService.cs" />
+    <Compile Include="Interfaces\IWatchFolderService.cs" />
     <Compile Include="Model\Album.cs" />
     <Compile Include="Model\Artist.cs" />
     <Compile Include="Helper\DukeboxInitialisationHelper.cs" />
@@ -156,9 +158,13 @@
     <Compile Include="Interfaces\ICdRipViewUpdater.cs" />
     <Compile Include="Interfaces\ITrack.cs" />
     <Compile Include="Interfaces\IMusicLibraryDbContext.cs" />
+    <Compile Include="Model\DirectoryImportReport.cs" />
     <Compile Include="Model\MusicLibraryEvent.cs" />
     <Compile Include="Model\TagTypeMap.cs" />
     <Compile Include="Model\GenericEventArgs.cs" />
+    <Compile Include="Model\WatchFolder.cs" />
+    <Compile Include="Model\WatchFolderEvent.cs" />
+    <Compile Include="Model\WatchFolderEventType.cs" />
     <Compile Include="Repositories\MusicLibraryDbContext.cs" />
     <Compile Include="LibraryPackage.cs" />
     <Compile Include="Model\AlbumArtCacheOperations.cs" />
@@ -194,6 +200,8 @@
     <Compile Include="Services\Track.cs" />
     <Compile Include="Model\Song.cs" />
     <Compile Include="Services\TrackGeneratorService.cs" />
+    <Compile Include="Services\WatchFolderManagerService.cs" />
+    <Compile Include="Services\WatchFolderService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.Config" />
