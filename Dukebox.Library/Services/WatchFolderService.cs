@@ -42,13 +42,13 @@ namespace Dukebox.Library.Services
             _updateService = updateService;
             _eventService = eventService;
 
-            _initalImportTask = AddFileChangesSinceLastStart();
+            _initalImportTask = skipInitalImport ? Task.CompletedTask : Task.Run(AddFileChangesSinceLastStart);
 
             _eventService.WatchFolderUpdated += (o, e) => ReloadServiceIfStarted(e);
         }
 
         private async Task AddFileChangesSinceLastStart()
-        {
+        { 
             await _importService.AddSupportedFilesInDirectory(WatchFolder.FolderPath, true, 
                 afi =>
                 {

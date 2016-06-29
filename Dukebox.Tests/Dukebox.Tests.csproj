@@ -138,6 +138,7 @@
     <Compile Include="Integration\AudioCdServiceTests.cs" />
     <Compile Include="Unit\AudioPlaylistTests.cs" />
     <Compile Include="Unit\TrackTests.cs" />
+    <Compile Include="Unit\WatchFolderTests.cs" />
     <Compile Include="Utils\AudioCdTestConstants.cs" />
     <Compile Include="Integration\AudioConverterServiceTests.cs" />
     <Compile Include="Unit\AudioFileMetaDataTests.cs" />
