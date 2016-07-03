@@ -38,11 +38,11 @@ namespace Dukebox.Desktop.Views
             {
                 if (nm.Notification == NotificationMessages.TrackListingDataGridColumnsUpdated)
                 {
-                    UpdateTracksDataGridColumns();
+                    //UpdateTracksDataGridColumns();
                 }
             });
 
-            UpdateTracksDataGridColumns();
+            //UpdateTracksDataGridColumns();
         }
 
         #region Extended Metadata Rendering

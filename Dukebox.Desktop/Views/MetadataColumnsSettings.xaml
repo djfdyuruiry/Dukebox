@@ -11,21 +11,14 @@
         Width="450"
         WindowStartupLocation="CenterOwner"
         DataContext="{Binding IMetadataColumnsSettingsViewModel, Source={StaticResource ViewModelLocator}}">    
-    <Window.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="../Styles/MetroButton.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </Window.Resources>
     <Window.CommandBindings>
         <CommandBinding Command="ApplicationCommands.Close"
                         Executed="CloseWindow"/>
     </Window.CommandBindings>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"></RowDefinition>
-            <RowDefinition Height="8*"></RowDefinition>
+            <RowDefinition Height="1.3*"></RowDefinition>
+            <RowDefinition Height="15*"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -46,6 +39,8 @@
                 </ItemsPanelTemplate>
             </ListBox.ItemsPanel>
         </ListBox>
-        <Button Grid.Row="2" Grid.Column="0" HorizontalAlignment="Right" Style="{StaticResource MetroButton}" Command="ApplicationCommands.Close">OK</Button>
+        <StackPanel Grid.Row="2" Grid.Column="0">
+            <Button Command="ApplicationCommands.Close" FontSize="12">OK</Button>
+        </StackPanel>
     </Grid>
 </Window>
