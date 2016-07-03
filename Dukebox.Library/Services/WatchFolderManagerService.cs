@@ -45,6 +45,8 @@ namespace Dukebox.Library.Services
                 .GetWatchFolders()
                 .Select(w => BuildWatchFolderService(w)).Cast<IWatchFolderService>().ToList();
 
+            WatchFolders.ForEach(w => Task.Run(w.StartWatching));
+
             _eventService.WatchFolderDeleted += (o, e) => RemoveWatchFolder(e);
         }
 
