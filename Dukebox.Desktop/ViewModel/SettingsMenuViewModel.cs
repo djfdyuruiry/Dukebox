@@ -8,16 +8,24 @@ namespace Dukebox.Desktop.ViewModel
     public class SettingsMenuViewModel : ViewModelBase, ISettingsMenuViewModel
     {
         public ICommand TrackColumnsSettings { get; private set; }
+        public ICommand WatchFolderSettings { get; private set; }
 
         public SettingsMenuViewModel()
         {
             TrackColumnsSettings = new RelayCommand(ShowTrackColumnsSettingsWindow);
+            WatchFolderSettings = new RelayCommand(ShowWatchFolderSettings);
         }
 
         private void ShowTrackColumnsSettingsWindow()
         {
             var metadataSettingsWindow = new MetadataColumnsSettings();
-            metadataSettingsWindow.Show();            
+            metadataSettingsWindow.Show();
+        }
+
+        private void ShowWatchFolderSettings()
+        {
+            var watchFoldersSettingsWindow = new WatchFolderSettings();
+            watchFoldersSettingsWindow.Show();
         }
     }
 }

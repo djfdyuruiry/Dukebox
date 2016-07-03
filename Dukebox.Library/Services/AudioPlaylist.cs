@@ -18,7 +18,9 @@ namespace Dukebox.Library.Services
     /// </summary>
     public class AudioPlaylist : IAudioPlaylist
     {
-        private readonly IMusicLibrary _musicLibrary;
+        private readonly IRecentlyPlayedRepository _recentlyPlayedRepo;
+        private readonly ITrackGeneratorService _trackGenerator;
+        private readonly IPlaylistGeneratorService _playlistGenerator;
         private readonly IMediaPlayer _mediaPlayer;
 
         #region Playback management fields
@@ -156,7 +158,7 @@ namespace Dukebox.Library.Services
                 // load current track into media player.
                 var currentTrack = Tracks[_currentTrackIndex];
 
-                _musicLibrary.RecentlyPlayed.Add(currentTrack);
+                _recentlyPlayedRepo.RecentlyPlayed.Add(currentTrack);
 
                 if (NewTrackLoaded != null)
                 {
@@ -177,9 +179,12 @@ namespace Dukebox.Library.Services
         /// Create a new playlist instance. All boolean
         /// playback flow control options default to false.
         /// </summary>
-        public AudioPlaylist(IMusicLibrary musicLibrary, IMediaPlayer mediaPlayer)
+        public AudioPlaylist(IRecentlyPlayedRepository recentlyPlayedRepo, ITrackGeneratorService trackGenerator, 
+            IPlaylistGeneratorService playlistGenerator, IMediaPlayer mediaPlayer)
         {
-            _musicLibrary = musicLibrary;
+            _recentlyPlayedRepo = recentlyPlayedRepo;
+            _trackGenerator = trackGenerator;
+            _playlistGenerator = playlistGenerator;
             _mediaPlayer = mediaPlayer;
 
             Tracks = new ObservableCollection<ITrack>();
@@ -467,8 +472,8 @@ namespace Dukebox.Library.Services
 
         public int LoadPlaylistFromFile(string filename, bool startPlayback)
         {
-            var playlist = _musicLibrary.GetPlaylistFromFile(filename);
-            var tracks = _musicLibrary.GetTracksForPlaylist(playlist);
+            var playlist = _playlistGenerator.GetPlaylistFromFile(filename);
+            var tracks = _trackGenerator.GetTracksForPlaylist(playlist);
 
             return LoadPlaylistFromList(tracks, startPlayback);
         }

@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
 using System.Diagnostics;
 using System.Linq;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
-using System.Data.Entity.Infrastructure;
 
 namespace Dukebox.Library.Repositories
 {
@@ -41,6 +41,7 @@ namespace Dukebox.Library.Repositories
 
         public virtual DbSet<Playlist> Playlists { get; set; }
         public virtual DbSet<Song> Songs { get; set; }
+        public virtual DbSet<WatchFolder> WatchFolders { get; set; }
 
         public new DbEntityEntry Entry(object entity)
         {

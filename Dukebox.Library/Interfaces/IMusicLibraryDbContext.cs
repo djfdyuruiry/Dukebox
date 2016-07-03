@@ -13,6 +13,7 @@ namespace Dukebox.Library.Interfaces
         List<Artist> Artists { get; }
         DbSet<Playlist> Playlists { get; set; }
         DbSet<Song> Songs { get; set; }
+        DbSet<WatchFolder> WatchFolders { get; set; }
         int SaveChanges();
         Task<int> SaveChangesAsync();
         DbEntityEntry Entry(object entity);

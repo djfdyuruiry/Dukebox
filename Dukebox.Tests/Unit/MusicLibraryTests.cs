@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using FakeItEasy;
 using Newtonsoft.Json;
 using Xunit;
@@ -13,14 +14,20 @@ using Dukebox.Library.Model;
 using Dukebox.Configuration.Interfaces;
 using Dukebox.Library.Factories;
 using Dukebox.Audio.Interfaces;
-using System.Threading.Tasks;
+using Dukebox.Library.Services.MusicLibrary;
+using Dukebox.Library.Services;
 
 namespace Dukebox.Tests.Unit
 {
     public class MusicLibraryTests
     {
         private readonly LibraryDbMockGenerator _mockDataLoader;
-        private readonly MusicLibrary _musicLibrary;
+        private readonly MusicLibraryCacheService _musicLibraryCacheService;
+        private readonly MusicLibraryImportService _musicLibraryImportService;
+        private readonly MusicLibraryRepository _musicLibraryRepo;
+        private readonly MusicLibrarySearchService _musicLibrarySearchService;
+        private readonly TrackGeneratorService _trackGenerator;
+        private readonly MusicLibraryUpdateService _musicLibaryUpdateService;
 
         public MusicLibraryTests()
         {
@@ -38,21 +45,29 @@ namespace Dukebox.Tests.Unit
 
             audioFormats.SupportedFormats.Add(".mp3");
 
-            _musicLibrary = new MusicLibrary(dbContextFactory, settings, albumArtCache, audioFormats, 
-                audioFileMetadataFactory, trackFactory);
+            var eventService = new MusicLibraryEventService();
+            var musicPlaylistGenerator = new PlaylistGeneratorService();
+            
+            _musicLibraryCacheService = new MusicLibraryCacheService(dbContextFactory, eventService);
+            _musicLibraryRepo = new MusicLibraryRepository(dbContextFactory, trackFactory, _musicLibraryCacheService);
+            _musicLibrarySearchService = new MusicLibrarySearchService(dbContextFactory, trackFactory, _musicLibraryCacheService);
+            _musicLibaryUpdateService = new MusicLibraryUpdateService(dbContextFactory, eventService);
+            _musicLibraryImportService = new MusicLibraryImportService(settings, audioFormats, dbContextFactory, audioFileMetadataFactory,
+                trackFactory, _musicLibraryCacheService, _musicLibaryUpdateService, eventService, albumArtCache, musicPlaylistGenerator);
+            _trackGenerator = new TrackGeneratorService(audioFormats, _musicLibrarySearchService, trackFactory);
         }
         
         [Fact]
         public void Album()
         {
-            var albums = _musicLibrary.OrderedAlbums;
+            var albums = _musicLibraryCacheService.OrderedAlbums;
 
             var mockOrderedAlbumNames = _mockDataLoader.Albums.OrderBy(a => a.Name).Select(a => a.Name);
             var allAlbumsReturned = albums.Select(a => a.Name).SequenceEqual(mockOrderedAlbumNames);
 
             Assert.True(allAlbumsReturned, "Failed to return all albums from the database");
 
-            var albumCountCorrect = _musicLibrary.GetAlbumCount() == _mockDataLoader.Albums.Count;
+            var albumCountCorrect = _musicLibraryRepo.GetAlbumCount() == _mockDataLoader.Albums.Count;
 
             Assert.True(albumCountCorrect, "Album count returned was incorrect");
 
@@ -63,7 +78,7 @@ namespace Dukebox.Tests.Unit
             {
                 _mockDataLoader.Albums.ForEach(a =>
                 {
-                    var album = _musicLibrary.OrderedAlbums.FirstOrDefault(la => la.Name.Equals(a.Name));
+                    var album = _musicLibraryCacheService.OrderedAlbums.FirstOrDefault(la => la.Name.Equals(a.Name));
 
                     if (album != null)
                     {
@@ -89,14 +104,14 @@ namespace Dukebox.Tests.Unit
         [Fact]
         public void Artist()
         {
-            var artists = _musicLibrary.OrderedArtists;
+            var artists = _musicLibraryCacheService.OrderedArtists;
 
             var mockOrderedArtistNames = _mockDataLoader.Artists.Select(a => a.Name).OrderBy(a => a);
             var allArtistsReturned = artists.Select(a => a.Name).SequenceEqual(mockOrderedArtistNames.OrderBy(a => a));
 
             Assert.True(allArtistsReturned, "Failed to return all artists from the database");
 
-            var artistCountCorrect = _musicLibrary.GetArtistCount() == _mockDataLoader.Artists.Count;
+            var artistCountCorrect = _musicLibraryRepo.GetArtistCount() == _mockDataLoader.Artists.Count;
 
             Assert.True(artistCountCorrect, "Artist count returned was incorrect");
 
@@ -107,7 +122,7 @@ namespace Dukebox.Tests.Unit
             {
                 _mockDataLoader.Artists.ForEach(a =>
                 {
-                    var artist = _musicLibrary.OrderedArtists.FirstOrDefault(la => la.Name.Equals(a.Name));
+                    var artist = _musicLibraryCacheService.OrderedArtists.FirstOrDefault(la => la.Name.Equals(a.Name));
 
                     if (artist != null)
                     {
@@ -133,14 +148,14 @@ namespace Dukebox.Tests.Unit
         [Fact]
         public void Playlist()
         {
-            var playlists = _musicLibrary.OrderedPlaylists;
+            var playlists = _musicLibraryCacheService.OrderedPlaylists;
 
             var mockOrderedPlaylistNames = _mockDataLoader.Playlists.OrderBy(a => a.Name).Select(a => a.Name);
             var allPlaylistsReturned = playlists.Select(a => a.Name).SequenceEqual(mockOrderedPlaylistNames);
 
             Assert.True(allPlaylistsReturned, "Failed to return all playlists from the database");
 
-            var playlistCountCorrect = _musicLibrary.GetArtistCount() == _mockDataLoader.Artists.Count;
+            var playlistCountCorrect = _musicLibraryRepo.GetArtistCount() == _mockDataLoader.Artists.Count;
 
             Assert.True(playlistCountCorrect, "Playlists count returned was incorrect");
 
@@ -151,7 +166,7 @@ namespace Dukebox.Tests.Unit
             {
                 _mockDataLoader.Playlists.ForEach(a =>
                 {
-                    var playlist = _musicLibrary.GetPlaylistById(a.Id);
+                    var playlist = _musicLibraryRepo.GetPlaylistById(a.Id);
                     playlistIdsReturned.Add(playlist.Id);
                 });
             }
@@ -173,32 +188,32 @@ namespace Dukebox.Tests.Unit
         [Fact]
         public void SearchByText()
         {
-            var resultsForKnownPhrase = _musicLibrary.SearchForTracksInArea(Library.Model.SearchAreas.All, "drom");
-            var resultsForMissingPhrase = _musicLibrary.SearchForTracksInArea(Library.Model.SearchAreas.All, "fake.it.easy");
+            var resultsForKnownPhrase = _musicLibrarySearchService.SearchForTracksInArea(Library.Model.SearchAreas.All, "drom");
+            var resultsForMissingPhrase = _musicLibrarySearchService.SearchForTracksInArea(Library.Model.SearchAreas.All, "fake.it.easy");
 
             Assert.True(resultsForKnownPhrase.Any(), "Failed to get tracks by known phrase");
             Assert.False(resultsForMissingPhrase.Any(), "Incorrectly got results for an unknown phrase");
 
-            var resultsForKnownArtist = _musicLibrary.SearchForTracksInArea(Library.Model.SearchAreas.Artist, "spike");
-            var resultsForMissingArtist = _musicLibrary.SearchForTracksInArea(Library.Model.SearchAreas.Artist, "gamblor");
+            var resultsForKnownArtist = _musicLibrarySearchService.SearchForTracksInArea(Library.Model.SearchAreas.Artist, "spike");
+            var resultsForMissingArtist = _musicLibrarySearchService.SearchForTracksInArea(Library.Model.SearchAreas.Artist, "gamblor");
 
             Assert.True(resultsForKnownArtist.Any(), "Failed to get tracks by known artist title");
             Assert.False(resultsForMissingArtist.Any(), "Incorrectly got results for an unknown artist title");
 
-            var resultsForKnownAlbum = _musicLibrary.SearchForTracksInArea(Library.Model.SearchAreas.Album, "neptune");
-            var resultsForMissingAlbum = _musicLibrary.SearchForTracksInArea(Library.Model.SearchAreas.Album, "homer");
+            var resultsForKnownAlbum = _musicLibrarySearchService.SearchForTracksInArea(Library.Model.SearchAreas.Album, "neptune");
+            var resultsForMissingAlbum = _musicLibrarySearchService.SearchForTracksInArea(Library.Model.SearchAreas.Album, "homer");
 
             Assert.True(resultsForKnownAlbum.Any(), "Failed to get tracks by known album title");
             Assert.False(resultsForMissingAlbum.Any(), "Incorrectly got results for an unknown album title");
 
-            var resultsForKnownSong = _musicLibrary.SearchForTracksInArea(Library.Model.SearchAreas.Song, "wish you were here");
-            var resultsForMissingSong = _musicLibrary.SearchForTracksInArea(Library.Model.SearchAreas.Song, "shine on");
+            var resultsForKnownSong = _musicLibrarySearchService.SearchForTracksInArea(Library.Model.SearchAreas.Song, "wish you were here");
+            var resultsForMissingSong = _musicLibrarySearchService.SearchForTracksInArea(Library.Model.SearchAreas.Song, "shine on");
 
             Assert.True(resultsForKnownSong.Any(), "Failed to get tracks by known song title");
             Assert.False(resultsForMissingSong.Any(), "Incorrectly got results for an unknown song title");
 
-            var resultsForKnownFilename = _musicLibrary.SearchForTracksInArea(Library.Model.SearchAreas.Filename, "sample.mp3");
-            var resultsForMissingFilename = _musicLibrary.SearchForTracksInArea(Library.Model.SearchAreas.Filename, "fakeiteasy.man");
+            var resultsForKnownFilename = _musicLibrarySearchService.SearchForTracksInArea(Library.Model.SearchAreas.Filename, "sample.mp3");
+            var resultsForMissingFilename = _musicLibrarySearchService.SearchForTracksInArea(Library.Model.SearchAreas.Filename, "fakeiteasy.man");
 
             Assert.True(resultsForKnownFilename.Any(), "Failed to get tracks by known filename");
             Assert.False(resultsForMissingFilename.Any(), "Incorrectly got results for an unknown filename");
@@ -207,26 +222,26 @@ namespace Dukebox.Tests.Unit
         [Fact]
         public void GetTrackByAttributeValue()
         {
-            var resultsForKnownAlbum = _musicLibrary.GetTracksByAttributeValue(SearchAreas.Album, "neptune");
-            var resultsForMissingAlbum = _musicLibrary.GetTracksByAttributeValue(SearchAreas.Album, "homer");
+            var resultsForKnownAlbum = _musicLibrarySearchService.GetTracksByAttributeValue(SearchAreas.Album, "neptune");
+            var resultsForMissingAlbum = _musicLibrarySearchService.GetTracksByAttributeValue(SearchAreas.Album, "homer");
 
             Assert.True(resultsForKnownAlbum.Any(), "Failed to get tracks by known album title");
             Assert.False(resultsForMissingAlbum.Any(), "Incorrectly got results for an unknown album title");
 
-            var resultsForKnownArtist = _musicLibrary.GetTracksByAttributeValue(SearchAreas.Artist, "spike");
-            var resultsForMissingArtist = _musicLibrary.GetTracksByAttributeValue(SearchAreas.Artist, "gamblor");
+            var resultsForKnownArtist = _musicLibrarySearchService.GetTracksByAttributeValue(SearchAreas.Artist, "spike");
+            var resultsForMissingArtist = _musicLibrarySearchService.GetTracksByAttributeValue(SearchAreas.Artist, "gamblor");
 
             Assert.True(resultsForKnownArtist.Any(), "Failed to get tracks by known artist title");
             Assert.False(resultsForMissingArtist.Any(), "Incorrectly got results for an unknown artist title");
 
-            var resultsForKnownFilename = _musicLibrary.GetTracksByAttributeValue(SearchAreas.Filename, LibraryDbMockGenerator.Mp3FilePath);
-            var resultsForMissingFilename = _musicLibrary.GetTracksByAttributeValue(SearchAreas.Filename, "fakeiteasy.man");
+            var resultsForKnownFilename = _musicLibrarySearchService.GetTracksByAttributeValue(SearchAreas.Filename, LibraryDbMockGenerator.Mp3FilePath);
+            var resultsForMissingFilename = _musicLibrarySearchService.GetTracksByAttributeValue(SearchAreas.Filename, "fakeiteasy.man");
 
             Assert.True(resultsForKnownFilename.Any(), "Failed to get tracks by known filename");
             Assert.False(resultsForMissingFilename.Any(), "Incorrectly got results for an unknown filename");
 
-            var resultsForKnownSong = _musicLibrary.GetTracksByAttributeValue(SearchAreas.Song, "wish you were here");
-            var resultsForMissingSong = _musicLibrary.GetTracksByAttributeValue(SearchAreas.Song, "shine on");
+            var resultsForKnownSong = _musicLibrarySearchService.GetTracksByAttributeValue(SearchAreas.Song, "wish you were here");
+            var resultsForMissingSong = _musicLibrarySearchService.GetTracksByAttributeValue(SearchAreas.Song, "shine on");
 
             Assert.True(resultsForKnownSong.Any(), "Failed to get tracks by known song title");
             Assert.False(resultsForMissingSong.Any(), "Incorrectly got results for an unknown song title");
@@ -235,20 +250,20 @@ namespace Dukebox.Tests.Unit
         [Fact]
         public void GetTrackByAttributeId()
         {
-            var resultsForKnownAlbum = _musicLibrary.GetTracksByAttributeId(SearchAreas.Album, "jupiter");
-            var resultsForMissingAlbum = _musicLibrary.GetTracksByAttributeId(SearchAreas.Album, "crazypants");
+            var resultsForKnownAlbum = _musicLibrarySearchService.GetTracksByAttributeId(SearchAreas.Album, "jupiter");
+            var resultsForMissingAlbum = _musicLibrarySearchService.GetTracksByAttributeId(SearchAreas.Album, "crazypants");
 
             Assert.True(resultsForKnownAlbum.Any(), "Failed to get tracks by known album id");
             Assert.False(resultsForMissingAlbum.Any(), "Incorrectly got results for an unknown album id");
 
-            var resultsForKnownArtist = _musicLibrary.GetTracksByAttributeId(SearchAreas.Artist, "spike");
-            var resultsForMissingArtist = _musicLibrary.GetTracksByAttributeId(SearchAreas.Artist, "crazierpants");
+            var resultsForKnownArtist = _musicLibrarySearchService.GetTracksByAttributeId(SearchAreas.Artist, "spike");
+            var resultsForMissingArtist = _musicLibrarySearchService.GetTracksByAttributeId(SearchAreas.Artist, "crazierpants");
 
             Assert.True(resultsForKnownArtist.Any(), "Failed to get tracks by known artist id");
             Assert.False(resultsForMissingArtist.Any(), "Incorrectly got results for an unknown artist id");
 
-            var resultsForKnownSong = _musicLibrary.GetTracksByAttributeId(SearchAreas.Song, "0");
-            var resultsForMissingSong = _musicLibrary.GetTracksByAttributeId(SearchAreas.Song, "25");
+            var resultsForKnownSong = _musicLibrarySearchService.GetTracksByAttributeId(SearchAreas.Song, "0");
+            var resultsForMissingSong = _musicLibrarySearchService.GetTracksByAttributeId(SearchAreas.Song, "25");
 
             Assert.True(resultsForKnownSong.Any(), "Failed to get tracks by known song id");
             Assert.False(resultsForMissingSong.Any(), "Incorrectly got results for an unknown song id");
@@ -262,7 +277,7 @@ namespace Dukebox.Tests.Unit
             PrepareSamplesDirectory("samples", numSamples);
             PrepareSamplesDirectory("samples/samples", numSamples);
 
-            var tracks = _musicLibrary.GetTracksForDirectory("samples", true);
+            var tracks = _trackGenerator.GetTracksForDirectory("samples", true);
 
             var tracksReturned = tracks.Any();
 
@@ -284,7 +299,7 @@ namespace Dukebox.Tests.Unit
                 FilenamesCsv = string.Join(",", files)
             };
 
-            var tracks = _musicLibrary.GetTracksForPlaylist(playlist);
+            var tracks = _trackGenerator.GetTracksForPlaylist(playlist);
             var tracksReturned = tracks.Any();
 
             Assert.True(tracksReturned, "Music library failed to return any tracks after adding playlist");
@@ -300,9 +315,9 @@ namespace Dukebox.Tests.Unit
             var numSamples = 5;
 
             PrepareSamplesDirectory("samples", numSamples);
-            _musicLibrary.AddSupportedFilesInDirectory("samples", false, null, null).Wait();
+            _musicLibraryImportService.AddSupportedFilesInDirectory("samples", false, null, null).Wait();
 
-            var tracks = _musicLibrary.SearchForTracks("samples", new List<SearchAreas> { SearchAreas.Filename });
+            var tracks = _musicLibrarySearchService.SearchForTracks("samples", new List<SearchAreas> { SearchAreas.Filename });
             var tracksReturned = tracks.Any();
 
             Assert.True(tracksReturned, "Music library failed to return any tracks after adding directory");
@@ -327,9 +342,9 @@ namespace Dukebox.Tests.Unit
             A.CallTo(() => audioMetadata.HasFutherMetadataTag).Returns(false);
             A.CallTo(() => audioMetadata.HasAlbumArt).Returns(false);
 
-            _musicLibrary.AddFile(trackFile.FullName, audioMetadata);
+            _musicLibraryImportService.AddFile(trackFile.FullName, audioMetadata);
 
-            var tracks = _musicLibrary.SearchForTracks(songTitle, new List<SearchAreas> { SearchAreas.Song });
+            var tracks = _musicLibrarySearchService.SearchForTracks(songTitle, new List<SearchAreas> { SearchAreas.Song });
             var tracksReturned = tracks.Any();
 
             Assert.True(tracksReturned, "Music library failed to return any tracks after adding new track");
@@ -353,9 +368,9 @@ namespace Dukebox.Tests.Unit
             File.Delete(jplFileName);
             File.WriteAllText(jplFileName, jplJson);
 
-            await _musicLibrary.AddPlaylistFiles(jplFileName);
+            await _musicLibraryImportService.AddPlaylistFiles(jplFileName);
 
-            var tracks = _musicLibrary.SearchForTracksInArea(SearchAreas.Filename, "samples");
+            var tracks = _musicLibrarySearchService.SearchForTracksInArea(SearchAreas.Filename, "samples");
             var tracksReturned = tracks.Any();
 
             Assert.True(tracksReturned, "Music library failed to return any tracks after adding playlist");
@@ -371,9 +386,9 @@ namespace Dukebox.Tests.Unit
             var playlistName = "magical music";
             var files = new List<string> { "samples/music.mp3", "samples/music1.mp3", "samples/music2.mp3", "samples/music3.mp3" };
 
-            await _musicLibrary.AddPlaylist(playlistName, files);
+            await _musicLibraryImportService.AddPlaylist(playlistName, files);
 
-            var playlist = _musicLibrary.OrderedPlaylists.FirstOrDefault(p => p.Name == playlistName);
+            var playlist = _musicLibraryCacheService.OrderedPlaylists.FirstOrDefault(p => p.Name == playlistName);
             var playlistReturned = playlist != null;
 
             Assert.True(playlistReturned, "Music library failed to add playlist");
@@ -388,12 +403,12 @@ namespace Dukebox.Tests.Unit
         [Fact]
         public async Task RemoveTrack()
         {
-            var tracks = _musicLibrary.SearchForTracks("wish you were here", new List<SearchAreas> { SearchAreas.Song });
+            var tracks = _musicLibrarySearchService.SearchForTracks("wish you were here", new List<SearchAreas> { SearchAreas.Song });
             var track = tracks.First();
 
-            await _musicLibrary.RemoveTrack(track);
+            await _musicLibaryUpdateService.RemoveTrack(track);
 
-            tracks = _musicLibrary.GetTracksByAttributeId(SearchAreas.Song, track.Song.Id.ToString());
+            tracks = _musicLibrarySearchService.GetTracksByAttributeId(SearchAreas.Song, track.Song.Id.ToString());
             var trackDeleted = !tracks.Any();
 
             Assert.True(trackDeleted, "Music library failed to delete track");

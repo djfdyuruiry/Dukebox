@@ -8,6 +8,8 @@ using Dukebox.Desktop.Interfaces;
 using Dukebox.Desktop.Model;
 using Dukebox.Desktop.Services;
 using Dukebox.Library.Interfaces;
+using System;
+using Dukebox.Library.Model;
 
 namespace Dukebox.Desktop.ViewModel
 {
@@ -16,7 +18,11 @@ namespace Dukebox.Desktop.ViewModel
         private readonly IAudioPlaylist _audioPlaylist;
 
         private List<ITrack> _tracks;
-        private readonly IMusicLibrary _musicLibrary;
+        private readonly IMusicLibraryRepository _musicLibraryRepo;
+        private readonly IMusicLibraryUpdateService _musicLibraryUpdateService;
+        private readonly IMusicLibraryEventService _eventService;
+        private string _trackFilter;
+        private string _trackFilterName;
 
         public ICommand ClearSearch
         {
@@ -58,7 +64,7 @@ namespace Dukebox.Desktop.ViewModel
         {
             get
             {
-                return _tracks.Select(t => new TrackWrapper(_musicLibrary, t)).ToList();
+                return _tracks.Select(t => new TrackWrapper(_musicLibraryUpdateService, _eventService, t)).ToList();
             }
         }
 
@@ -68,17 +74,65 @@ namespace Dukebox.Desktop.ViewModel
             OnPropertyChanged("Tracks");
         }
 
-        public TrackListingPreviewViewModel(IAudioPlaylist audioPlaylist, IMusicLibrary musicLibrary)
+        public TrackListingPreviewViewModel(IAudioPlaylist audioPlaylist, IMusicLibraryRepository libraryRepo, 
+            IMusicLibraryUpdateService updateService, IMusicLibraryEventService eventService)
         {
             _audioPlaylist = audioPlaylist;
-            _musicLibrary = musicLibrary;
+            _musicLibraryRepo = libraryRepo;
+            _musicLibraryUpdateService = updateService;
+            _eventService = eventService;
 
             _tracks = new List<ITrack>();
 
             LoadTrack = new RelayCommand<ITrack>(DoLoadTrack);
 
+            _trackFilter = string.Empty;
+            _trackFilterName = string.Empty;
+
             RegisterMessageHandlers();
+
+            _eventService.SongAdded += (o, e) => ReloadTracksIfNeccessary(e);
+            _eventService.SongDeleted += (o, e) => RemoveTrackIfNeccessary(e);
         }
+
+        private void ReloadTracksIfNeccessary(Song song)
+        {
+            var matchingTrack = Tracks.FirstOrDefault(t => t.Data.Song == song);
+            var songHasMatchingFilter = _trackFilter.Equals("Artist") ? song.Artist.Name.Equals(_trackFilterName) : song.Album.Name.Equals(_trackFilterName);
+
+            if (matchingTrack == null && !songHasMatchingFilter)
+            {
+                return;
+            }
+
+            if (songHasMatchingFilter)
+            {
+                if (_trackFilter == "Artist")
+                {
+                    UpdateTracks(_musicLibraryRepo.GetTracksForArtist(_trackFilterName));
+                }
+                else
+                {
+                    UpdateTracks(_musicLibraryRepo.GetTracksForAlbum(_trackFilterName));
+                }
+            }
+
+            OnPropertyChanged("Tracks");
+        }
+
+        private void RemoveTrackIfNeccessary(Song song)
+        {
+            var matchingTrack = Tracks.FirstOrDefault(t => t.Data.Song == song);
+
+            if (matchingTrack == null)
+            {
+                return;
+            }
+
+            Tracks.Remove(matchingTrack);
+            OnPropertyChanged("Tracks");
+        }
+
 
         private void RegisterMessageHandlers()
         {
@@ -86,12 +140,16 @@ namespace Dukebox.Desktop.ViewModel
             {
                 if (nm.IsArtist)
                 {
-                    UpdateTracks(_musicLibrary.GetTracksForArtist(nm.Name));
+                    _trackFilter = "Artist";
+                    UpdateTracks(_musicLibraryRepo.GetTracksForArtist(nm.Name));
                 }
                 else
                 {
-                    UpdateTracks(_musicLibrary.GetTracksForAlbum(nm.Name));
+                    _trackFilter = "Album";
+                    UpdateTracks(_musicLibraryRepo.GetTracksForAlbum(nm.Name));
                 }
+
+                _trackFilterName = nm.Name;
             });
         }
 

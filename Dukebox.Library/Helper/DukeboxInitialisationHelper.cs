@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using log4net;
 using Un4seen.Bass;
 using Dukebox.Audio;
 using Dukebox.Configuration.Interfaces;
-using System.Text;
 
 namespace Dukebox.Library.Helper
 {

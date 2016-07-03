@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 using System.Threading.Tasks;
 using log4net;
-using Un4seen.Bass.Misc;
 using Dukebox.Audio.Interfaces;
 using Dukebox.Library.Factories;
 using Dukebox.Library.Interfaces;
@@ -32,7 +32,11 @@ namespace Dukebox.Library.Services
             _trackFactory = trackFactory;
             _audioMetadataFactory = audioMetadataFactory;
         }
-        
+        public async Task RipCdToFolder(string inPath, string outPath, ICdRipViewUpdater viewUpdater)
+        {
+            await RipCdToFolder(inPath, outPath, viewUpdater, null);
+        }
+
         /// <summary>
         /// Rips an audio CD to a folder as a collection of MP3 files
         /// with relevant metadata encoded in their ID3 tags.
@@ -40,7 +44,7 @@ namespace Dukebox.Library.Services
         /// <param name="inPath">The CD drive root folder.</param>
         /// <param name="outPath">The folder to save MP3 files to.</param>
         /// <param name="viewUpdater">A ICdRipViewUpdater implementation object that will recieve messages on ripping progress.</param>
-        public async Task RipCdToFolder(string inPath, string outPath, ICdRipViewUpdater viewUpdater)
+        public async Task RipCdToFolder(string inPath, string outPath, ICdRipViewUpdater viewUpdater, List<ITrack> customTracks)
         {
             try
             {
@@ -66,15 +70,26 @@ namespace Dukebox.Library.Services
                 {
                     try
                     {
-                        var t = _trackFactory.BuildTrackInstance(inFiles[trackIdx], cdMetadata[trackIdx]);
-                        var outFile = string.Format(outFileFormat, t);
+                        ITrack cdTrack = null;
+
+                        if (customTracks != null && 
+                            customTracks.Any(ct => !ct.Metadata.IsEmpty && ct.Metadata.AudioFilePath.Equals(inFiles[trackIdx])))
+                        {
+                            cdTrack = customTracks.First(ct => ct.Metadata.AudioFilePath.Equals(inFiles[trackIdx]));
+                        }
+                        else
+                        {
+                            cdTrack = _trackFactory.BuildTrackInstance(inFiles[trackIdx], cdMetadata[trackIdx]);
+                        }
+
+                        var outFile = string.Format(outFileFormat, cdTrack);
 
                         await _audioConverterService.ConvertCdaFileToMp3(inFiles[trackIdx], outFile,
-                            new BaseEncoder.ENCODEFILEPROC((a, b) => CdRippingProgressMonitor(viewUpdater, a, b, t, numTracks, trackIdx)), true);
+                            (a, b) => CdRippingProgressMonitor(viewUpdater, a, b, cdTrack, numTracks, trackIdx), true);
 
                         var audioMetadata = _audioMetadataFactory.BuildAudioFileMetadataInstance(outFile);
 
-                        t.CopyDetailsToAudioMetadata(audioMetadata);
+                        cdTrack.CopyDetailsToAudioMetadata(audioMetadata);
                         audioMetadata.SaveMetadataToFileTag();
 
                         viewUpdater.ResetProgressBar();

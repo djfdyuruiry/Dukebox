@@ -23,6 +23,7 @@ namespace Dukebox.Desktop.ViewModel
         private Visibility _showArtistListing;
         private Visibility _showRecentlyPlayedListing;
         private Visibility _showAudioCdListing;
+        private string _importReportText;
 
         public Visibility ShowCurrentlyPlayingListing
         {
@@ -107,11 +108,25 @@ namespace Dukebox.Desktop.ViewModel
                     Visibility.Hidden;
             }
         }
+
+        public string ImportReportText
+        {
+            get
+            {
+                return _importReportText;
+            }
+            set
+            {
+                _importReportText = value;
+                OnPropertyChanged("ImportReportText");
+            }
+        }
+
         public ICommand ShowLoadingScreen { get; private set; }
         public ICommand NavBarItemClickCommand { get; private set; }
         public ICommand StopAudio { get; private set; }
 
-        public MainWindowViewModel(IAudioPlaylist audioPlaylist) : base()
+        public MainWindowViewModel(IAudioPlaylist audioPlaylist, IWatchFolderManagerService watchFolderManager) : base()
         {
             _audioPlaylist = audioPlaylist;
 
@@ -134,6 +149,9 @@ namespace Dukebox.Desktop.ViewModel
                     NavBarItemClicked(NavIconNames.CurrentlyPlaying);
                 }
             });
+
+            watchFolderManager.WatchFolderServiceProcessedEvent += (o, e) => ImportReportText = e.GetReportString();
+            ImportReportText = string.Empty;
         }
 
         private void DoShowSplashScreen()

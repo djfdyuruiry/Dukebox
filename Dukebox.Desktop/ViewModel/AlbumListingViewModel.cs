@@ -14,7 +14,8 @@ namespace Dukebox.Desktop.ViewModel
 {
     public class AlbumListingViewModel : ViewModelBase, IAlbumListingViewModel, ISearchControlViewModel
     {
-        private readonly IMusicLibrary _musicLibrary;
+        private readonly IMusicLibraryRepository _musicLibraryRepo;
+        private readonly IMusicLibraryCacheService _cacheService;
         private readonly IAudioPlaylist _audioPlaylist;
         private readonly ListSearchHelper<Services.Album> _listSearchHelper;
         
@@ -59,9 +60,11 @@ namespace Dukebox.Desktop.ViewModel
         public ICommand ClearSearch { get; private set; }
         public ICommand LoadAlbum { get; private set; }
 
-        public AlbumListingViewModel(IMusicLibrary musicLibrary, IAudioPlaylist audioPlaylist) : base()
+        public AlbumListingViewModel(IMusicLibraryRepository musicLibraryRepo, IMusicLibraryCacheService cacheService, 
+            IMusicLibraryEventService eventService, IAudioPlaylist audioPlaylist) : base()
         {
-            _musicLibrary = musicLibrary;
+            _musicLibraryRepo = musicLibraryRepo;
+            _cacheService = cacheService;
             _audioPlaylist = audioPlaylist;
             _listSearchHelper = new ListSearchHelper<Services.Album>
             {
@@ -70,7 +73,8 @@ namespace Dukebox.Desktop.ViewModel
                 SortLambda = (a) => a.Data.Name.ToLower(CultureInfo.InvariantCulture)
             };
 
-            _musicLibrary.AlbumAdded += (o, e) => LoadAlbumsFromLibrary();
+            eventService.AlbumsAdded += (o, e) => LoadAlbumsFromLibrary();
+            eventService.SongDeleted += (o, e) => LoadAlbumsFromLibrary();
 
             ClearSearch = new RelayCommand(() => SearchText = string.Empty);
             LoadAlbum = new RelayCommand<Services.Album>(this.DoLoadAlbum);
@@ -80,7 +84,7 @@ namespace Dukebox.Desktop.ViewModel
 
         private void LoadAlbumsFromLibrary()
         {
-            var albums = _musicLibrary.OrderedAlbums
+            var albums = _cacheService.OrderedAlbums
                 .Select(a => Album.BuildAlbumInstance(a))
                 .ToList();
 
@@ -89,7 +93,7 @@ namespace Dukebox.Desktop.ViewModel
 
         private void DoLoadAlbum(Album album)
         {
-            var tracks = _musicLibrary.GetTracksForAlbum((album.Data as LibraryAlbum).Name);
+            var tracks = _musicLibraryRepo.GetTracksForAlbum((album.Data as LibraryAlbum).Name);
             _audioPlaylist.LoadPlaylistFromList(tracks);
 
             SendNotificationMessage(NotificationMessages.AudioPlaylistLoadedNewTracks);

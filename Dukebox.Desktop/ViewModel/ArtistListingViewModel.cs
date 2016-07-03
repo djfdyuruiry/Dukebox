@@ -13,8 +13,10 @@ namespace Dukebox.Desktop.ViewModel
     public class ArtistListingViewModel : ViewModelBase, IArtistListingViewModel, ISearchControlViewModel
     {
         private readonly ListSearchHelper<Artist> _listSearchHelper;
+        private readonly IMusicLibraryRepository _musicLibraryRepo;
+        private readonly IMusicLibraryEventService _eventService;
+        private readonly IMusicLibraryCacheService _cacheService;
         private readonly IAudioPlaylist _audioPlaylist;
-        private readonly IMusicLibrary _musicLibrary;
 
         private List<Artist> _artists;
         private string _searchText;
@@ -59,9 +61,11 @@ namespace Dukebox.Desktop.ViewModel
         public ICommand ClearSearch { get; private set; }
         public ICommand LoadArtist { get; private set; }
 
-        public ArtistListingViewModel(IMusicLibrary musicLibrary, IAudioPlaylist audioPlaylist) : base()
+        public ArtistListingViewModel(IMusicLibraryRepository musicLibraryRepo, IMusicLibraryCacheService cacheService,
+            IMusicLibraryEventService eventService, IAudioPlaylist audioPlaylist) : base()
         {
-            _musicLibrary = musicLibrary;
+            _musicLibraryRepo = musicLibraryRepo;
+            _cacheService = cacheService;
             _audioPlaylist = audioPlaylist;
 
             _listSearchHelper = new ListSearchHelper<Artist>
@@ -71,8 +75,9 @@ namespace Dukebox.Desktop.ViewModel
                 SortLambda = (a) => a.Name.ToLower(CultureInfo.InvariantCulture)
             };
 
-            _musicLibrary.ArtistAdded += (o, e) => RefreshArtistsFromLibrary();
-            
+            eventService.ArtistsAdded += (o, e) => RefreshArtistsFromLibrary();
+            eventService.SongDeleted += (o, e) => RefreshArtistsFromLibrary();
+
             LoadArtist = new RelayCommand<Artist>(DoLoadArtist);
             ClearSearch = new RelayCommand(() => SearchText = string.Empty);
 
@@ -81,12 +86,12 @@ namespace Dukebox.Desktop.ViewModel
 
         public void RefreshArtistsFromLibrary()
         {
-            Artists = _musicLibrary.OrderedArtists;
+            Artists = _cacheService.OrderedArtists;
         }
 
         private void DoLoadArtist(Artist artist)
         {
-            var tracks = _musicLibrary.GetTracksForArtist(artist.Name);
+            var tracks = _musicLibraryRepo.GetTracksForArtist(artist.Name);
             _audioPlaylist.LoadPlaylistFromList(tracks);
 
             SendNotificationMessage(NotificationMessages.AudioPlaylistLoadedNewTracks);

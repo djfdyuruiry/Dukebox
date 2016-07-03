@@ -1,10 +1,5 @@
-﻿using Dukebox.Library.Interfaces;
-using Dukebox.Library.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
+using Dukebox.Library.Interfaces;
 
 namespace Dukebox.Library.Model
 {

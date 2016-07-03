@@ -9,11 +9,13 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Dukebox.Library</RootNamespace>
     <AssemblyName>Dukebox.Library</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -68,9 +70,11 @@
     <DefineConstants>TRACE</DefineConstants>
     <Optimize>true</Optimize>
     <PlatformTarget>x64</PlatformTarget>
-    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <DebugType>pdbonly</DebugType>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Bass.Net, Version=2.4.10.3, Culture=neutral, PublicKeyToken=b7566c273e6ef480, processorArchitecture=MSIL">
@@ -108,16 +112,17 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.Entity" />
-    <Reference Include="System.Data.SQLite, Version=1.0.92.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\System.Data.SQLite.Core.1.0.92.0\lib\net40\System.Data.SQLite.dll</HintPath>
+    <Reference Include="System.Data.SQLite, Version=1.0.102.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SQLite.Core.1.0.102.0\lib\net46\System.Data.SQLite.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="System.Data.SQLite.EF6">
-      <HintPath>..\packages\System.Data.SQLite.EF6.1.0.92.0\lib\net40\System.Data.SQLite.EF6.dll</HintPath>
+    <Reference Include="System.Data.SQLite.EF6, Version=1.0.102.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SQLite.EF6.1.0.102.0\lib\net46\System.Data.SQLite.EF6.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="System.Data.SQLite.Linq, Version=1.0.92.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\System.Data.SQLite.Linq.1.0.92.0\lib\net40\System.Data.SQLite.Linq.dll</HintPath>
+    <Reference Include="System.Data.SQLite.Linq, Version=1.0.102.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SQLite.Linq.1.0.102.0\lib\net46\System.Data.SQLite.Linq.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Serialization" />
@@ -137,10 +142,20 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Factories\AudioFileMetadataFactory.cs" />
+    <Compile Include="Interfaces\IMusicLibraryImportService.cs" />
+    <Compile Include="Interfaces\IMusicLibraryUpdateService.cs" />
+    <Compile Include="Interfaces\IMusicLibraryCacheService.cs" />
     <Compile Include="Interfaces\IMusicLibraryDbContextFactory.cs" />
     <Compile Include="Factories\MusicLibraryDbContextFactory.cs" />
     <Compile Include="Factories\TrackFactory.cs" />
     <Compile Include="Helper\Md5HashGenerator.cs" />
+    <Compile Include="Interfaces\IMusicLibraryEventService.cs" />
+    <Compile Include="Interfaces\IMusicLibraryRepository.cs" />
+    <Compile Include="Interfaces\IPlaylistGeneratorService.cs" />
+    <Compile Include="Interfaces\IRecentlyPlayedRepository.cs" />
+    <Compile Include="Interfaces\ITrackGeneratorService.cs" />
+    <Compile Include="Interfaces\IWatchFolderManagerService.cs" />
+    <Compile Include="Interfaces\IWatchFolderService.cs" />
     <Compile Include="Model\Album.cs" />
     <Compile Include="Model\Artist.cs" />
     <Compile Include="Helper\DukeboxInitialisationHelper.cs" />
@@ -148,8 +163,13 @@
     <Compile Include="Interfaces\ICdRipViewUpdater.cs" />
     <Compile Include="Interfaces\ITrack.cs" />
     <Compile Include="Interfaces\IMusicLibraryDbContext.cs" />
+    <Compile Include="Model\DirectoryImportReport.cs" />
+    <Compile Include="Model\MusicLibraryEvent.cs" />
     <Compile Include="Model\TagTypeMap.cs" />
     <Compile Include="Model\GenericEventArgs.cs" />
+    <Compile Include="Model\WatchFolder.cs" />
+    <Compile Include="Model\WatchFolderEvent.cs" />
+    <Compile Include="Model\WatchFolderEventType.cs" />
     <Compile Include="Repositories\MusicLibraryDbContext.cs" />
     <Compile Include="LibraryPackage.cs" />
     <Compile Include="Model\AlbumArtCacheOperations.cs" />
@@ -160,7 +180,8 @@
     <Compile Include="Model\NewTrackLoadedEventArgs.cs" />
     <Compile Include="Model\TrackListAccessEventArgs.cs" />
     <Compile Include="Model\Playlist.cs" />
-    <Compile Include="Interfaces\IMusicLibrary.cs" />
+    <Compile Include="Repositories\MusicLibraryRepository.cs" />
+    <Compile Include="Repositories\RecentlyPlayedRepository.cs" />
     <Compile Include="Services\AlbumArtCacheService.cs" />
     <Compile Include="Services\AudioCdDriveMonitoringService.cs" />
     <Compile Include="Services\AudioCdRippingService.cs" />
@@ -171,14 +192,21 @@
     <Compile Include="Interfaces\IAudioCdRippingService.cs" />
     <Compile Include="Interfaces\IAudioPlaylist.cs" />
     <Compile Include="Services\AudioPlaylist.cs" />
-    <Compile Include="Repositories\MusicLibrary.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Model\SearchAreas.cs" />
     <Compile Include="Interfaces\IAudioFileMetaData.cs" />
     <Compile Include="Interfaces\IMusicLibrarySearchService.cs" />
-    <Compile Include="Services\MusicLibrarySearchService.cs" />
+    <Compile Include="Services\MusicLibrary\MusicLibraryCacheService.cs" />
+    <Compile Include="Services\MusicLibrary\MusicLibraryImportService.cs" />
+    <Compile Include="Services\MusicLibrary\MusicLibraryUpdateService.cs" />
+    <Compile Include="Services\MusicLibrary\MusicLibraryEventService.cs" />
+    <Compile Include="Services\MusicLibrary\MusicLibrarySearchService.cs" />
+    <Compile Include="Services\PlaylistGeneratorService.cs" />
     <Compile Include="Services\Track.cs" />
     <Compile Include="Model\Song.cs" />
+    <Compile Include="Services\TrackGeneratorService.cs" />
+    <Compile Include="Services\WatchFolderManagerService.cs" />
+    <Compile Include="Services\WatchFolderService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.Config" />
@@ -212,7 +240,9 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
+    <Error Condition="!Exists('..\packages\System.Data.SQLite.Core.1.0.102.0\build\net46\System.Data.SQLite.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.Data.SQLite.Core.1.0.102.0\build\net46\System.Data.SQLite.Core.targets'))" />
   </Target>
+  <Import Project="..\packages\System.Data.SQLite.Core.1.0.102.0\build\net46\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.102.0\build\net46\System.Data.SQLite.Core.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

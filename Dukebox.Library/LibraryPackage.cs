@@ -11,27 +11,41 @@ using Dukebox.Library.Interfaces;
 using Dukebox.Library.Services;
 using Dukebox.Library.Repositories;
 using Dukebox.Library.Factories;
+using Dukebox.Library.Services.MusicLibrary;
 
 namespace Dukebox.Library
 {
     public class LibraryPackage : IPackage
     {
-
         private static readonly ILog logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         
         private static void Configure(Container container)
         {
             container.RegisterSingleton(() => GetAlbumArtCacheServiceInstance(container));
-            container.RegisterSingleton<ICdMetadataService, CdMetadataService>();
-            container.RegisterSingleton<IAudioCdRippingService, AudioCdRippingService>();
+
             container.RegisterSingleton<IAudioPlaylist, AudioPlaylist>();
-            container.RegisterSingleton<IMusicLibraryDbContextFactory, MusicLibraryDbContextFactory>();
-            container.RegisterSingleton<IMusicLibrary, MusicLibrary>();
-            container.RegisterSingleton<IAudioCdDriveMonitoringService, AudioCdDriveMonitoringService>();
+
             container.RegisterSingleton<AudioFileMetadataFactory, AudioFileMetadataFactory>();
             container.RegisterSingleton<TrackFactory, TrackFactory>();
+            container.RegisterSingleton<IMusicLibraryDbContextFactory, MusicLibraryDbContextFactory>();
 
-            var assemblies = new List<Assembly> {Assembly.GetAssembly(typeof(AudioPackage))};
+            container.RegisterSingleton<ICdMetadataService, CdMetadataService>();
+            container.RegisterSingleton<IAudioCdRippingService, AudioCdRippingService>();
+            container.RegisterSingleton<IAudioCdDriveMonitoringService, AudioCdDriveMonitoringService>();
+            container.RegisterSingleton<IMusicLibraryEventService, MusicLibraryEventService>();
+            container.RegisterSingleton<IMusicLibraryCacheService, MusicLibraryCacheService>();
+            container.RegisterSingleton<IMusicLibraryUpdateService, MusicLibraryUpdateService>();
+            container.RegisterSingleton<IMusicLibrarySearchService, MusicLibrarySearchService>();
+            container.RegisterSingleton<IMusicLibraryImportService, MusicLibraryImportService>();
+            container.RegisterSingleton<IPlaylistGeneratorService, PlaylistGeneratorService>();
+            container.RegisterSingleton<ITrackGeneratorService, TrackGeneratorService>();
+
+            container.RegisterSingleton<IMusicLibraryRepository, MusicLibraryRepository>();
+            container.RegisterSingleton<IRecentlyPlayedRepository, RecentlyPlayedRepository>();
+
+            container.RegisterSingleton<IWatchFolderManagerService, WatchFolderManagerService>();
+
+            var assemblies = new List<Assembly> { Assembly.GetAssembly(typeof(AudioPackage)) };
 
             container.RegisterPackages(assemblies);
 
