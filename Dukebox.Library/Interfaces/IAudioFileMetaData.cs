@@ -14,6 +14,7 @@ namespace Dukebox.Library.Interfaces
         bool HasAlbumArt { get; }
         bool HasFutherMetadataTag { get; }
         Dictionary<string, List<string>> ExtendedMetadata { get; }
+        bool IsEmpty { get; }
         Image GetAlbumArt();
         Image GetAlbumArt(Action<Image> beforeStreamClosedCallback);
         string SaveAlbumArtToTempFile();

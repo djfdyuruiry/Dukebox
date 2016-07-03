@@ -1,8 +1,9 @@
-﻿using MessageBox = System.Windows.MessageBox;
-using MessageBoxButton = System.Windows.MessageBoxButton;
-using MessageBoxImage = System.Windows.MessageBoxImage;
+﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using MessageBox = System.Windows.MessageBox;
+using MessageBoxButton = System.Windows.MessageBoxButton;
+using MessageBoxImage = System.Windows.MessageBoxImage;
 using Dukebox.Desktop.ViewModel;
 using Dukebox.Desktop.Views;
 using Dukebox.Library.Interfaces;
@@ -43,10 +44,10 @@ namespace Dukebox.Desktop.Helper
 
         public static void RipCdToFolder(IAudioCdRippingService cdRippingService)
         {
-            RipCdToFolder(cdRippingService, null);
+            RipCdToFolder(cdRippingService, null, null);
         }
 
-        public static void RipCdToFolder(IAudioCdRippingService cdRippingService, string audioCdDrivePath)
+        public static void RipCdToFolder(IAudioCdRippingService cdRippingService, string audioCdDrivePath, List<ITrack> customTracks)
         {
 
             var audioCdDrive = audioCdDrivePath ?? BrowseForAudioCdDrive();
@@ -71,7 +72,7 @@ namespace Dukebox.Desktop.Helper
 
             progressViewModel.OnComplete += (o, e) => progressWindow.Dispatcher.InvokeAsync(progressWindow.Hide);
 
-            cdRippingService.RipCdToFolder(audioCdDrive, selectMp3OutputDialog.SelectedPath, progressViewModel);
+            cdRippingService.RipCdToFolder(audioCdDrive, selectMp3OutputDialog.SelectedPath, progressViewModel, customTracks);
 
             progressWindow.Show();
         }
