@@ -44,7 +44,7 @@ namespace Dukebox.Tests.Unit
                 signalEvent.Set();
             };
 
-            signalEvent.WaitOne(1000);
+            signalEvent.WaitOne(2000);
 
             Assert.True(importEventFired, "Watch folder service failed to do an inital import when created");
         }
