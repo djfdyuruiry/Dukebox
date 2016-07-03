@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows;
 using GalaSoft.MvvmLight.Command;
@@ -20,6 +22,7 @@ namespace Dukebox.Desktop.ViewModel
 
         private List<ITrack> _tracks;
         private string _searchText;
+        private CancellationTokenSource _cancellationTokenSource;
 
         public ICommand ClearSearch { get; private set; }
         public string SearchText
@@ -85,6 +88,8 @@ namespace Dukebox.Desktop.ViewModel
             ClearSearch = new RelayCommand(() => SearchText = string.Empty);
             LoadTrack = new RelayCommand<ITrack>(DoLoadTrack);
 
+            _tracks = new List<ITrack>();
+
             RefreshTrackListing();
         }
 
@@ -104,8 +109,19 @@ namespace Dukebox.Desktop.ViewModel
 
         private void DoSearch()
         {
-            _tracks = _musicLibrarySearcher.SearchForTracksInArea(SearchAreas.All, SearchText);
-            OnPropertyChanged("Tracks");
+            _cancellationTokenSource?.Cancel();
+            _cancellationTokenSource = new CancellationTokenSource();
+
+            var taskCancelToken = _cancellationTokenSource.Token;
+
+            Task.Run(async () =>
+            {
+                await Task.Delay(250);
+                taskCancelToken.ThrowIfCancellationRequested();
+
+                _tracks = _musicLibrarySearcher.SearchForTracksInArea(SearchAreas.All, SearchText);
+                OnPropertyChanged("Tracks");
+            }, taskCancelToken);
         }
     }
 }
