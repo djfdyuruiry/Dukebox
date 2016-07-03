@@ -93,7 +93,7 @@ namespace Dukebox.Library.Services.MusicLibrary
                     matchingSongs = matchingSongs.Concat(songs.Where(s => s.FileName.ToLower().Contains(searchTerm)));
                 }
 
-                matchingSongsList = matchingSongs.ToList();
+                matchingSongsList = matchingSongs.Distinct().ToList();
 
                 stopwatch.Stop();
                 var searchAreasString = searchAreas.Select(sa => Enum.GetName(typeof(SearchAreas), sa)).Aggregate((c, n) => c + ", " + n);
@@ -143,7 +143,7 @@ namespace Dukebox.Library.Services.MusicLibrary
                     matchingSongs = matchingSongs.Concat(songs.Where(s => s.FileName.ToLower().Equals(lowerAttributeValue)));
                 }
 
-                matchingSongsList = matchingSongs.ToList();
+                matchingSongsList = matchingSongs.Distinct().ToList();
             }
 
             stopwatch.Stop();
@@ -229,7 +229,7 @@ namespace Dukebox.Library.Services.MusicLibrary
                     matchingSongs = matchingSongs.Concat(songs.Where(s => s.Id.ToString() == attributeId));
                 }
 
-                matchingSongsList = matchingSongs.ToList();
+                matchingSongsList = matchingSongs.Distinct().ToList();
             }
 
             stopwatch.Stop();
