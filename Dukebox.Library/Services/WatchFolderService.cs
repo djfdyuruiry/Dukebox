@@ -174,6 +174,11 @@ namespace Dukebox.Library.Services
 
         public void StopWatching()
         {
+            if (_fileWatcher == null)
+            {
+                return;
+            }
+
             _fileWatcher.EnableRaisingEvents = false;
             _fileWatcher = null;
 
