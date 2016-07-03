@@ -1,20 +1,9 @@
-﻿using Dukebox.Desktop.Interfaces;
-using Dukebox.Desktop.Model;
-using GalaSoft.MvvmLight.Messaging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Timers;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
+﻿using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using GalaSoft.MvvmLight.Messaging;
+using Dukebox.Desktop.Interfaces;
+using Dukebox.Desktop.Model;
+using Dukebox.Desktop.Services;
 
 namespace Dukebox.Desktop.Views
 {
@@ -32,9 +21,10 @@ namespace Dukebox.Desktop.Views
         {
             var listBox = sender as ListBox;
 
-            if (listBox != null)
+            if (listBox?.SelectedItem != null)
             {
-                var item = listBox.SelectedItem;
+                var item = listBox.SelectedItem as Album;
+
                 var albumListingViewModel = DataContext as IAlbumListingViewModel;
 
                 albumListingViewModel?.LoadAlbum?.Execute(item);
@@ -45,9 +35,14 @@ namespace Dukebox.Desktop.Views
         {
             var listBox = sender as ListBox;
 
-            if (listBox != null)
+            if (listBox?.SelectedItem != null)
             {
-                var item = listBox.SelectedItem as Services.Album;
+                var item = listBox.SelectedItem as Album;
+
+                if (item == null)
+                {
+                    return;
+                }
 
                 Messenger.Default.Send<PreviewArtistOrAlbumMessage>(new PreviewArtistOrAlbumMessage
                 {
