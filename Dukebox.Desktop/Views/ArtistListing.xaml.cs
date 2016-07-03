@@ -21,11 +21,11 @@ namespace Dukebox.Desktop.Views
         {
             var listBox = sender as ListBox;
 
-            if (listBox != null)
+            if (listBox?.SelectedItem != null)
             {
                 var item = listBox.SelectedItem;
                 var albumListingViewModel = DataContext as IArtistListingViewModel;
-
+                
                 albumListingViewModel?.LoadArtist?.Execute(item);
             }
         }
@@ -34,9 +34,14 @@ namespace Dukebox.Desktop.Views
         {
             var listBox = sender as ListBox;
 
-            if (listBox != null)
+            if (listBox?.SelectedItem != null)
             {
                 var item = listBox.SelectedItem as Artist;
+
+                if (item == null)
+                {
+                    return;
+                }
 
                 Messenger.Default.Send<PreviewArtistOrAlbumMessage>(new PreviewArtistOrAlbumMessage
                 {
