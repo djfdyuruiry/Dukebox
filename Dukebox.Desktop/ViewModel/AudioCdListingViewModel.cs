@@ -24,6 +24,7 @@ namespace Dukebox.Desktop.ViewModel
         private readonly IMusicLibraryEventService _eventService;
 
         private List<ITrack> _tracks;
+        private List<TrackWrapper> _uiTracks;
         private string _selectedAudioCdDrivePath;
 
         public ICommand ClearSearch { get; private set; }
@@ -32,21 +33,26 @@ namespace Dukebox.Desktop.ViewModel
         {
             get
             {
-                return _tracks.Select(t => new TrackWrapper(_musicLibraryUpdateService, _eventService, t)).ToList();
+                return _uiTracks;
+            }
+            private set
+            {
+                _uiTracks = value;
+                OnPropertyChanged("Tracks");
             }
         }
 
         private void UpdateTracks(List<ITrack> tracks)
         {
             _tracks = tracks;
-            OnPropertyChanged("Tracks");
+            Tracks = _tracks.Select(t => new TrackWrapper(_musicLibraryUpdateService, _eventService, t)).ToList();
         }
 
         public bool EditingListingsDisabled
         {
             get 
             { 
-                return false; 
+                return true; 
             }
         }
         public bool SearchEnabled
@@ -169,7 +175,7 @@ namespace Dukebox.Desktop.ViewModel
                 return;
             }
 
-            AudioCdHelper.RipCdToFolder(_cdRippingService, SelectedAudioCdDrivePath);
+            AudioCdHelper.RipCdToFolder(_cdRippingService, SelectedAudioCdDrivePath, _tracks);
         }
 
         private void ShowCdDriveNotReadyError(string operation)

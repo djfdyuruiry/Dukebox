@@ -59,6 +59,14 @@ namespace Dukebox.Library.Services
 
         public Dictionary<string, List<string>> ExtendedMetadata { get; private set; }
 
+        public bool IsEmpty
+        {
+            get
+            {
+                return Title.Equals("Unknown Title") && Artist.Equals("Unknown Artist") && Album.Equals("Unknown Album");
+            }
+        }
+
         public AudioFileMetadata(string audioFilePath, string title, string artist, string album, int trackLength, 
             Dictionary<string, List<string>> extendedMetadata, bool hasFutherMetadataTag, bool hasAlbumArt, long dbAlbumId)
         {
