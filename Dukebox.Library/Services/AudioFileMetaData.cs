@@ -169,7 +169,7 @@ namespace Dukebox.Library.Services
             SaveMetadataToFileTag(null);
         }
 
-        public void SaveMetadataToFileTag(Action atomicUpdateAction)
+        public void SaveMetadataToFileTag(Action atomicBeforeTagCommitAction)
         {
             try
             {
@@ -180,7 +180,7 @@ namespace Dukebox.Library.Services
 
                 _saveMetadataSemaphore.Wait();
 
-                atomicUpdateAction?.Invoke();
+                atomicBeforeTagCommitAction?.Invoke();
 
                 using (var fileStream = new FileStream(AudioFilePath, FileMode.Open))
                 {
