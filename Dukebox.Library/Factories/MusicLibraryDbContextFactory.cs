@@ -105,17 +105,16 @@ namespace Dukebox.Library.Factories
         {
             foreach (var dbValidationResult in dbValidationExecption.EntityValidationErrors)
             {
-                try
+                string entityJson = "null";
+                var entity = dbValidationResult?.Entry?.Entity;
+
+                if (entity != null)
                 {
-                    var entity = dbValidationResult?.Entry?.Entity;
-                    var entityJson = entity != null ? JsonConvert.SerializeObject(dbValidationResult.Entry) : "null";
-                    logger.ErrorFormat("Database validation error occurred; Entity is valid? {0} | Entity JSON: '{1}'",
-                        dbValidationResult.IsValid, entityJson);
+                    entityJson = JsonConvert.SerializeObject(entity);
                 }
-                catch (Exception ex)
-                {
-                    logger.Warn("Error while serilaizing entity that caused validation error", ex);
-                }
+
+                logger.ErrorFormat("Database validation error occurred: Entity is valid? {0} | Entity JSON: '{1}'",
+                    dbValidationResult.IsValid, entityJson);
 
                 foreach (var ve in dbValidationResult.ValidationErrors)
                 {
