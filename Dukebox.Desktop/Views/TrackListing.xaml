@@ -32,7 +32,7 @@
             </Style.Triggers>
         </Style>
     </UserControl.Resources>
-    <Grid>
+    <Grid VirtualizingStackPanel.IsVirtualizing="True">
         <Grid.RowDefinitions>
             <RowDefinition Height="0.05*"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
@@ -56,8 +56,10 @@
                   SelectionMode="Single"
                   SelectionUnit="FullRow"
                   Name="TrackListingsGrid"
-                  ItemsSource="{Binding Tracks}"
-                  IsSynchronizedWithCurrentItem="True">
+                  ItemsSource="{Binding Tracks, UpdateSourceTrigger=PropertyChanged}"
+                  IsSynchronizedWithCurrentItem="True"
+                  VirtualizingStackPanel.VirtualizationMode="Standard"
+                  VirtualizingStackPanel.IsVirtualizing="True">
             <DataGrid.RowStyle>
                 <Style TargetType="DataGridRow">
                     <Setter Property="Margin" Value="1"></Setter>

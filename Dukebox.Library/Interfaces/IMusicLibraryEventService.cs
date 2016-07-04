@@ -11,10 +11,11 @@ namespace Dukebox.Library.Interfaces
         event EventHandler<Song> SongAdded;
         event EventHandler<Song> SongUpdated;
         event EventHandler<Song> SongDeleted;
-        event EventHandler PlaylistsAdded;
+        event EventHandler PlaylistsAdded; 
         event EventHandler ArtistCacheRefreshed;
         event EventHandler AlbumCacheRefreshed;
         event EventHandler PlaylistCacheRefreshed;
+        event EventHandler FilesCacheRefreshed;
         event EventHandler CachesRefreshed;
         event EventHandler DatabaseChangesSaved;
         event EventHandler<WatchFolder> WatchFolderUpdated;

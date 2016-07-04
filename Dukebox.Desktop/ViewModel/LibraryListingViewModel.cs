@@ -117,7 +117,11 @@ namespace Dukebox.Desktop.ViewModel
             Task.Run(async () =>
             {
                 await Task.Delay(250);
-                taskCancelToken.ThrowIfCancellationRequested();
+
+                if (taskCancelToken.IsCancellationRequested)
+                {
+                    return;
+                }
 
                 _tracks = _musicLibrarySearcher.SearchForTracksInArea(SearchAreas.All, SearchText);
                 OnPropertyChanged("Tracks");

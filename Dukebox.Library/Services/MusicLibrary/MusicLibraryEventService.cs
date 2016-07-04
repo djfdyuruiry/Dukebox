@@ -18,6 +18,7 @@ namespace Dukebox.Library.Services.MusicLibrary
         public event EventHandler ArtistCacheRefreshed;
         public event EventHandler AlbumCacheRefreshed;
         public event EventHandler PlaylistCacheRefreshed;
+        public event EventHandler FilesCacheRefreshed; 
         public event EventHandler CachesRefreshed;
         public event EventHandler DatabaseChangesSaved;
         public event EventHandler<WatchFolder> WatchFolderUpdated;

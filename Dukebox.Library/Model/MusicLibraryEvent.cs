@@ -9,6 +9,7 @@
         public static readonly MusicLibraryEvent AlbumCacheRefreshed = new MusicLibraryEvent { Name = "AlbumCacheRefreshed" };
         public static readonly MusicLibraryEvent ArtistCacheRefreshed = new MusicLibraryEvent { Name = "ArtistCacheRefreshed" };
         public static readonly MusicLibraryEvent PlaylistCacheRefreshed = new MusicLibraryEvent { Name = "PlaylistCacheRefreshed" };
+        public static readonly MusicLibraryEvent FilesCacheRefreshed = new MusicLibraryEvent { Name = "FilesCacheRefreshed" };
         public static readonly MusicLibraryEvent CachesRefreshed = new MusicLibraryEvent { Name = "CachesRefreshed" };
         public static readonly MusicLibraryEvent DatabaseChangesSaved = new MusicLibraryEvent { Name = "DatabaseChangesSaved" };
 

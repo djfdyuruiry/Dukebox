@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
 using Dukebox.Library.Model;
 
 namespace Dukebox.Library.Interfaces
@@ -8,7 +9,7 @@ namespace Dukebox.Library.Interfaces
         List<Album> OrderedAlbums { get; }
         List<Artist> OrderedArtists { get; }
         List<Playlist> OrderedPlaylists { get; }
-        List<string> FilesCache { get; }
+        BlockingCollection<string> FilesCache { get; }
         void RefreshCaches();
     }
 }

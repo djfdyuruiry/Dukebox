@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using log4net;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
+using System.Threading;
 
 namespace Dukebox.Library.Services.MusicLibrary
 {
@@ -14,45 +16,42 @@ namespace Dukebox.Library.Services.MusicLibrary
 
         private readonly IMusicLibraryDbContextFactory _dbContextFactory;
         private readonly IMusicLibraryEventService _eventService;
+        private readonly SemaphoreSlim _cacheSemaphore;
+        private readonly BlockingCollection<string> _allFilesCache;
 
         private List<Artist> _allArtistsCache;
         private List<Album> _allAlbumsCache;
         private List<Playlist> _allPlaylistsCache;
-        private List<string> _allFilesCache;
 
         public List<Artist> OrderedArtists
         {
             get
             {
-                if (_allArtistsCache == null)
+                try
                 {
-                    using (var dukeboxData = _dbContextFactory.GetInstance())
-                    {
-                        _allArtistsCache = dukeboxData.Artists.OrderBy(a => a.Name).ToList();
-                    }
-
-                    _eventService.TriggerEvent(MusicLibraryEvent.ArtistCacheRefreshed);
+                    _cacheSemaphore.Wait();
+                    return _allArtistsCache;
                 }
-
-                return _allArtistsCache;
+                finally
+                {
+                    _cacheSemaphore.Release();
+                }
             }
         }
-        
+
         public List<Album> OrderedAlbums
         {
             get
             {
-                if (_allAlbumsCache == null)
+                try
                 {
-                    using (var dukeboxData = _dbContextFactory.GetInstance())
-                    {
-                        _allAlbumsCache = dukeboxData.Albums.OrderBy(a => a.Name).ToList();
-                    }
-
-                    _eventService.TriggerEvent(MusicLibraryEvent.AlbumCacheRefreshed);
+                    _cacheSemaphore.Wait();
+                    return _allAlbumsCache;
                 }
-
-                return _allAlbumsCache;
+                finally
+                {
+                    _cacheSemaphore.Release();
+                }
             }
         }
 
@@ -60,35 +59,31 @@ namespace Dukebox.Library.Services.MusicLibrary
         {
             get
             {
-                if (_allPlaylistsCache == null)
+                try
                 {
-                    using (var dukeboxData = _dbContextFactory.GetInstance())
-                    {
-                        _allPlaylistsCache = dukeboxData.Playlists.OrderBy(a => a.Name).ToList();
-                    }
-
-                    _eventService.TriggerEvent(MusicLibraryEvent.PlaylistCacheRefreshed);
+                    _cacheSemaphore.Wait();
+                    return _allPlaylistsCache;
                 }
-
-                return _allPlaylistsCache;
+                finally
+                {
+                    _cacheSemaphore.Release();
+                }
             }
         }
 
-        public List<string> FilesCache
+        public BlockingCollection<string> FilesCache
         {
             get
             {
-                if (_allFilesCache == null)
+                try
                 {
-                    using (var dukeboxData = _dbContextFactory.GetInstance())
-                    {
-                        _allFilesCache = dukeboxData.Songs.Select(s => s.FileName).ToList();
-                    }
-
-                    _eventService.TriggerEvent(MusicLibraryEvent.PlaylistCacheRefreshed);
+                    _cacheSemaphore.Wait();
+                    return _allFilesCache;
                 }
-
-                return _allFilesCache;
+                finally
+                {
+                    _cacheSemaphore.Release();
+                }
             }
         }
 
@@ -96,30 +91,55 @@ namespace Dukebox.Library.Services.MusicLibrary
         {
             _dbContextFactory = dbContextFactory;
             _eventService = eventService;
+            _cacheSemaphore = new SemaphoreSlim(1, 1);
 
             _eventService.DatabaseChangesSaved += (o, e) => RefreshCaches();
-            
+
+            _allFilesCache = new BlockingCollection<string>();
+
             RefreshCaches();
         }
 
         public void RefreshCaches()
         {
-            var stopwatch = Stopwatch.StartNew();
+            try
+            {
+                _cacheSemaphore.Wait();
 
-            _allArtistsCache = null;
-            _allAlbumsCache = null;
-            _allPlaylistsCache = null;
-            _allFilesCache = null;
+                var stopwatch = Stopwatch.StartNew();
+                List<string> files;
+                
+                using (var dukeboxData = _dbContextFactory.GetInstance())
+                {
+                    _allArtistsCache = dukeboxData.Artists.OrderBy(a => a.Name).ToList();
+                    _allAlbumsCache = dukeboxData.Albums.OrderBy(a => a.Name).ToList();
+                    _allPlaylistsCache = dukeboxData.Playlists.OrderBy(a => a.Name).ToList();
 
-            var albums = OrderedAlbums;
-            var artists = OrderedArtists;
-            var playlists = OrderedPlaylists;
-            var files = _allFilesCache;
+                    files = dukeboxData.Songs.Select(s => s.FileName).ToList();
+                }
 
-            stopwatch.Stop();
-            logger.Info("Music library artist, album, playlist and file path caches were refreshed");
-            logger.DebugFormat("Refreshing library artist and album caches took {0}ms.", stopwatch.ElapsedMilliseconds);
+                while (_allFilesCache.Count > 0)
+                {
+                    string item;
+                    _allFilesCache.TryTake(out item);
+                }
 
+                files.ForEach(f => _allFilesCache.Add(f));
+
+                stopwatch.Stop();
+
+                logger.Info("Music library artist, album, playlist and file path caches were refreshed");
+                logger.DebugFormat("Refreshing library artist and album caches took {0}ms.", stopwatch.ElapsedMilliseconds);
+            }
+            finally
+            {
+                _cacheSemaphore.Release();
+            }
+
+            _eventService.TriggerEvent(MusicLibraryEvent.ArtistCacheRefreshed);
+            _eventService.TriggerEvent(MusicLibraryEvent.AlbumCacheRefreshed);
+            _eventService.TriggerEvent(MusicLibraryEvent.PlaylistCacheRefreshed);
+            _eventService.TriggerEvent(MusicLibraryEvent.FilesCacheRefreshed);
             _eventService.TriggerEvent(MusicLibraryEvent.CachesRefreshed);
         }
     }

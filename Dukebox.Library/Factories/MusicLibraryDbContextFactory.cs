@@ -2,11 +2,11 @@
 using System.Data.Entity.Validation;
 using System.IO;
 using System.Reflection;
+using System.Threading.Tasks;
 using log4net;
 using Newtonsoft.Json;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Repositories;
-using System.Threading.Tasks;
 using Dukebox.Library.Model;
 
 namespace Dukebox.Library.Factories
@@ -101,22 +101,29 @@ namespace Dukebox.Library.Factories
             }
         }
 
-        private void LogEntityValidationException(DbEntityValidationException ex)
+        private void LogEntityValidationException(DbEntityValidationException dbValidationExecption)
         {
-            foreach (var vr in ex.EntityValidationErrors)
+            foreach (var dbValidationResult in dbValidationExecption.EntityValidationErrors)
             {
-                var entity = vr?.Entry?.Entity;
-                var entityJson = entity != null ? JsonConvert.SerializeObject(vr.Entry) : "null";
-                logger.ErrorFormat("Database validation error occurred; Entity is valid? {0} | Entity JSON: '{1}'",
-                    vr.IsValid, entityJson);
+                try
+                {
+                    var entity = dbValidationResult?.Entry?.Entity;
+                    var entityJson = entity != null ? JsonConvert.SerializeObject(dbValidationResult.Entry) : "null";
+                    logger.ErrorFormat("Database validation error occurred; Entity is valid? {0} | Entity JSON: '{1}'",
+                        dbValidationResult.IsValid, entityJson);
+                }
+                catch (Exception ex)
+                {
+                    logger.Warn("Error while serilaizing entity that caused validation error", ex);
+                }
 
-                foreach (var ve in vr.ValidationErrors)
+                foreach (var ve in dbValidationResult.ValidationErrors)
                 {
                     logger.ErrorFormat("Error on property '{1}': {0}", ve.ErrorMessage, ve.PropertyName);
                 }
             }
 
-            logger.Error(ex);
+            logger.Error(dbValidationExecption);
         }
     }
 }
