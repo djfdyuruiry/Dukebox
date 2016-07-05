@@ -5,7 +5,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace;Dukebox.ViewModel"
              mc:Ignorable="d" 
-             d:DesignHeight="160" d:DesignWidth="1024"
+             d:DesignHeight="160" 
+             d:DesignWidth="1024"
+             Margin="5"
              DataContext="{Binding IPlaybackMonitor, Source={StaticResource ViewModelLocator}}">
     <Grid Grid.Row="0" Grid.Column="0" Background="White">
         <Grid.RowDefinitions>
