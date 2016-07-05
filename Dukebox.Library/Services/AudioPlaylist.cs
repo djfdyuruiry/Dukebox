@@ -320,12 +320,12 @@ namespace Dukebox.Library.Services
             }
             else if (trackIndex == GetCurrentTrackIndex())
             {
-                SetCurrentTrackIndex(GetCurrentTrackIndex() - 1);
+                SetCurrentTrackIndex(GetCurrentTrackIndex() - 1, true);
                 _forward = true;
             }
             else
             {
-                SetCurrentTrackIndex(trackIndex - 1);
+                SetCurrentTrackIndex(trackIndex - 1, true);
                 _forward = true;
             }
 
