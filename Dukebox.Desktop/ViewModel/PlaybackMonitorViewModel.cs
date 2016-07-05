@@ -10,6 +10,7 @@ using Dukebox.Desktop.Helper;
 using Dukebox.Desktop.Interfaces;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
+using Dukebox.Desktop.Services;
 
 namespace Dukebox.Desktop.ViewModel
 {
@@ -22,6 +23,7 @@ namespace Dukebox.Desktop.ViewModel
         private readonly IMediaPlayer _mediaPlayer;
         private readonly IAudioPlaylist _audioPlaylist;
         private readonly IGlobalMultimediaHotKeyService _globalHotKeyService;
+        private readonly IMusicLibraryEventService _eventService;
         private readonly IAlbumArtCacheService _albumArtCache;
 
         private string _artist;
@@ -131,12 +133,14 @@ namespace Dukebox.Desktop.ViewModel
         public ICommand ForwardCommand { get; private set; }
 
         public PlaybackMonitorViewModel(IMediaPlayer mediaPlayer, IAudioPlaylist audioPlaylist,
-            IGlobalMultimediaHotKeyService globalHotKeyService, IAlbumArtCacheService albumArtCache) : base()
+            IGlobalMultimediaHotKeyService globalHotKeyService, IAlbumArtCacheService albumArtCache,
+            IMusicLibraryEventService eventService) : base()
         {
             _mediaPlayer = mediaPlayer;
             _audioPlaylist = audioPlaylist;
             _globalHotKeyService = globalHotKeyService;
             _albumArtCache = albumArtCache;
+            _eventService = eventService;
 
             UpdateAlbumArt(ImageResources.DefaultAlbumArtUri);
             PlayPauseImage = ImageResources.PlayImage;
@@ -150,7 +154,7 @@ namespace Dukebox.Desktop.ViewModel
         private void SetupAudioEventListeners()
         {
             _mediaPlayer.LoadedTrackFromFile += (o, e) => LoadedTrackFromFile(e);
-            _audioPlaylist.NewTrackLoaded += (o, e) => LoadNewTrackAlbumArtIfPresent(e);
+            _audioPlaylist.NewTrackLoaded += (o, e) => LoadNewTrackArtIfNeccessary(e);
 
             _mediaPlayer.FinishedPlayingTrack += (o, e) => TrackFinishedPlaying();
             _mediaPlayer.AudioPositionChanged += (o, e) => TrackPositionChanged();
@@ -161,9 +165,13 @@ namespace Dukebox.Desktop.ViewModel
             _mediaPlayer.TrackResumed += (o, e) => PlayPauseImage = ImageResources.PauseImage;
             _mediaPlayer.ErrorHandlingAction = (errMsg, title) => MessageBox.Show(errMsg, title, MessageBoxButton.OK, MessageBoxImage.Error);
 
-            // reflect metadata changes in UI
-            // TODO: replace with message handler
-            //TrackFactory.TrackMetadataUpdated += (o, e) => UpdateTrackDisplay(o as ITrack);
+            _eventService.SongUpdated += (o, e) =>
+            {
+                if (e.FileName.Equals(_currentlyLoadedFile))
+                {
+                    UpdateTrackDisplay(e);
+                }
+            };
         }
 
         private void SetupPlaybackControlCommands()
@@ -210,29 +218,24 @@ namespace Dukebox.Desktop.ViewModel
             _currentlyLoadedFile = trackLoadedArgs.FileName;
         }
 
-        private void UpdateTrackDisplay(ITrack track)
+        private void UpdateTrackDisplay(Song song)
         {
-            if (_currentlyLoadedFile != track.Song.FileName)
-            {
-                return;
-            }
-
             LoadedTrackFromFile(new TrackLoadedFromFileEventArgs
             {
-                FileName = track.Song.FileName,
+                FileName = song.FileName,
                 Metadata = new MediaPlayerMetadata
                 {
-                    TrackName = track.Song.Title,
-                    ArtistName = track.Artist.Name,
-                    AlbumName = track.Album.Name
+                    TrackName = song.Title,
+                    ArtistName = song.ArtistName,
+                    AlbumName = song.AlbumName
                 }
             });
         }
 
-        private void LoadNewTrackAlbumArtIfPresent(NewTrackLoadedEventArgs newTrackArgs)
+        private void LoadNewTrackArtIfNeccessary(NewTrackLoadedEventArgs newTrackArgs)
         {
             var albumId = newTrackArgs.Track.Album.Id;
-            
+
             try
             {
                 if (_albumArtCache.CheckCacheForAlbum(albumId))
@@ -255,7 +258,7 @@ namespace Dukebox.Desktop.ViewModel
             catch
             {
                 UpdateAlbumArt(ImageResources.DefaultAlbumArtUri);
-            }
+            }            
         }
 
         private void UpdateAlbumArt(string albumArtUri)
