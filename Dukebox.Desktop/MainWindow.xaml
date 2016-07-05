@@ -18,6 +18,15 @@
             <i:InvokeCommandAction Command="{Binding StopAudio}" />
         </i:EventTrigger>
     </i:Interaction.Triggers>
+    <Window.Resources>
+        <Style x:Key="isCheckedMenuItem" TargetType="{x:Type MenuItem}">
+            <Style.Triggers>
+                <Trigger Property="MenuItem.IsChecked" Value="true">
+                    <Setter Property="Background" Value="White"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
     <!-- Window container -->
     <Grid Name="WindowContainer">
         <Grid.RowDefinitions>
@@ -57,11 +66,11 @@
                     </MenuItem>
                 </MenuItem>
                 <MenuItem Header="_Playback" DataContext="{Binding PlaybackMenuViewModel, Source={StaticResource ViewModelLocator}}">
-                    <MenuItem Header="Shuffle" IsCheckable="True" IsChecked="{Binding ShuffleOn}" Command="{Binding Shuffle}">
+                    <MenuItem Header="Shuffle" IsCheckable="True" IsChecked="{Binding ShuffleOn, Mode=TwoWay}" Command="{Binding Shuffle}" Style="{StaticResource isCheckedMenuItem}">
                     </MenuItem>
-                    <MenuItem Header="Repeat" IsCheckable="True" IsChecked="{Binding RepeatOn}" Command="{Binding Repeat}">
+                    <MenuItem Header="Repeat" IsCheckable="True" IsChecked="{Binding RepeatOn, Mode=TwoWay}" Command="{Binding Repeat}" Style="{StaticResource isCheckedMenuItem}">
                     </MenuItem>
-                    <MenuItem Header="Repeat All" IsCheckable="True" IsChecked="{Binding RepeatAllOn}" Command="{Binding RepeatAll}">
+                    <MenuItem Header="Repeat All" IsCheckable="True" IsChecked="{Binding RepeatAllOn, Mode=TwoWay}" Command="{Binding RepeatAll}" Style="{StaticResource isCheckedMenuItem}">
                     </MenuItem>
                 </MenuItem>
                 <MenuItem Header="_Playlist" DataContext="{Binding PlaylistMenuViewModel, Source={StaticResource ViewModelLocator}}">
