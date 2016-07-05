@@ -159,6 +159,7 @@ namespace Dukebox.Desktop.ViewModel
             _mediaPlayer.StartPlayingTrack += (o, e) => PlayPauseImage = ImageResources.PauseImage;
             _mediaPlayer.TrackPaused += (o, e) => PlayPauseImage = ImageResources.PlayImage;
             _mediaPlayer.TrackResumed += (o, e) => PlayPauseImage = ImageResources.PauseImage;
+            _mediaPlayer.ErrorHandlingAction = (errMsg, title) => MessageBox.Show(errMsg, title, MessageBoxButton.OK, MessageBoxImage.Error);
 
             // reflect metadata changes in UI
             // TODO: replace with message handler

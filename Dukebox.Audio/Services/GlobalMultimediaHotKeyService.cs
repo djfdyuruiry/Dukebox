@@ -1,10 +1,10 @@
-﻿using Dukebox.Audio.Interfaces;
-using GlobalHotKey;
-using log4net;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Input;
+using GlobalHotKey;
+using log4net;
+using Dukebox.Audio.Interfaces;
 
 namespace Dukebox.Audio.Services
 {

@@ -2,7 +2,6 @@
 using System.IO;
 using System.Linq;
 using System.Threading;
-using System.Windows;
 using log4net;
 using Un4seen.Bass;
 using Un4seen.Bass.AddOn.Cd;
@@ -107,6 +106,8 @@ namespace Dukebox.Audio
         public bool Playing { get; set; }
         public bool Stopped { get; set; }
         public bool Finished { get; set; }
+
+        public Action<string, string> ErrorHandlingAction { get; set; }
 
         public event EventHandler StartPlayingTrack;
         public event EventHandler TrackPaused;
@@ -273,7 +274,7 @@ namespace Dukebox.Audio
                 string msg = string.Format("Error playing file '{0}' [BASS error code: {1}]", _fileName.Split('\\').LastOrDefault(), Bass.BASS_ErrorGetCode().ToString());
                 logger.Error(msg);
 
-                MessageBox.Show(msg, "Dukebox: Error Playing File", MessageBoxButton.OK, MessageBoxImage.Error);
+                ErrorHandlingAction?.Invoke(msg, "Dukebox: Error Playing File");
                 return;
             }
 

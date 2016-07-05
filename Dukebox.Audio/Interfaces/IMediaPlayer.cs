@@ -1,6 +1,5 @@
-﻿using Dukebox.Audio.Model;
-using System;
-using Un4seen.Bass.Misc;
+﻿using System;
+using Dukebox.Audio.Model;
 
 namespace Dukebox.Audio.Interfaces
 {
@@ -15,6 +14,7 @@ namespace Dukebox.Audio.Interfaces
         double SecondsPlayed { get; }
         bool Stopped { get; set; }
         bool Finished { get; set; }
+        Action<string, string> ErrorHandlingAction { get; set; }
         event EventHandler StartPlayingTrack;
         event EventHandler TrackPaused;
         event EventHandler TrackResumed;
