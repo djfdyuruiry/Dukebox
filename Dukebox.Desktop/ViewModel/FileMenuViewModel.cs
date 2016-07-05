@@ -3,14 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
+using Application = System.Windows.Application;
 using System.Windows.Forms;
 using System.Windows.Input;
-using Application = System.Windows.Application;
 using GalaSoft.MvvmLight.Command;
 using Dukebox.Audio;
 using Dukebox.Desktop.Interfaces;
 using Dukebox.Desktop.Model;
-using Dukebox.Desktop.Views;
 using Dukebox.Library.Factories;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
@@ -118,21 +117,7 @@ namespace Dukebox.Desktop.ViewModel
                     System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
             }
         }
-
-        private void ImportStep(ProgressMonitorViewModel viewModel, AudioFileImportedInfo fileImportedArgs, ref int filesAdded)
-        {
-            viewModel.MaximumProgressValue = (fileImportedArgs.TotalFilesThisImport * 2);
-
-            var percentComplete = (filesAdded / ((float)fileImportedArgs.TotalFilesThisImport / 100)) / 2;
-
-            viewModel.CurrentProgressValue++;
-
-            viewModel.NotificationText = string.Format("{0}%", percentComplete);
-            viewModel.StatusText = string.Format(@"{0} '{1}'", fileImportedArgs.Status, Path.GetFileName(fileImportedArgs.FileAdded));
-
-            Interlocked.Increment(ref filesAdded);
-        }
-
+        
         protected virtual void Dispose(bool cleanAllResources)
         {
             if (cleanAllResources)
