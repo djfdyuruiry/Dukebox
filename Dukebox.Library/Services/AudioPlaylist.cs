@@ -381,6 +381,9 @@ namespace Dukebox.Library.Services
                 _lastTrack = GetCurrentTrackIndex();
             }
 
+            var trackIndexBeforePlaybackSleep = GetCurrentTrackIndex();
+
+
             // While next and back are not pressed and the user is not finished with the song.
             while (!_forward && !_back && !_mediaPlayer.Finished)
             {
@@ -388,7 +391,7 @@ namespace Dukebox.Library.Services
             }
 
             // Move forward if forward motion has been indicated and shuffle is off.
-            if (_forward && !Shuffle)
+            if (_forward && (!Shuffle || GetCurrentTrackIndex() != trackIndexBeforePlaybackSleep))
             {
                 SetCurrentTrackIndex(GetCurrentTrackIndex() + 1);
 
