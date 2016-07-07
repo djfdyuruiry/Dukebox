@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Threading.Tasks;
 using GalaSoft.MvvmLight.Messaging;
 
 namespace Dukebox.Desktop.ViewModel
@@ -9,13 +10,14 @@ namespace Dukebox.Desktop.ViewModel
 
         protected void OnPropertyChanged(string propertyName)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            Task.Run(() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName)));
         } 
 
         protected void SendNotificationMessage(string message)
         {
             var messageObj = new NotificationMessage(this, message);
-            Messenger.Default.Send(messageObj);
+
+            Task.Run(() => Messenger.Default.Send(messageObj));
         }
     }
 }
