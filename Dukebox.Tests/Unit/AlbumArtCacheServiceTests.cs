@@ -60,7 +60,7 @@ namespace Dukebox.Tests.Unit
 
             AddDummyImageToAlbumArtCache(albumArtCache, album);
 
-            var albumArtPath = Path.Combine(cachePath, album.Id);
+            var albumArtPath = Path.Combine(cachePath, album.FileNameSafeName);
             var albumAdded = File.Exists(albumArtPath);
 
             Assert.True(albumAdded, "Album art was not successfully added to the cache");
@@ -82,7 +82,7 @@ namespace Dukebox.Tests.Unit
 
             AddDummyImageToAlbumArtCache(albumArtCache, album);
 
-            var existingAlbumArtFound = albumArtCache.CheckCacheForAlbum(album.Id);
+            var existingAlbumArtFound = albumArtCache.CheckCacheForAlbum(album.FileNameSafeName);
 
             Assert.True(existingAlbumArtFound, "Album art check returned false for album already in cache");
 
@@ -102,7 +102,7 @@ namespace Dukebox.Tests.Unit
 
             var image = AddDummyImageToAlbumArtCache(albumArtCache, album);
 
-            var returnedImage = albumArtCache.GetAlbumArtFromCache(album.Id);
+            var returnedImage = albumArtCache.GetAlbumArtFromCache(album.FileNameSafeName);
             var imageLength = 0;
             var returnedImageLength = 0;
 
@@ -134,7 +134,7 @@ namespace Dukebox.Tests.Unit
 
             albums.ForEach(id => AddDummyImageToAlbumArtCache(albumArtCache, id));
 
-            var albumIds = albums.Select(a => a.Id).ToList();
+            var albumIds = albums.Select(a => a.FileNameSafeName).ToList();
             var idsInCache = albumArtCache.GetAlbumIdsFromCache();
 
             albumIds.Sort();
@@ -158,7 +158,7 @@ namespace Dukebox.Tests.Unit
                 action(blankImage);
             });
 
-            File.Delete(Path.Combine(cachePath, album.Id));
+            File.Delete(Path.Combine(cachePath, album.FileNameSafeName));
 
             albumArtCache.AddAlbumToCache(album, metadata);
 

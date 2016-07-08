@@ -234,7 +234,7 @@ namespace Dukebox.Desktop.ViewModel
 
         private void LoadNewTrackArtIfNeccessary(NewTrackLoadedEventArgs newTrackArgs)
         {
-            var albumId = newTrackArgs.Track.Album.Id;
+            var albumId = newTrackArgs.Track.Album.FileNameSafeName;
 
             try
             {
