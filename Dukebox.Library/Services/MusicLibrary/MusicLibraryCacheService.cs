@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using log4net;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
-using System.Threading;
 
 namespace Dukebox.Library.Services.MusicLibrary
 {
@@ -22,6 +22,7 @@ namespace Dukebox.Library.Services.MusicLibrary
         private List<Artist> _allArtistsCache;
         private List<Album> _allAlbumsCache;
         private List<Playlist> _allPlaylistsCache;
+        private List<Song> _allSongsCache;
 
         public List<Artist> OrderedArtists
         {
@@ -87,6 +88,22 @@ namespace Dukebox.Library.Services.MusicLibrary
             }
         }
 
+        public List<Song> SongsCache
+        {
+            get
+            {
+                try
+                {
+                    _cacheSemaphore.Wait();
+                    return _allSongsCache;
+                }
+                finally
+                {
+                    _cacheSemaphore.Release();
+                }
+            }
+        }
+
         public MusicLibraryCacheService(IMusicLibraryDbContextFactory dbContextFactory, IMusicLibraryEventService eventService)
         {
             _dbContextFactory = dbContextFactory;
@@ -114,8 +131,9 @@ namespace Dukebox.Library.Services.MusicLibrary
                     _allArtistsCache = dukeboxData.Artists.OrderBy(a => a.Name).ToList();
                     _allAlbumsCache = dukeboxData.Albums.OrderBy(a => a.Name).ToList();
                     _allPlaylistsCache = dukeboxData.Playlists.OrderBy(a => a.Name).ToList();
-
-                    files = dukeboxData.Songs.Select(s => s.FileName).ToList();
+                    
+                    _allSongsCache = dukeboxData.Songs.ToList();
+                    files = _allSongsCache.Select(s => s.FileName).ToList();
                 }
 
                 while (_allFilesCache.Count > 0)

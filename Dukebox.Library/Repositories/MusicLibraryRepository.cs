@@ -66,26 +66,18 @@ namespace Dukebox.Library.Repositories
 
         public List<ITrack> GetTracksForArtist(string artistName)
         {
-            using (var dukeboxData = _dbContextFactory.GetInstance())
-            {
-                return dukeboxData.Songs
-                    .Where(s => s.ArtistName.Equals(artistName))
-                    .ToList()
-                    .Select(s => _trackFactory.BuildTrackInstance(s))
-                    .ToList();
-            }
+            return _cacheService.SongsCache
+                .Where(s => s.ArtistName.Equals(artistName))
+                .Select(s => _trackFactory.BuildTrackInstance(s))
+                .ToList();
         }
 
         public List<ITrack> GetTracksForAlbum(string albumName)
         {
-            using (var dukeboxData = _dbContextFactory.GetInstance())
-            {
-                return dukeboxData.Songs
-                    .Where(s => s.AlbumName.Equals(albumName))
-                    .ToList()
-                    .Select(s => _trackFactory.BuildTrackInstance(s))
-                    .ToList();
-            }
+            return _cacheService.SongsCache
+                .Where(s => s.AlbumName.Equals(albumName))
+                .Select(s => _trackFactory.BuildTrackInstance(s))
+                .ToList();
         }
 
         public List<WatchFolder> GetWatchFolders()
