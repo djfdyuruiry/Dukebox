@@ -48,9 +48,9 @@
                     </Separator>
                     <MenuItem Header="Add Files to Library..." Command="{Binding AddFilesToLibrary}">
                     </MenuItem>
-                    <MenuItem Header="Export Library..." IsEnabled="False" Command="{Binding ExportLibrary}">
+                    <MenuItem Header="Backup Library..." Command="{Binding ExportLibrary}">
                     </MenuItem>
-                    <MenuItem Header="Import Library..." IsEnabled="False" Command="{Binding ImportLibrary}">
+                    <MenuItem Header="Restore Library from Backup..." Command="{Binding ImportLibrary}">
                     </MenuItem>
                     <Separator>
                     </Separator>

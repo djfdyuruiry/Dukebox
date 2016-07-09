@@ -6,5 +6,7 @@ namespace Dukebox.Library.Interfaces
     {
         IMusicLibraryDbContext GetInstance();
         Task SaveDbChanges(IMusicLibraryDbContext dukeboxData);
+        string ImportLibraryFile(string libraryFileToImport);
+        void ExportCurrentLibraryFile(string outputPath);
     }
 }
