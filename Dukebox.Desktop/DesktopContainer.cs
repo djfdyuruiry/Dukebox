@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Reflection;
 using SimpleInjector;
 using SimpleInjector.Packaging;
-using Dukebox.Configuration;
-using Dukebox.Desktop.Helper;
 using Dukebox.Desktop.Interfaces;
 using Dukebox.Desktop.Services;
 using Dukebox.Desktop.ViewModel;

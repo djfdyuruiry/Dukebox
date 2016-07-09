@@ -27,6 +27,8 @@
             <ReverseBoolToVisibilityConverter xmlns="clr-namespace:Dukebox.Desktop.Converters" x:Key="ReverseBoolToVisibilityConverter" />
             <ShowTrackListingToHeightConverter xmlns="clr-namespace:Dukebox.Desktop.Converters" x:Key="ShowTrackListingToHeightConverter" />
             <CamelCaseToSentanceCaseConverter xmlns="clr-namespace:Dukebox.Desktop.Converters" x:Key="CamelCaseToSentanceCaseConverter" />
+            <VisibilityToBorderBrushConverter xmlns="clr-namespace:Dukebox.Desktop.Converters" x:Key="VisibilityToBorderBrushConverter" />
+            <VisibilityToBorderThickness xmlns="clr-namespace:Dukebox.Desktop.Converters" x:Key="VisibilityToBorderThickness" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

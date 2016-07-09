@@ -162,6 +162,8 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Converters\CamelCaseToSentanceCaseConverter.cs" />
+    <Compile Include="Converters\VisibilityToBorderBrushConverter.cs" />
+    <Compile Include="Converters\VisibilityToBorderThickness.cs" />
     <Compile Include="DesktopContainer.cs" />
     <Compile Include="DukeboxUserSettings.cs" />
     <Compile Include="Factories\DukeboxUserSettingsFactory.cs" />

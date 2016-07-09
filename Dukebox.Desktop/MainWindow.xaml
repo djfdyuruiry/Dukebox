@@ -2,6 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+        xmlns:sd="clr-namespace:System.Drawing;assembly=System.Drawing"
         xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         xmlns:DukeboxViews="clr-namespace:Dukebox.Desktop.Views"
         Title="Dukebox" 
@@ -138,6 +139,8 @@
                             <Button Name="CurrentlyPlayingNavIcon" 
                                     HorizontalAlignment="Stretch" 
                                     VerticalAlignment="Stretch"  
+                                    BorderBrush="{Binding ShowCurrentlyPlayingListing, Converter={StaticResource VisibilityToBorderBrushConverter}, ConverterParameter={x:Static sd:Color.LightBlue}}"
+                                    BorderThickness="{Binding ShowCurrentlyPlayingListing, Converter={StaticResource VisibilityToBorderThickness}, ConverterParameter=5}"
                                     Command="{Binding NavBarItemClickCommand}"
                                     CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Name}">
                                 <Image Source="Graphics/ic_play_arrow_48px.png" />
@@ -148,6 +151,8 @@
                             <Button Name="LibraryNavIcon" 
                                     HorizontalAlignment="Stretch" 
                                     VerticalAlignment="Stretch"  
+                                    BorderBrush="{Binding ShowLibraryListing, Converter={StaticResource VisibilityToBorderBrushConverter}, ConverterParameter={x:Static sd:Color.LightBlue}}"
+                                    BorderThickness="{Binding ShowLibraryListing, Converter={StaticResource VisibilityToBorderThickness}, ConverterParameter=10}"
                                     Command="{Binding NavBarItemClickCommand}"
                                     CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Name}">
                             <Image Source="Graphics/black_7_music_nodes.png" />
@@ -158,6 +163,8 @@
                             <Button Name="AlbumsNavIcon"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Stretch" 
+                                    BorderBrush="{Binding ShowAlbumListing, Converter={StaticResource VisibilityToBorderBrushConverter}, ConverterParameter={x:Static sd:Color.LightBlue}}"
+                                    BorderThickness="{Binding ShowAlbumListing, Converter={StaticResource VisibilityToBorderThickness}, ConverterParameter=5}"
                                     Command="{Binding NavBarItemClickCommand}"
                                     CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Name}">
                                 <Image Source="Graphics/ic_album.png" />
@@ -168,6 +175,8 @@
                             <Button Name="ArtistsNavIcon" 
                                     HorizontalAlignment="Stretch" 
                                     VerticalAlignment="Stretch" 
+                                    BorderBrush="{Binding ShowArtistListing, Converter={StaticResource VisibilityToBorderBrushConverter}, ConverterParameter={x:Static sd:Color.LightBlue}}"
+                                    BorderThickness="{Binding ShowArtistListing, Converter={StaticResource VisibilityToBorderThickness}, ConverterParameter=5}"
                                     Command="{Binding NavBarItemClickCommand}"
                                     CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Name}">
                                 <Image Source="Graphics/icon-ios7-people.png" />
@@ -178,6 +187,8 @@
                             <Button Name="RecentlyPlayedNavIcon" 
                                     HorizontalAlignment="Stretch" 
                                     VerticalAlignment="Stretch" 
+                                    BorderBrush="{Binding ShowRecentlyPlayedListing, Converter={StaticResource VisibilityToBorderBrushConverter}, ConverterParameter={x:Static sd:Color.LightBlue}}"
+                                    BorderThickness="{Binding ShowRecentlyPlayedListing, Converter={StaticResource VisibilityToBorderThickness}, ConverterParameter=5}"
                                     Command="{Binding NavBarItemClickCommand}"
                                     CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Name}">
                                 <Image Source="Graphics/ic_history.png" />
@@ -188,6 +199,8 @@
                             <Button Name="AudioCdNavIcon" 
                                     HorizontalAlignment="Stretch" 
                                     VerticalAlignment="Stretch" 
+                                    BorderBrush="{Binding ShowAudioCdListing, Converter={StaticResource VisibilityToBorderBrushConverter}, ConverterParameter={x:Static sd:Color.LightBlue}}"
+                                    BorderThickness="{Binding ShowAudioCdListing, Converter={StaticResource VisibilityToBorderThickness}, ConverterParameter=5}"
                                     Command="{Binding NavBarItemClickCommand}"
                                     CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Name}">
                                 <Image Source="Graphics/BT_cd.png" />
