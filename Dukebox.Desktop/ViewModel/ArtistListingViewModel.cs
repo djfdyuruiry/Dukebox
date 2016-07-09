@@ -116,8 +116,7 @@ namespace Dukebox.Desktop.ViewModel
                 }
 
                 _listSearchHelper.SearchFilter = SearchText;
-
-                // trigger filtered items call via songs property
+                
                 OnPropertyChanged("Artists");
             }, taskCancelToken);
         }

@@ -5,9 +5,10 @@ using System.Reflection;
 using System.Threading.Tasks;
 using log4net;
 using Newtonsoft.Json;
+using Dukebox.Library.Helper;
 using Dukebox.Library.Interfaces;
-using Dukebox.Library.Repositories;
 using Dukebox.Library.Model;
+using Dukebox.Library.Repositories;
 
 namespace Dukebox.Library.Factories
 {
@@ -20,6 +21,7 @@ namespace Dukebox.Library.Factories
 
         private readonly IMusicLibraryEventService _eventService;
         private readonly string _dbFilePath;
+        private string _dbFileDirectory;
 
         public MusicLibraryDbContextFactory(IMusicLibraryEventService eventService)
         {
@@ -64,6 +66,8 @@ namespace Dukebox.Library.Factories
 
             logger.Debug($"DataDirectory set to '{appDataPath}'");
             logger.Debug($"Database file path set to '{dbFilePath}'");
+
+            _dbFileDirectory = appDataPath;
 
             return dbFilePath;
         }
@@ -123,6 +127,23 @@ namespace Dukebox.Library.Factories
             }
 
             logger.Error(dbValidationExecption);
+        }
+
+        public string ImportLibraryFile(string libraryFileToImport)
+        {
+            var fileNameSafeDate = StringToFilenameConverter.ConvertStringToValidFileName(DateTime.UtcNow.ToString());
+            var libraryBackupPath = Path.Combine(_dbFileDirectory, $"_dbFilePath_{fileNameSafeDate}.backup");
+
+            File.Copy(_dbFilePath, libraryBackupPath);
+            File.Delete(_dbFilePath);
+            File.Copy(libraryFileToImport, _dbFilePath, true);
+
+            return libraryBackupPath;
+        }
+
+        public void ExportCurrentLibraryFile(string outputPath)
+        {
+            File.Copy(_dbFilePath, outputPath, true);
         }
     }
 }
