@@ -216,11 +216,6 @@ namespace Dukebox.Library.Services.MusicLibrary
             }
         }
 
-        private Song AddFile(IMusicLibraryDbContext dukeboxData, string filename)
-        {
-            return AddFile(dukeboxData, filename, null);
-        }
-
         private Song AddFile(IMusicLibraryDbContext dukeboxData, string filename, IAudioFileMetadata metadata)
         {
             if (!File.Exists(filename))
@@ -297,10 +292,7 @@ namespace Dukebox.Library.Services.MusicLibrary
 
                     try
                     {
-                        using (var dukeboxData = _dbContextFactory.GetInstance())
-                        {
-                            song = AddFile(dukeboxData, f);
-                        }
+                        song = AddFile(f, null);
                     }
                     catch (Exception ex)
                     {

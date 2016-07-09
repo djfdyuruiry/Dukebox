@@ -111,6 +111,7 @@ namespace Dukebox.Library.Services.MusicLibrary
             _cacheSemaphore = new SemaphoreSlim(1, 1);
 
             _eventService.DatabaseChangesSaved += (o, e) => RefreshCaches();
+            _eventService.SongAdded += (o, e) => RefreshCaches();
 
             _allFilesCache = new BlockingCollection<string>();
 

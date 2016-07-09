@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Newtonsoft.Json;
@@ -22,6 +23,7 @@ namespace Dukebox.Tests.Unit
     public class MusicLibraryTests
     {
         private readonly LibraryDbMockGenerator _mockDataLoader;
+        private readonly MusicLibraryEventService _musicLibraryEventService;
         private readonly MusicLibraryCacheService _musicLibraryCacheService;
         private readonly MusicLibraryImportService _musicLibraryImportService;
         private readonly MusicLibraryRepository _musicLibraryRepo;
@@ -39,21 +41,31 @@ namespace Dukebox.Tests.Unit
             var audioFormats = new AudioFileFormats();
             var audioFileMetadataFactory = new AudioFileMetadataFactory(A.Fake<ICdMetadataService>(), A.Fake<IAudioCdService>());
             var trackFactory = new TrackFactory(settings, audioFileMetadataFactory);
+            
+            _musicLibraryEventService = new MusicLibraryEventService();
+            var musicPlaylistGenerator = new PlaylistGeneratorService();
 
             A.CallTo(() => dbContextFactory.GetInstance()).Returns(_mockDataLoader.DbContextMock);
+            A.CallTo(dbContextFactory)
+                .Where(c => c.Method.Name == nameof(IMusicLibraryDbContextFactory.SaveDbChanges))
+                .WithReturnType<Task>()
+                .WithAnyArguments()
+                .Invokes(() =>
+                {
+                    _musicLibraryEventService.TriggerEvent(MusicLibraryEvent.DatabaseChangesSaved);
+                })
+                .Returns(Task.CompletedTask);
+
             A.CallTo(() => settings.AddDirectoryConcurrencyLimit).Returns(5);
 
             audioFormats.SupportedFormats.Add(".mp3");
-
-            var eventService = new MusicLibraryEventService();
-            var musicPlaylistGenerator = new PlaylistGeneratorService();
             
-            _musicLibraryCacheService = new MusicLibraryCacheService(dbContextFactory, eventService);
+            _musicLibraryCacheService = new MusicLibraryCacheService(dbContextFactory, _musicLibraryEventService);
             _musicLibraryRepo = new MusicLibraryRepository(dbContextFactory, trackFactory, _musicLibraryCacheService);
             _musicLibrarySearchService = new MusicLibrarySearchService(dbContextFactory, trackFactory, _musicLibraryCacheService);
-            _musicLibaryUpdateService = new MusicLibraryUpdateService(dbContextFactory, eventService);
+            _musicLibaryUpdateService = new MusicLibraryUpdateService(dbContextFactory, _musicLibraryEventService);
             _musicLibraryImportService = new MusicLibraryImportService(settings, audioFormats, dbContextFactory, audioFileMetadataFactory,
-                trackFactory, _musicLibraryCacheService, _musicLibaryUpdateService, eventService, albumArtCache, musicPlaylistGenerator);
+                trackFactory, _musicLibraryCacheService, _musicLibaryUpdateService, _musicLibraryEventService, albumArtCache, musicPlaylistGenerator);
             _trackGenerator = new TrackGeneratorService(audioFormats, _musicLibrarySearchService, trackFactory);
         }
         
@@ -337,12 +349,20 @@ namespace Dukebox.Tests.Unit
 
             var trackFile = new FileInfo(sampleFileName);
             var audioMetadata = A.Fake<IAudioFileMetadata>();
-            
+            var signalEvent = new ManualResetEvent(false);
+
             A.CallTo(() => audioMetadata.Title).Returns(songTitle);
             A.CallTo(() => audioMetadata.HasFutherMetadataTag).Returns(false);
             A.CallTo(() => audioMetadata.HasAlbumArt).Returns(false);
 
+            _musicLibraryEventService.CachesRefreshed += (o, e) =>
+            {
+                signalEvent.Set();
+            };
+
             _musicLibraryImportService.AddFile(trackFile.FullName, audioMetadata);
+
+            signalEvent.WaitOne(1000);
 
             var tracks = _musicLibrarySearchService.SearchForTracks(songTitle, new List<SearchAreas> { SearchAreas.Song });
             var tracksReturned = tracks.Any();
@@ -360,6 +380,8 @@ namespace Dukebox.Tests.Unit
         {
             var jplFileName = "sample_playlist.jpl";
             var numSamples = 5;
+            var signalEvent = new ManualResetEvent(false);
+            var numSamplesImported = 0;
 
             var files = PrepareSamplesDirectory("samples", numSamples);
 
@@ -368,7 +390,19 @@ namespace Dukebox.Tests.Unit
             File.Delete(jplFileName);
             File.WriteAllText(jplFileName, jplJson);
 
+            _musicLibraryEventService.CachesRefreshed += (o, e) =>
+            {
+                numSamplesImported++;
+
+                if (numSamplesImported == 5)
+                {
+                    signalEvent.Set();
+                }
+            };
+
             await _musicLibraryImportService.AddPlaylistFiles(jplFileName);
+
+            signalEvent.WaitOne(1000);
 
             var tracks = _musicLibrarySearchService.SearchForTracksInArea(SearchAreas.Filename, "samples");
             var tracksReturned = tracks.Any();
