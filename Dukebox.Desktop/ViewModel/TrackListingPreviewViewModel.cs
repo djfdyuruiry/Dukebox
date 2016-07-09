@@ -10,6 +10,8 @@ using Dukebox.Desktop.Services;
 using Dukebox.Library.Interfaces;
 using System;
 using Dukebox.Library.Model;
+using Dukebox.Desktop.Helper;
+using System.Globalization;
 
 namespace Dukebox.Desktop.ViewModel
 {
@@ -23,14 +25,10 @@ namespace Dukebox.Desktop.ViewModel
         private readonly IMusicLibraryEventService _eventService;
         private string _trackFilter;
         private string _trackFilterName;
+        private readonly ListSearchHelper<ITrack> _listSearchHelper;
+        private string _searchTerm;
 
-        public ICommand ClearSearch
-        {
-            get
-            {
-                return null;
-            }
-        }
+        public ICommand ClearSearch { get; private set; }
 
         public bool EditingListingsDisabled
         {
@@ -46,17 +44,30 @@ namespace Dukebox.Desktop.ViewModel
         {
             get
             {
-                return false;
+                return true;
             }
         }
 
-        public string SearchText { get; set; }
+        public string SearchText
+        {
+            get
+            {
+                return _searchTerm;
+            }
+            set
+            {
+                _searchTerm = value;
+                _listSearchHelper.SearchFilter = _searchTerm;
+
+                OnPropertyChanged(nameof(Tracks));
+            }
+        }
 
         public Visibility ShowSearchControl
         {
             get
             {
-                return Visibility.Hidden;
+                return Visibility.Visible;
             }
         }
 
@@ -64,14 +75,8 @@ namespace Dukebox.Desktop.ViewModel
         {
             get
             {
-                return _tracks.Select(t => new TrackWrapper(_musicLibraryUpdateService, _eventService, t)).ToList();
+                return _listSearchHelper.FilteredItems.Select(t => new TrackWrapper(_musicLibraryUpdateService, _eventService, t)).ToList();
             }
-        }
-
-        private void UpdateTracks(List<ITrack> tracks)
-        {
-            _tracks = tracks;
-            OnPropertyChanged("Tracks");
         }
 
         public TrackListingPreviewViewModel(IAudioPlaylist audioPlaylist, IMusicLibraryRepository libraryRepo, 
@@ -84,7 +89,17 @@ namespace Dukebox.Desktop.ViewModel
 
             _tracks = new List<ITrack>();
 
+            _listSearchHelper = new ListSearchHelper<ITrack>
+            {
+                FilterLambda = (t, s) => t.ToString().ToLower(CultureInfo.InvariantCulture)
+                    .Contains(s.ToLower(CultureInfo.InvariantCulture)),
+                SortResults = true,
+                SortLambda = (t) => t.Title.ToLower(CultureInfo.InvariantCulture),
+                Items = _tracks
+            };
+
             LoadTrack = new RelayCommand<ITrack>(DoLoadTrack);
+            ClearSearch = new RelayCommand(DoClearSearch);
 
             _trackFilter = string.Empty;
             _trackFilterName = string.Empty;
@@ -93,6 +108,47 @@ namespace Dukebox.Desktop.ViewModel
 
             _eventService.SongAdded += (o, e) => ReloadTracksIfNeccessary(e);
             _eventService.SongDeleted += (o, e) => RemoveTrackIfNeccessary(e);
+        }
+
+        private void DoLoadTrack(ITrack track)
+        {
+            _audioPlaylist.LoadPlaylistFromList(_tracks, false);
+            _audioPlaylist.SkipToTrack(track);
+
+            SendNotificationMessage(NotificationMessages.AudioPlaylistLoadedNewTracks);
+        }
+
+        private void DoClearSearch()
+        {
+            _listSearchHelper.SearchFilter = string.Empty;
+            OnPropertyChanged(nameof(Tracks));
+        }
+        
+        private void RegisterMessageHandlers()
+        {
+            Messenger.Default.Register<PreviewArtistOrAlbumMessage>(this, (nm) =>
+            {
+                if (nm.IsArtist)
+                {
+                    _trackFilter = "Artist";
+                    UpdateTracks(_musicLibraryRepo.GetTracksForArtist(nm.Name));
+                }
+                else
+                {
+                    _trackFilter = "Album";
+                    UpdateTracks(_musicLibraryRepo.GetTracksForAlbum(nm.Name));
+                }
+
+                _trackFilterName = nm.Name;
+            });
+        }
+
+        private void UpdateTracks(List<ITrack> tracks)
+        {
+            _tracks = tracks;
+            _listSearchHelper.Items = _tracks;
+
+            OnPropertyChanged(nameof(Tracks));
         }
 
         private void ReloadTracksIfNeccessary(Song song)
@@ -130,35 +186,7 @@ namespace Dukebox.Desktop.ViewModel
             }
 
             Tracks.Remove(matchingTrack);
-            OnPropertyChanged("Tracks");
-        }
-
-
-        private void RegisterMessageHandlers()
-        {
-            Messenger.Default.Register<PreviewArtistOrAlbumMessage>(this, (nm) =>
-            {
-                if (nm.IsArtist)
-                {
-                    _trackFilter = "Artist";
-                    UpdateTracks(_musicLibraryRepo.GetTracksForArtist(nm.Name));
-                }
-                else
-                {
-                    _trackFilter = "Album";
-                    UpdateTracks(_musicLibraryRepo.GetTracksForAlbum(nm.Name));
-                }
-
-                _trackFilterName = nm.Name;
-            });
-        }
-
-        private void DoLoadTrack(ITrack track)
-        {
-            _audioPlaylist.LoadPlaylistFromList(_tracks, false);
-            _audioPlaylist.SkipToTrack(track);
-
-            SendNotificationMessage(NotificationMessages.AudioPlaylistLoadedNewTracks);
+            OnPropertyChanged(nameof(Tracks));
         }
     }
 }

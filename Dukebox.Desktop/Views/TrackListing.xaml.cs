@@ -2,15 +2,17 @@
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Xml;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Markup;
+using System.Xml;
 using GalaSoft.MvvmLight.Messaging;
 using Dukebox.Desktop.Factories;
 using Dukebox.Desktop.Model;
 using Dukebox.Desktop.Interfaces;
 using Dukebox.Desktop.Services;
+using Dukebox.Desktop.ViewModel;
 
 namespace Dukebox.Desktop.Views
 {
@@ -20,10 +22,14 @@ namespace Dukebox.Desktop.Views
     public partial class TrackListing : UserControl
     {
         private const string tracksDataGridElementName = "TrackListingsGrid";
+        private const string layoutGridElementName = "TrackListingLayoutGrid";
+        private const float trackListingPreviewSearchControlHeight = 0.15f;
+
         private readonly List<string> _columnsToKeep = new List<string> { "Artist", "Album", "Title" };
 
         private readonly IDukeboxUserSettings _settings; 
         private readonly DataGrid _tracksDataGrid;
+        private readonly Grid _layoutGrid;
 
         public TrackListing()
         {
@@ -33,6 +39,7 @@ namespace Dukebox.Desktop.Views
 
             _settings = userSettingsFactory.GetInstance();
             _tracksDataGrid = FindName(tracksDataGridElementName) as DataGrid;
+            _layoutGrid = FindName(layoutGridElementName) as Grid;
 
             Messenger.Default.Register<NotificationMessage>(this, (nm) =>
             {
@@ -45,6 +52,14 @@ namespace Dukebox.Desktop.Views
 
             // TODO: Selecting Track Columns to Display does not Update DataGrid's
             //UpdateTracksDataGridColumns();
+
+            DataContextChanged += (o, e) =>
+            {
+                if (e.NewValue is TrackListingPreviewViewModel)
+                {
+                    _layoutGrid.RowDefinitions[0].Height = new GridLength(trackListingPreviewSearchControlHeight, GridUnitType.Star);
+                }
+            };
         }
 
         #region Extended Metadata Rendering

@@ -32,7 +32,7 @@
             </Style.Triggers>
         </Style>
     </UserControl.Resources>
-    <Grid VirtualizingStackPanel.IsVirtualizing="True">
+    <Grid VirtualizingStackPanel.IsVirtualizing="True" Name="TrackListingLayoutGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="0.05*"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
