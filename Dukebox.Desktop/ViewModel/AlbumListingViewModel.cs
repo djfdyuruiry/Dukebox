@@ -125,5 +125,4 @@ namespace Dukebox.Desktop.ViewModel
             }, taskCancelToken);
         }
     }
-    }
 }
