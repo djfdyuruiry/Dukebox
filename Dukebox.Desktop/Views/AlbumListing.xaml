@@ -14,7 +14,7 @@
              DataContext="{Binding IAlbumListing, Source={StaticResource ViewModelLocator}}">
     <UserControl.Resources>
         <DataTemplate DataType="{x:Type DukeboxServices:Album}">
-            <StackPanel>
+            <StackPanel Margin="6" Width="194">
                 <Image x:Name="AlbumArt" Width="194" Height="194" IsHitTestVisible="False">
                     <Image.Source>
                         <BitmapImage DecodePixelHeight="194"
@@ -24,7 +24,7 @@
                                      CacheOption="None"/>
                     </Image.Source>
                 </Image>
-                <TextBlock HorizontalAlignment="center" Text="{Binding Data.Name}"/>
+                <TextBlock Text="{Binding Data.Name}" Width="185" TextWrapping="Wrap"/>
             </StackPanel>
         </DataTemplate>
     </UserControl.Resources>
@@ -65,7 +65,7 @@
             </ListBox.Resources>
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <WrapPanel IsItemsHost="True"/>
+                    <WrapPanel ItemWidth="200" IsItemsHost="True"/>
                 </ItemsPanelTemplate>
             </ListBox.ItemsPanel>
         </ListBox>

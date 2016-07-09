@@ -1,5 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Threading;
 using System.Windows.Input;
 using GalaSoft.MvvmLight.Command;
 using Dukebox.Desktop.Helper;
@@ -7,8 +10,6 @@ using Dukebox.Desktop.Interfaces;
 using Dukebox.Desktop.Model;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
-using System.Threading.Tasks;
-using System.Threading;
 
 namespace Dukebox.Desktop.ViewModel
 {
@@ -89,6 +90,8 @@ namespace Dukebox.Desktop.ViewModel
         public void RefreshArtistsFromLibrary()
         {
             Artists = _cacheService.OrderedArtists;
+
+            Artists = Enumerable.Range(1, 100).Select(i => new Artist("abcdefghijklmnopqrstvwxyz0123456789")).ToList();
         }
 
         private void DoLoadArtist(Artist artist)

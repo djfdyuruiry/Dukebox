@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using GalaSoft.MvvmLight.Command;
 using Dukebox.Desktop.Helper;
@@ -9,8 +11,6 @@ using Dukebox.Desktop.Model;
 using Dukebox.Desktop.Services;
 using LibraryAlbum = Dukebox.Library.Model.Album;
 using Dukebox.Library.Interfaces;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Dukebox.Desktop.ViewModel
 {

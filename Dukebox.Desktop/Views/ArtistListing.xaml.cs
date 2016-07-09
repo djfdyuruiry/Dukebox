@@ -1,7 +1,7 @@
 ﻿using System.Windows.Controls;
 using System.Windows.Input;
-using Dukebox.Desktop.Interfaces;
 using GalaSoft.MvvmLight.Messaging;
+using Dukebox.Desktop.Interfaces;
 using Dukebox.Desktop.Model;
 using Dukebox.Library.Model;
 
