@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using FakeItEasy;
 using Xunit;
 using Dukebox.Library.Model;
@@ -52,12 +53,12 @@ namespace Dukebox.Tests.Unit
             Assert.True(trackStringIsCorrect, string.Format("Track string was incorrect for current track details (track string: '{0}')", trackString));
         }
 
-        //TODO: Refactor test with new sync metadata method
-        //[Fact]
+        [Fact]
         public void SaveMetadataChangesToDisk()
         {
             var saveChangesMp3FileName = string.Format("{0}._saveChangesTest_.mp3", AudioFileMetaDataTests.SampleMp3FileName);
             var audioFileMetadataFactory = new AudioFileMetadataFactory(A.Fake<ICdMetadataService>(), A.Fake<IAudioCdService>());
+            var musicLibraryUpdateSerive = A.Fake<IMusicLibraryUpdateService>();
             var newArtistName = "funky artist";
             var newAlbumName = "funky album";
             var newTitle = "funky title";
@@ -67,11 +68,22 @@ namespace Dukebox.Tests.Unit
             var song = new Song { ArtistName = "artist", FileName = saveChangesMp3FileName, Title = "song" };
             var track = BuildTrack(song);
             var signalEvent = new ManualResetEvent(false);
-            var numChangesSaved = 0;
 
             track.Song.Title = newTitle;
             track.AlbumName = newAlbumName;
             track.ArtistName = newArtistName;
+            
+            A.CallTo(musicLibraryUpdateSerive)
+                .Where(c => c.Method.Name == nameof(IMusicLibraryUpdateService.SaveSongChanges))
+                .WithReturnType<Task>()
+                .WithAnyArguments()
+                .Invokes(() =>
+                {
+                    signalEvent.Set();
+                })
+                .Returns(Task.CompletedTask);
+
+            track.SyncMetadata(musicLibraryUpdateSerive);
 
             signalEvent.WaitOne(1000);
 

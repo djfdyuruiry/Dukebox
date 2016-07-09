@@ -38,10 +38,12 @@ namespace Dukebox.Desktop.Views
             {
                 if (nm.Notification == NotificationMessages.TrackListingDataGridColumnsUpdated)
                 {
+                    // TODO: Selecting Track Columns to Display does not Update DataGrid's
                     //UpdateTracksDataGridColumns();
                 }
             });
 
+            // TODO: Selecting Track Columns to Display does not Update DataGrid's
             //UpdateTracksDataGridColumns();
         }
 
