@@ -125,6 +125,8 @@ namespace Dukebox.Library.Factories
             audioFileName = truncateSpacesRegex.Replace(audioFileName, " ");
 
             string[] metadata = null;
+            string extractedArtist = string.Empty;
+            string extractedTitle;
 
             if (audioFileName.Contains('-'))
             {
@@ -139,34 +141,34 @@ namespace Dukebox.Library.Factories
                 metadata = audioFileName.Split(' ');
             }
 
-            if (metadata == null || metadata.Length < 1)
+            if (metadata == null || !metadata.Any())
             {
                 // metdata extraction failed, just use filename
-                currentTitle = audioFileName;
+                extractedTitle = audioFileName;
             }
             else
             {
                 // assign artist and build title
-                currentArtist = metadata[0];
+                extractedArtist = metadata[0];
                 var stringBuilder = new StringBuilder();
 
                 for (var i = 1; i < metadata.Length; i++)
                 {
-                    stringBuilder.AppendFormat(" {0}", metadata[i]);
+                    stringBuilder.AppendFormat("{0}{1}", i > 1 ? " " : string.Empty, metadata[i]);
                 }
 
-                currentTitle = stringBuilder.ToString();
+                extractedTitle = stringBuilder.ToString();
             }
 
             // assign found metadata or placeholders if metadata is invalid
             if (!titleExists)
             {
-                currentTitle = string.IsNullOrWhiteSpace(currentTitle) ? "Unknown Title" : currentTitle;
+                currentTitle = string.IsNullOrWhiteSpace(extractedTitle) ? "Unknown Title" : extractedTitle;
             }
 
             if (!artistExists)
             {
-                currentArtist = string.IsNullOrWhiteSpace(currentArtist) ? "Unknown Artist" : currentArtist;
+                currentArtist = string.IsNullOrWhiteSpace(extractedArtist) ? "Unknown Artist" : extractedArtist;
             }
 
             if (!albumExists)

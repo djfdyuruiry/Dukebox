@@ -49,7 +49,7 @@ namespace Dukebox.Library.Factories
 #if !DEBUG 
             var dbFilePath = Path.Combine(appDataPath, libraryDbFileName);
 #else
-            var dbFilePath = "./library.s3db";
+            var dbFilePath = "./library_v0.9.s3db";
             appDataPath = Environment.CurrentDirectory;
 #endif
 

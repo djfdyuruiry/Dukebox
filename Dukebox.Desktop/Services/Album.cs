@@ -18,8 +18,8 @@ namespace Dukebox.Desktop.Services
             {
                 if (_albumArtPath == null)
                 {
-                    _albumArtPath = _albumArtCacheService.CheckCacheForAlbum(Data.Id) ? 
-                        _albumArtCacheService.GetAlbumArtPathFromCache(Data.Id) : 
+                    _albumArtPath = _albumArtCacheService.CheckCacheForAlbum(Data.FileNameSafeName) ? 
+                        _albumArtCacheService.GetAlbumArtPathFromCache(Data.FileNameSafeName) : 
                         ImageResources.DefaultAlbumArtUri;
                 }
 

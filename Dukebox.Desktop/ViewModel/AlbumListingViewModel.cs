@@ -9,6 +9,8 @@ using Dukebox.Desktop.Model;
 using Dukebox.Desktop.Services;
 using LibraryAlbum = Dukebox.Library.Model.Album;
 using Dukebox.Library.Interfaces;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Dukebox.Desktop.ViewModel
 {
@@ -20,6 +22,7 @@ namespace Dukebox.Desktop.ViewModel
         private readonly ListSearchHelper<Services.Album> _listSearchHelper;
         
         private string _searchText;
+        private CancellationTokenSource _cancellationTokenSource;
 
         public string SearchText
         {
@@ -101,10 +104,26 @@ namespace Dukebox.Desktop.ViewModel
 
         private void DoSearch()
         {
-            _listSearchHelper.SearchFilter = SearchText;
+            _cancellationTokenSource?.Cancel();
+            _cancellationTokenSource = new CancellationTokenSource();
 
-            // trigger filtered items call via songs property
-            OnPropertyChanged("Albums");
+            var taskCancelToken = _cancellationTokenSource.Token;
+
+            Task.Run(async () =>
+            {
+                await Task.Delay(250);
+
+                if (taskCancelToken.IsCancellationRequested)
+                {
+                    return;
+                }
+
+                _listSearchHelper.SearchFilter = SearchText;
+
+                // trigger filtered items call via songs property
+                OnPropertyChanged("Albums");
+            }, taskCancelToken);
         }
+    }
     }
 }

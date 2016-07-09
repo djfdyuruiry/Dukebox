@@ -56,7 +56,7 @@ namespace Dukebox.Library.Services
                 throw new ArgumentNullException("album");
             }
 
-            var albumId = album.Id;
+            var albumId = album.FileNameSafeName;
 
             if (CheckCacheForAlbum(albumId))
             {

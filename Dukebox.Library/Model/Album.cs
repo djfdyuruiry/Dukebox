@@ -5,11 +5,11 @@ namespace Dukebox.Library.Model
     public class Album
     {
         public string Name { get; private set; }
-        public string Id
+        public string FileNameSafeName
         {
             get
             {
-                return Md5HashGenerator.GenerateMd5Hash(Name);
+                return StringToFilenameConverter.ConvertStringToValidFileName(Name);
             }
         }
 
