@@ -15,6 +15,8 @@ namespace Dukebox.Library.Services.MusicLibrary
         public event EventHandler<Song> SongUpdated;
         public event EventHandler<Song> SongDeleted;
         public event EventHandler PlaylistsAdded;
+        public event EventHandler<Playlist> PlaylistUpdated;
+        public event EventHandler<Playlist> PlaylistDeleted;
         public event EventHandler ArtistCacheRefreshed;
         public event EventHandler AlbumCacheRefreshed;
         public event EventHandler PlaylistCacheRefreshed;
@@ -56,6 +58,16 @@ namespace Dukebox.Library.Services.MusicLibrary
         public void TriggerWatchFolderDeleted(WatchFolder watchFolder)
         {
             Task.Run(() => WatchFolderDeleted?.Invoke(this, watchFolder));
+        }
+
+        public void TriggerPlaylistUpdated(Playlist playlist)
+        {
+            Task.Run(() => PlaylistUpdated?.Invoke(this, playlist));
+        }
+
+        public void TriggerPlaylistDeleted(Playlist playlist)
+        {
+            Task.Run(() => PlaylistDeleted?.Invoke(this, playlist));
         }
     }
 }

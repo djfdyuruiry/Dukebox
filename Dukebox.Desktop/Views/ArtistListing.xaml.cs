@@ -43,7 +43,7 @@ namespace Dukebox.Desktop.Views
                     return;
                 }
 
-                Messenger.Default.Send<PreviewArtistOrAlbumMessage>(new PreviewArtistOrAlbumMessage
+                Messenger.Default.Send<PreviewTracksMessage>(new PreviewTracksMessage
                 {
                     Name = item.Name,
                     IsArtist = true

@@ -10,6 +10,7 @@ namespace Dukebox.Library.Interfaces
         int GetPlaylistCount();
         List<ITrack> GetTracksForArtist(string artistName);
         List<ITrack> GetTracksForAlbum(string albumName);
+        List<ITrack> GetTracksForPlaylist(string playlistName);
         Playlist GetPlaylistById(long? playlistId);
         List<WatchFolder> GetWatchFolders();
     }

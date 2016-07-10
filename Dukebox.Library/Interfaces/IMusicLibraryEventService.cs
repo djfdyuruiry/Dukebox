@@ -11,7 +11,8 @@ namespace Dukebox.Library.Interfaces
         event EventHandler<Song> SongAdded;
         event EventHandler<Song> SongUpdated;
         event EventHandler<Song> SongDeleted;
-        event EventHandler PlaylistsAdded; 
+        event EventHandler PlaylistsAdded;
+        event EventHandler<Playlist> PlaylistUpdated;
         event EventHandler ArtistCacheRefreshed;
         event EventHandler AlbumCacheRefreshed;
         event EventHandler PlaylistCacheRefreshed;
@@ -26,5 +27,7 @@ namespace Dukebox.Library.Interfaces
         void TriggerSongDeleted(Song song);
         void TriggerWatchFolderUpdated(WatchFolder song);
         void TriggerWatchFolderDeleted(WatchFolder song);
+        void TriggerPlaylistUpdated(Playlist playlist);
+        void TriggerPlaylistDeleted(Playlist dbPlaylist);
     }
 }

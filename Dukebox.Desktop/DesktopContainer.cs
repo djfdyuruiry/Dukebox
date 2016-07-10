@@ -45,6 +45,7 @@ namespace Dukebox.Desktop
             container.RegisterSingleton<IPlaybackMonitorViewModel, PlaybackMonitorViewModel>();
             container.RegisterSingleton<IAlbumListingViewModel, AlbumListingViewModel>();
             container.RegisterSingleton<IArtistListingViewModel, ArtistListingViewModel>();
+            container.RegisterSingleton<IPlaylistListingViewModel, PlaylistListingViewModel>();
             container.RegisterSingleton<TrackListingPreviewViewModel>();
             container.RegisterSingleton<LibraryListingViewModel>();
             container.RegisterSingleton<RecentlyPlayedListingViewModel>();

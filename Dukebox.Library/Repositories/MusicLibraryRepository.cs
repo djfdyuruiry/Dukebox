@@ -80,6 +80,14 @@ namespace Dukebox.Library.Repositories
                 .ToList();
         }
 
+        public List<ITrack> GetTracksForPlaylist(string playlistName)
+        {
+            return _cacheService.OrderedPlaylists
+                .Where(s => s.Name.Equals(playlistName))
+                .SelectMany(s => s.Files.Select(f => _trackFactory.BuildTrackInstance(f)))
+                .ToList();
+        }
+
         public List<WatchFolder> GetWatchFolders()
         {
             using (var dukeboxData = _dbContextFactory.GetInstance())

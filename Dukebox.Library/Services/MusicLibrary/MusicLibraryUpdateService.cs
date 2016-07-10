@@ -18,6 +18,105 @@ namespace Dukebox.Library.Services.MusicLibrary
             _eventService = eventService;
         }
 
+        public async Task SaveSongChanges(Song song)
+        {
+            if (song == null)
+            {
+                throw new ArgumentNullException("song");
+            }
+
+            using (var dukeboxData = _dbContextFactory.GetInstance())
+            {
+                dukeboxData.Songs.Attach(song);
+
+                var dbEntity = dukeboxData.Entry(song);
+
+                if (dbEntity != null)
+                {
+                    dbEntity.State = EntityState.Modified;
+                    await _dbContextFactory.SaveDbChanges(dukeboxData);
+
+                    _eventService.TriggerSongUpdated(song);
+                }
+            }
+        }
+
+        public async Task SavePlaylistChanges(Playlist playlist)
+        {
+            if (playlist == null)
+            {
+                throw new ArgumentNullException("playlist");
+            }
+
+            using (var dukeboxData = _dbContextFactory.GetInstance())
+            {
+                dukeboxData.Playlists.Attach(playlist);
+
+                var dbEntity = dukeboxData.Entry(playlist);
+
+                if (dbEntity != null)
+                {
+                    dbEntity.State = EntityState.Modified;
+                    await _dbContextFactory.SaveDbChanges(dukeboxData);
+
+                    _eventService.TriggerPlaylistUpdated(playlist);
+                }
+            }
+        }
+
+        public async Task SaveWatchFolderChanges(WatchFolder watchFolder)
+        {
+            if (watchFolder == null)
+            {
+                throw new ArgumentNullException("watchFolder");
+            }
+
+            using (var dukeboxData = _dbContextFactory.GetInstance())
+            {
+                dukeboxData.WatchFolders.Attach(watchFolder);
+
+                var dbEntity = dukeboxData.Entry(watchFolder);
+
+                if (dbEntity != null)
+                {
+                    dbEntity.State = EntityState.Modified;
+                    await _dbContextFactory.SaveDbChanges(dukeboxData);
+
+                    _eventService.TriggerWatchFolderUpdated(watchFolder);
+                }
+            }
+        }
+
+        public async Task<bool> UpdateSongFilePath(string oldFullPath, string fullPath)
+        {
+            if (string.IsNullOrWhiteSpace(oldFullPath))
+            {
+                throw new ArgumentNullException("oldFullPath");
+            }
+            else if (string.IsNullOrWhiteSpace(fullPath))
+            {
+                throw new ArgumentNullException("filePath");
+            }
+            
+            using (var dukeboxData = _dbContextFactory.GetInstance())
+            {
+                var song = dukeboxData.Songs.FirstOrDefault(s => s.FileName.Equals(oldFullPath));
+
+                if (song == null)
+                {
+                    return false;
+                }
+
+                song.FileName = fullPath;
+
+                await _dbContextFactory.SaveDbChanges(dukeboxData);
+
+                _eventService.TriggerSongUpdated(song);
+
+                return true;
+            }
+        }
+
         public async Task RemoveTrack(ITrack track)
         {
             if (track == null)
@@ -64,79 +163,26 @@ namespace Dukebox.Library.Services.MusicLibrary
             }
         }
 
-        public async Task SaveSongChanges(Song song)
+        public async Task RemovePlaylist(Playlist playlist)
         {
-            if (song == null)
+            if (playlist == null)
             {
-                throw new ArgumentNullException("song");
+                throw new ArgumentNullException(nameof(playlist));
             }
 
             using (var dukeboxData = _dbContextFactory.GetInstance())
             {
-                dukeboxData.Songs.Attach(song);
+                var dbPlaylist = dukeboxData.Playlists.FirstOrDefault(p => p.Name.Equals(playlist.Name));
 
-                var dbEntity = dukeboxData.Entry(song);
-
-                if (dbEntity != null)
+                if (dbPlaylist == null)
                 {
-                    dbEntity.State = EntityState.Modified;
-                    await _dbContextFactory.SaveDbChanges(dukeboxData);
-
-                    _eventService.TriggerSongUpdated(song);
-                }
-            }
-        }
-
-        public async Task<bool> UpdateSongFilePath(string oldFullPath, string fullPath)
-        {
-            if (string.IsNullOrWhiteSpace(oldFullPath))
-            {
-                throw new ArgumentNullException("oldFullPath");
-            }
-            else if (string.IsNullOrWhiteSpace(fullPath))
-            {
-                throw new ArgumentNullException("filePath");
-            }
-            
-            using (var dukeboxData = _dbContextFactory.GetInstance())
-            {
-                var song = dukeboxData.Songs.FirstOrDefault(s => s.FileName.Equals(oldFullPath));
-
-                if (song == null)
-                {
-                    return false;
+                    return;
                 }
 
-                song.FileName = fullPath;
-
+                dukeboxData.Playlists.Remove(dbPlaylist);
                 await _dbContextFactory.SaveDbChanges(dukeboxData);
 
-                _eventService.TriggerSongUpdated(song);
-
-                return true;
-            }
-        }
-
-        public async Task SaveWatchFolderChanges(WatchFolder watchFolder)
-        {
-            if (watchFolder == null)
-            {
-                throw new ArgumentNullException("watchFolder");
-            }
-
-            using (var dukeboxData = _dbContextFactory.GetInstance())
-            {
-                dukeboxData.WatchFolders.Attach(watchFolder);
-
-                var dbEntity = dukeboxData.Entry(watchFolder);
-
-                if (dbEntity != null)
-                {
-                    dbEntity.State = EntityState.Modified;
-                    await _dbContextFactory.SaveDbChanges(dukeboxData);
-
-                    _eventService.TriggerWatchFolderUpdated(watchFolder);
-                }
+                _eventService.TriggerPlaylistDeleted(dbPlaylist);
             }
         }
 

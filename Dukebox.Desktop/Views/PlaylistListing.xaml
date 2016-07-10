@@ -1,0 +1,50 @@
+﻿<UserControl x:Class="Dukebox.Desktop.Views.PlaylistListing"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:DukeboxServices="clr-namespace:Dukebox.Desktop.Services"
+             xmlns:DukeboxViews="clr-namespace:Dukebox.Desktop.Views" 
+             mc:Ignorable="d" 
+             d:DesignHeight="592" 
+             d:DesignWidth="1016"
+             Name="PlaylistListingControl"
+             DataContext="{Binding IPlaylistListingViewModel, Source={StaticResource ViewModelLocator}}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="0.05*"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <DukeboxViews:SearchControl Grid.Row="0" 
+                                    Grid.Column="0" 
+                                    DataContext="{Binding ElementName=PlaylistListingControl, Path=DataContext}">
+        </DukeboxViews:SearchControl>
+        <ListBox Grid.Row="1" 
+                 Grid.Column="0" 
+                 Name="PlaylistListBox"
+                 ItemsSource="{Binding Playlists}" 
+                 SelectionChanged="ListBox_SelectionChanged"
+                 MouseDoubleClick="ListBox_MouseDoubleClick" 
+                 VirtualizingPanel.IsVirtualizing="True"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                 IsSynchronizedWithCurrentItem="True">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Height="16" Width="16" Source="../Graphics/black_4_audio_play.png"/>
+                        <TextBox Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Button Content="Edit" IsEnabled="False" Margin="2"></Button>
+                        <Button Content="Delete" 
+                                Command="{Binding ElementName=PlaylistListingControl, Path=DataContext.RemovePlaylist}" 
+                                CommandParameter="{Binding ElementName=PlaylistListBox, Path=SelectedValue}"
+                                Margin="2">
+                        </Button>
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
+</UserControl>

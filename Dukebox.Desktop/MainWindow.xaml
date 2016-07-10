@@ -77,6 +77,8 @@
                 <MenuItem Header="_Playlist" DataContext="{Binding PlaylistMenuViewModel, Source={StaticResource ViewModelLocator}}">
                     <MenuItem Header="Clear" Command="{Binding Clear}">
                     </MenuItem>
+                    <MenuItem Header="Save Current Playlist..." Command="{Binding SaveCurrentPlaylistToLibrary}">
+                    </MenuItem>
                     <Separator>
                     </Separator>
                     <MenuItem Header="Load From File..." Command="{Binding LoadFromFile}">
@@ -125,6 +127,7 @@
                 <ScrollViewer Grid.Row="0" Grid.Column="0">
                     <Grid Name="NavIconContainer">
                         <Grid.RowDefinitions>
+                            <RowDefinition Height="*"></RowDefinition>
                             <RowDefinition Height="*"></RowDefinition>
                             <RowDefinition Height="*"></RowDefinition>
                             <RowDefinition Height="*"></RowDefinition>
@@ -196,6 +199,18 @@
                             <Label HorizontalAlignment="Center">Recently Played</Label>
                         </StackPanel>
                         <StackPanel Grid.Row="5" Grid.Column="0">
+                            <Button Name="PlaylistNavIcon" 
+                                    HorizontalAlignment="Stretch" 
+                                    VerticalAlignment="Stretch" 
+                                    BorderBrush="{Binding ShowPlaylistListing, Converter={StaticResource VisibilityToBorderBrushConverter}, ConverterParameter={x:Static sd:Color.LightBlue}}"
+                                    BorderThickness="{Binding ShowPlaylistListing, Converter={StaticResource VisibilityToBorderThickness}, ConverterParameter=5}"
+                                    Command="{Binding NavBarItemClickCommand}"
+                                    CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Name}">
+                                <Image Source="Graphics/ic_playlist_add_48px.png" />
+                            </Button>
+                            <Label HorizontalAlignment="Center">Playlists</Label>
+                        </StackPanel>
+                        <StackPanel Grid.Row="6" Grid.Column="0">
                             <Button Name="AudioCdNavIcon" 
                                     HorizontalAlignment="Stretch" 
                                     VerticalAlignment="Stretch" 
@@ -217,8 +232,12 @@
                         <RowDefinition Height=".04*"></RowDefinition>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"></ColumnDefinition> 
+                        <ColumnDefinition Width="*"></ColumnDefinition>
                     </Grid.ColumnDefinitions>
+                    <ContentControl Grid.Row="1" Grid.Column="0" Visibility="{Binding ShowTrackListingPreview}">
+                        <DukeboxViews:TrackListing DataContext="{Binding TrackListingPreview, Source={StaticResource ViewModelLocator}}">
+                        </DukeboxViews:TrackListing>
+                    </ContentControl>
                     <ContentControl Grid.Row="0" Grid.Column="0" Visibility="{Binding ShowCurrentlyPlayingListing}">
                         <DukeboxViews:TrackListing DataContext="{Binding CurrentlyPlayingListing, Source={StaticResource ViewModelLocator}}">
                         </DukeboxViews:TrackListing>
@@ -239,13 +258,13 @@
                         <DukeboxViews:TrackListing DataContext="{Binding RecentlyPlayedListing, Source={StaticResource ViewModelLocator}}">
                         </DukeboxViews:TrackListing>
                     </ContentControl>
+                    <ContentControl Grid.Row="0" Grid.Column="0" Visibility="{Binding ShowPlaylistListing}">
+                        <DukeboxViews:PlaylistListing>
+                        </DukeboxViews:PlaylistListing>
+                    </ContentControl>
                     <ContentControl Grid.Row="0" Grid.Column="0" Visibility="{Binding ShowAudioCdListing}">
                         <DukeboxViews:AudioCdListing DataContext="{Binding AudioCdListing, Source={StaticResource ViewModelLocator}}">
                         </DukeboxViews:AudioCdListing>
-                    </ContentControl>
-                    <ContentControl Grid.Row="1" Grid.Column="0" Visibility="{Binding ShowTrackListingPreview}">
-                        <DukeboxViews:TrackListing DataContext="{Binding TrackListingPreview, Source={StaticResource ViewModelLocator}}">
-                        </DukeboxViews:TrackListing>
                     </ContentControl>
                     <ContentControl Grid.Row="2" Grid.Column="0">
                         <StackPanel HorizontalAlignment="Right">

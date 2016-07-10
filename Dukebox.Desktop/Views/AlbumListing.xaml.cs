@@ -24,7 +24,6 @@ namespace Dukebox.Desktop.Views
             if (listBox?.SelectedItem != null)
             {
                 var item = listBox.SelectedItem as Album;
-
                 var albumListingViewModel = DataContext as IAlbumListingViewModel;
 
                 albumListingViewModel?.LoadAlbum?.Execute(item);
@@ -44,7 +43,7 @@ namespace Dukebox.Desktop.Views
                     return;
                 }
 
-                Messenger.Default.Send<PreviewArtistOrAlbumMessage>(new PreviewArtistOrAlbumMessage
+                Messenger.Default.Send(new PreviewTracksMessage
                 {
                     Name = item.Data.Name,
                     IsAlbum = true

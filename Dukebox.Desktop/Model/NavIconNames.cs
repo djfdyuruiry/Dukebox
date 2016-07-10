@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Dukebox.Desktop.Model
+﻿namespace Dukebox.Desktop.Model
 {
     public static class NavIconNames
     {
@@ -12,6 +7,7 @@ namespace Dukebox.Desktop.Model
         public const string Albums = "AlbumsNavIcon";
         public const string Artists = "ArtistsNavIcon";
         public const string RecentlyPlayed = "RecentlyPlayedNavIcon";
+        public const string PlaylistListing = "PlaylistNavIcon";
         public const string AudioCd = "AudioCdNavIcon";
     }
 }

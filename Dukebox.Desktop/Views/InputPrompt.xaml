@@ -1,0 +1,28 @@
+﻿<Window x:Class="Dukebox.Desktop.Views.InputPrompt"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Dukebox.Desktop.Views"
+        mc:Ignorable="d"
+        Height="130" 
+        Width="450"
+        WindowStartupLocation="CenterOwner"
+        Title="{Binding Title, StringFormat='Dukebox - {0}'}" >
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="0.4*"></RowDefinition>
+            <RowDefinition Height="0.3*"></RowDefinition>
+            <RowDefinition Height="0.3*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding Prompt}" Margin="1" TextWrapping="Wrap"/>
+        <TextBox Grid.Row="1" Grid.Column="0" Text="{Binding Input, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="1"/>
+        <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Click="Ok_Button_Click" Content="OK" Margin="1" Padding="3"/>
+            <Button Click="Cancel_Button_Click" Content="Cancel" Margin="1" Padding="3"/>
+        </StackPanel>
+    </Grid>
+</Window>

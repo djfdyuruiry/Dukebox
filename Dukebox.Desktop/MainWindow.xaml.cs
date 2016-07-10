@@ -2,6 +2,7 @@
 using MahApps.Metro.Controls;
 using Dukebox.Desktop.Interfaces;
 using Dukebox.Desktop.Model;
+using System.Windows.Controls;
 
 namespace Dukebox.Desktop
 {
@@ -14,7 +15,8 @@ namespace Dukebox.Desktop
         {
             InitializeComponent();
 
-            (DataContext as IMainWindowViewModel)?.ShowLoadingScreen?.Execute(null);
+            var viewModel = DataContext as IMainWindowViewModel;
+            viewModel?.ShowLoadingScreen?.Execute(null);
 
             Messenger.Default.Register<NotificationMessage>(this, (nm) =>
             {

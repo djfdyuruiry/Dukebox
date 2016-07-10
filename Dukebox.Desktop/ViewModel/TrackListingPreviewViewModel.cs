@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
@@ -8,10 +10,8 @@ using Dukebox.Desktop.Interfaces;
 using Dukebox.Desktop.Model;
 using Dukebox.Desktop.Services;
 using Dukebox.Library.Interfaces;
-using System;
 using Dukebox.Library.Model;
 using Dukebox.Desktop.Helper;
-using System.Globalization;
 
 namespace Dukebox.Desktop.ViewModel
 {
@@ -26,7 +26,6 @@ namespace Dukebox.Desktop.ViewModel
         private string _trackFilter;
         private string _trackFilterName;
         private readonly ListSearchHelper<ITrack> _listSearchHelper;
-        private string _searchTerm;
 
         public ICommand ClearSearch { get; private set; }
 
@@ -52,12 +51,11 @@ namespace Dukebox.Desktop.ViewModel
         {
             get
             {
-                return _searchTerm;
+                return _listSearchHelper.SearchFilter;
             }
             set
             {
-                _searchTerm = value;
-                _listSearchHelper.SearchFilter = _searchTerm;
+                _listSearchHelper.SearchFilter = value;
 
                 OnPropertyChanged(nameof(Tracks));
             }
@@ -79,7 +77,7 @@ namespace Dukebox.Desktop.ViewModel
             }
         }
 
-        public TrackListingPreviewViewModel(IAudioPlaylist audioPlaylist, IMusicLibraryRepository libraryRepo, 
+        public TrackListingPreviewViewModel(IAudioPlaylist audioPlaylist, IMusicLibraryRepository libraryRepo,
             IMusicLibraryUpdateService updateService, IMusicLibraryEventService eventService)
         {
             _audioPlaylist = audioPlaylist;
@@ -120,35 +118,47 @@ namespace Dukebox.Desktop.ViewModel
 
         private void DoClearSearch()
         {
-            _listSearchHelper.SearchFilter = string.Empty;
-            OnPropertyChanged(nameof(Tracks));
+            SearchText = string.Empty;
         }
-        
+
         private void RegisterMessageHandlers()
         {
-            Messenger.Default.Register<PreviewArtistOrAlbumMessage>(this, (nm) =>
+            Messenger.Default.Register<PreviewTracksMessage>(this, (nm) =>
             {
                 if (nm.IsArtist)
                 {
                     _trackFilter = "Artist";
-                    UpdateTracks(_musicLibraryRepo.GetTracksForArtist(nm.Name));
+                    UpdateTracks(() => _musicLibraryRepo.GetTracksForArtist(nm.Name));
+                }
+                else if (nm.IsAlbum)
+                {
+                    _trackFilter = "Album";
+                    UpdateTracks(() => _musicLibraryRepo.GetTracksForAlbum(nm.Name));
                 }
                 else
                 {
-                    _trackFilter = "Album";
-                    UpdateTracks(_musicLibraryRepo.GetTracksForAlbum(nm.Name));
+                    UpdateTracks(() => _musicLibraryRepo.GetTracksForPlaylist(nm.Name));
                 }
 
                 _trackFilterName = nm.Name;
             });
         }
 
-        private void UpdateTracks(List<ITrack> tracks)
+        private void UpdateTracks(Func<List<ITrack>> tracksGenerator)
         {
-            _tracks = tracks;
-            _listSearchHelper.Items = _tracks;
-
-            OnPropertyChanged(nameof(Tracks));
+            try
+            {
+                _tracks = tracksGenerator();
+            }
+            catch (Exception)
+            {
+                _tracks = new List<ITrack>();
+            }
+            finally
+            {
+                _listSearchHelper.Items = _tracks;
+                OnPropertyChanged(nameof(Tracks));
+            }
         }
 
         private void ReloadTracksIfNeccessary(Song song)
@@ -165,11 +175,11 @@ namespace Dukebox.Desktop.ViewModel
             {
                 if (_trackFilter == "Artist")
                 {
-                    UpdateTracks(_musicLibraryRepo.GetTracksForArtist(_trackFilterName));
+                    UpdateTracks(() => _musicLibraryRepo.GetTracksForArtist(_trackFilterName));
                 }
                 else
                 {
-                    UpdateTracks(_musicLibraryRepo.GetTracksForAlbum(_trackFilterName));
+                    UpdateTracks(() => _musicLibraryRepo.GetTracksForAlbum(_trackFilterName));
                 }
             }
 

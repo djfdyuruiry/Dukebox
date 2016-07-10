@@ -1,15 +1,13 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
+using log4net;
 using GalaSoft.MvvmLight.Command;
+using GalaSoft.MvvmLight.Messaging;
 using Dukebox.Desktop.Interfaces;
 using Dukebox.Desktop.Model;
-using System;
 using Dukebox.Library.Interfaces;
-using log4net;
-using System.Reflection;
-using GalaSoft.MvvmLight.Messaging;
-using System.Windows.Threading;
 
 namespace Dukebox.Desktop.ViewModel
 {
@@ -22,6 +20,7 @@ namespace Dukebox.Desktop.ViewModel
         private Visibility _showAlbumListing;
         private Visibility _showArtistListing;
         private Visibility _showRecentlyPlayedListing;
+        private Visibility _showPlaylistListing;
         private Visibility _showAudioCdListing;
         private string _importReportText;
 
@@ -87,6 +86,19 @@ namespace Dukebox.Desktop.ViewModel
                 OnPropertyChanged("ShowRecentlyPlayedListing");
             }
         }
+        public Visibility ShowPlaylistListing
+        {
+            get
+            {
+                return _showPlaylistListing;
+            }
+            private set
+            {
+                _showPlaylistListing = value;
+                OnPropertyChanged(nameof(ShowPlaylistListing));
+                OnPropertyChanged(nameof(ShowTrackListingPreview));
+            }
+        }
         public Visibility ShowAudioCdListing
         {
             get
@@ -103,7 +115,9 @@ namespace Dukebox.Desktop.ViewModel
         {
             get
             {
-                return (ShowAlbumListing == Visibility.Visible || ShowArtistListing == Visibility.Visible) ? 
+                return (ShowAlbumListing == Visibility.Visible || 
+                        ShowArtistListing == Visibility.Visible || 
+                        ShowPlaylistListing == Visibility.Visible) ? 
                     Visibility.Visible : 
                     Visibility.Hidden;
             }
@@ -135,6 +149,7 @@ namespace Dukebox.Desktop.ViewModel
             ShowAlbumListing = Visibility.Hidden;
             ShowArtistListing = Visibility.Hidden;
             ShowRecentlyPlayedListing = Visibility.Hidden;
+            ShowPlaylistListing = Visibility.Hidden;
             ShowAudioCdListing = Visibility.Hidden;
 
             ShowLoadingScreen = new RelayCommand(DoShowSplashScreen);
@@ -198,6 +213,10 @@ namespace Dukebox.Desktop.ViewModel
             {
                 ShowRecentlyPlayedListing = Visibility.Visible;
             }
+            else if (navIconName == NavIconNames.PlaylistListing)
+            {
+                ShowPlaylistListing = Visibility.Visible;
+            }
             else if (navIconName == NavIconNames.AudioCd)
             {
                 ShowAudioCdListing = Visibility.Visible;
@@ -210,6 +229,7 @@ namespace Dukebox.Desktop.ViewModel
             ShowAlbumListing = Visibility.Hidden;
             ShowArtistListing = Visibility.Hidden;
             ShowRecentlyPlayedListing = Visibility.Hidden;
+            ShowPlaylistListing = Visibility.Hidden;
             ShowAudioCdListing = Visibility.Hidden;
         }
     }

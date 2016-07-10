@@ -172,10 +172,11 @@
     <Compile Include="Converters\ReverseBoolToVisibilityConverter.cs" />
     <Compile Include="Interfaces\IAudioDriveListingViewModel.cs" />
     <Compile Include="Interfaces\IMetadataColumnsSettingsViewModel.cs" />
+    <Compile Include="Interfaces\IPlaylistListingViewModel.cs" />
     <Compile Include="Interfaces\ISettingsMenuViewModel.cs" />
     <Compile Include="Interfaces\IWatchFolderSettingsViewModel.cs" />
     <Compile Include="Model\ExtendedMetadataColumnSetting.cs" />
-    <Compile Include="Model\PreviewArtistOrAlbumMessage.cs" />
+    <Compile Include="Model\PreviewTracksMessage.cs" />
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
     <Compile Include="Converters\ArtistToCardPathConverter.cs" />
     <Compile Include="Helper\ImageResourceLoader.cs" />
@@ -194,6 +195,7 @@
     <Compile Include="Model\NotificationMessages.cs" />
     <Compile Include="Services\Album.cs" />
     <Compile Include="Model\NavIconNames.cs" />
+    <Compile Include="Services\PlaylistWrapper.cs" />
     <Compile Include="Services\TrackWrapper.cs" />
     <Compile Include="Services\WatchFolderWrapper.cs" />
     <Compile Include="ViewModel\CdRippingProgressMonitorViewModel.cs" />
@@ -212,10 +214,12 @@
     <Compile Include="Interfaces\IHelpMenuViewModel.cs" />
     <Compile Include="Interfaces\IPlaybackMenuViewModel.cs" />
     <Compile Include="Interfaces\IPlaylistMenuViewModel.cs" />
+    <Compile Include="ViewModel\InputPromptViewModel.cs" />
     <Compile Include="ViewModel\LoadingScreenViewModel.cs" />
     <Compile Include="ViewModel\MetadataColumnsSettingsViewModel.cs" />
     <Compile Include="ViewModel\PlaybackMenuViewModel.cs" />
     <Compile Include="ViewModel\PlaybackMonitorViewModel.cs" />
+    <Compile Include="ViewModel\PlaylistListingViewModel.cs" />
     <Compile Include="ViewModel\PlaylistMenuViewModel.cs" />
     <Compile Include="ViewModel\ProgressMonitorViewModel.cs" />
     <Compile Include="ViewModel\RecentlyPlayedListingViewModel.cs" />
@@ -235,11 +239,17 @@
     <Compile Include="Views\AudioCdListing.xaml.cs">
       <DependentUpon>AudioCdListing.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\InputPrompt.xaml.cs">
+      <DependentUpon>InputPrompt.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\MetadataColumnsSettings.xaml.cs">
       <DependentUpon>MetadataColumnsSettings.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\PlaybackMonitor.xaml.cs">
       <DependentUpon>PlaybackMonitor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\PlaylistListing.xaml.cs">
+      <DependentUpon>PlaylistListing.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ProgressMonitor.xaml.cs">
       <DependentUpon>ProgressMonitor.xaml</DependentUpon>
@@ -281,11 +291,19 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\InputPrompt.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\MetadataColumnsSettings.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\PlaybackMonitor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\PlaylistListing.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

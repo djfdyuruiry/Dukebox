@@ -336,21 +336,18 @@ namespace Dukebox.Library.Services.MusicLibrary
 
                 var stopwatch = Stopwatch.StartNew();
                 var newPlaylist = new Playlist() { Name = name, FilenamesCsv = string.Join(",", filenames) };
-
+                
                 using (var dukeboxData = _dbContextFactory.GetInstance())
                 {
                     dukeboxData.Playlists.Add(newPlaylist);
                     await _dbContextFactory.SaveDbChanges(dukeboxData);
                 }
 
-                // Invalidate playlist cache.
-                _cacheService.RefreshCaches();
+                _eventService.TriggerEvent(MusicLibraryEvent.PlaylistsAdded);
 
                 stopwatch.Stop();
                 logger.InfoFormat("Added playlist to library: {0}", newPlaylist.Name);
                 logger.DebugFormat("Adding playlist to library took {0}ms. Playlist id: {1}", stopwatch.ElapsedMilliseconds, newPlaylist.Id);
-
-                _eventService.TriggerEvent(MusicLibraryEvent.PlaylistsAdded);
 
                 return newPlaylist;
             }

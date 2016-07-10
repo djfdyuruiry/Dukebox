@@ -133,8 +133,16 @@ namespace Dukebox.Desktop.ViewModel
             {
                 return DesktopContainer.GetInstance<AudioCdViewModel>();
             }
-        } 
-        
+        }
+
+        public IPlaylistListingViewModel IPlaylistListingViewModel
+        {
+            get
+            {
+                return DesktopContainer.GetInstance<IPlaylistListingViewModel>();
+            }
+        }
+
         public IMetadataColumnsSettingsViewModel IMetadataColumnsSettingsViewModel
         {
             get
