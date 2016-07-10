@@ -10,14 +10,13 @@ namespace Dukebox.Desktop.ViewModel
 
         protected void OnPropertyChanged(string propertyName)
         {
-            Task.Run(() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         } 
 
         protected void SendNotificationMessage(string message)
         {
             var messageObj = new NotificationMessage(this, message);
-
-            Task.Run(() => Messenger.Default.Send(messageObj));
+            Messenger.Default.Send(messageObj);
         }
     }
 }
