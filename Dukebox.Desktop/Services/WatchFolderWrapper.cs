@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
 
@@ -21,16 +22,39 @@ namespace Dukebox.Desktop.Services
             set
             {
                 Data.FolderPath = value;
-                OnPropertyChanged("FolderPath");
+                OnPropertyChanged(nameof(FolderPath));
 
                 PropagateWatchFolderChanges();
             }
         }
 
-        public WatchFolderWrapper(WatchFolder data, IMusicLibraryUpdateService updateService)
+        public DateTime LastScanDateTime
+        {
+            get
+            {
+                return Data.LastScanDateTime;
+            }
+        }
+
+        public WatchFolderWrapper(WatchFolder data, IMusicLibraryUpdateService updateService, 
+            IMusicLibraryEventService eventService)
         {
             Data = data;
             _updateService = updateService;
+
+            eventService.WatchFolderUpdated += (o, e) => UpdateWatchFolder(e);
+        }
+
+        private void UpdateWatchFolder(WatchFolder watchFolderToUpdate)
+        {
+            if (!watchFolderToUpdate.FolderPath.Equals(Data.FolderPath))
+            {
+                return;
+            }
+
+            Data = watchFolderToUpdate;
+            OnPropertyChanged(nameof(FolderPath));
+            OnPropertyChanged(nameof(LastScanDateTime));
         }
 
         private void PropagateWatchFolderChanges()
