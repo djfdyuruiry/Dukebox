@@ -113,6 +113,7 @@ namespace Dukebox.Tests.Unit
             var eventService = A.Fake<IMusicLibraryEventService>();
 
             audioFormats.SupportedFormats.Add(".mp3");
+            audioFormats.SignalFormatsHaveBeenLoaded();
 
             A.CallTo(importService).Where(c => c.Method.Name == "AddSupportedFilesInDirectory").WithReturnType<Task>().ReturnsLazily(async e =>
             {
