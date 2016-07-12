@@ -14,13 +14,19 @@ namespace Dukebox.Library.Model
         public string FolderPath { get; set; }
         
         [Column("lastScanTimestamp")]
-        public int LastScanTimestamp { get; set; }
+        public long LastScanTimestamp { get; set; }
 
+        [NotMapped]
         public DateTime LastScanDateTime
         {
             get
             {
                 return DateTimeOffset.FromUnixTimeSeconds(LastScanTimestamp).DateTime;
+            }
+            set
+            {
+                DateTimeOffset offset = value;
+                LastScanTimestamp = offset.ToUnixTimeSeconds();
             }
         }
     }

@@ -61,6 +61,8 @@ namespace Dukebox.Library.Services
                 {
                     Task.Run(() => ImportCompleted?.Invoke(this, dir));
                     logger.Info($"Inital import for folder '{WatchFolder.FolderPath}' has completed");
+
+                    UpdateLastScannedDateTime();
                 });
         }
 
@@ -165,11 +167,19 @@ namespace Dukebox.Library.Services
                     FileAdded = eventArgs.FullPath,
                     TotalFilesThisImport = 1
                 }));
+
+                UpdateLastScannedDateTime();
             }
             catch (Exception ex)
             {
                 logger.Error($"Error while processing event for file '{eventArgs.FullPath}' from watch folder '{WatchFolder.FolderPath}'", ex);
             }
+        }
+
+        private void UpdateLastScannedDateTime()
+        {
+            WatchFolder.LastScanDateTime = DateTime.UtcNow;
+            _updateService.SaveWatchFolderChanges(WatchFolder);
         }
 
         public void StopWatching()
