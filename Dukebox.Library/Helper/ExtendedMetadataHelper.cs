@@ -9,7 +9,18 @@ namespace Dukebox.Library.Helper
     public static class ExtendedMetadataHelper
     {
         private static readonly Type audioTagType = typeof(Tag);
-        private static readonly List<string> protectedTagProperties = new List<string> { "Title", "Performers", "Album" };
+        private static readonly List<string> protectedTagProperties = new List<string>
+        {
+            "Title",
+            "TitleSort",
+            "Artists",
+            "AlbumArtists",
+            "AlbumArtistsSort",
+            "Performers",
+            "PerformersSort",
+            "Album",
+            "Pictures"
+        };
 
         private static readonly List<PropertyInfo> readableProperties = audioTagType.GetProperties()
             .Where(p => !protectedTagProperties.Contains(p.Name) && p.CanRead)
@@ -58,8 +69,13 @@ namespace Dukebox.Library.Helper
 
                 if (property.PropertyType.IsArray)
                 {
-                    var values = extendedMetadataValue.Select(v => Convert.ChangeType(v, propertyType)).ToArray();
-                    property.SetValue(tag, values);
+                    var elementType = propertyType.GetElementType();
+                    var values = extendedMetadataValue.Select(v => Convert.ChangeType(v, elementType)).ToArray();
+                    var arrayValue = Array.CreateInstance(elementType, values.Length);
+
+                    Array.Copy(values, arrayValue, values.Length);
+
+                    property.SetValue(tag, arrayValue);
                 }
                 else
                 {
