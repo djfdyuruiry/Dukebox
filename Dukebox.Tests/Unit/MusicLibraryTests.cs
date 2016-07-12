@@ -325,9 +325,17 @@ namespace Dukebox.Tests.Unit
         public void AddDirectory()
         {
             var numSamples = 5;
+            var signalEvent = new ManualResetEvent(false);
+
+            _musicLibraryEventService.CachesRefreshed += (o, e) =>
+            {
+                signalEvent.Set();
+            };
 
             PrepareSamplesDirectory("samples", numSamples);
             _musicLibraryImportService.AddSupportedFilesInDirectory("samples", false, null, null).Wait();
+            
+            signalEvent.WaitOne(1000);
 
             var tracks = _musicLibrarySearchService.SearchForTracks("samples", new List<SearchAreas> { SearchAreas.Filename });
             var tracksReturned = tracks.Any();
@@ -419,8 +427,16 @@ namespace Dukebox.Tests.Unit
         {
             var playlistName = "magical music";
             var files = new List<string> { "samples/music.mp3", "samples/music1.mp3", "samples/music2.mp3", "samples/music3.mp3" };
+            var signalEvent = new ManualResetEvent(false);
+
+            _musicLibraryEventService.CachesRefreshed += (o, e) =>
+            {
+                signalEvent.Set();
+            };
 
             await _musicLibraryImportService.AddPlaylist(playlistName, files);
+
+            signalEvent.WaitOne(1000);
 
             var playlist = _musicLibraryCacheService.OrderedPlaylists.FirstOrDefault(p => p.Name == playlistName);
             var playlistReturned = playlist != null;
