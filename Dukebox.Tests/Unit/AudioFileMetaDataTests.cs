@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -129,16 +130,19 @@ namespace Dukebox.Tests.Unit
             var newTitle = "UnqiueTitle";
             var newArtist = "UniqueArtist";
             var newAlbum = "UnqiueAlbum";
+            var newYear = "1999";
 
             audioFileMetadata.Title = newTitle;
             audioFileMetadata.Artist = newArtist;
             audioFileMetadata.Album = newAlbum;
+            audioFileMetadata.ExtendedMetadata["Year"] = new List<string> { newYear };
 
             audioFileMetadata.SaveMetadataToFileTag();
 
             audioFileMetadata = _audioFileMetadataFactory.BuildAudioFileMetadataInstance(sampleForEditingMp3FileName);
 
-            var metadataCorrect = audioFileMetadata.Title == newTitle && audioFileMetadata.Artist == newArtist && audioFileMetadata.Album == newAlbum;
+            var metadataCorrect = audioFileMetadata.Title == newTitle && audioFileMetadata.Artist == newArtist 
+                && audioFileMetadata.Album == newAlbum && audioFileMetadata.ExtendedMetadata["Year"].First().Equals(newYear);
 
             Assert.True(metadataCorrect, "Failed to save and retrieve correct audio file metadata");
         }

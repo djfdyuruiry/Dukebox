@@ -439,8 +439,16 @@ namespace Dukebox.Tests.Unit
         {
             var tracks = _musicLibrarySearchService.SearchForTracks("wish you were here", new List<SearchAreas> { SearchAreas.Song });
             var track = tracks.First();
+            var signalEvent = new ManualResetEvent(false);
+
+            _musicLibraryEventService.CachesRefreshed += (o, e) =>
+            {
+                signalEvent.Set();
+            };
 
             await _musicLibaryUpdateService.RemoveTrack(track);
+
+            signalEvent.WaitOne(1000);
 
             tracks = _musicLibrarySearchService.GetTracksByAttributeId(SearchAreas.Song, track.Song.Id.ToString());
             var trackDeleted = !tracks.Any();

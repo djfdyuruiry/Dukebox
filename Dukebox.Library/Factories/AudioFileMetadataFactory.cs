@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using log4net;
 using TagLib;
 using Dukebox.Audio.Interfaces;
+using Dukebox.Library.Helper;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
 using Dukebox.Library.Services;
@@ -17,7 +18,6 @@ namespace Dukebox.Library.Factories
     {
         private static readonly ILog logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private static readonly Regex truncateSpacesRegex = new Regex("\\s+");
-        private static readonly Type audioTagType = typeof(Tag);
 
         private readonly ICdMetadataService _cdMetadataService;
         private readonly IAudioCdService _audioCdService;
@@ -73,9 +73,9 @@ namespace Dukebox.Library.Factories
 
                 using (var fileStream = new FileStream(audioFilePath, FileMode.Open))
                 {
-                    InspectAudioFileTag(audioFilePath, fileStream, 
+                    extendedMetadata = InspectAudioFileTag(audioFilePath, fileStream, 
                         ref title, ref artist, ref album, ref trackLength, 
-                        ref hasAlbumArt, extendedMetadata);
+                        ref hasAlbumArt);
                 }
 
                 LoadMissingTrackDetailsFromFileName(audioFilePath, ref title, ref artist, ref album);
@@ -88,8 +88,6 @@ namespace Dukebox.Library.Factories
                 hasFutherMetadataTag = false;
                 trackLength = 0;
                 LoadMissingTrackDetailsFromFileName(audioFilePath, ref title, ref artist, ref album);
-
-                extendedMetadata.Clear();
             }
 
             return new AudioFileMetadata(audioFilePath, title, artist, album, trackLength,
@@ -185,9 +183,8 @@ namespace Dukebox.Library.Factories
                 audioFilePath, currentArtist, currentTitle, currentAlbum);
         }
 
-        private void InspectAudioFileTag(string audioFilePath, FileStream fileStream,
-            ref string title, ref string artist, ref string album, ref int trackLength,
-            ref bool hasAlbumArt, Dictionary<string, List<string>> extendedMetadata)
+        private Dictionary<string, List<string>> InspectAudioFileTag(string audioFilePath, FileStream fileStream,
+            ref string title, ref string artist, ref string album, ref int trackLength, ref bool hasAlbumArt)
         {
             var tagFile = TagLib.File.Create(new StreamFileAbstraction(audioFilePath, fileStream, fileStream));
             var tag = tagFile.Tag;
@@ -216,32 +213,12 @@ namespace Dukebox.Library.Factories
 
             try
             {
-                PopulateExtendedMetadata(tag, extendedMetadata);
+                return ExtendedMetadataHelper.ReadExtendedMetadata(tag);
             }
             catch (Exception ex)
             {
                 logger.Warn(string.Format("Failed to extract extended metadata from the tag in audio file '{0}'", audioFilePath), ex);
-                extendedMetadata.Clear();
-            }
-        }
-
-        private void PopulateExtendedMetadata(Tag tag, Dictionary<string, List<string>> extendedMetadata)
-        {
-            foreach (var property in audioTagType.GetProperties())
-            {
-                if (property.CanRead)
-                {
-                    var values = property.PropertyType.IsArray ?
-                          ((object[])property.GetValue(tag))?.Select(o => o.ToString())?.ToList() ?? new List<string>()
-                        : new List<string> { property.GetValue(tag)?.ToString() ?? string.Empty };
-
-                    var validValues = values.Where(s => !string.IsNullOrEmpty(s)).ToList();
-
-                    if (validValues.Any())
-                    {
-                        extendedMetadata[property.Name] = validValues;
-                    }
-                }
+                return new Dictionary<string, List<string>>();
             }
         }
     }
