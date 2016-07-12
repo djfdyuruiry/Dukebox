@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Dukebox.Desktop.Interfaces;
 using Dukebox.Desktop.Model;
 using Dukebox.Library.Factories;
+using Dukebox.Library.Helper;
 
 namespace Dukebox.Desktop.ViewModel
 {
@@ -16,9 +16,8 @@ namespace Dukebox.Desktop.ViewModel
         public MetadataColumnsSettingsViewModel(IDukeboxUserSettings userSettings, AudioFileMetadataFactory audioFileMetadataFactory)
         {
             _userSettings = userSettings;
-
-            var metadataTagType = audioFileMetadataFactory.GetConcreteMetadataTagType();
-            PopulateMetadataColumns(metadataTagType);
+            
+            PopulateMetadataColumns();
 
             MetadataColumns.ForEach(s => s.PropertyChanged += 
                 (o, e) => UpdateMetadatColumnSetting(o as ExtendedMetadataColumnSetting)); ;
@@ -46,13 +45,12 @@ namespace Dukebox.Desktop.ViewModel
             SendNotificationMessage(NotificationMessages.TrackListingDataGridColumnsUpdated);
         }
 
-        private void PopulateMetadataColumns(Type metadataTagType)
+        private void PopulateMetadataColumns()
         {
-            MetadataColumns = metadataTagType
-                .GetProperties()
-                .Where(p => p.CanRead)
-                .OrderBy(p => p.Name)
-                .Select(p => new ExtendedMetadataColumnSetting { ColumnName = p.Name, IsEnabled = IsMetadataColumnEnabled(p.Name) })
+            MetadataColumns = ExtendedMetadataHelper
+                .MetadataPropertyNames
+                .OrderBy(p => p)
+                .Select(p => new ExtendedMetadataColumnSetting { ColumnName = p, IsEnabled = IsMetadataColumnEnabled(p) })
                 .ToList();
         }
 

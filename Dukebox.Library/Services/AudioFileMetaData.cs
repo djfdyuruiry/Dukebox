@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using log4net;
 using TagLib;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
+using Dukebox.Library.Helper;
 
 namespace Dukebox.Library.Services
 {
@@ -20,7 +22,8 @@ namespace Dukebox.Library.Services
             "Unable to get audio length: there is no metadata tag for audio file '{0}', defaulting to 0";
 
         private static readonly ILog logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-                        
+        private static readonly Type audioTagType = typeof(Tag);
+
         private readonly long _dbAlbumId;
         private readonly int _trackLength;
         private readonly bool _hasAlbumArt;
@@ -203,6 +206,8 @@ namespace Dukebox.Library.Services
                     tag.Title = Title;
                     tag.Performers = new string[] { Artist };
                     tag.Album = Album;
+
+                    ExtendedMetadataHelper.WriteExtendedMetadata(tag, ExtendedMetadata);
 
                     tagFile.Save();
 
