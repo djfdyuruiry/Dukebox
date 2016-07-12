@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Dukebox.Library.Model;
 
@@ -12,5 +13,6 @@ namespace Dukebox.Library.Interfaces
         BlockingCollection<string> FilesCache { get; }
         List<Song> SongsCache { get; }
         void RefreshCaches();
+        bool HasFileBeenUpdatedSinceLastScan(string file, DateTime lastWriteTime);
     }
 }

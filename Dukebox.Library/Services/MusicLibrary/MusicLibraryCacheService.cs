@@ -7,6 +7,7 @@ using System.Threading;
 using log4net;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
+using System;
 
 namespace Dukebox.Library.Services.MusicLibrary
 {
@@ -18,6 +19,7 @@ namespace Dukebox.Library.Services.MusicLibrary
         private readonly IMusicLibraryEventService _eventService;
         private readonly SemaphoreSlim _cacheSemaphore;
         private readonly BlockingCollection<string> _allFilesCache;
+        private Dictionary<string, DateTime> _fileLastScannedMap;
 
         private List<Artist> _allArtistsCache;
         private List<Album> _allAlbumsCache;
@@ -145,6 +147,8 @@ namespace Dukebox.Library.Services.MusicLibrary
 
                 files.ForEach(f => _allFilesCache.Add(f));
 
+                _fileLastScannedMap = _allSongsCache.ToDictionary(s => s.FileName, s => s.LastScanDateTime);
+
                 stopwatch.Stop();
 
                 logger.Info("Music library artist, album, playlist and file path caches were refreshed");
@@ -160,6 +164,25 @@ namespace Dukebox.Library.Services.MusicLibrary
             _eventService.TriggerEvent(MusicLibraryEvent.PlaylistCacheRefreshed);
             _eventService.TriggerEvent(MusicLibraryEvent.FilesCacheRefreshed);
             _eventService.TriggerEvent(MusicLibraryEvent.CachesRefreshed);
+        }
+
+        public bool HasFileBeenUpdatedSinceLastScan(string file, DateTime lastWriteTime)
+        {
+            try
+            {
+                _cacheSemaphore.Wait();
+
+                if (!_fileLastScannedMap.ContainsKey(file))
+                {
+                    return true;
+                }
+
+                return _fileLastScannedMap[file] < lastWriteTime;
+            }
+            finally
+            {
+                _cacheSemaphore.Release();
+            }
         }
     }
 }
