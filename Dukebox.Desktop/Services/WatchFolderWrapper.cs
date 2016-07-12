@@ -22,8 +22,6 @@ namespace Dukebox.Desktop.Services
             set
             {
                 Data.FolderPath = value;
-                OnPropertyChanged(nameof(FolderPath));
-
                 PropagateWatchFolderChanges();
             }
         }
@@ -53,13 +51,19 @@ namespace Dukebox.Desktop.Services
             }
 
             Data = watchFolderToUpdate;
-            OnPropertyChanged(nameof(FolderPath));
-            OnPropertyChanged(nameof(LastScanDateTime));
+            RefreshProperties();
         }
 
         private void PropagateWatchFolderChanges()
         {
+            Data.LastScanTimestamp = 0;
             _updateService.SaveWatchFolderChanges(Data);
+        }
+
+        private void RefreshProperties()
+        {
+            OnPropertyChanged(nameof(FolderPath));
+            OnPropertyChanged(nameof(LastScanDateTime));
         }
 
         protected void OnPropertyChanged(string propertyName)
