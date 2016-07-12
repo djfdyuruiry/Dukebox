@@ -136,6 +136,7 @@ namespace Dukebox.Library.Services.MusicLibrary
                     _allPlaylistsCache = dukeboxData.Playlists.OrderBy(a => a.Name).ToList();
                     
                     _allSongsCache = dukeboxData.Songs.ToList();
+
                     files = _allSongsCache.Select(s => s.FileName).ToList();
                 }
 
@@ -147,7 +148,10 @@ namespace Dukebox.Library.Services.MusicLibrary
 
                 files.ForEach(f => _allFilesCache.Add(f));
 
-                _fileLastScannedMap = _allSongsCache.ToDictionary(s => s.FileName, s => s.LastScanDateTime);
+                _fileLastScannedMap = _allSongsCache
+                        .GroupBy(s => s.FileName)
+                        .Select(sg => sg.First())
+                        .ToDictionary(s => s.FileName, s => s.LastScanDateTime);
 
                 stopwatch.Stop();
 

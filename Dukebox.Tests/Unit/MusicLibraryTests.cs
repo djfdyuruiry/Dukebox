@@ -59,7 +59,8 @@ namespace Dukebox.Tests.Unit
             A.CallTo(() => settings.AddDirectoryConcurrencyLimit).Returns(5);
 
             audioFormats.SupportedFormats.Add(".mp3");
-            
+            audioFormats.SignalFormatsHaveBeenLoaded();
+
             _musicLibraryCacheService = new MusicLibraryCacheService(dbContextFactory, _musicLibraryEventService);
             _musicLibraryRepo = new MusicLibraryRepository(dbContextFactory, trackFactory, _musicLibraryCacheService);
             _musicLibrarySearchService = new MusicLibrarySearchService(dbContextFactory, trackFactory, _musicLibraryCacheService);
