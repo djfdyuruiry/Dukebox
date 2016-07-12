@@ -19,6 +19,7 @@ namespace Dukebox.Library.Services
         private readonly IMusicLibraryEventService _eventService;
         private Task _initalImportTask;
 
+        private string _lastWatchFolderPath;
         private FileSystemWatcher _fileWatcher;
 
         public event EventHandler<DirectoryImportReport> ImportCompleted;
@@ -36,6 +37,8 @@ namespace Dukebox.Library.Services
             IMusicLibraryUpdateService updateService, IMusicLibraryEventService eventService, bool skipInitalImport)
         {
             WatchFolder = watchFolder;
+
+            _lastWatchFolderPath = watchFolder.FolderPath;
 
             _audioFormats = audioFormats;
             _importService = importService;
@@ -68,13 +71,16 @@ namespace Dukebox.Library.Services
 
         private void ReloadServiceIfStarted(WatchFolder watchFolder)
         {
-            if (watchFolder != WatchFolder || _fileWatcher == null)
+            if (_fileWatcher == null || 
+                watchFolder != WatchFolder ||
+                watchFolder.FolderPath.Equals(_lastWatchFolderPath))
             {
                 return;
             }
 
             StopWatching();
 
+            _lastWatchFolderPath = WatchFolder.FolderPath;
             _initalImportTask = AddFileChangesSinceLastStart();
 
             StartWatching();

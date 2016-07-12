@@ -128,7 +128,7 @@ namespace Dukebox.Library.Services.MusicLibrary
             var fileInfo = new FileInfo(file);
 
             return (!_cacheService.FilesCache.Contains(file) ||
-                _cacheService.HasFileBeenUpdatedSinceLastScan(file, fileInfo.LastWriteTime)) &&
+                _cacheService.HasFileBeenUpdatedSinceLastScan(file, fileInfo.LastAccessTimeUtc)) &&
                 _audioFormats.FileSupported(file);
         }
 
