@@ -19,6 +19,7 @@ namespace Dukebox.Library.Services
         private readonly IMusicLibraryEventService _eventService;
         private Task _initalImportTask;
 
+        private string _lastWatchFolderPath;
         private FileSystemWatcher _fileWatcher;
 
         public event EventHandler<DirectoryImportReport> ImportCompleted;
@@ -36,6 +37,8 @@ namespace Dukebox.Library.Services
             IMusicLibraryUpdateService updateService, IMusicLibraryEventService eventService, bool skipInitalImport)
         {
             WatchFolder = watchFolder;
+
+            _lastWatchFolderPath = watchFolder.FolderPath;
 
             _audioFormats = audioFormats;
             _importService = importService;
@@ -61,18 +64,23 @@ namespace Dukebox.Library.Services
                 {
                     Task.Run(() => ImportCompleted?.Invoke(this, dir));
                     logger.Info($"Inital import for folder '{WatchFolder.FolderPath}' has completed");
+
+                    UpdateLastScannedDateTime();
                 });
         }
 
         private void ReloadServiceIfStarted(WatchFolder watchFolder)
         {
-            if (watchFolder != WatchFolder || _fileWatcher == null)
+            if (_fileWatcher == null || 
+                watchFolder != WatchFolder ||
+                watchFolder.FolderPath.Equals(_lastWatchFolderPath))
             {
                 return;
             }
 
             StopWatching();
 
+            _lastWatchFolderPath = WatchFolder.FolderPath;
             _initalImportTask = AddFileChangesSinceLastStart();
 
             StartWatching();
@@ -165,11 +173,19 @@ namespace Dukebox.Library.Services
                     FileAdded = eventArgs.FullPath,
                     TotalFilesThisImport = 1
                 }));
+
+                UpdateLastScannedDateTime();
             }
             catch (Exception ex)
             {
                 logger.Error($"Error while processing event for file '{eventArgs.FullPath}' from watch folder '{WatchFolder.FolderPath}'", ex);
             }
+        }
+
+        private void UpdateLastScannedDateTime()
+        {
+            WatchFolder.LastScanDateTime = DateTime.UtcNow;
+            _updateService.SaveWatchFolderChanges(WatchFolder);
         }
 
         public void StopWatching()

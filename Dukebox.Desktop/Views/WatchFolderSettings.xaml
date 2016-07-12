@@ -8,7 +8,7 @@
         Title="Dukebox - Watch Folder Settings" 
         Icon="..\app.ico"
         Height="400" 
-        Width="450"
+        Width="575"
         WindowStartupLocation="CenterOwner"
         Name="WatchFolderSettingsWindow"
         DataContext="{Binding IWatchFolderSettingsViewModel, Source={StaticResource ViewModelLocator}}">
@@ -51,6 +51,16 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding FolderPath, UpdateSourceTrigger=PropertyChanged}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="Last Activity" 
+                                        Width="125" 
+                                        SortMemberPath="LastScanDateTime" 
+                                        CanUserSort="True">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding LastScanDateTime, StringFormat={}{0}, UpdateSourceTrigger=PropertyChanged}"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>

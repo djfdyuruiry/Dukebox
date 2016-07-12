@@ -90,8 +90,6 @@ namespace Dukebox.Desktop.ViewModel
         public void RefreshArtistsFromLibrary()
         {
             Artists = _cacheService.OrderedArtists;
-
-            Artists = Enumerable.Range(1, 100).Select(i => new Artist("abcdefghijklmnopqrstvwxyz0123456789")).ToList();
         }
 
         private void DoLoadArtist(Artist artist)

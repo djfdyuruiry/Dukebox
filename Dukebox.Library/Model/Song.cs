@@ -55,7 +55,7 @@ namespace Dukebox.Library.Model
         public virtual string AlbumName { get; set; }
 
         [Column("lastScanTimestamp")]
-        public int LastScanTimestamp { get; set; }
+        public long LastScanTimestamp { get; set; }
 
         public Artist Artist
         {
@@ -73,11 +73,17 @@ namespace Dukebox.Library.Model
             }
         }
 
+        [NotMapped]
         public DateTime LastScanDateTime
         {
             get
             {
                 return DateTimeOffset.FromUnixTimeSeconds(LastScanTimestamp).DateTime;
+            }
+            set
+            {
+                DateTimeOffset offset = value;
+                LastScanTimestamp = offset.ToUnixTimeSeconds();
             }
         }
 

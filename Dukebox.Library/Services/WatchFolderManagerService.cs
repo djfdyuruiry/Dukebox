@@ -41,11 +41,15 @@ namespace Dukebox.Library.Services
             _updateService = updateService;
             _eventService = eventService;
 
-            WatchFolders = musicRepo
-                .GetWatchFolders()
-                .Select(w => BuildWatchFolderService(w)).Cast<IWatchFolderService>().ToList();
-
-            WatchFolders.ForEach(w => Task.Run(w.StartWatching));
+            // Import files only when we can validate if files are supported or not.
+            audioFormats.FormatsLoaded += (o, e) =>
+            {
+                WatchFolders = musicRepo
+                    .GetWatchFolders()
+                    .Select(w => BuildWatchFolderService(w)).Cast<IWatchFolderService>().ToList();
+                
+                WatchFolders.ForEach(w => Task.Run(w.StartWatching));
+            };
 
             _eventService.WatchFolderDeleted += (o, e) => RemoveWatchFolder(e);
         }

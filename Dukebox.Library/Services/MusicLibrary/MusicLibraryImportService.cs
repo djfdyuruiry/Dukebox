@@ -70,20 +70,23 @@ namespace Dukebox.Library.Services.MusicLibrary
 
             var concurrencyLimit = _settings.AddDirectoryConcurrencyLimit;
             var allfiles = Directory.GetFiles(@directory, "*.*", subDirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
-            var filesToAdd = allfiles.Where(f => !_cacheService.FilesCache.Contains(f) && _audioFormats.FileSupported(f));
-            var filesToRemove = _cacheService.FilesCache.Where(f => f.StartsWith(directory) && !allfiles.Contains(f)).ToList();
-            var numFilesToAdd = filesToAdd.Count();
+            var filesToAdd = allfiles.Where(ShouldFileBeAdded).ToList();
+            var filesToRemove = _cacheService.FilesCache
+                .Where(f => f.StartsWith(directory))
+                .Where(f => ShouldFileBeRemoved(f, filesToAdd, allfiles))
+                .ToList();
+            var numFilesToAdd = filesToAdd.Count;
 
             var filesWithMetadata = ExtractMetadataFromFiles(filesToAdd, progressHandler, concurrencyLimit, numFilesToAdd);
             List<Tuple<Album, IAudioFileMetadata>> albumsWithMetadata;
 
             using (var dukeboxData = _dbContextFactory.GetInstance())
             {
-                albumsWithMetadata = AddFilesToDatabaseModel(dukeboxData, filesWithMetadata, concurrencyLimit, progressHandler, numFilesToAdd);
-
                 logger.Info($"Removing {filesToRemove.Count} library song(s) missing (deleted, renamed or moved) from the path '{directory}'");
                 filesToRemove.ForEach(f => _updateService.RemoveSongByFilePath(f));
 
+                albumsWithMetadata = AddFilesToDatabaseModel(dukeboxData, filesWithMetadata, concurrencyLimit, progressHandler, numFilesToAdd);
+                
                 _dbContextFactory.SaveDbChanges(dukeboxData);
             }
 
@@ -118,6 +121,22 @@ namespace Dukebox.Library.Services.MusicLibrary
                 logger.WarnFormat("Not all files found in directory '{0}' were added to the database [{1}/{2} files added]",
                     directory, numFilesAdded, numFilesToAdd);
             }
+        }
+
+        private bool ShouldFileBeAdded(string file)
+        {
+            var fileInfo = new FileInfo(file);
+
+            return (!_cacheService.FilesCache.Contains(file) ||
+                _cacheService.HasFileBeenUpdatedSinceLastScan(file, fileInfo.LastAccessTimeUtc)) &&
+                _audioFormats.FileSupported(file);
+        }
+
+        private bool ShouldFileBeRemoved(string file, List<string> filesToAdd, string[] allFiles)
+        {
+            var fileExists = allFiles.Contains(file);
+
+            return (fileExists && filesToAdd.Contains(file)) || !fileExists;
         }
 
         private List<Tuple<string, IAudioFileMetadata>> ExtractMetadataFromFiles(IEnumerable<string> filesToAdd,
@@ -258,7 +277,8 @@ namespace Dukebox.Library.Services.MusicLibrary
                 ArtistName = metadata.Artist,
                 AlbumName = metadata.Album,
                 ExtendedMetadataJson = extendedMetadataJson,
-                LengthInSeconds = metadata.Length
+                LengthInSeconds = metadata.Length,
+                LastScanDateTime = DateTime.UtcNow
             };
 
             logger.DebugFormat("Title for file '{0}': {1} [artist = '{2}', album = '{3}']",

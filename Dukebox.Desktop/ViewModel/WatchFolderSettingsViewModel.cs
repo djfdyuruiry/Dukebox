@@ -14,6 +14,7 @@ namespace Dukebox.Desktop.ViewModel
     {
         private readonly IWatchFolderManagerService _watchFolderManager;
         private readonly IMusicLibraryUpdateService _updateService;
+        private readonly IMusicLibraryEventService _eventService;
         private readonly FolderBrowserDialog _selectFolderDialog;
 
         private List<WatchFolderWrapper> _watchFolders;
@@ -35,10 +36,12 @@ namespace Dukebox.Desktop.ViewModel
         public ICommand UpdateWatchFolder { get; private set; }
         public ICommand DeleteWatchFolder { get; private set; }
 
-        public WatchFolderSettingsViewModel(IWatchFolderManagerService watchFolderManager, IMusicLibraryUpdateService updateService)
+        public WatchFolderSettingsViewModel(IWatchFolderManagerService watchFolderManager, IMusicLibraryUpdateService updateService,
+            IMusicLibraryEventService eventService)
         {
             _watchFolderManager = watchFolderManager;
             _updateService = updateService;
+            _eventService = eventService;
             _selectFolderDialog = new FolderBrowserDialog();
 
             _selectFolderDialog.Description = "Select a folder to watch";
@@ -92,7 +95,7 @@ namespace Dukebox.Desktop.ViewModel
         {
             WatchFolders = _watchFolderManager
                 .WatchFolders
-                .Select(wfs => new WatchFolderWrapper(wfs.WatchFolder, _updateService))
+                .Select(wfs => new WatchFolderWrapper(wfs.WatchFolder, _updateService, _eventService))
                 .ToList();
         }
     }
