@@ -11,6 +11,9 @@ namespace Dukebox.Desktop.Interfaces
         string Track { get; }
         string TrackMinutesPassed { get; }
         string TrackMinutesTotal { get; }
+        double TrackSecondsPassed { get; set; }
+        double TrackSecondsTotal { get; }
+        bool SeekingEnabled { get; }
         ImageSource AlbumArt { get; }
         ImageSource PlayPauseImage { get; }
         ICommand BackCommand { get; }

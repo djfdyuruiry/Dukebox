@@ -31,6 +31,9 @@ namespace Dukebox.Desktop.ViewModel
         private string _album;
         private string _trackMinutesPassed;
         private string _trackMinutesTotal;
+        private double _trackSecondsPassed;
+        private double _trackSecondsTotal;
+        private bool _seekingEnabled;
         private ImageSource _playPauseImage;
         private string _albumArtUri;
         private ImageSource _albumArtImage;
@@ -49,6 +52,7 @@ namespace Dukebox.Desktop.ViewModel
                 OnPropertyChanged("Artist");
             }
         }
+
         public string Track
         {
             get
@@ -62,6 +66,7 @@ namespace Dukebox.Desktop.ViewModel
                 OnPropertyChanged("Track");
             }
         }
+
         public string Album
         {
             get
@@ -75,6 +80,7 @@ namespace Dukebox.Desktop.ViewModel
                 OnPropertyChanged("Album");
             }
         }
+
         public string TrackMinutesPassed
         {
             get
@@ -101,6 +107,47 @@ namespace Dukebox.Desktop.ViewModel
                 OnPropertyChanged("TrackMinutesTotal");
             }
         }
+
+        public double TrackSecondsPassed
+        {
+            get
+            {
+                return _trackSecondsPassed;
+            }
+            set
+            {
+                _mediaPlayer.ChangeAudioPosition(value);
+            }
+        }
+
+        public double TrackSecondsTotal
+        {
+            get
+            {
+                return _trackSecondsTotal;
+            }
+            private set
+            {
+                _trackSecondsTotal = value;
+
+                OnPropertyChanged(nameof(TrackSecondsTotal));
+            }
+        }
+
+        public bool SeekingEnabled
+        {
+            get
+            {
+                return _seekingEnabled;
+            }
+            private set
+            {
+                _seekingEnabled = value;
+
+                OnPropertyChanged(nameof(SeekingEnabled));
+            }
+        }
+
         public ImageSource AlbumArt
         {
             get
@@ -114,6 +161,7 @@ namespace Dukebox.Desktop.ViewModel
                 OnPropertyChanged("AlbumArt");
             }
         }
+
         public ImageSource PlayPauseImage
         {
             get
@@ -145,6 +193,8 @@ namespace Dukebox.Desktop.ViewModel
             UpdateAlbumArt(ImageResources.DefaultAlbumArtUri);
             PlayPauseImage = ImageResources.PlayImage;
 
+            TrackSecondsTotal = 100;
+
             SetupAudioEventListeners();
             SetupPlaybackControlCommands();
 
@@ -164,7 +214,7 @@ namespace Dukebox.Desktop.ViewModel
             _mediaPlayer.TrackPaused += (o, e) => PlayPauseImage = ImageResources.PlayImage;
             _mediaPlayer.TrackResumed += (o, e) => PlayPauseImage = ImageResources.PauseImage;
             _mediaPlayer.ErrorHandlingAction = (errMsg, title) => MessageBox.Show(errMsg, title, MessageBoxButton.OK, MessageBoxImage.Error);
-
+            
             _eventService.SongUpdated += (o, e) =>
             {
                 if (e.FileName.Equals(_currentlyLoadedFile))
@@ -210,6 +260,8 @@ namespace Dukebox.Desktop.ViewModel
         private void LoadedTrackFromFile(TrackLoadedFromFileEventArgs trackLoadedArgs)
         {
             TrackMinutesTotal = _mediaPlayer.AudioLengthInMins;
+            TrackSecondsTotal = _mediaPlayer.AudioLengthInSecs;
+            SeekingEnabled = true;
 
             Artist = trackLoadedArgs.Metadata.ArtistName;
             Track = trackLoadedArgs.Metadata.TrackName;
@@ -258,12 +310,12 @@ namespace Dukebox.Desktop.ViewModel
             catch
             {
                 UpdateAlbumArt(ImageResources.DefaultAlbumArtUri);
-            }            
+            }
         }
 
         private void UpdateAlbumArt(string albumArtUri)
         {
-            if(string.IsNullOrEmpty(albumArtUri))
+            if (string.IsNullOrEmpty(albumArtUri))
             {
                 throw new Exception("Unable to update album art for playback monitor: album art uri string was null or empty");
             }
@@ -273,7 +325,7 @@ namespace Dukebox.Desktop.ViewModel
                 // if currently displaying requested image
                 return;
             }
-            
+
             ImageSource albumArtImage = null;
 
             Application.Current.Dispatcher.Invoke(() =>
@@ -289,11 +341,19 @@ namespace Dukebox.Desktop.ViewModel
         {
             PlayPauseImage = ImageResources.PlayImage;
             TrackMinutesPassed = string.Format(MediaPlayer.MinuteFormat, emptyTrackTimeText, emptyTrackTimeText);
+            UpdateSecondsPassed(0);
         }
 
         private void TrackPositionChanged()
         {
             TrackMinutesPassed = _mediaPlayer.MinutesPlayed;
+            UpdateSecondsPassed(_mediaPlayer.SecondsPlayed);
+        }
+
+        private void UpdateSecondsPassed(double seconds)
+        {
+            _trackSecondsPassed = seconds;
+            OnPropertyChanged(nameof(TrackSecondsPassed));
         }
     }
 }
