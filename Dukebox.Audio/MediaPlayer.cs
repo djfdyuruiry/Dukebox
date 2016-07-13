@@ -7,6 +7,7 @@ using Un4seen.Bass;
 using Un4seen.Bass.AddOn.Cd;
 using Dukebox.Audio.Interfaces;
 using Dukebox.Audio.Model;
+using System.Threading.Tasks;
 
 namespace Dukebox.Audio
 {
@@ -31,6 +32,8 @@ namespace Dukebox.Audio
 
         private string _fileName;
         private double _newPosition;
+        private TrackLoadedFromFileEventArgs _lastLoadedTrackEventArgs;
+        private MediaPlayerMetadata _lastMediaPlayerMetadata;
 
         public bool AudioLoaded { get { return _stream != 0; } }
 
@@ -155,30 +158,21 @@ namespace Dukebox.Audio
                 _playbackThread.Abort();
             }
 
-            ScheduleLoadedTrackFromFileEvent(fileName, mediaPlayerMetadata);
+            _lastLoadedTrackEventArgs = new TrackLoadedFromFileEventArgs
+            {
+                FileName = fileName,
+                Metadata = mediaPlayerMetadata ?? _lastMediaPlayerMetadata ?? defaultMetadata
+            };
+
+            if (mediaPlayerMetadata != null)
+            {
+                _lastMediaPlayerMetadata = mediaPlayerMetadata;
+            }
 
             _playbackThread = new Thread(PlayAudioFile);
             _playbackThread.Start();
 
             logger.InfoFormat("{0} loaded for playback by the media player", fileName);
-        }
-
-        private void ScheduleLoadedTrackFromFileEvent(string fileName, MediaPlayerMetadata mediaPlayerMetadata)
-        {
-            EventHandler handler = null;
-            handler = (o, e) =>
-            {
-                LoadedTrackFromFile?.Invoke(this, new TrackLoadedFromFileEventArgs
-                {
-                    FileName = fileName,
-                    Metadata = mediaPlayerMetadata ?? defaultMetadata
-                });
-
-                var eventInfo = o.GetType().GetEvent(startPlayingTrackEventName);
-                eventInfo.RemoveEventHandler(o, handler);
-            };
-
-            StartPlayingTrack += handler;
         }
 
         /// <summary>
@@ -190,19 +184,16 @@ namespace Dukebox.Audio
             {
                 Playing = !Playing;
 
-                if (TrackPaused != null)
+                if (!Playing)
                 {
-                    TrackPaused(this, EventArgs.Empty);
+                    Task.Run(() => TrackPaused?.Invoke(this, EventArgs.Empty));
                 }
             }
             else if (_fileName != string.Empty)
             {
                 LoadFile(_fileName);
 
-                if (StartPlayingTrack != null)
-                {
-                    StartPlayingTrack(this, EventArgs.Empty);
-                }
+                Task.Run(() => StartPlayingTrack?.Invoke(this, EventArgs.Empty));
             }
         }
 
@@ -218,16 +209,18 @@ namespace Dukebox.Audio
                 Bass.BASS_ChannelStop(_stream);
                 _playbackThread.Abort();
 
-                if (FinishedPlayingTrack != null)
-                {
-                    FinishedPlayingTrack(this, EventArgs.Empty);
-                }
+                Task.Run(() => FinishedPlayingTrack?.Invoke(this, EventArgs.Empty));
             }
         }
 
         public void ChangeAudioPosition(double newPositionInSeconds)
         {
-            if (Playing && newPositionInSeconds >= 0 && newPositionInSeconds <=  AudioLengthInSecs)
+            if (!Playing)
+            {
+                PausePlayAudio();
+            }
+
+            if (newPositionInSeconds >= 0 && newPositionInSeconds <=  AudioLengthInSecs)
             {
                 _newPosition = newPositionInSeconds;
             }
@@ -238,9 +231,7 @@ namespace Dukebox.Audio
         /// </summary>
         private void PlayAudioFile()
         {
-            // Create a stream channel from a file.
-            
-            if((new FileInfo(_fileName)).Extension != ".cda")
+            if ((new FileInfo(_fileName)).Extension != ".cda")
             {
                 _stream = Bass.BASS_StreamCreateFile(_fileName, 0L, 0L, BASSFlag.BASS_DEFAULT);
             }
@@ -267,14 +258,15 @@ namespace Dukebox.Audio
                 Playing = true;
                 Stopped = false;
 
-                StartPlayingTrack.Invoke(this, EventArgs.Empty);
+                Task.Run(() => StartPlayingTrack?.Invoke(this, EventArgs.Empty));
+                Task.Run(() => LoadedTrackFromFile?.Invoke(this, _lastLoadedTrackEventArgs));
             }
             else // Error.
             {
                 string msg = string.Format("Error playing file '{0}' [BASS error code: {1}]", _fileName.Split('\\').LastOrDefault(), Bass.BASS_ErrorGetCode().ToString());
                 logger.Error(msg);
 
-                ErrorHandlingAction?.Invoke(msg, "Dukebox: Error Playing File");
+                Task.Run(() => ErrorHandlingAction?.Invoke(msg, "Dukebox: Error Playing File"));
                 return;
             }
 
@@ -287,10 +279,7 @@ namespace Dukebox.Audio
                 {
                     Bass.BASS_ChannelPause(_stream);
 
-                    if (TrackPaused != null)
-                    {
-                        TrackPaused(this, EventArgs.Empty);
-                    }
+                    Task.Run(() => TrackPaused?.Invoke(this, EventArgs.Empty));
 
                     // Wait while audio is paused.
                     while (!Playing && !Stopped)
@@ -303,10 +292,7 @@ namespace Dukebox.Audio
                     {
                         Bass.BASS_ChannelPlay(_stream, false);
 
-                        if (TrackResumed != null)
-                        {
-                            TrackResumed(this, EventArgs.Empty);
-                        }
+                        Task.Run(() => TrackResumed?.Invoke(this, EventArgs.Empty));
                     }
                 }
 
@@ -316,7 +302,7 @@ namespace Dukebox.Audio
                     _newPosition = -1;
                 }
 
-                AudioPositionChanged?.Invoke(this, EventArgs.Empty);
+                Task.Run(() => AudioPositionChanged?.Invoke(this, EventArgs.Empty));
             }
 
             if (Stopped)
@@ -337,10 +323,7 @@ namespace Dukebox.Audio
             Playing = false;
             Stopped = false;
 
-            if (FinishedPlayingTrack != null)
-            {
-                FinishedPlayingTrack(this, EventArgs.Empty);
-            }
+            Task.Run(() => FinishedPlayingTrack?.Invoke(this, EventArgs.Empty));
         }     
 
         /// <summary>
