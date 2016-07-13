@@ -2,12 +2,12 @@
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using log4net;
 using Un4seen.Bass;
 using Un4seen.Bass.AddOn.Cd;
 using Dukebox.Audio.Interfaces;
 using Dukebox.Audio.Model;
-using System.Threading.Tasks;
 
 namespace Dukebox.Audio
 {
