@@ -96,7 +96,7 @@ namespace Dukebox.Audio.Services
 
                         bytesSoFar += length;
 
-                        progressCallback.Invoke(totalLength, bytesSoFar);
+                        progressCallback?.Invoke(totalLength, bytesSoFar);
                     }
                 }
 

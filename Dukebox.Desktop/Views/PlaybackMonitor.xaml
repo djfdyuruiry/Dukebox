@@ -99,10 +99,19 @@
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="0.3*"></ColumnDefinition>
                     <ColumnDefinition Width="auto"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
                 <!-- Playback buttons -->
-                <Grid Name="PlaybackButtonsContainter" Grid.Row="0" Grid.Column="1">
+                <Slider Grid.Row="0" 
+                        Grid.Column="0" 
+                        VerticalAlignment="Center" 
+                        IsMoveToPointEnabled="True"
+                        IsEnabled="{Binding SeekingEnabled}"
+                        Minimum="0"
+                        Maximum="{Binding TrackSecondsTotal}"
+                        Value="{Binding TrackSecondsPassed, Mode=TwoWay}"/>
+                <Grid Name="PlaybackButtonsContainter" Grid.Row="0" Grid.Column="2">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"></RowDefinition>
                     </Grid.RowDefinitions>
