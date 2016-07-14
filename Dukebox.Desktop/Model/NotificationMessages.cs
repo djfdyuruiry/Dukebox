@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Dukebox.Desktop.Model
+﻿namespace Dukebox.Desktop.Model
 {
     public static class NotificationMessages
     {
@@ -13,5 +7,6 @@ namespace Dukebox.Desktop.Model
         public const string LoadingScreenShouldHide = "LoadingScreenShouldHide";
         public const string LoadingScreenShouldClose = "LoadingScreenShouldClose";
         public const string TrackListingDataGridColumnsUpdated = "TrackListingDataGridColumnsUpdated";
+        public const string IntialImportWindowShouldClose = "IntialImportWindowShouldClose";
     }
 }

@@ -29,6 +29,7 @@ namespace Dukebox.Desktop
 
             // window view model
             container.RegisterSingleton<ILoadingScreenViewModel, LoadingScreenViewModel>();
+            container.RegisterSingleton<IInitalImportWindowViewModel, InitalImportWindowViewModel>();
             container.RegisterSingleton<IMainWindowViewModel, MainWindowViewModel>();
             container.RegisterSingleton<IMetadataColumnsSettingsViewModel, MetadataColumnsSettingsViewModel>();
             container.RegisterSingleton<IWatchFolderSettingsViewModel, WatchFolderSettingsViewModel>();

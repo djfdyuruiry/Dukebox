@@ -8,5 +8,6 @@ namespace Dukebox.Desktop.Interfaces
         bool RepeatAll { get; set; }
         bool Shuffle { get; set; }
         List<string> ExtendedMetadataColumnsToShow { get; set; }
+        bool InitalImportHasBeenShown { get; set; }
     }
 }
