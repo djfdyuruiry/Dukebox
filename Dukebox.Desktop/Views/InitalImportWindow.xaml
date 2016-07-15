@@ -4,11 +4,12 @@
         Icon="..\app.ico"
         WindowStartupLocation="CenterScreen"
         Title="Dukebox - Welcome" 
-        Height="280" 
-        Width="550" 
+        Height="300" 
+        Width="600" 
         WindowStyle="ToolWindow"
+        Closing="Window_Closing"
         DataContext="{Binding InitalImportViewModel, Source={StaticResource ViewModelLocator}}">
-    <Grid>
+    <Grid Margin="2">
         <Grid.RowDefinitions>
             <RowDefinition Height="0.4*"></RowDefinition>
             <RowDefinition Height="0.1*"></RowDefinition>
@@ -28,7 +29,7 @@
                 <ColumnDefinition Width="0.3*"></ColumnDefinition>
                 <ColumnDefinition Width="*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
-            <Image Grid.Row="0" Grid.Column="0" Source="..\app.ico" Stretch="Uniform" Margin="5"></Image>
+            <Image Grid.Row="0" Grid.Column="0" Source="..\Graphics\app.png" Stretch="Uniform" Margin="5"></Image>
             <Grid Grid.Row="0" Grid.Column="1">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="2*"></RowDefinition>
@@ -48,12 +49,12 @@
                            Grid.Column="0" 
                            Margin="2" 
                            FontSize="14" 
-                           Text="To get started, browse for a folder you keep music in to add songs to your music library." 
+                           Text="To get started, browse for a folder you keep music in to add songs to your music library" 
                            TextAlignment="Left"
                            TextWrapping="Wrap"/>
                 <TextBlock Grid.Row="2"
                            Grid.Column="0"
-                           FontSize="10" 
+                           FontSize="11" 
                            Margin="2"
                            TextAlignment="Right">
                     <Hyperlink Command="{Binding SkipImport}">Skip Inital Import</Hyperlink>
@@ -77,6 +78,6 @@
         </StackPanel>
         <Separator Grid.Row="3" Grid.Column="0"></Separator>
         <ProgressBar Grid.Row="4" Grid.Column="0" Margin="2" Maximum="{Binding MaximumProgressValue}" Value="{Binding CurrentProgressValue, Mode=OneWay}"></ProgressBar>
-        <TextBlock Grid.Row="5" Grid.Column="0" FontSize="14" Text="{Binding StatusText}" TextAlignment="Right"></TextBlock>
+        <TextBlock Grid.Row="5" Grid.Column="0" FontSize="14" Text="{Binding NotificationText}" TextAlignment="Left"></TextBlock>
     </Grid>
 </Window>

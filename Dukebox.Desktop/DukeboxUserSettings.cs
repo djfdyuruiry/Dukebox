@@ -79,6 +79,14 @@ namespace Dukebox.Desktop
         public DukeboxUserSettings()
         {
             _settings = Settings.Default;
+
+#if DEBUG 
+            _settings.repeat = false;
+            _settings.repeatAll = false;
+            _settings.shuffle = false;
+            _settings.extendedMetadataColumnsToShow = "Year";
+            _settings.initalImportHasBeenShown = false;
+#endif
         }
     }
 }

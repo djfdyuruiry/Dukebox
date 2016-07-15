@@ -1,5 +1,7 @@
-﻿using GalaSoft.MvvmLight.Messaging;
+﻿using System;
 using System.Windows;
+using GalaSoft.MvvmLight.Messaging;
+using Dukebox.Desktop.Interfaces;
 using Dukebox.Desktop.Model;
 
 namespace Dukebox.Desktop.Views
@@ -19,10 +21,23 @@ namespace Dukebox.Desktop.Views
                 {
                     if (nm.Notification == NotificationMessages.IntialImportWindowShouldClose)
                     {
-                        Close();
+                        try
+                        {
+                            Close();
+                        }
+                        catch (Exception)
+                        {
+                            // Window is closing already...
+                        }
                     }
                 });
             });
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            var viewModel = DataContext as IInitalImportWindowViewModel;
+            viewModel?.SkipImport?.Execute(null);
         }
     }
 }

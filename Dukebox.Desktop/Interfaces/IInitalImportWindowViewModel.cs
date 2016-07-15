@@ -7,8 +7,8 @@ namespace Dukebox.Desktop.Interfaces
         string ImportPath { get; }
         string NotificationText { get; }
         string StatusText { get; }
-        int MaximumProgressValue { get; }
-        int CurrentProgressValue { get; }
+        double MaximumProgressValue { get; }
+        double CurrentProgressValue { get; }
         bool ImportHasNotStarted { get; }
         ICommand SelectImportPath { get; }
         ICommand Import { get; }
