@@ -2,7 +2,6 @@
 using MahApps.Metro.Controls;
 using Dukebox.Desktop.Interfaces;
 using Dukebox.Desktop.Model;
-using System.Windows.Controls;
 
 namespace Dukebox.Desktop
 {

@@ -12,6 +12,14 @@ namespace Dukebox.Desktop.ViewModel
             }
         }
 
+        public IInitalImportWindowViewModel InitalImportViewModel
+        {
+            get
+            {
+                return DesktopContainer.GetInstance<IInitalImportWindowViewModel>();
+            }
+        }
+
         // window view model
         public IMainWindowViewModel MainWindow
         {

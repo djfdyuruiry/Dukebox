@@ -1,4 +1,5 @@
 ﻿using System;
+using Dukebox.Library.Helper;
 
 namespace Dukebox.Library.Model
 {
@@ -16,22 +17,14 @@ namespace Dukebox.Library.Model
 
             if (EventType == WatchFolderEventType.DirectoryImport)
             {
-                msg = $"Imported {ImportReport.NumberOfFilesAdded} songs from directory {TruncatePath(ImportReport.DirectoryPath)}";
+                msg = $"Imported {ImportReport.NumberOfFilesAdded} songs from directory {TruncatePathHelper.TruncatePath(ImportReport.DirectoryPath)}";
             }
             else
             {
-                msg = $"{AudioFileImportInfo.Status} file {TruncatePath(AudioFileImportInfo.FileAdded)}";
+                msg = $"{AudioFileImportInfo.Status} file {TruncatePathHelper.TruncatePath(AudioFileImportInfo.FileAdded)}";
             }
 
             return $"{ImportReport?.ImportDateTime ?? DateTime.UtcNow} - {msg}";
-        }
-
-
-        private string TruncatePath(string path)
-        { 
-            var truncatedpath = path.Substring(Math.Max(0, path.Length - trailingReportCharsToPrint));
-
-            return path.Length > truncatedpath.Length ? $"...{truncatedpath}" : path;
         }
     }
 }

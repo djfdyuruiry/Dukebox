@@ -173,6 +173,7 @@
     <Compile Include="Interfaces\IAudioDriveListingViewModel.cs" />
     <Compile Include="Interfaces\IMetadataColumnsSettingsViewModel.cs" />
     <Compile Include="Interfaces\IPlaylistListingViewModel.cs" />
+    <Compile Include="Interfaces\IProgressMonitorViewModel.cs" />
     <Compile Include="Interfaces\ISettingsMenuViewModel.cs" />
     <Compile Include="Interfaces\IWatchFolderSettingsViewModel.cs" />
     <Compile Include="Model\ExtendedMetadataColumnSetting.cs" />
@@ -187,7 +188,7 @@
     <Compile Include="Interfaces\IArtistListingViewModel.cs" />
     <Compile Include="Interfaces\ILoadingScreenViewModel.cs" />
     <Compile Include="Interfaces\IPlaybackMonitorViewModel.cs" />
-    <Compile Include="Interfaces\IProgressMonitorViewModel.cs" />
+    <Compile Include="Interfaces\IInitalImportWindowViewModel.cs" />
     <Compile Include="Interfaces\ISearchControlViewModel.cs" />
     <Compile Include="LoadingScreen.xaml.cs">
       <DependentUpon>LoadingScreen.xaml</DependentUpon>
@@ -214,6 +215,7 @@
     <Compile Include="Interfaces\IHelpMenuViewModel.cs" />
     <Compile Include="Interfaces\IPlaybackMenuViewModel.cs" />
     <Compile Include="Interfaces\IPlaylistMenuViewModel.cs" />
+    <Compile Include="ViewModel\InitalImportWindowViewModel.cs" />
     <Compile Include="ViewModel\InputPromptViewModel.cs" />
     <Compile Include="ViewModel\LoadingScreenViewModel.cs" />
     <Compile Include="ViewModel\MetadataColumnsSettingsViewModel.cs" />
@@ -250,6 +252,9 @@
     </Compile>
     <Compile Include="Views\PlaylistListing.xaml.cs">
       <DependentUpon>PlaylistListing.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\InitalImportWindow.xaml.cs">
+      <DependentUpon>InitalImportWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ProgressMonitor.xaml.cs">
       <DependentUpon>ProgressMonitor.xaml</DependentUpon>
@@ -306,6 +311,10 @@
     <Page Include="Views\PlaylistListing.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\InitalImportWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\ProgressMonitor.xaml">
       <SubType>Designer</SubType>

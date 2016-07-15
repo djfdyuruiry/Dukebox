@@ -70,5 +70,17 @@ namespace Dukebox.Desktop.Properties {
                 this["extendedMetadataColumnsToShow"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool initalImportHasBeenShown {
+            get {
+                return ((bool)(this["initalImportHasBeenShown"]));
+            }
+            set {
+                this["initalImportHasBeenShown"] = value;
+            }
+        }
     }
 }

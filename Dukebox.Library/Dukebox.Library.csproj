@@ -144,6 +144,7 @@
     <Compile Include="Factories\AudioFileMetadataFactory.cs" />
     <Compile Include="Helper\ExtendedMetadataHelper.cs" />
     <Compile Include="Helper\StringToFilenameConverter.cs" />
+    <Compile Include="Helper\TruncatePathHelper.cs" />
     <Compile Include="Interfaces\IMusicLibraryImportService.cs" />
     <Compile Include="Interfaces\IMusicLibraryUpdateService.cs" />
     <Compile Include="Interfaces\IMusicLibraryCacheService.cs" />

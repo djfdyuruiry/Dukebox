@@ -62,9 +62,31 @@ namespace Dukebox.Desktop
             }
         }
 
+        public bool InitalImportHasBeenShown
+        {
+            get
+            {
+                return _settings.initalImportHasBeenShown;
+            }
+
+            set
+            {
+                _settings.initalImportHasBeenShown = value;
+                _settings.Save();
+            }
+        }
+
         public DukeboxUserSettings()
         {
             _settings = Settings.Default;
+
+#if DEBUG 
+            _settings.repeat = false;
+            _settings.repeatAll = false;
+            _settings.shuffle = false;
+            _settings.extendedMetadataColumnsToShow = "Year";
+            _settings.initalImportHasBeenShown = false;
+#endif
         }
     }
 }

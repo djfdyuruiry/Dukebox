@@ -6,12 +6,10 @@ using System.Windows;
 using System.Windows.Input;
 using log4net;
 using GalaSoft.MvvmLight.Command;
-using GalaSoft.MvvmLight.Messaging;
-using Dukebox.Desktop.Helper;
 using Dukebox.Desktop.Interfaces;
-using System.Threading;
 using Dukebox.Desktop.Model;
 using Dukebox.Library.Helper;
+using Dukebox.Desktop.Views;
 
 namespace Dukebox.Desktop.ViewModel
 {
@@ -20,6 +18,7 @@ namespace Dukebox.Desktop.ViewModel
         private static readonly ILog logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private readonly DukeboxInitialisationHelper _initHelper;
+        private readonly IDukeboxUserSettings _userSettings;
 
         private string _notification;
 
@@ -40,9 +39,11 @@ namespace Dukebox.Desktop.ViewModel
 
         public ICommand LoadComponents { get; }
 
-        public LoadingScreenViewModel(DukeboxInitialisationHelper DukeboxInitialisationHelper)
+        public LoadingScreenViewModel(DukeboxInitialisationHelper DukeboxInitialisationHelper, IDukeboxUserSettings userSettings)
         {
             _initHelper = DukeboxInitialisationHelper;
+            _userSettings = userSettings;
+
             LoadComponents = new RelayCommand(() => Task.Run(() => DoLoadComponents()));
         }
         
@@ -79,8 +80,22 @@ namespace Dukebox.Desktop.ViewModel
                 Application.Current.Shutdown();
             }
 
+            if (!_userSettings.InitalImportHasBeenShown)
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    var initalImportWindow = new InitalImportWindow();
+                    initalImportWindow.Show();
+                });
+            }
+
             SendNotificationMessage(NotificationMessages.LoadingScreenShouldHide);
-            SendNotificationMessage(NotificationMessages.LoadingFinished);
+
+            if (_userSettings.InitalImportHasBeenShown)
+            {
+                SendNotificationMessage(NotificationMessages.LoadingFinished);
+            }
+
             SendNotificationMessage(NotificationMessages.LoadingScreenShouldClose);
         }
     }
