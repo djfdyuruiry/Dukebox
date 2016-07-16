@@ -1,36 +1,37 @@
-﻿using System.Threading;
-using TestStack.White;
-using TestStack.White.Factory;
-using TestStack.White.ScreenObjects;
+﻿using System;
+using System.Threading;
 using Xunit;
 using Dukebox.Tests.UI.Screens;
+using Dukebox.Tests.UI.Applciations;
 
 namespace Dukebox.Tests.UI
 {
-    public class MainWindowTests
+    public class MainWindowTests : IDisposable
     {
-        private readonly Application _application;
-        private readonly ScreenRepository _screenRepository;
+        private readonly DukeboxApplication _dukeboxApp;
 
         public MainWindowTests()
         {
-            _application = Application.Launch(@"..\..\..\..\Dukebox.Desktop\bin\x64\Debug\Dukebox.exe");
-            _screenRepository = new ScreenRepository(_application.ApplicationSession);
+            _dukeboxApp = new DukeboxApplication();
+            _dukeboxApp.Launch();
 
-            var initalImportScreen = _screenRepository.Get<InitalImportScreen>("Dukebox - Welcome", InitializeOption.NoCache);
-            initalImportScreen.SkipImport();
+            _dukeboxApp.SkipInitalImport();            
+        }
+
+        public void Dispose()
+        {
+            _dukeboxApp.Dispose();
         }
 
         [Fact]
         public void When_File_Menu_Exit_Item_Clicked_App_Should_Close()
         {
-            var mainScreen = _screenRepository.Get<MainScreen>("Dukebox", InitializeOption.NoCache);
+            var mainScreen = _dukeboxApp.GetScreen<MainScreen>();
+             
             mainScreen.Exit();
-
             Thread.Sleep(250);
 
-            var appIsClosed = _application.ApplicationSession.Application.HasExited;
-
+            var appIsClosed = _dukeboxApp.AppHasExited;
             Assert.True(appIsClosed);
         }
     }

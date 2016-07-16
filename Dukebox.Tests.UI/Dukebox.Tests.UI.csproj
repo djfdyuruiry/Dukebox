@@ -100,6 +100,9 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="Applications\DukeboxApplication.cs" />
+    <Compile Include="Dialogs\HotkeyWarningDialog.cs" />
+    <Compile Include="Helpers\ScreenDialogWindowTitleHelper.cs" />
     <Compile Include="MainWindowTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Screens\InitalImportScreen.cs" />
