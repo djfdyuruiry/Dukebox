@@ -1,16 +1,16 @@
 ﻿using System.Linq;
 using TestStack.White.ScreenObjects;
 using TestStack.White.UIItems;
-using TestStack.White.UIItems.Finders;
 using TestStack.White.UIItems.WindowItems;
 using TestStack.White.UIItems.WindowStripControls;
 using Dukebox.Tests.UI.Controls;
+using TestStack.White.UIItems.Actions;
 
 namespace Dukebox.Tests.UI.Screens
 {
     public class MainScreen : AppScreen
     {
-        public MenuBar ToolbarMenu;
+        private MenuBarControl _menuBar;
 
         public Button CurrentlyPlayingNavIcon;
         public Button LibraryNavIcon;
@@ -31,16 +31,13 @@ namespace Dukebox.Tests.UI.Screens
 
         public MainScreen(Window window, ScreenRepository screenRepository) : base(window, screenRepository)
         {
+            var menuBar = window.Get<MenuBar>("MenuBar");
+            _menuBar = new MenuBarControl(menuBar);
         }
 
-        public virtual void Exit()
+        public virtual MenuBarControl GetMenuBar()
         {
-            var fileMenu = ToolbarMenu.MenuItemBy(SearchCriteria.ByAutomationId("FileMenu"));
-
-            fileMenu
-                .ChildMenus
-                .First(m => m.AutomationElement.Current.AutomationId == "ExitMenuItem")
-                .Click();
+            return _menuBar;
         }
     }
 }

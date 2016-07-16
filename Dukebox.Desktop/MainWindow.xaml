@@ -39,11 +39,11 @@
         </Grid.ColumnDefinitions>
         <!-- Menu bar -->
         <ToolBar Grid.Row="0" Grid.Column="0">
-            <Menu Name="MenuBar" Background="White" AutomationProperties.AutomationId="ToolbarMenu">
-                <MenuItem Header="_File" AutomationProperties.AutomationId="FileMenu" DataContext="{Binding FileMenuViewModel, Source={StaticResource ViewModelLocator}}">
+            <Menu Name="MenuBar" Background="White">
+                <MenuItem Name="FileMenu" Header="_File" DataContext="{Binding FileMenuViewModel, Source={StaticResource ViewModelLocator}}">
                     <MenuItem Header="Play File..." Command="{Binding PlayFile}">
                     </MenuItem>
-                    <MenuItem Header="Play Folder..." Command="{Binding PlayFolder}">
+                    <MenuItem Name="PlayFolderMenuItem" Header="Play Folder..." Command="{Binding PlayFolder}">
                     </MenuItem>
                     <Separator>                        
                     </Separator>
@@ -55,7 +55,7 @@
                     </MenuItem>
                     <Separator>
                     </Separator>
-                    <MenuItem Header="Exit" AutomationProperties.AutomationId="ExitMenuItem" Command="{Binding Exit}">
+                    <MenuItem Name="ExitMenuItem" Header="Exit" Command="{Binding Exit}">
                     </MenuItem>                        
                 </MenuItem>
                 <MenuItem Header="_Audio CD" DataContext="{Binding AudioCdMenuViewModel, Source={StaticResource ViewModelLocator}}">

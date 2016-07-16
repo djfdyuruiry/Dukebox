@@ -25,12 +25,12 @@ namespace Dukebox.Tests.UI.Applciations
                 return ApplicationHandle?.ApplicationSession?.Application?.HasExited ?? false;
             }
         }
-        
+
         public void Launch(bool dismissHotkeyWarningDialog)
         {
             ApplicationHandle = Application.Launch(binPath);
             ScreenRepository = new ScreenRepository(ApplicationHandle.ApplicationSession);
-            
+
             WaitForFirstWindow();
 
             if (dismissHotkeyWarningDialog)
@@ -72,6 +72,17 @@ namespace Dukebox.Tests.UI.Applciations
             var screen = ScreenRepository.Get<T>(windowTitle, InitializeOption.NoCache);
 
             return screen;
+        }
+
+        public T GetModal<T>() where T : AppScreen
+        {
+            var modalTitle = ScreenDialogWindowTitleHelper.GetWindowTitleForScreenDialog<T>();
+            var mainWindow = ApplicationHandle.GetWindows()
+                .First(w => w.Title.Equals(ScreenDialogWindowTitleHelper.GetWindowTitleForScreenDialog<MainScreen>()));
+
+            var modal = ScreenRepository.GetModal<T>(modalTitle, mainWindow, InitializeOption.NoCache);
+
+            return modal;
         }
 
         public void SkipInitalImport()

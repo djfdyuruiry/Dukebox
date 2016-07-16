@@ -16,6 +16,7 @@ namespace Dukebox.Tests.UI.Helpers
                 {typeof(HotkeyWarningDialog), "Dukebox - Error Registering Hot Keys"},
                 {typeof(InitalImportScreen), "Dukebox - Welcome"},
                 {typeof(MainScreen), "Dukebox"},
+                {typeof(SelectFolderDialog), "Browse For Folder" }
             };
         }
 
