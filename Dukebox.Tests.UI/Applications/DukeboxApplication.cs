@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using TestStack.White;
 using TestStack.White.Configuration;
@@ -7,8 +8,6 @@ using TestStack.White.ScreenObjects;
 using Dukebox.Tests.UI.Dialogs;
 using Dukebox.Tests.UI.Screens;
 using Dukebox.Tests.UI.Helpers;
-using System.Linq;
-using TestStack.White.Reporting.Configuration;
 
 namespace Dukebox.Tests.UI.Applciations
 {
