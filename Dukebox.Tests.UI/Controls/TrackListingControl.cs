@@ -6,17 +6,19 @@ using TestStack.White.UIItems.WPFUIItems;
 namespace Dukebox.Tests.UI.Controls
 {
     [ControlTypeMapping(CustomUIItemType.Custom)]
-    public class ArtistListingControl : CustomUIItem
+    public class TrackListingControl : CustomUIItem
     {
         public SearchControl SearchControl { get; private set; }
+        public TrackListingsGrid TrackListingsGrid { get; private set; }
 
-        public ArtistListingControl(AutomationElement automationElement, ActionListener actionListener) 
+        public TrackListingControl(AutomationElement automationElement, ActionListener actionListener) 
             : base(automationElement, actionListener)
         {
             SearchControl = this.Get<SearchControl>("SearchUserControl");
+            TrackListingsGrid = this.Get<TrackListingsGrid>("TrackListingsGrid");
         }
 
-        public ArtistListingControl()
+        public TrackListingControl()
         {
         }
     }

@@ -235,15 +235,15 @@
                         <ColumnDefinition Width="*"></ColumnDefinition>
                     </Grid.ColumnDefinitions>
                     <ContentControl Grid.Row="1" Grid.Column="0" Visibility="{Binding ShowTrackListingPreview}">
-                        <DukeboxViews:TrackListing DataContext="{Binding TrackListingPreview, Source={StaticResource ViewModelLocator}}">
+                        <DukeboxViews:TrackListing x:Name="TrackListingPreviewControl" DataContext="{Binding TrackListingPreview, Source={StaticResource ViewModelLocator}}">
                         </DukeboxViews:TrackListing>
                     </ContentControl>
                     <ContentControl Grid.Row="0" Grid.Column="0" Visibility="{Binding ShowCurrentlyPlayingListing}">
-                        <DukeboxViews:TrackListing DataContext="{Binding CurrentlyPlayingListing, Source={StaticResource ViewModelLocator}}">
+                        <DukeboxViews:TrackListing x:Name="CurrentlyPlayingListingControl" DataContext="{Binding CurrentlyPlayingListing, Source={StaticResource ViewModelLocator}}">
                         </DukeboxViews:TrackListing>
                     </ContentControl>
                     <ContentControl Grid.Row="0" Grid.Column="0" Visibility="{Binding ShowLibraryListing}">
-                        <DukeboxViews:TrackListing DataContext="{Binding LibraryListing, Source={StaticResource ViewModelLocator}}">
+                        <DukeboxViews:TrackListing x:Name="LibraryListingControl" DataContext="{Binding LibraryListing, Source={StaticResource ViewModelLocator}}">
                         </DukeboxViews:TrackListing>
                     </ContentControl>
                     <ContentControl Grid.Row="0" Grid.Column="0" Visibility="{Binding ShowAlbumListing}">
@@ -255,7 +255,7 @@
                         </DukeboxViews:ArtistListing>
                     </ContentControl>
                     <ContentControl Grid.Row="0" Grid.Column="0" Visibility="{Binding ShowRecentlyPlayedListing}">
-                        <DukeboxViews:TrackListing DataContext="{Binding RecentlyPlayedListing, Source={StaticResource ViewModelLocator}}">
+                        <DukeboxViews:TrackListing x:Name="RecentlyPlayedListingControl" DataContext="{Binding RecentlyPlayedListing, Source={StaticResource ViewModelLocator}}">
                         </DukeboxViews:TrackListing>
                     </ContentControl>
                     <ContentControl Grid.Row="0" Grid.Column="0" Visibility="{Binding ShowPlaylistListing}">

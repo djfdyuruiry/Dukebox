@@ -10,7 +10,7 @@ namespace Dukebox.Tests.UI.Screens
 {
     public class MainScreen : AppScreen
     {
-        protected MenuBar ToolbarMenu;
+        public MenuBar ToolbarMenu;
 
         public Button CurrentlyPlayingNavIcon;
         public Button LibraryNavIcon;
@@ -20,10 +20,14 @@ namespace Dukebox.Tests.UI.Screens
         public Button PlaylistNavIcon;
         public Button AudioCdNavIcon;
 
+        public TrackListingControl CurrentlyPlayingListingControl;
+        public TrackListingControl LibraryListingControl;
         public AlbumListingControl AlbumListingControl;
         public ArtistListingControl ArtistListingControl;
         public PlaylistListingControl PlaylistListingControl;
+        public TrackListingControl RecentlyPlayedListingControl;
         public AudioCdListingControl AudioCdListingControl;
+        public TrackListingControl TrackListingPreviewControl;
 
         public MainScreen(Window window, ScreenRepository screenRepository) : base(window, screenRepository)
         {

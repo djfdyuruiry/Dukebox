@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              mc:Ignorable="d" 
+             Name="SearchUserControl"
              d:DesignHeight="30" d:DesignWidth="1016">
     <Grid>
         <!-- Visibility="{Binding SearchEnabled, Converter={StaticResource ResourceKey=BoolToVisibilityConverter}}"> -->
@@ -15,15 +16,16 @@
             <ColumnDefinition Width="0.03*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <TextBox Grid.Row="0" 
-                     Grid.Column="0" 
-                     Name="SearchText" 
-                     FontSize="18"
-                     Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
-                     IsEnabled="{Binding SearchEnabled}"></TextBox>
+                 Grid.Column="0" 
+                 Name="SearchText" 
+                 FontSize="18"
+                 Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                 IsEnabled="{Binding SearchEnabled}"></TextBox>
         <Button Grid.Row="0" 
-                    Grid.Column="1" 
-                    IsEnabled="{Binding SearchEnabled}"
-                    Command="{Binding ClearSearch}">
+                Grid.Column="1" 
+                Name="SearchButton"
+                IsEnabled="{Binding SearchEnabled}"
+                Command="{Binding ClearSearch}">
             <Image Height="auto" Width="auto" Source="../Graphics/ic_close_48px.png"></Image>
         </Button>
     </Grid>
