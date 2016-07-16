@@ -57,7 +57,7 @@
                            FontSize="11" 
                            Margin="2"
                            TextAlignment="Right">
-                    <Hyperlink Command="{Binding SkipImport}">Skip Inital Import</Hyperlink>
+                    <Hyperlink AutomationProperties.AutomationId="SkipImportLink" Command="{Binding SkipImport}">Skip Inital Import</Hyperlink>
                 </TextBlock>
             </Grid>
         </Grid>
