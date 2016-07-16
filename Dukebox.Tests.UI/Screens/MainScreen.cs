@@ -1,16 +1,13 @@
-﻿using System.Linq;
-using TestStack.White.ScreenObjects;
+﻿using TestStack.White.ScreenObjects;
 using TestStack.White.UIItems;
 using TestStack.White.UIItems.WindowItems;
-using TestStack.White.UIItems.WindowStripControls;
 using Dukebox.Tests.UI.Controls;
-using TestStack.White.UIItems.Actions;
 
 namespace Dukebox.Tests.UI.Screens
 {
     public class MainScreen : AppScreen
     {
-        private MenuBarControl _menuBar;
+        private readonly MenuBarControl _menuBar;
 
         public Button CurrentlyPlayingNavIcon;
         public Button LibraryNavIcon;
@@ -31,8 +28,7 @@ namespace Dukebox.Tests.UI.Screens
 
         public MainScreen(Window window, ScreenRepository screenRepository) : base(window, screenRepository)
         {
-            var menuBar = window.Get<MenuBar>("MenuBar");
-            _menuBar = new MenuBarControl(menuBar);
+            _menuBar = new MenuBarControl(window);
         }
 
         public virtual MenuBarControl GetMenuBar()

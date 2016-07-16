@@ -1,4 +1,4 @@
-﻿using TestStack.White.UIItems.Finders;
+﻿using TestStack.White.UIItems.WindowItems;
 using TestStack.White.UIItems.WindowStripControls;
 
 namespace Dukebox.Tests.UI.Controls
@@ -9,12 +9,11 @@ namespace Dukebox.Tests.UI.Controls
 
         public FileMenuControl FileMenu { get; private set; }
 
-        public MenuBarControl(MenuBar menuBar)
+        public MenuBarControl(Window window)
         {
-            _menuBar = menuBar;
-
-            var fileMenu = _menuBar.MenuItemBy(SearchCriteria.ByAutomationId("FileMenu"));
-            FileMenu = new FileMenuControl(fileMenu);
+            _menuBar = window.Get<MenuBar>("MenuBar");
+                        
+            FileMenu = new FileMenuControl(_menuBar);
         }
     }
 }
