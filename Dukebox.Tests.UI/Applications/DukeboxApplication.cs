@@ -26,16 +26,17 @@ namespace Dukebox.Tests.UI.Applciations
             }
         }
         
-        public void Launch()
+        public void Launch(bool dismissHotkeyWarningDialog)
         {
             ApplicationHandle = Application.Launch(binPath);
             ScreenRepository = new ScreenRepository(ApplicationHandle.ApplicationSession);
-
-
-
+            
             WaitForFirstWindow();
 
-            DismissHotkeyWarningDialogIfPresent();
+            if (dismissHotkeyWarningDialog)
+            {
+                DismissHotkeyWarningDialogIfPresent();
+            }
         }
 
         private void WaitForFirstWindow()

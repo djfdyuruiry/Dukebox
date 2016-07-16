@@ -1,14 +1,29 @@
 ﻿using System.Linq;
 using TestStack.White.ScreenObjects;
+using TestStack.White.UIItems;
 using TestStack.White.UIItems.Finders;
 using TestStack.White.UIItems.WindowItems;
 using TestStack.White.UIItems.WindowStripControls;
+using Dukebox.Tests.UI.Controls;
 
 namespace Dukebox.Tests.UI.Screens
 {
     public class MainScreen : AppScreen
     {
         protected MenuBar ToolbarMenu;
+
+        public Button CurrentlyPlayingNavIcon;
+        public Button LibraryNavIcon;
+        public Button AlbumsNavIcon;
+        public Button ArtistsNavIcon;
+        public Button RecentlyPlayedNavIcon;
+        public Button PlaylistNavIcon;
+        public Button AudioCdNavIcon;
+
+        public AlbumListingControl AlbumListingControl;
+        public ArtistListingControl ArtistListingControl;
+        public PlaylistListingControl PlaylistListingControl;
+        public AudioCdListingControl AudioCdListingControl;
 
         public MainScreen(Window window, ScreenRepository screenRepository) : base(window, screenRepository)
         {
