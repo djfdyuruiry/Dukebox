@@ -30,7 +30,7 @@ namespace Dukebox.Tests.UI.Helpers
 
             var screenshotInfoJson = JsonConvert.SerializeObject(screenshotInfo);
 
-            File.AppendAllText(csvLogName, screenshotInfoJson);
+            File.AppendAllText(csvLogName, $"{screenshotInfoJson}\n");
         }
     }
 }
