@@ -66,6 +66,11 @@ namespace Dukebox.Tests.UI.Dialogs
                     targetNode.Focus();
                     i--;
                 }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine($"Error while looking up Select Folder Dialog node with name '{nodeText}': {ex}");
+                    throw;
+                }
             }
 
             Ok.Click();
