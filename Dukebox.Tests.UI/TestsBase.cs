@@ -18,6 +18,8 @@ namespace Dukebox.Tests.UI
         private readonly TestsBaseOptions _options;
         private readonly string _testClassName;
 
+        private bool lastTestResult;
+
         protected readonly DukeboxApplication _dukeboxApp;
 
         static TestsBase()
@@ -42,7 +44,9 @@ namespace Dukebox.Tests.UI
 
             _testClassName = GetType().FullName;
 
-            DeleteUserDataIfInReleaseMode();
+#if !DEBUG
+            DeleteUserDataIfPresent();
+#endif
 
             _dukeboxApp = new DukeboxApplication();
             _dukeboxApp.Launch(_options.DismissHotkeyWarningDialog);
@@ -53,7 +57,7 @@ namespace Dukebox.Tests.UI
             }
         }
 
-        private void DeleteUserDataIfInReleaseMode()
+        private void DeleteUserDataIfPresent()
         {
             var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
             appDataPath = Path.Combine(appDataPath, appDataFolderName);
@@ -87,11 +91,13 @@ namespace Dukebox.Tests.UI
 
                 if (_options.SaveScreenshotsForPassingTests)
                 {
+                    lastTestResult = true;
                     TakeScreenshot(testMethodName, true);
                 }
             }
             catch (Exception)
             {
+                lastTestResult = false;
                 TakeScreenshot(testMethodName, false);
                 throw;
             }

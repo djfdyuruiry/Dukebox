@@ -119,6 +119,8 @@ namespace Dukebox.Tests.Unit
             {
                 var completeAction = e.Arguments[3] as Action<DirectoryImportReport>;
 
+                Thread.Sleep(250);
+
                 completeAction?.Invoke(new DirectoryImportReport());
 
                 await Task.CompletedTask;

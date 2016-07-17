@@ -7,12 +7,15 @@ using TestStack.White.ScreenObjects.ScreenAttributes;
 using TestStack.White.UIItems;
 using TestStack.White.UIItems.TreeItems;
 using TestStack.White.UIItems.WindowItems;
+using Dukebox.Tests.UI.Helpers;
 
 namespace Dukebox.Tests.UI.Dialogs
 {
     public class SelectFolderDialog : AppScreen
     {
         private const string nodeNotVisibleText = "expand button not visible";
+
+        private static readonly string rootComputerNodeName;
 
         [AutomationId("100")]
         protected Tree FolderTree;
@@ -21,6 +24,11 @@ namespace Dukebox.Tests.UI.Dialogs
         public Button Ok;
         [AutomationId("2")]
         public Button Cancel;
+
+        static SelectFolderDialog()
+        {
+            rootComputerNodeName = OperatingSystemVersionHelper.OsIsWindows8OrAbove ? "This PC" : "Computer";
+        }
 
         public SelectFolderDialog(Window window, ScreenRepository screenRepository) : base(window, screenRepository)
         {
@@ -35,7 +43,7 @@ namespace Dukebox.Tests.UI.Dialogs
             var drive = explodedPath[0];
 
             explodedPath[0] = $"Local Disk ({drive})";
-            explodedPath.Insert(0, "This PC");
+            explodedPath.Insert(0, rootComputerNodeName);
 
             var targetNode = FolderTree.Nodes.First();
 

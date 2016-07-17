@@ -117,6 +117,7 @@
     <Compile Include="Controls\ArtistListingControl.cs" />
     <Compile Include="Controls\AlbumListingControl.cs" />
     <Compile Include="Dialogs\HotkeyWarningDialog.cs" />
+    <Compile Include="Helpers\OperatingSystemVersionHelper.cs" />
     <Compile Include="Helpers\ScreenDialogWindowTitleHelper.cs" />
     <Compile Include="FileMenuTests.cs" />
     <Compile Include="Dialogs\SelectFolderDialog.cs" />
