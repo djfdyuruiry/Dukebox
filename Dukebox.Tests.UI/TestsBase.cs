@@ -1,10 +1,11 @@
 ﻿using System;
+using System.IO;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using Xunit;
 using Dukebox.Tests.UI.Applciations;
 using Dukebox.Tests.UI.Helpers;
 using Dukebox.Tests.UI.Model;
-using System.IO;
-using System.Runtime.CompilerServices;
 
 namespace Dukebox.Tests.UI
 {
@@ -13,15 +14,13 @@ namespace Dukebox.Tests.UI
         protected static readonly WindowScreenshotHelper _screenshotHelper;
 
         private readonly TestsBaseOptions _options;
-        protected readonly DukeboxApplication _dukeboxApp;
+        private readonly string _testClassName;
 
-        public TestsBase() : this(new TestsBaseOptions())
-        {
-        }
+        protected readonly DukeboxApplication _dukeboxApp;
 
         static TestsBase()
         {
-            var currentPath = Path.Combine(Environment.CurrentDirectory, "screenshots");
+            var currentPath = Path.Combine(Environment.CurrentDirectory, "target/screenshots");
 
             if (Directory.Exists(currentPath))
             {
@@ -31,9 +30,15 @@ namespace Dukebox.Tests.UI
             _screenshotHelper = new WindowScreenshotHelper(currentPath);
         }
 
+        public TestsBase() : this(new TestsBaseOptions())
+        {
+        }
+
         public TestsBase(TestsBaseOptions options)
         {            
             _options = options;
+
+            _testClassName = GetType().FullName;
 
             _dukeboxApp = new DukeboxApplication();
             _dukeboxApp.Launch(_options.DismissHotkeyWarningDialog);
@@ -51,30 +56,64 @@ namespace Dukebox.Tests.UI
 
         protected void AssertTrue(bool assertion, string message, [CallerMemberName] string testMethodName = null)
         {
-            if (!assertion || _options.SaveScreenshotsForPassingTests)
-            {
-                TakeScreenshots(testMethodName);
-            }
-
-            Assert.True(assertion, message);
+            DoAssertWithSnaphot(() => Assert.True(assertion, message), testMethodName);
         }
 
         protected void AssertFalse(bool assertion, string message, [CallerMemberName] string testMethodName = null)
         {
-            if (assertion || _options.SaveScreenshotsForPassingTests)
-            {
-                TakeScreenshots(testMethodName);
-            }
-
-            Assert.False(assertion, message);
+            DoAssertWithSnaphot(() => Assert.False(assertion, message), testMethodName);
         }
 
-        private void TakeScreenshots(string testMethodName)
+        private void DoAssertWithSnaphot(Action assertionAction, string testMethodName)
         {
-            var appWindows = _dukeboxApp.ApplicationHandle.GetWindows();
-            var screenshotPaths = _screenshotHelper.TakeWindowScreenshots(appWindows, testMethodName);
+            try
+            {
+                assertionAction?.Invoke();
 
-            screenshotPaths.ForEach(ScreenshotCsvLogger.LogScreenshot);
+                if (_options.SaveScreenshotsForPassingTests)
+                {
+                    TakeScreenshot(testMethodName, true);
+                }
+            }
+            catch (Exception)
+            {
+                TakeScreenshot(testMethodName, false);
+                throw;
+            }
+        }
+
+        private void TakeScreenshot(string testMethodName, bool testPassed)
+        {
+            var testClassAndMethodName = $"{_testClassName}.{testMethodName}";
+
+            try
+            {
+                var appWindows = _dukeboxApp.ApplicationHandle.GetWindows();
+
+                if (_options.ScreenshotAllWindows)
+                {
+                    _screenshotHelper.TakeWindowScreenshots(appWindows, testClassAndMethodName);
+                }
+                else
+                {
+                    var appWindow = appWindows.First();
+                    _screenshotHelper.TakeWindowScreenshot(appWindow, testClassAndMethodName);
+                }
+
+                var screenshotInfo = new CapturedUiScreenshotInfo
+                {
+                    Method = testClassAndMethodName,
+                    Class = _testClassName
+                };
+
+                screenshotInfo.SetStatus(testPassed);
+
+                ScreenshotCsvLogger.LogScreenshot(screenshotInfo);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error occurred while saving screenshot for unit test {testClassAndMethodName}: {ex}");
+            }
         }
     }
 }

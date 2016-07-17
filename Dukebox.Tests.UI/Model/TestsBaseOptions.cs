@@ -5,12 +5,14 @@
         public bool SkipInitalImport { get; set; }
         public bool DismissHotkeyWarningDialog { get; set; }
         public bool SaveScreenshotsForPassingTests { get; set; }
+        public bool ScreenshotAllWindows { get; set; }
 
         public TestsBaseOptions()
         {
             SkipInitalImport = true;
             DismissHotkeyWarningDialog = true;
-            SaveScreenshotsForPassingTests = false;
+            SaveScreenshotsForPassingTests = true;
+            ScreenshotAllWindows = true;
         }
     }
 }

@@ -19,8 +19,9 @@ namespace Dukebox.Tests.UI
             menuBar.FileMenu.PlayFolder.Click();
 
             Thread.Sleep(250);
-
+            
             var folderBrowser = _dukeboxApp.GetModal<SelectFolderDialog>();
+          
             folderBrowser.SetFolderPathAndClickOk(folderPath);
             
             Thread.Sleep(250);

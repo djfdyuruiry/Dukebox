@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using TestStack.White.UIItems.WindowItems;
-using Dukebox.Library.Helper;
 
 namespace Dukebox.Tests.UI.Helpers
 {
@@ -48,7 +48,7 @@ namespace Dukebox.Tests.UI.Helpers
             OutputPath = outputDirectory;
         }
 
-        public List<string> TakeWindowScreenshots(List<Window> windows, string screenshotPrefix)
+        public string TakeWindowScreenshots(List<Window> windows, string screenshotName)
         {
             if (windows == null)
             {
@@ -57,29 +57,51 @@ namespace Dukebox.Tests.UI.Helpers
 
             if (!windows.Any())
             {
-                return new List<string>();
+                throw new InvalidOperationException($"Parameter list {nameof(windows)} is empty");
             }
 
-            var screenshotPaths = windows.Select(w => TakeWindowScreenshot(w, screenshotPrefix)).ToList();
+            var width = windows.Max(w => w.Bounds.Width);
+            var height = windows.Sum(w => w.Bounds.Height);
 
-            return screenshotPaths;
+            using (var image = new Bitmap((int)width, (int)height))
+            {
+                var imageGraphics = Graphics.FromImage(image);
+                var currentY = 0;
+
+                foreach (var window in windows)
+                {
+                    var windowImage = window.VisibleImage;
+
+                    imageGraphics.DrawImage(windowImage, 0, currentY);
+
+                    currentY += windowImage.Height;
+                }
+
+                return SaveWindowScreenshot(image, screenshotName);
+            }
         }
 
-        public string TakeWindowScreenshot(Window window, string screenshotPrefix)
+        private string SaveWindowScreenshot(Image image, string screenshotName)
         {
-            var windowTitle = string.IsNullOrEmpty(window.Title) ? Guid.NewGuid().ToString().Substring(0, 4) : window.Title;
-            var fileName = $"{screenshotPrefix ?? string.Empty}_{windowTitle}_{DateTime.UtcNow}{ScreenshotFileExtension}";
-
-            fileName = StringToFilenameConverter.ConvertStringToValidFileName(fileName);
-
-            var filePath = Path.Combine(OutputPath, fileName);
-
-            using (var windowImage = window.VisibleImage)
+            if (string.IsNullOrEmpty(screenshotName))
             {
-                windowImage.Save(filePath, ScreenshotImageFormat);
+                throw new ArgumentNullException(nameof(screenshotName));
             }
 
+            var filePath = $"{screenshotName}{ScreenshotFileExtension}";
+            filePath = Path.Combine(OutputPath, filePath);
+
+            image.Save(filePath, ScreenshotImageFormat);
+
             return filePath;
+        }
+
+        public string TakeWindowScreenshot(Window window, string screenshotName)
+        {
+            using (var windowImage = window.VisibleImage)
+            {
+                return SaveWindowScreenshot(windowImage, screenshotName);
+            }            
         }
     }
 }

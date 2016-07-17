@@ -59,6 +59,11 @@
       <HintPath>..\packages\Castle.Core.3.3.0\lib\net45\Castle.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
     <Reference Include="TestStack.White, Version=0.13.0.0, Culture=neutral, PublicKeyToken=2672efbf3e161801, processorArchitecture=MSIL">
@@ -115,8 +120,9 @@
     <Compile Include="Helpers\ScreenDialogWindowTitleHelper.cs" />
     <Compile Include="FileMenuTests.cs" />
     <Compile Include="Dialogs\SelectFolderDialog.cs" />
-    <Compile Include="Helpers\ScreenshotCsvLogHelper.cs" />
+    <Compile Include="Helpers\ScreenshotJsonReportHelper.cs" />
     <Compile Include="Helpers\WindowScreenshotHelper.cs" />
+    <Compile Include="Model\CapturedUiScreenshotInfo.cs" />
     <Compile Include="Model\TestsBaseOptions.cs" />
     <Compile Include="Model\Track.cs" />
     <Compile Include="NavigationTests.cs" />
@@ -133,10 +139,6 @@
     <ProjectReference Include="..\Dukebox.Desktop\Dukebox.Desktop.csproj">
       <Project>{2ce69f0e-15ed-47ae-a285-4197d458443f}</Project>
       <Name>Dukebox.Desktop</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Dukebox.Library\Dukebox.Library.csproj">
-      <Project>{6c5b8890-79a4-43ee-9734-b5db714fcf16}</Project>
-      <Name>Dukebox.Library</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>
