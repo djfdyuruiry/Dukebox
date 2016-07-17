@@ -11,6 +11,8 @@ namespace Dukebox.Tests.UI
 {
     public class TestsBase : IDisposable
     {
+        private const string appDataFolderName = "Dukebox";
+
         protected static readonly WindowScreenshotHelper _screenshotHelper;
 
         private readonly TestsBaseOptions _options;
@@ -40,12 +42,25 @@ namespace Dukebox.Tests.UI
 
             _testClassName = GetType().FullName;
 
+            DeleteUserDataIfInReleaseMode();
+
             _dukeboxApp = new DukeboxApplication();
             _dukeboxApp.Launch(_options.DismissHotkeyWarningDialog);
 
             if (_options.SkipInitalImport)
             {
                 _dukeboxApp.SkipInitalImport();
+            }
+        }
+
+        private void DeleteUserDataIfInReleaseMode()
+        {
+            var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            appDataPath = Path.Combine(appDataPath, appDataFolderName);
+
+            if (Directory.Exists(appDataPath))
+            {
+                Directory.Delete(appDataPath, true);
             }
         }
 
