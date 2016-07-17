@@ -13,7 +13,11 @@ namespace Dukebox.Tests.UI.Applciations
 {
     public class DukeboxApplication : IDisposable
     {
+#if !DEBUG
         private const string binPath = @"..\..\..\..\Dukebox.Desktop\bin\x64\Release\Dukebox.exe";
+#else
+        private const string binPath = @"..\..\..\..\Dukebox.Desktop\bin\x64\Debug\Dukebox.exe";
+#endif
 
         public Application ApplicationHandle { get; private set; }
         public ScreenRepository ScreenRepository { get; private set; }

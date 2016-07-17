@@ -10,14 +10,14 @@ namespace Dukebox.Tests.UI.Helpers
         {
             get
             {
-                return OsVersion > 6.1f;
+                return OsVersion >= 6.2;
             }
         }
         public static bool OsIsWindows7OrBelow
         {
             get
             {
-                return OsVersion < 6.2f;
+                return OsVersion <= 6.1;
             }
         }
 
