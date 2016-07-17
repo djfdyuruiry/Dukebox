@@ -40,10 +40,10 @@
         <!-- Menu bar -->
         <ToolBar Grid.Row="0" Grid.Column="0">
             <Menu Name="MenuBar" Background="White">
-                <MenuItem Header="_File" DataContext="{Binding FileMenuViewModel, Source={StaticResource ViewModelLocator}}">
+                <MenuItem Name="FileMenu" Header="_File" DataContext="{Binding FileMenuViewModel, Source={StaticResource ViewModelLocator}}">
                     <MenuItem Header="Play File..." Command="{Binding PlayFile}">
                     </MenuItem>
-                    <MenuItem Header="Play Folder..." Command="{Binding PlayFolder}">
+                    <MenuItem Name="PlayFolderMenuItem" Header="Play Folder..." Command="{Binding PlayFolder}">
                     </MenuItem>
                     <Separator>                        
                     </Separator>
@@ -55,7 +55,7 @@
                     </MenuItem>
                     <Separator>
                     </Separator>
-                    <MenuItem Header="Exit" Command="{Binding Exit}">
+                    <MenuItem Name="ExitMenuItem" Header="Exit" Command="{Binding Exit}">
                     </MenuItem>                        
                 </MenuItem>
                 <MenuItem Header="_Audio CD" DataContext="{Binding AudioCdMenuViewModel, Source={StaticResource ViewModelLocator}}">
@@ -235,15 +235,15 @@
                         <ColumnDefinition Width="*"></ColumnDefinition>
                     </Grid.ColumnDefinitions>
                     <ContentControl Grid.Row="1" Grid.Column="0" Visibility="{Binding ShowTrackListingPreview}">
-                        <DukeboxViews:TrackListing DataContext="{Binding TrackListingPreview, Source={StaticResource ViewModelLocator}}">
+                        <DukeboxViews:TrackListing x:Name="TrackListingPreviewControl" DataContext="{Binding TrackListingPreview, Source={StaticResource ViewModelLocator}}">
                         </DukeboxViews:TrackListing>
                     </ContentControl>
                     <ContentControl Grid.Row="0" Grid.Column="0" Visibility="{Binding ShowCurrentlyPlayingListing}">
-                        <DukeboxViews:TrackListing DataContext="{Binding CurrentlyPlayingListing, Source={StaticResource ViewModelLocator}}">
+                        <DukeboxViews:TrackListing x:Name="CurrentlyPlayingListingControl" DataContext="{Binding CurrentlyPlayingListing, Source={StaticResource ViewModelLocator}}">
                         </DukeboxViews:TrackListing>
                     </ContentControl>
                     <ContentControl Grid.Row="0" Grid.Column="0" Visibility="{Binding ShowLibraryListing}">
-                        <DukeboxViews:TrackListing DataContext="{Binding LibraryListing, Source={StaticResource ViewModelLocator}}">
+                        <DukeboxViews:TrackListing x:Name="LibraryListingControl" DataContext="{Binding LibraryListing, Source={StaticResource ViewModelLocator}}">
                         </DukeboxViews:TrackListing>
                     </ContentControl>
                     <ContentControl Grid.Row="0" Grid.Column="0" Visibility="{Binding ShowAlbumListing}">
@@ -255,7 +255,7 @@
                         </DukeboxViews:ArtistListing>
                     </ContentControl>
                     <ContentControl Grid.Row="0" Grid.Column="0" Visibility="{Binding ShowRecentlyPlayedListing}">
-                        <DukeboxViews:TrackListing DataContext="{Binding RecentlyPlayedListing, Source={StaticResource ViewModelLocator}}">
+                        <DukeboxViews:TrackListing x:Name="RecentlyPlayedListingControl" DataContext="{Binding RecentlyPlayedListing, Source={StaticResource ViewModelLocator}}">
                         </DukeboxViews:TrackListing>
                     </ContentControl>
                     <ContentControl Grid.Row="0" Grid.Column="0" Visibility="{Binding ShowPlaylistListing}">
