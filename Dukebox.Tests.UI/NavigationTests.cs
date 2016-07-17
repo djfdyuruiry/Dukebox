@@ -14,7 +14,7 @@ namespace Dukebox.Tests.UI
 
             var listingWasShown = mainScreen.CurrentlyPlayingListingControl.Visible;
 
-            Assert.True(listingWasShown, "App failed to show currently playing listing when nav icon was clicked");
+            AssertTrue(listingWasShown, "App failed to show currently playing listing when nav icon was clicked");
         }
 
         [Fact]
@@ -26,7 +26,7 @@ namespace Dukebox.Tests.UI
 
             var listingWasShown = mainScreen.LibraryListingControl.Visible;
 
-            Assert.True(listingWasShown, "App failed to show library listing when nav icon was clicked");
+            AssertTrue(listingWasShown, "App failed to show library listing when nav icon was clicked");
         }
 
         [Fact]
@@ -38,7 +38,7 @@ namespace Dukebox.Tests.UI
 
             var listingWasShown = mainScreen.AlbumListingControl.Visible;
 
-            Assert.True(listingWasShown, "App failed to show album listing when nav icon was clicked");
+            AssertTrue(listingWasShown, "App failed to show album listing when nav icon was clicked");
         }
 
         [Fact]
@@ -50,7 +50,7 @@ namespace Dukebox.Tests.UI
 
             var listingWasShown = mainScreen.ArtistListingControl.Visible;
 
-            Assert.True(listingWasShown, "App failed to show artist listing when nav icon was clicked");
+            AssertTrue(listingWasShown, "App failed to show artist listing when nav icon was clicked");
         }
 
         [Fact]
@@ -62,7 +62,7 @@ namespace Dukebox.Tests.UI
 
             var listingWasShown = mainScreen.PlaylistListingControl.Visible;
 
-            Assert.True(listingWasShown, "App failed to show playlist listing when nav icon was clicked");
+            AssertTrue(listingWasShown, "App failed to show playlist listing when nav icon was clicked");
         }
 
         [Fact]
@@ -74,7 +74,7 @@ namespace Dukebox.Tests.UI
 
             var listingWasShown = mainScreen.RecentlyPlayedListingControl.Visible;
 
-            Assert.True(listingWasShown, "App failed to show recently playing listing when nav icon was clicked");
+            AssertTrue(listingWasShown, "App failed to show recently playing listing when nav icon was clicked");
         }
 
         [Fact]
@@ -86,7 +86,7 @@ namespace Dukebox.Tests.UI
 
             var listingWasShown = mainScreen.AudioCdListingControl.Visible;
 
-            Assert.True(listingWasShown, "App failed to show audio cd listing when nav icon was clicked");
+            AssertTrue(listingWasShown, "App failed to show audio cd listing when nav icon was clicked");
         }
     }
 }

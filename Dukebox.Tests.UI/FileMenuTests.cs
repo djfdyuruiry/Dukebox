@@ -30,7 +30,7 @@ namespace Dukebox.Tests.UI
 
             var allTracksLoaded = loadedTracks.Count == trackCount && distinctLoadedTitles.Count == trackCount;
 
-            Assert.True(allTracksLoaded, $"App failed to load all tracks when folder '${folderPath}' was selected in 'file -> play folder...'");
+            AssertTrue(allTracksLoaded, $"App failed to load all tracks when folder '${folderPath}' was selected in 'file -> play folder...'");
         }
 
         [Fact]
@@ -43,7 +43,7 @@ namespace Dukebox.Tests.UI
             Thread.Sleep(250);
 
             var appIsClosed = _dukeboxApp.AppHasExited;
-            Assert.True(appIsClosed, "App failed to close when 'file -> exit' was clicked");
+            AssertTrue(appIsClosed, "App failed to close when 'file -> exit' was clicked");
         }
     }
 }
