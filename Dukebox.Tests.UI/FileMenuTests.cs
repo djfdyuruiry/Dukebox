@@ -12,7 +12,7 @@ namespace Dukebox.Tests.UI
         public void When_PlayFolder_MenuItem_Clicked_And_Folder_Is_Selected_Tracks_Should_Be_Loaded()
         {
             var mainScreen = _dukeboxApp.GetScreen<MainScreen>();
-            var folderPath = @"C:\Users\Matthew\Temp\aaaaa";
+            var folderPath = @"C:\music";
             var trackCount = 6;
 
             var menuBar = mainScreen.GetMenuBar();
