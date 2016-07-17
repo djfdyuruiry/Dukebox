@@ -8,7 +8,9 @@ namespace Dukebox.Tests.UI
         [Fact]
         public void When_CurrentlyPlaying_Nav_Icon_Clicked_CurrentlyPlaying_Listing_Should_Be_Shown()
         {
-            var mainScreen = _dukeboxApp.GetScreen<MainScreen>();
+            TestMethodName = nameof(When_CurrentlyPlaying_Nav_Icon_Clicked_CurrentlyPlaying_Listing_Should_Be_Shown);
+
+            var mainScreen = DukeboxApp.GetScreen<MainScreen>();
 
             mainScreen.CurrentlyPlayingNavIcon.Click();
 
@@ -20,7 +22,9 @@ namespace Dukebox.Tests.UI
         [Fact]
         public void When_LibraryListing_Nav_Icon_Clicked_LibraryListing_Listing_Should_Be_Shown()
         {
-            var mainScreen = _dukeboxApp.GetScreen<MainScreen>();
+            TestMethodName = nameof(When_LibraryListing_Nav_Icon_Clicked_LibraryListing_Listing_Should_Be_Shown);
+
+            var mainScreen = DukeboxApp.GetScreen<MainScreen>();
 
             mainScreen.LibraryNavIcon.Click();
 
@@ -32,7 +36,9 @@ namespace Dukebox.Tests.UI
         [Fact]
         public void When_Album_Nav_Icon_Clicked_Album_Listing_Should_Be_Shown()
         {
-            var mainScreen = _dukeboxApp.GetScreen<MainScreen>();
+            TestMethodName = nameof(When_Album_Nav_Icon_Clicked_Album_Listing_Should_Be_Shown);
+
+            var mainScreen = DukeboxApp.GetScreen<MainScreen>();
 
             mainScreen.AlbumsNavIcon.Click();
 
@@ -44,7 +50,9 @@ namespace Dukebox.Tests.UI
         [Fact]
         public void When_Artist_Nav_Icon_Clicked_Album_Listing_Should_Be_Shown()
         {
-            var mainScreen = _dukeboxApp.GetScreen<MainScreen>();
+            TestMethodName = nameof(When_Artist_Nav_Icon_Clicked_Album_Listing_Should_Be_Shown);
+
+            var mainScreen = DukeboxApp.GetScreen<MainScreen>();
 
             mainScreen.ArtistsNavIcon.Click();
 
@@ -56,7 +64,9 @@ namespace Dukebox.Tests.UI
         [Fact]
         public void When_Playlist_Nav_Icon_Clicked_Album_Listing_Should_Be_Shown()
         {
-            var mainScreen = _dukeboxApp.GetScreen<MainScreen>();
+            TestMethodName = nameof(When_Playlist_Nav_Icon_Clicked_Album_Listing_Should_Be_Shown);
+
+            var mainScreen = DukeboxApp.GetScreen<MainScreen>();
 
             mainScreen.PlaylistNavIcon.Click();
 
@@ -68,7 +78,9 @@ namespace Dukebox.Tests.UI
         [Fact]
         public void When_RecentlyPlayed_Nav_Icon_Clicked_RecentlyPlayed_Listing_Should_Be_Shown()
         {
-            var mainScreen = _dukeboxApp.GetScreen<MainScreen>();
+            TestMethodName = nameof(When_RecentlyPlayed_Nav_Icon_Clicked_RecentlyPlayed_Listing_Should_Be_Shown);
+
+            var mainScreen = DukeboxApp.GetScreen<MainScreen>();
 
             mainScreen.RecentlyPlayedNavIcon.Click();
 
@@ -80,7 +92,9 @@ namespace Dukebox.Tests.UI
         [Fact]
         public void When_AudioCd_Nav_Icon_Clicked_Album_Listing_Should_Be_Shown()
         {
-            var mainScreen = _dukeboxApp.GetScreen<MainScreen>();
+            TestMethodName = nameof(When_AudioCd_Nav_Icon_Clicked_Album_Listing_Should_Be_Shown);
+
+            var mainScreen = DukeboxApp.GetScreen<MainScreen>();
 
             mainScreen.AudioCdNavIcon.Click();
 

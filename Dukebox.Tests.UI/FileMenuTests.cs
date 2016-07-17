@@ -11,7 +11,9 @@ namespace Dukebox.Tests.UI
         [Fact]
         public void When_PlayFolder_MenuItem_Clicked_And_Folder_Is_Selected_Tracks_Should_Be_Loaded()
         {
-            var mainScreen = _dukeboxApp.GetScreen<MainScreen>();
+            TestMethodName = nameof(When_PlayFolder_MenuItem_Clicked_And_Folder_Is_Selected_Tracks_Should_Be_Loaded);
+
+            var mainScreen = DukeboxApp.GetScreen<MainScreen>();
             var folderPath = @"C:\music";
             var trackCount = 6;
 
@@ -20,7 +22,7 @@ namespace Dukebox.Tests.UI
 
             Thread.Sleep(250);
             
-            var folderBrowser = _dukeboxApp.GetModal<SelectFolderDialog>();
+            var folderBrowser = DukeboxApp.GetModal<SelectFolderDialog>();
           
             folderBrowser.SetFolderPathAndClickOk(folderPath);
             
@@ -37,13 +39,16 @@ namespace Dukebox.Tests.UI
         [Fact]
         public void When_Exit_MenuItem_Clicked_App_Should_Close()
         {
-            var mainScreen = _dukeboxApp.GetScreen<MainScreen>();
+            TestMethodName = nameof(When_Exit_MenuItem_Clicked_App_Should_Close);
+            Options.SaveScreenshotsForPassingTests = false;
+
+            var mainScreen = DukeboxApp.GetScreen<MainScreen>();
             var menuBar = mainScreen.GetMenuBar();
 
             menuBar.FileMenu.Exit.Click();
             Thread.Sleep(250);
 
-            var appIsClosed = _dukeboxApp.AppHasExited;
+            var appIsClosed = DukeboxApp.AppHasExited;
             AssertTrue(appIsClosed, "App failed to close when 'file -> exit' was clicked");
         }
     }

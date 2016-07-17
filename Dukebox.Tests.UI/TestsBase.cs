@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using Xunit;
 using Dukebox.Tests.UI.Applciations;
 using Dukebox.Tests.UI.Helpers;
@@ -13,14 +12,15 @@ namespace Dukebox.Tests.UI
     {
         private const string appDataFolderName = "Dukebox";
 
-        protected static readonly WindowScreenshotHelper _screenshotHelper;
+        protected static readonly WindowScreenshotHelper screenshotHelper;
 
-        private readonly TestsBaseOptions _options;
+        public DukeboxApplication DukeboxApp { get; private set; }
+        public TestsBaseOptions Options { get; private set; }
+        public string TestMethodName { get; protected set; }
+
         private readonly string _testClassName;
 
-        private bool lastTestResult;
-
-        protected readonly DukeboxApplication _dukeboxApp;
+        private bool _lastTestResult;
 
         static TestsBase()
         {
@@ -31,7 +31,7 @@ namespace Dukebox.Tests.UI
                 Directory.Delete(currentPath, true);
             }
 
-            _screenshotHelper = new WindowScreenshotHelper(currentPath);
+            screenshotHelper = new WindowScreenshotHelper(currentPath);
         }
 
         public TestsBase() : this(new TestsBaseOptions())
@@ -40,7 +40,7 @@ namespace Dukebox.Tests.UI
 
         public TestsBase(TestsBaseOptions options)
         {            
-            _options = options;
+            this.Options = options;
 
             _testClassName = GetType().FullName;
 
@@ -48,12 +48,12 @@ namespace Dukebox.Tests.UI
             DeleteUserDataIfPresent();
 #endif
 
-            _dukeboxApp = new DukeboxApplication();
-            _dukeboxApp.Launch(_options.DismissHotkeyWarningDialog);
+            DukeboxApp = new DukeboxApplication();
+            DukeboxApp.Launch(this.Options.DismissHotkeyWarningDialog);
 
-            if (_options.SkipInitalImport)
+            if (this.Options.SkipInitalImport)
             {
-                _dukeboxApp.SkipInitalImport();
+                DukeboxApp.SkipInitalImport();
             }
         }
 
@@ -68,39 +68,38 @@ namespace Dukebox.Tests.UI
             }
         }
 
-        public void Dispose()
+        protected void AssertTrue(bool assertion, string message)
         {
-            _dukeboxApp.Dispose();
+            DoAssertWithSnaphot(() => Assert.True(assertion, message));
         }
 
-        protected void AssertTrue(bool assertion, string message, [CallerMemberName] string testMethodName = null)
+        protected void AssertFalse(bool assertion, string message)
         {
-            DoAssertWithSnaphot(() => Assert.True(assertion, message), testMethodName);
+            DoAssertWithSnaphot(() => Assert.False(assertion, message));
         }
 
-        protected void AssertFalse(bool assertion, string message, [CallerMemberName] string testMethodName = null)
-        {
-            DoAssertWithSnaphot(() => Assert.False(assertion, message), testMethodName);
-        }
-
-        private void DoAssertWithSnaphot(Action assertionAction, string testMethodName)
+        private void DoAssertWithSnaphot(Action assertionAction)
         {
             try
             {
                 assertionAction?.Invoke();
-
-                if (_options.SaveScreenshotsForPassingTests)
-                {
-                    lastTestResult = true;
-                    TakeScreenshot(testMethodName, true);
-                }
+                _lastTestResult = true;                                
             }
             catch (Exception)
             {
-                lastTestResult = false;
-                TakeScreenshot(testMethodName, false);
+                _lastTestResult = false;
                 throw;
             }
+        }
+
+        public void Dispose()
+        {
+            if (!_lastTestResult || Options.SaveScreenshotsForPassingTests)
+            {
+                TakeScreenshot(TestMethodName, _lastTestResult);
+            }
+
+            DukeboxApp.Dispose();
         }
 
         private void TakeScreenshot(string testMethodName, bool testPassed)
@@ -109,16 +108,16 @@ namespace Dukebox.Tests.UI
 
             try
             {
-                var appWindows = _dukeboxApp.ApplicationHandle.GetWindows();
+                var appWindows = DukeboxApp.ApplicationHandle.GetWindows();
 
-                if (_options.ScreenshotAllWindows)
+                if (Options.ScreenshotAllWindows)
                 {
-                    _screenshotHelper.TakeWindowScreenshots(appWindows, testClassAndMethodName);
+                    screenshotHelper.TakeWindowScreenshots(appWindows, testClassAndMethodName);
                 }
                 else
                 {
                     var appWindow = appWindows.First();
-                    _screenshotHelper.TakeWindowScreenshot(appWindow, testClassAndMethodName);
+                    screenshotHelper.TakeWindowScreenshot(appWindow, testClassAndMethodName);
                 }
 
                 var screenshotInfo = new CapturedUiScreenshotInfo
