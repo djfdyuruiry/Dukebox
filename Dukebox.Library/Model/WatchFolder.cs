@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Dukebox.Library.Helper;
 
 namespace Dukebox.Library.Model
 {
@@ -21,12 +22,11 @@ namespace Dukebox.Library.Model
         {
             get
             {
-                return DateTimeOffset.FromUnixTimeSeconds(LastScanTimestamp).DateTime;
+                return UnixTimestampHelper.UnixTimestampToDateTime(LastScanTimestamp);
             }
             set
             {
-                DateTimeOffset offset = value;
-                LastScanTimestamp = offset.ToUnixTimeSeconds();
+                LastScanTimestamp = UnixTimestampHelper.DateTimeToUnixTimestamp(value);
             }
         }
     }

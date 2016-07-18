@@ -5,8 +5,6 @@ namespace Dukebox.Library.Model
 {
     public class WatchFolderEvent
     {
-        private const int trailingReportCharsToPrint = 50;
-
         public WatchFolderEventType EventType { get; set; }
         public DirectoryImportReport ImportReport { get; set; }
         public AudioFileImportedInfo AudioFileImportInfo { get; set; }

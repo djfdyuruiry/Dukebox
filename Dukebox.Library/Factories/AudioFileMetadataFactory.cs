@@ -28,11 +28,6 @@ namespace Dukebox.Library.Factories
             _audioCdService = audioCdService;
         }
 
-        public Type GetConcreteMetadataTagType()
-        {
-            return typeof(Tag);
-        }
-
         public IAudioFileMetadata BuildAudioFileMetadataInstance(CdMetadata cdMetadata, int trackNumber)
         {
             var title = cdMetadata.Tracks[trackNumber];

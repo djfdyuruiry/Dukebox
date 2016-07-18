@@ -1,27 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Dukebox.Audio
 {
-    /// <summary>
-    /// 
-    /// </summary>
     public class AudioFileFormats
     {
         private const string fileFormatsNotLoadedErrorMessage = 
             "Please wait until FormatsLoaded has fired before using FileSupported or FileFormatSupported methods";
 
         public const string FileFilterPrefixFormat = "Audio Files |{0}";
-
-        /// <summary>
-        /// A string list of all supported audio
-        /// formats specified by file extension. (e.g. '.mp3')
-        /// </summary>
+        
         public List<string> SupportedFormats { get; private set; }
         
         public string FileFilter
@@ -39,11 +29,7 @@ namespace Dukebox.Audio
                 return filter;
             }
         }
-
-        /// <summary>
-        /// A file filter string for use with a file dialog
-        /// class which represents all supported formats.
-        /// </summary>
+        
         public string FileDialogFilter
         {
             get
