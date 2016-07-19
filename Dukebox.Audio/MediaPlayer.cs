@@ -110,9 +110,9 @@ namespace Dukebox.Audio
             }
         }
 
-        public bool Playing { get; set; }
-        public bool Stopped { get; set; }
-        public bool Finished { get; set; }
+        public bool Playing { get; private set; }
+        public bool Stopped { get; private set; }
+        public bool Finished { get; private set; }
 
         public Action<string, string> ErrorHandlingAction { get; set; }
 
@@ -147,19 +147,26 @@ namespace Dukebox.Audio
                 throw new ArgumentException(string.Format("File '{0}' does not exist.", fileName));
             }
 
-            if (_stream != 0)
+            if (_playbackThread != null)
             {
-                _audioService.FreeStream(_stream);
+                StopAudio();
+
+                var timeElapsed = 0;
+
+                while (Playing || timeElapsed < 50)
+                {
+                    Thread.Sleep(10);
+                    timeElapsed += 10;
+                }
+
+                if (Playing)
+                {
+                    _playbackThread.Abort();
+                }
             }
 
             _stream = 0;
-
             _fileName = fileName;
-
-            if (_playbackThread != null)
-            {
-                _playbackThread.Abort();
-            }
 
             _lastLoadedTrackEventArgs = new TrackLoadedFromFileEventArgs
             {
@@ -189,7 +196,7 @@ namespace Dukebox.Audio
                     Task.Run(() => TrackPaused?.Invoke(this, EventArgs.Empty));
                 }
             }
-            else if (_fileName != string.Empty)
+            else if (!string.IsNullOrEmpty(_fileName))
             {
                 LoadFile(_fileName);
 
@@ -200,14 +207,6 @@ namespace Dukebox.Audio
         public void StopAudio()
         {
             Stopped = true;
-
-            if (_playbackThread != null)
-            {
-                _audioService.StopChannel(_stream);
-                _playbackThread.Abort();
-
-                Task.Run(() => FinishedPlayingTrack?.Invoke(this, EventArgs.Empty));
-            }
         }
 
         public void ChangeAudioPosition(double newPositionInSeconds)
@@ -237,7 +236,7 @@ namespace Dukebox.Audio
                 _stream = _audioService.CreateStreamFromCd(driveIndex, trackNumber);
             }
 
-            if (_stream != 0)
+            if (_stream > 0)
             {
                 if ((new FileInfo(_fileName)).Extension == ".cda")
                 {
@@ -308,14 +307,14 @@ namespace Dukebox.Audio
             Finished = true;
 
             // Free the stream channel.
-            if (_stream != 0)
+            if (_stream > 0)
             {
                 _audioService.FreeStream(_stream);
                 _stream = 0;
             }
 
             Playing = false;
-            Stopped = false;
+            Stopped = true;
 
             Task.Run(() => FinishedPlayingTrack?.Invoke(this, EventArgs.Empty));
         }     
@@ -353,6 +352,19 @@ namespace Dukebox.Audio
         private double GetSecondsFromChannelPosition(int stream, long channelPosition)
         {
             return _audioService.GetSecondsForChannelPosition(stream, channelPosition);
+        }
+
+        public void Dispose()
+        {
+            if (Playing)
+            {
+                StopAudio();
+            }
+
+            if (_stream != 0)
+            {
+                _audioService.FreeStream(_stream);
+            }
         }
     }
     

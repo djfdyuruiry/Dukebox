@@ -3,17 +3,17 @@ using Dukebox.Audio.Model;
 
 namespace Dukebox.Audio.Interfaces
 {
-    public interface IMediaPlayer
+    public interface IMediaPlayer : IDisposable
     {
         string AudioLengthInMins { get; }
         double AudioLengthInSecs { get; }
         bool AudioLoaded { get; }
         string MinutesPlayed { get; }
         double PercentagePlayed { get; }
-        bool Playing { get; set; }
+        bool Playing { get; }
         double SecondsPlayed { get; }
-        bool Stopped { get; set; }
-        bool Finished { get; set; }
+        bool Stopped { get; }
+        bool Finished { get; }
         Action<string, string> ErrorHandlingAction { get; set; }
         event EventHandler StartPlayingTrack;
         event EventHandler TrackPaused;
