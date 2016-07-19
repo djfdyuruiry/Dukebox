@@ -67,7 +67,7 @@ namespace Dukebox.Tests.Unit
 
             var count = audioPlaylist.LoadPlaylistFromList(new List<ITrack> { track });            
 
-            signalEvent.WaitOne(100);
+            signalEvent.WaitOne(500);
 
             var countCorrect = count == 1;
 
@@ -141,7 +141,7 @@ namespace Dukebox.Tests.Unit
 
             audioPlaylist.SkipToTrack(0);
 
-            signalEvent.WaitOne(100);
+            signalEvent.WaitOne(500);
 
             A.CallTo(() => mediaPlayer.LoadFile(A<string>.Ignored, A<MediaPlayerMetadata>.Ignored)).MustHaveHappened();
         }
@@ -161,7 +161,7 @@ namespace Dukebox.Tests.Unit
 
             audioPlaylist.StartPlaylistPlayback();
 
-            signalEvent.WaitOne(100);
+            signalEvent.WaitOne(500);
 
             A.CallTo(() => mediaPlayer.LoadFile(A<string>.Ignored, A<MediaPlayerMetadata>.Ignored)).MustHaveHappened();
         }
@@ -172,8 +172,10 @@ namespace Dukebox.Tests.Unit
             var audioPlaylistTuple = PrepareAudioPlaylistFakes();
             var audioPlaylist = audioPlaylistTuple.Item1;
             var mediaPlayer = audioPlaylistTuple.Item2;
+            var finished = false;
 
-            A.CallTo(() => mediaPlayer.StopAudio()).Invokes(() => mediaPlayer.Finished = true);
+            A.CallTo(() => mediaPlayer.Finished).ReturnsLazily(() => finished);
+            A.CallTo(() => mediaPlayer.StopAudio()).Invokes(() => finished = true);
             
             audioPlaylist.StartPlaylistPlayback();
             audioPlaylist.Stop();
