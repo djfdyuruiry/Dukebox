@@ -107,6 +107,7 @@
   <ItemGroup>
     <Compile Include="AudioFileFormats.cs" />
     <Compile Include="AudioPackage.cs" />
+    <Compile Include="Interfaces\IAudioService.cs" />
     <Compile Include="Interfaces\IMediaPlayer.cs" />
     <Compile Include="MediaPlayer.cs" />
     <Compile Include="Model\MediaPlayerMetadata.cs" />
@@ -121,6 +122,7 @@
     <Compile Include="Services\AudioConverterService.cs" />
     <Compile Include="Interfaces\IAudioConverterService.cs" />
     <Compile Include="Interfaces\IAudioCdService.cs" />
+    <Compile Include="Services\AudioService.cs" />
     <Compile Include="Services\GlobalMultimediaHotKeyService.cs" />
     <Compile Include="Interfaces\IGlobalMultimediaHotKeyService.cs" />
   </ItemGroup>

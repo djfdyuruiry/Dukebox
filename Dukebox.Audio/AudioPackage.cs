@@ -28,6 +28,7 @@ namespace Dukebox.Audio
             container.RegisterSingleton<IAudioCdService, AudioCdService>();
             container.RegisterSingleton<IAudioConverterService, AudioConverterService>();
             container.RegisterSingleton<IGlobalMultimediaHotKeyService, GlobalMultimediaHotKeyService>();
+            container.RegisterSingleton<IAudioService, AudioService>();
             container.RegisterSingleton<IMediaPlayer, MediaPlayer>();
 
             var assemblies = new List<Assembly> { Assembly.GetAssembly(typeof(ConfigurationPackage)) };
