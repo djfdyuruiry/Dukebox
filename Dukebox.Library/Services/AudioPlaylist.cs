@@ -53,6 +53,7 @@ namespace Dukebox.Library.Services
         private readonly Stack<int> _previousTracks;
 
         private int _lastTrack;
+        private bool _skippingToTrack;
 
         #endregion
 
@@ -194,12 +195,6 @@ namespace Dukebox.Library.Services
             _currentTrackIndexMutex = new Mutex();
 
             SetCurrentTrackIndex(-1);
-            _forward = false;
-            _back = false;
-
-            Shuffle = false;
-            RepeatAll = false;
-            Repeat = false;
         }
 
         private void CallTrackModifiedHandler()
@@ -216,7 +211,12 @@ namespace Dukebox.Library.Services
             if (!StreamingPlaylist)
             {
                 _playlistManagerThread = new Thread(PlayAllTracks);
+
+                // Set playback flow controls to default values.  
                 SetCurrentTrackIndex(0);
+                _back = false;
+                _forward = false;
+
                 _playlistManagerThread.Start();
             }
         }
@@ -306,8 +306,7 @@ namespace Dukebox.Library.Services
                     return;
                 }
 
-                // WTF does this even do...
-                while (GetCurrentTrackIndex() != 0)
+                while (!_mediaPlayer.Playing)
                 {
                     Thread.Sleep(10);
                 }
@@ -318,14 +317,10 @@ namespace Dukebox.Library.Services
                 StopPlaylistPlayback();
                 StartPlaylistPlayback();
             }
-            else if (trackIndex == GetCurrentTrackIndex())
-            {
-                SetCurrentTrackIndex(GetCurrentTrackIndex() - 1, true);
-                _forward = true;
-            }
             else
             {
                 SetCurrentTrackIndex(trackIndex - 1, true);
+                _skippingToTrack = true;
                 _forward = true;
             }
 
@@ -380,10 +375,7 @@ namespace Dukebox.Library.Services
 
                 _lastTrack = GetCurrentTrackIndex();
             }
-
-            var trackIndexBeforePlaybackSleep = GetCurrentTrackIndex();
-
-
+            
             // While next and back are not pressed and the user is not finished with the song.
             while (!_forward && !_back && !_mediaPlayer.Finished)
             {
@@ -391,11 +383,12 @@ namespace Dukebox.Library.Services
             }
 
             // Move forward if forward motion has been indicated and shuffle is off.
-            if (_forward && (!Shuffle || GetCurrentTrackIndex() != trackIndexBeforePlaybackSleep))
+            if (_forward && (!Shuffle || _skippingToTrack))
             {
                 SetCurrentTrackIndex(GetCurrentTrackIndex() + 1);
 
                 _forward = false;
+                _skippingToTrack = false;
             }
             else if (_back && !Shuffle) // Move back one song if indicated and shuffle is off.
             {
@@ -455,10 +448,6 @@ namespace Dukebox.Library.Services
         private void PlayAllTracks()
         {
             var random = new Random();
-
-            // Set playback flow controls to default values.            
-            _back = false;
-            _forward = false;
 
             while (GetCurrentTrackIndex() < Tracks.Count)
             {
