@@ -16,9 +16,6 @@ using Dukebox.Desktop.ViewModel;
 
 namespace Dukebox.Desktop.Views
 {
-    /// <summary>
-    /// Interaction logic for LibraryListing.xaml
-    /// </summary>
     public partial class TrackListing : UserControl
     {
         private const string tracksDataGridElementName = "TrackListingsGrid";
@@ -41,17 +38,20 @@ namespace Dukebox.Desktop.Views
             _tracksDataGrid = FindName(tracksDataGridElementName) as DataGrid;
             _layoutGrid = FindName(layoutGridElementName) as Grid;
 
+            SetupEventAndMessageHandlers();
+
+            UpdateTracksDataGridColumns();
+        }
+
+        private void SetupEventAndMessageHandlers()
+        {
             Messenger.Default.Register<NotificationMessage>(this, (nm) =>
             {
                 if (nm.Notification == NotificationMessages.TrackListingDataGridColumnsUpdated)
                 {
-                    // TODO: Selecting Track Columns to Display does not Update DataGrid's
-                    //UpdateTracksDataGridColumns();
+                    UpdateTracksDataGridColumns();
                 }
             });
-
-            // TODO: Selecting Track Columns to Display does not Update DataGrid's
-            //UpdateTracksDataGridColumns();
 
             DataContextChanged += (o, e) =>
             {
@@ -134,12 +134,11 @@ namespace Dukebox.Desktop.Views
         private string InjectExtendedMetadataBindings(string metadataColumnXamlString, string metadataName)
         {
             var bindingString = $"{{Binding ExtendedMetadata, Converter={{StaticResource ListDictionaryKeyToValueConverter}}, ConverterParameter = '{metadataName}'";
-
-            metadataColumnXamlString = metadataColumnXamlString.Replace("Text=\"\"", string.Empty);
-            metadataColumnXamlString = metadataColumnXamlString.Replace("<TextBlock ",
+            
+            metadataColumnXamlString = metadataColumnXamlString.Replace("<TextBlock Text=\"\"",
                 $"<TextBlock Text=\"{bindingString}}}\" ");
-            metadataColumnXamlString = metadataColumnXamlString.Replace("<TextBox ",
-                $"<TextBox Text=\"{bindingString}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}}\" ");
+            metadataColumnXamlString = metadataColumnXamlString.Replace("<TextBox Visibility=\"Visible\"",
+                $"<TextBox Text=\"{bindingString}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}}\" Visibility=\"Visible\"");
 
             return metadataColumnXamlString;
         }
