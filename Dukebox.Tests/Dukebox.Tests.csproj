@@ -173,17 +173,17 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="sample.mid">
+    <Content Include="artist - title.mid">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="sample.mp3">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Compile Include="Unit\AudioFileFormatsTests.cs" />
-    <Content Include="sampleEmptyTag.mp3">
+    <Content Include="artist - title.mp3">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="sampleWithNoTag.mp3">
+    <Content Include="artist1 - title1.mp3">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="sampleWithoutAlbumArt.mp3">
