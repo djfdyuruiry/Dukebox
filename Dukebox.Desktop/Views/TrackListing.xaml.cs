@@ -139,6 +139,8 @@ namespace Dukebox.Desktop.Views
                 $"<TextBlock Text=\"{bindingString}}}\" ");
             metadataColumnXamlString = metadataColumnXamlString.Replace("<TextBox Visibility=\"Visible\"",
                 $"<TextBox Text=\"{bindingString}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}}\" Visibility=\"Visible\"");
+            metadataColumnXamlString = metadataColumnXamlString.Replace("Width=\"{TemplateBinding assembly:TextBoxHelper.ButtonWidth}\" Visibility=\"Visible\"",
+                "Width=\"{TemplateBinding assembly:TextBoxHelper.ButtonWidth}\" Visibility=\"Collapsed\"");
 
             return metadataColumnXamlString;
         }
