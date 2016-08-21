@@ -49,14 +49,16 @@ namespace Dukebox.Library.Services.MusicLibrary
         /// <returns>A list of tracks that match the given search criteria.</returns>
         public List<ITrack> SearchForTracks(string searchTerm, List<SearchAreas> searchAreas)
         {
-            var stopwatch = Stopwatch.StartNew();
-            var songs = _cacheService.SongsCache;
-            var matchingSongs = Enumerable.Empty<Song>();
-
-            if (string.IsNullOrWhiteSpace(searchTerm))
+            using (var dukeboxData = _dbContextFactory.GetInstance())
             {
-                return songs.Select(s => _trackFactory.BuildTrackInstance(s)).ToList();
-            }
+                var stopwatch = Stopwatch.StartNew();
+                var songs = dukeboxData.Songs;
+                var matchingSongs = Enumerable.Empty<Song>();
+
+                if (string.IsNullOrWhiteSpace(searchTerm))
+                {
+                    return songs.Select(s => _trackFactory.BuildTrackInstance(s)).ToList();
+                }
 
             searchTerm = searchTerm.ToLower();
             searchAreas = searchAreas ?? new List<SearchAreas>();
@@ -97,6 +99,7 @@ namespace Dukebox.Library.Services.MusicLibrary
             
 
             return !matchingSongsList.Any() ? new List<ITrack>() : matchingSongsList.Select(s => _trackFactory.BuildTrackInstance(s)).ToList();
+            }
         }
 
         public List<ITrack> SearchForTracksInArea(SearchAreas attribute, string nameOrTitle)

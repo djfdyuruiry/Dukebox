@@ -111,7 +111,7 @@ namespace Dukebox.Desktop.ViewModel
             }
         }
 
-        public ITrackListingViewModel CurrentlyPlayingListing
+        public CurrentlyPlayingListingViewModel CurrentlyPlayingListing
         {
             get
             {
@@ -119,7 +119,7 @@ namespace Dukebox.Desktop.ViewModel
             }
         }
 
-        public ITrackListingViewModel LibraryListing
+        public LibraryListingViewModel LibraryListing
         {
             get
             {

@@ -11,7 +11,7 @@ using Dukebox.Library.Interfaces;
 
 namespace Dukebox.Desktop.ViewModel
 {
-    public class CurrentlyPlayingListingViewModel : ViewModelBase, ITrackListingViewModel, ISearchControlViewModel
+    public class CurrentlyPlayingListingViewModel : ViewModelBase, ISearchControlViewModel
     {
         private readonly IAudioPlaylist _audioPlaylist;
         private readonly IMusicLibraryUpdateService _musicLibraryUpdateService;
@@ -20,11 +20,11 @@ namespace Dukebox.Desktop.ViewModel
         private string _searchText;
         private readonly ListSearchHelper<ITrack> _listSearchHelper;
 
-        public List<TrackWrapper> Tracks
+        public List<ITrack> Tracks
         {
             get
             {
-                return _listSearchHelper.FilteredItems.Select(t => new TrackWrapper(_musicLibraryUpdateService, _eventService, t)).ToList();
+                return _listSearchHelper.FilteredItems;
             }
         }
 

@@ -134,8 +134,8 @@ namespace Dukebox.Library.Services.MusicLibrary
                     _allArtistsCache = dukeboxData.Artists.OrderBy(a => a.Name).ToList();
                     _allAlbumsCache = dukeboxData.Albums.OrderBy(a => a.Name).ToList();
                     _allPlaylistsCache = dukeboxData.Playlists.OrderBy(a => a.Name).ToList();
-                    
-                    _allSongsCache = dukeboxData.Songs.ToList();
+
+                    _allSongsCache = new List<Song>();// dukeboxData.Songs.ToList();
 
                     files = _allSongsCache.Select(s => s.FileName).ToList();
                 }

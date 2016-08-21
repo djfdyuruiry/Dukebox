@@ -13,7 +13,7 @@ using Dukebox.Library.Model;
 
 namespace Dukebox.Desktop.ViewModel
 {
-    public class LibraryListingViewModel : ViewModelBase, ITrackListingViewModel, ISearchControlViewModel
+    public class LibraryListingViewModel : ViewModelBase, ISearchControlViewModel
     {
         private readonly IMusicLibraryUpdateService _musicLibraryUpdateService;
         private readonly IAudioPlaylist _audioPlaylist;
@@ -40,11 +40,11 @@ namespace Dukebox.Desktop.ViewModel
                 OnPropertyChanged("SearchText");
             }
         }
-        public List<TrackWrapper> Tracks 
+        public List<ITrack> Tracks 
         { 
             get 
             {
-                return _tracks.Select(t => new TrackWrapper(_musicLibraryUpdateService, _eventService, t)).ToList();
+                return _tracks;
             }
         }
         public bool EditingListingsDisabled

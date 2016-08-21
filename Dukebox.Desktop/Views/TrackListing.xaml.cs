@@ -166,7 +166,7 @@ namespace Dukebox.Desktop.Views
             }
 
             var item = row.Item as TrackWrapper;
-            var trackListingViewModel = DataContext as ITrackListingViewModel;
+            var trackListingViewModel = DataContext as LibraryListingViewModel;
 
             trackListingViewModel?.LoadTrack?.Execute(item?.Data);
         }
