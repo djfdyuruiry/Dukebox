@@ -10,6 +10,9 @@ namespace Dukebox.Library.Repositories
 {
     public class RecentlyPlayedRepository : IRecentlyPlayedRepository
     {
+        // TODO: Make Configurable
+        private const int MaxFilesInRecentlyPlayed = 150;
+
         public event EventHandler<NotifyCollectionChangedEventArgs> RecentlyPlayedListModified;
 
         public ObservableCollection<string> RecentlyPlayed { get; private set; }
@@ -25,7 +28,16 @@ namespace Dukebox.Library.Repositories
         public RecentlyPlayedRepository()
         {
             RecentlyPlayed = new ObservableCollection<string>();
-            RecentlyPlayed.CollectionChanged += (o, e) => Task.Run(() => RecentlyPlayedListModified?.Invoke(this, e));
+
+            RecentlyPlayed.CollectionChanged += (o, e) => Task.Run(() =>
+            {
+                while(RecentlyPlayed.Count > MaxFilesInRecentlyPlayed)
+                {
+                    RecentlyPlayed.RemoveAt(0);      
+                }
+
+                RecentlyPlayedListModified?.Invoke(this, e);
+            });
         }
     }
 }
