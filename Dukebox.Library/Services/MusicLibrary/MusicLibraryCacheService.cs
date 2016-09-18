@@ -117,8 +117,6 @@ namespace Dukebox.Library.Services.MusicLibrary
                     _allPlaylistsCache = dukeboxData.Playlists.OrderBy(a => a.Name).ToList();
                     
                     _fileLastScannedMap = dukeboxData.Songs
-                            .GroupBy(s => s.FileName)
-                            .Select(sg => sg.First())
                             .ToDictionary(s => s.FileName, s => s.LastScanDateTime);
                 }
 
@@ -128,6 +126,10 @@ namespace Dukebox.Library.Services.MusicLibrary
 
                 logger.Info("Music library artist, album, playlist and file path caches were refreshed");
                 logger.DebugFormat("Refreshing library artist and album caches took {0}ms.", stopwatch.ElapsedMilliseconds);
+            }
+            catch (Exception ex)
+            {
+                var f = 2;
             }
             finally
             {

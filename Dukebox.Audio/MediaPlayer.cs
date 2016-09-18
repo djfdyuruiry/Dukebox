@@ -160,8 +160,7 @@ namespace Dukebox.Audio
 
             _lastLoadedTrackEventArgs = new TrackLoadedFromFileEventArgs
             {
-                FileName = fileName,
-                Metadata = mediaPlayerMetadata ?? _lastMediaPlayerMetadata ?? defaultMetadata
+                FileName = fileName
             };
 
             if (mediaPlayerMetadata != null)

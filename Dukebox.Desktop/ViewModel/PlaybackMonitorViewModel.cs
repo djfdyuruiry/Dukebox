@@ -265,9 +265,11 @@ namespace Dukebox.Desktop.ViewModel
             TrackSecondsTotal = _mediaPlayer.AudioLengthInSecs;
             SeekingEnabled = true;
 
-            Artist = trackLoadedArgs.Metadata.ArtistName;
-            Track = trackLoadedArgs.Metadata.TrackName;
-            Album = trackLoadedArgs.Metadata.AlbumName;
+            var track = _searchService.GetTrackFromLibraryOrFile(trackLoadedArgs.FileName);
+
+            Artist = track.ArtistName;
+            Track = track.Song.Title;
+            Album = track.AlbumName;
 
             _currentlyLoadedFile = trackLoadedArgs.FileName;
         }
@@ -276,13 +278,7 @@ namespace Dukebox.Desktop.ViewModel
         {
             LoadedTrackFromFile(new TrackLoadedFromFileEventArgs
             {
-                FileName = song.FileName,
-                Metadata = new MediaPlayerMetadata
-                {
-                    TrackName = song.Title,
-                    ArtistName = song.ArtistName,
-                    AlbumName = song.AlbumName
-                }
+                FileName = song.FileName
             });
         }
 

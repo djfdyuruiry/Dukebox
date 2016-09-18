@@ -87,9 +87,9 @@ namespace Dukebox.Desktop.ViewModel
 
         private void LoadAlbumsFromLibrary()
         {
-            var albums = _cacheService.OrderedAlbums
+            var albums = new List<Album>();/*_cacheService.OrderedAlbums
                 .Select(a => Album.BuildAlbumInstance(a))
-                .ToList();
+                .ToList();*/
 
             Albums = albums;
         }

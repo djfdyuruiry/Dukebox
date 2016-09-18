@@ -13,6 +13,7 @@ using Dukebox.Desktop.Model;
 using Dukebox.Desktop.Interfaces;
 using Dukebox.Desktop.Services;
 using Dukebox.Desktop.ViewModel;
+using Dukebox.Library.Interfaces;
 
 namespace Dukebox.Desktop.Views
 {
@@ -165,10 +166,10 @@ namespace Dukebox.Desktop.Views
                 return;
             }
 
-            var item = row.Item as TrackWrapper;
+            var item = row.Item as ITrack;
             var trackListingViewModel = DataContext as ITrackListingViewModel;
 
-            trackListingViewModel?.LoadTrack?.Execute(item?.Data);
+            trackListingViewModel?.LoadTrack?.Execute(item);
         }
     }
 }
