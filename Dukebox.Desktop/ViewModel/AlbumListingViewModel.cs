@@ -97,7 +97,7 @@ namespace Dukebox.Desktop.ViewModel
         private void DoLoadAlbum(Album album)
         {
             var tracks = _musicLibraryRepo.GetTracksForAlbum((album.Data as LibraryAlbum).Name);
-            _audioPlaylist.LoadPlaylistFromList(tracks);
+            _audioPlaylist.LoadPlaylistFromList(tracks.Select(t => t.Song.FileName).ToList());
 
             SendNotificationMessage(NotificationMessages.AudioPlaylistLoadedNewTracks);
         }

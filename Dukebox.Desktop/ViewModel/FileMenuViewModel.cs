@@ -10,6 +10,7 @@ using Dukebox.Desktop.Model;
 using Dukebox.Library.Factories;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
+using System.Linq;
 
 namespace Dukebox.Desktop.ViewModel
 {
@@ -85,7 +86,7 @@ namespace Dukebox.Desktop.ViewModel
             var fileName = _selectAudioFileDialog.FileName;
             var track = _trackFactory.BuildTrackInstance(fileName);
 
-            _audioPlaylist.LoadPlaylistFromList(new List<ITrack> { track });
+            _audioPlaylist.LoadPlaylistFromList(new List<string> { track.Song.FileName });
 
             SendNotificationMessage(NotificationMessages.AudioPlaylistLoadedNewTracks);
         }
@@ -100,7 +101,7 @@ namespace Dukebox.Desktop.ViewModel
             }
             
             var tracks = _tracksGenerator.GetTracksForDirectory(_selectMusicFolderDialog.SelectedPath, false);
-            _audioPlaylist.LoadPlaylistFromList(tracks);
+            _audioPlaylist.LoadPlaylistFromList(tracks.Select(t => t.Song.FileName).ToList());
 
             SendNotificationMessage(NotificationMessages.AudioPlaylistLoadedNewTracks);
         }

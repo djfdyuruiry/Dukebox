@@ -95,7 +95,7 @@ namespace Dukebox.Desktop.ViewModel
             }
 
             var name = inputPromptViewModel.Input;
-            var files = _audioPlaylist.Tracks.Select(t => t.Song.FileName).Distinct().ToList();
+            var files = _audioPlaylist.Tracks.Distinct().ToList();
 
             _musicLibraryImportService.AddPlaylist(name, files);
         }

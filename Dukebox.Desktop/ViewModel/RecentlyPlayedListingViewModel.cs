@@ -9,6 +9,7 @@ using Dukebox.Desktop.Interfaces;
 using Dukebox.Desktop.Model;
 using Dukebox.Library.Interfaces;
 using Dukebox.Desktop.Services;
+using AlphaChiTech.Virtualization;
 
 namespace Dukebox.Desktop.ViewModel
 {
@@ -18,7 +19,7 @@ namespace Dukebox.Desktop.ViewModel
         private readonly IRecentlyPlayedRepository _recentlyPlayedRepo;
         private readonly IAudioPlaylist _audioPlaylist;
         private readonly IMusicLibraryEventService _eventService;
-        private readonly ListSearchHelper<ITrack> _listSearchHelper;
+        private readonly ListSearchHelper<string> _listSearchHelper;
         
         private string _searchText;
 
@@ -38,11 +39,11 @@ namespace Dukebox.Desktop.ViewModel
                 OnPropertyChanged("SearchText");
             }
         }
-        public List<TrackWrapper> Tracks
+        public VirtualizingObservableCollection<ITrack> Tracks
         {
             get
             {
-                return _listSearchHelper.FilteredItems.Select(t => new TrackWrapper(_musicLibraryUpdateService, _eventService, t)).ToList();
+                return null; // _listSearchHelper.FilteredItems;
             }
         }
 
@@ -79,9 +80,9 @@ namespace Dukebox.Desktop.ViewModel
             _audioPlaylist = audioPlaylist;
             _eventService = eventService;
 
-            _listSearchHelper = new ListSearchHelper<ITrack>
+            _listSearchHelper = new ListSearchHelper<string>
             {
-                FilterLambda = (t, s) => t.ToString().ToLower(CultureInfo.InvariantCulture)
+                FilterLambda = (t, s) => t.ToLower(CultureInfo.InvariantCulture)
                 .Contains(s.ToLower(CultureInfo.InvariantCulture))
             };
 
@@ -95,7 +96,7 @@ namespace Dukebox.Desktop.ViewModel
         private void DoLoadTrack(ITrack track)
         {
             _audioPlaylist.LoadPlaylistFromList(_listSearchHelper.FilteredItems);
-            _audioPlaylist.SkipToTrack(track);
+            _audioPlaylist.SkipToTrack(track.Song.FileName);
 
             SendNotificationMessage(NotificationMessages.AudioPlaylistLoadedNewTracks);
         }

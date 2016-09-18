@@ -13,13 +13,13 @@
     <UserControl.Resources>
         <DataTemplate DataType="{x:Type DukeboxLibrary:Artist}">
             <StackPanel Name="Artist" Margin="6" Width="194">
-                <Image x:Name="AlbumArt" Width="194" Height="194" IsHitTestVisible="False">
+                <Image x:Name="ArtistCard" Width="194" Height="194" IsHitTestVisible="False">
                     <Image.Source>
                         <BitmapImage DecodePixelHeight="194"
                                      DecodePixelWidth="194"
                                      UriSource="{Binding Path=., Converter={StaticResource ArtistToCardPathConverter}}" 
                                      CreateOptions="DelayCreation" 
-                                     CacheOption="None"/>
+                                     CacheOption="OnDemand"/>
                     </Image.Source>
                 </Image>
                 <TextBlock Text="{Binding Name}" Width="185" TextWrapping="Wrap"/>

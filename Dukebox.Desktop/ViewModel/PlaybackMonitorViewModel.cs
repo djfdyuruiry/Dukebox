@@ -24,6 +24,7 @@ namespace Dukebox.Desktop.ViewModel
         private readonly IAudioPlaylist _audioPlaylist;
         private readonly IGlobalMultimediaHotKeyService _globalHotKeyService;
         private readonly IMusicLibraryEventService _eventService;
+        private readonly IMusicLibrarySearchService _searchService;
         private readonly IAlbumArtCacheService _albumArtCache;
 
         private string _artist;
@@ -182,13 +183,14 @@ namespace Dukebox.Desktop.ViewModel
 
         public PlaybackMonitorViewModel(IMediaPlayer mediaPlayer, IAudioPlaylist audioPlaylist,
             IGlobalMultimediaHotKeyService globalHotKeyService, IAlbumArtCacheService albumArtCache,
-            IMusicLibraryEventService eventService) : base()
+            IMusicLibraryEventService eventService, IMusicLibrarySearchService searchService) : base()
         {
             _mediaPlayer = mediaPlayer;
             _audioPlaylist = audioPlaylist;
             _globalHotKeyService = globalHotKeyService;
             _albumArtCache = albumArtCache;
             _eventService = eventService;
+            _searchService = searchService;
 
             UpdateAlbumArt(ImageResources.DefaultAlbumArtUri);
             PlayPauseImage = ImageResources.PlayImage;
@@ -286,7 +288,8 @@ namespace Dukebox.Desktop.ViewModel
 
         private void LoadNewTrackArtIfNeccessary(NewTrackLoadedEventArgs newTrackArgs)
         {
-            var albumId = newTrackArgs.Track.Album.FileNameSafeName;
+            var newTrack = _searchService.GetTrackFromLibraryOrFile(newTrackArgs.Track);
+            var albumId = newTrack.Album.FileNameSafeName;
 
             try
             {
@@ -298,13 +301,13 @@ namespace Dukebox.Desktop.ViewModel
                     return;
                 }
 
-                if (!newTrackArgs.Track.Metadata.HasAlbumArt)
+                if (!newTrack.Metadata.HasAlbumArt)
                 {
                     UpdateAlbumArt(ImageResources.DefaultAlbumArtUri);
                     return;
                 }
 
-                var albumArtTempImagePath = newTrackArgs.Track.Metadata.SaveAlbumArtToTempFile();
+                var albumArtTempImagePath = newTrack.Metadata.SaveAlbumArtToTempFile();
                 UpdateAlbumArt(albumArtTempImagePath);
             }
             catch

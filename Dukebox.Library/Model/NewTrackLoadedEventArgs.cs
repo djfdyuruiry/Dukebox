@@ -5,7 +5,7 @@ namespace Dukebox.Library.Model
 {
     public class NewTrackLoadedEventArgs : EventArgs
     {
-        public ITrack Track { get; set; }
+        public string Track { get; set; }
         public int TrackIndex { get; set; }
     }
 }

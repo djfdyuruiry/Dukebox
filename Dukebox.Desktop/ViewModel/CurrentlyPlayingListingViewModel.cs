@@ -8,6 +8,7 @@ using Dukebox.Desktop.Helper;
 using Dukebox.Desktop.Interfaces;
 using Dukebox.Desktop.Services;
 using Dukebox.Library.Interfaces;
+using AlphaChiTech.Virtualization;
 
 namespace Dukebox.Desktop.ViewModel
 {
@@ -18,13 +19,13 @@ namespace Dukebox.Desktop.ViewModel
         private readonly IMusicLibraryEventService _eventService;
 
         private string _searchText;
-        private readonly ListSearchHelper<ITrack> _listSearchHelper;
+        private readonly ListSearchHelper<string> _listSearchHelper;
 
-        public List<TrackWrapper> Tracks
+        public VirtualizingObservableCollection<ITrack> Tracks
         {
             get
             {
-                return _listSearchHelper.FilteredItems.Select(t => new TrackWrapper(_musicLibraryUpdateService, _eventService, t)).ToList();
+                return null; // _listSearchHelper.FilteredItems;
             }
         }
 
@@ -77,9 +78,9 @@ namespace Dukebox.Desktop.ViewModel
             _audioPlaylist = audioPlaylist;
             _musicLibraryUpdateService = musicLibraryUpdateService;
             _eventService = eventService;
-            _listSearchHelper = new ListSearchHelper<ITrack>
+            _listSearchHelper = new ListSearchHelper<string>
             {
-                FilterLambda = (t, s) => t.ToString().ToLower(CultureInfo.InvariantCulture)
+                FilterLambda = (t, s) => t.ToLower(CultureInfo.InvariantCulture)
                     .Contains(s.ToLower(CultureInfo.InvariantCulture))
             };
 
@@ -99,7 +100,7 @@ namespace Dukebox.Desktop.ViewModel
 
         private void DoLoadTrack(ITrack track)
         {
-            _audioPlaylist.SkipToTrack(track);
+            _audioPlaylist.SkipToTrack(track.Song.FileName);
         }
 
         private void DoSearch()

@@ -89,13 +89,13 @@ namespace Dukebox.Desktop.ViewModel
 
         public void RefreshArtistsFromLibrary()
         {
-            Artists = _cacheService.OrderedArtists;
+            Artists = new List<Artist>();// _cacheService.OrderedArtists;
         }
 
         private void DoLoadArtist(Artist artist)
         {
             var tracks = _musicLibraryRepo.GetTracksForArtist(artist.Name);
-            _audioPlaylist.LoadPlaylistFromList(tracks);
+            _audioPlaylist.LoadPlaylistFromList(tracks.Select(t => t.Song.FileName).ToList());
 
             SendNotificationMessage(NotificationMessages.AudioPlaylistLoadedNewTracks);
         }

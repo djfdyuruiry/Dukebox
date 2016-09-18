@@ -4,10 +4,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows;
+using AlphaChiTech.Virtualization;
 using GalaSoft.MvvmLight.Command;
 using Dukebox.Desktop.Interfaces;
 using Dukebox.Desktop.Model;
-using Dukebox.Desktop.Services;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
 
@@ -19,8 +19,10 @@ namespace Dukebox.Desktop.ViewModel
         private readonly IAudioPlaylist _audioPlaylist;
         private readonly IMusicLibrarySearchService _musicLibrarySearcher;
         private readonly IMusicLibraryEventService _eventService;
+        private readonly ILibraryTracksSource _libraryTrackSource;
 
         private List<ITrack> _tracks;
+        private VirtualizingObservableCollection<ITrack> _virtualTrackCollection = null;
         private string _searchText;
         private CancellationTokenSource _cancellationTokenSource;
 
@@ -37,14 +39,20 @@ namespace Dukebox.Desktop.ViewModel
 
                 // run search on key press
                 DoSearch();
-                OnPropertyChanged("SearchText");
+                OnPropertyChanged(nameof(SearchText));
             }
         }
-        public List<TrackWrapper> Tracks 
+        public VirtualizingObservableCollection<ITrack> Tracks 
         { 
-            get 
+            get
             {
-                return _tracks.Select(t => new TrackWrapper(_musicLibraryUpdateService, _eventService, t)).ToList();
+                return _virtualTrackCollection;
+                //return _tracks.Select(t => new TrackWrapper(_musicLibraryUpdateService, _eventService, t)).ToList();
+            }
+            private set
+            {
+                _virtualTrackCollection = value;
+                OnPropertyChanged(nameof(Tracks));
             }
         }
         public bool EditingListingsDisabled
@@ -73,8 +81,8 @@ namespace Dukebox.Desktop.ViewModel
         public ICommand LoadTrack { get; private set; }
 
 
-        public LibraryListingViewModel(IMusicLibraryUpdateService musicLibraryUpdateService, IMusicLibraryEventService eventService, 
-            IMusicLibrarySearchService musicLibrarySearcher, IAudioPlaylist audioPlaylist) : base()
+        public LibraryListingViewModel(IMusicLibraryUpdateService musicLibraryUpdateService, IMusicLibraryEventService eventService,
+            IMusicLibrarySearchService musicLibrarySearcher, IAudioPlaylist audioPlaylist, ILibraryTracksSource libraryTrackSource) : base()
         {
             _musicLibraryUpdateService = musicLibraryUpdateService;
             _audioPlaylist = audioPlaylist;
@@ -90,13 +98,22 @@ namespace Dukebox.Desktop.ViewModel
 
             _tracks = new List<ITrack>();
 
+            _libraryTrackSource = libraryTrackSource;
+
             RefreshTrackListing();
         }
 
         private void DoLoadTrack(ITrack track)
         {
-            _audioPlaylist.LoadPlaylistFromList(_tracks, false);
-            _audioPlaylist.SkipToTrack(track);
+            var tracks = _libraryTrackSource
+                .GetItemsAt(0, _libraryTrackSource.Count, true)
+                .Items
+                .Select(t => t.Song.FileName)
+                .ToList();
+
+            _audioPlaylist.LoadPlaylistFromList(tracks, false);
+
+            _audioPlaylist.SkipToTrack(track.Song.FileName);
 
             SendNotificationMessage(NotificationMessages.AudioPlaylistLoadedNewTracks);
         }
@@ -104,7 +121,20 @@ namespace Dukebox.Desktop.ViewModel
         private void RefreshTrackListing()
         {
             SearchText = string.Empty;
+
+            var paginationManager = new PaginationManager<ITrack>(_libraryTrackSource)
+            {
+                Provider = _libraryTrackSource
+            };
+
+            paginationManager.PageSize = 50;
+            paginationManager.MaxPages = 2;
+
+            Tracks = new VirtualizingObservableCollection<ITrack>(paginationManager);
+            
+            /*
             DoSearch();
+            */
         }
 
         private void DoSearch()
@@ -123,8 +153,8 @@ namespace Dukebox.Desktop.ViewModel
                     return;
                 }
 
-                _tracks = _musicLibrarySearcher.SearchForTracksInArea(SearchAreas.All, SearchText);
-                OnPropertyChanged("Tracks");
+                //_tracks = _musicLibrarySearcher.SearchForTracksInArea(SearchAreas.All, SearchText);
+                OnPropertyChanged(nameof(Tracks));
             }, taskCancelToken);
         }
     }

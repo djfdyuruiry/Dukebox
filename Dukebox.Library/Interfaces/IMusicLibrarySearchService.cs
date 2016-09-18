@@ -8,6 +8,7 @@ namespace Dukebox.Library.Interfaces
     {
         int GetSongCount();
         List<ITrack> GetTracksForRange(int start, int count);
+        ITrack GetTrackFromLibraryOrFile(string filename);
         List<ITrack> GetTracksByAttributeId(SearchAreas attribute, string attributeId);
         List<ITrack> GetTracksByAttributeValue(SearchAreas attribute, string attributeValue);
         List<ITrack> SearchForTracks(string searchTerm, List<SearchAreas> searchAreas);

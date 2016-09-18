@@ -57,6 +57,16 @@ namespace Dukebox.Library.Services.MusicLibrary
             }
         }
 
+        public ITrack GetTrackFromLibraryOrFile(string filename)
+        {
+            using (var dukeboxData = _dbContextFactory.GetInstance())
+            {
+                var song = dukeboxData.Songs.FirstOrDefault(s => s.FileName.ToLower() == filename.ToLower());
+
+                return song != null ? _trackFactory.BuildTrackInstance(song) : _trackFactory.BuildTrackInstance(filename);
+            }
+        }
+
         /// <summary>
         /// Search the library database for tracks matching
         /// the search term specified. All text returned by
@@ -118,7 +128,7 @@ namespace Dukebox.Library.Services.MusicLibrary
                     searchAreasString, searchTerm, stopwatch.ElapsedMilliseconds, matchingSongsList.Count);
 
 
-                return !matchingSongsList.Any() ? new List<ITrack>() : matchingSongsList.ToList().Select(s => _trackFactory.BuildTrackInstance(s)).ToList();
+                return !matchingSongsList.Any() ? new List<ITrack>() : matchingSongsList.Select(s => _trackFactory.BuildTrackInstance(s)).ToList();
             }
         }
 
@@ -164,7 +174,7 @@ namespace Dukebox.Library.Services.MusicLibrary
                 logger.DebugFormat("Getting tracks by attribute(s) '{0}' where name or title equal '{1}' took {2}ms and returned {3} results.",
                     attribute, lowerAttributeValue, stopwatch.ElapsedMilliseconds, matchingSongsList.Count);
 
-                return !matchingSongsList.Any() ? new List<ITrack>() : matchingSongsList.ToList().Select(s => _trackFactory.BuildTrackInstance(s)).ToList();
+                return !matchingSongsList.Any() ? new List<ITrack>() : matchingSongsList.Select(s => _trackFactory.BuildTrackInstance(s)).ToList();
             }
         }
 
@@ -248,7 +258,7 @@ namespace Dukebox.Library.Services.MusicLibrary
                 logger.DebugFormat("Getting tracks by attribute {0} and value {1} took {2}ms and returned {3} results.",
                     Enum.GetName(typeof(SearchAreas), attribute), attributeId, stopwatch.ElapsedMilliseconds, matchingSongsList.Count);
 
-                return !matchingSongsList.Any() ? new List<ITrack>() : matchingSongsList.ToList().Select(s => _trackFactory.BuildTrackInstance(s)).ToList();
+                return !matchingSongsList.Any() ? new List<ITrack>() : matchingSongsList.Select(s => _trackFactory.BuildTrackInstance(s)).ToList();
             }
         }
     }

@@ -65,7 +65,7 @@ namespace Dukebox.Tests.Unit
 
             mediaPlayer.LoadedTrackFromFile += (o, e) => signalEvent.Set();
 
-            var count = audioPlaylist.LoadPlaylistFromList(new List<ITrack> { track });            
+            var count = audioPlaylist.LoadPlaylistFromList(new List<string> { track.Song.FileName });            
 
             signalEvent.WaitOne(100);
 
@@ -212,7 +212,7 @@ namespace Dukebox.Tests.Unit
             var audioPlaylist = new AudioPlaylist(recentlyPlayedRepo, trackGenerator, playlistGenerator, mediaPlayer);
             var track = BuildTrackFake();
 
-            audioPlaylist.Tracks.Add(track);
+            audioPlaylist.Tracks.Add(track.Song.FileName);
 
             return new Tuple<AudioPlaylist, IMediaPlayer> (audioPlaylist, mediaPlayer);
         }

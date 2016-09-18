@@ -7,6 +7,7 @@ using MessageBoxImage = System.Windows.MessageBoxImage;
 using Dukebox.Desktop.ViewModel;
 using Dukebox.Desktop.Views;
 using Dukebox.Library.Interfaces;
+using System.Linq;
 
 namespace Dukebox.Desktop.Helper
 {
@@ -39,7 +40,7 @@ namespace Dukebox.Desktop.Helper
             }
 
             var tracks = trackGenerator.GetTracksForDirectory(audioCdDrivePath, false);
-            audioPlaylist.LoadPlaylistFromList(tracks);
+            audioPlaylist.LoadPlaylistFromList(tracks.Select(t => t.Song.FileName).ToList());
         }
 
         public static void RipCdToFolder(IAudioCdRippingService cdRippingService)

@@ -88,7 +88,7 @@ namespace Dukebox.Desktop.ViewModel
         private void DoLoadPlaylist(PlaylistWrapper playlistWrapper)
         {
             var tracks = _musicRepo.GetTracksForPlaylist(playlistWrapper.Name);
-            _audioPlaylist.LoadPlaylistFromList(tracks);
+            _audioPlaylist.LoadPlaylistFromList(tracks.Select(t => t.Song.FileName).ToList());
 
             SendNotificationMessage(NotificationMessages.AudioPlaylistLoadedNewTracks);
         }

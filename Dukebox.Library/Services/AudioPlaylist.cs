@@ -62,12 +62,12 @@ namespace Dukebox.Library.Services
         /// <summary>
         /// The list of tracks in the playlist.
         /// </summary>
-        public ObservableCollection<ITrack> Tracks { get; private set; }
+        public ObservableCollection<string> Tracks { get; private set; }
         
         /// <summary>
         /// The track currently loaded into memory for playback.
         /// </summary>
-        public ITrack CurrentlyLoadedTrack
+        public string CurrentlyLoadedTrack
         {
             get
             {
@@ -188,7 +188,7 @@ namespace Dukebox.Library.Services
             _playlistGenerator = playlistGenerator;
             _mediaPlayer = mediaPlayer;
 
-            Tracks = new ObservableCollection<ITrack>();
+            Tracks = new ObservableCollection<string>();
             Tracks.CollectionChanged += (o, e) => CallTrackModifiedHandler();
 
             _previousTracks = new Stack<int>();
@@ -332,7 +332,7 @@ namespace Dukebox.Library.Services
         /// occurs if track is not in the current playlist.
         /// </summary>
         /// <param name="trackIndex">The track to skip to.</param>
-        public void SkipToTrack(ITrack trackToPlay)
+        public void SkipToTrack(string trackToPlay)
         {
             int idx = Tracks.IndexOf(trackToPlay);
 
@@ -355,12 +355,9 @@ namespace Dukebox.Library.Services
                 var currentTrack = Tracks[GetCurrentTrackIndex()];
                 var mediaPlayMetadata = new MediaPlayerMetadata
                 {
-                    AlbumName = currentTrack.Album?.Name,
-                    ArtistName = currentTrack.Artist?.Name,
-                    TrackName = currentTrack.Song.Title
                 };
 
-                _mediaPlayer.LoadFile(currentTrack.Song.FileName, mediaPlayMetadata);
+                _mediaPlayer.LoadFile(currentTrack, mediaPlayMetadata);
 
                 // Wait until media player thread has started playback.
                 while (!_mediaPlayer.Playing)
@@ -465,16 +462,19 @@ namespace Dukebox.Library.Services
         public int LoadPlaylistFromFile(string filename, bool startPlayback)
         {
             var playlist = _playlistGenerator.GetPlaylistFromFile(filename);
-            var tracks = _trackGenerator.GetTracksForPlaylist(playlist);
+            var tracks = _trackGenerator
+                .GetTracksForPlaylist(playlist)
+                .Select(t => t.Song.FileName)
+                .ToList();
 
             return LoadPlaylistFromList(tracks, startPlayback);
         }
-        public int LoadPlaylistFromList(List<ITrack> tracks)
+        public int LoadPlaylistFromList(List<string> tracks)
         {
             return LoadPlaylistFromList(tracks, true);
         }
 
-        public int LoadPlaylistFromList(List<ITrack> tracks, bool startPlayback)
+        public int LoadPlaylistFromList(List<string> tracks, bool startPlayback)
         {
             ClearPlaylist();
 
@@ -510,7 +510,7 @@ namespace Dukebox.Library.Services
                 return;
             }
 
-            var jsonTracks = JsonConvert.SerializeObject(Tracks.Select(t => t.Song.FileName).ToList());
+            var jsonTracks = JsonConvert.SerializeObject(Tracks.ToList());
 
             File.WriteAllText(filename, jsonTracks);             
         }

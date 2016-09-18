@@ -12,9 +12,9 @@ namespace Dukebox.Library.Repositories
     {
         public event EventHandler<NotifyCollectionChangedEventArgs> RecentlyPlayedListModified;
 
-        public ObservableCollection<ITrack> RecentlyPlayed { get; private set; }
+        public ObservableCollection<string> RecentlyPlayed { get; private set; }
 
-        public List<ITrack> RecentlyPlayedAsList
+        public List<string> RecentlyPlayedAsList
         {
             get
             {
@@ -24,7 +24,7 @@ namespace Dukebox.Library.Repositories
 
         public RecentlyPlayedRepository()
         {
-            RecentlyPlayed = new ObservableCollection<ITrack>();
+            RecentlyPlayed = new ObservableCollection<string>();
             RecentlyPlayed.CollectionChanged += (o, e) => Task.Run(() => RecentlyPlayedListModified?.Invoke(this, e));
         }
     }

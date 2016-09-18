@@ -8,7 +8,7 @@ namespace Dukebox.Library.Interfaces
     public interface IRecentlyPlayedRepository
     {
         event EventHandler<NotifyCollectionChangedEventArgs> RecentlyPlayedListModified;
-        ObservableCollection<ITrack> RecentlyPlayed { get; }
-        List<ITrack> RecentlyPlayedAsList { get; }
+        ObservableCollection<string> RecentlyPlayed { get; }
+        List<string> RecentlyPlayedAsList { get; }
     }
 }

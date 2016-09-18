@@ -8,6 +8,7 @@ using Dukebox.Library.Interfaces;
 using Dukebox.Desktop.Model;
 using Dukebox.Desktop.Helper;
 using Dukebox.Desktop.Services;
+using AlphaChiTech.Virtualization;
 
 namespace Dukebox.Desktop.ViewModel
 {
@@ -24,28 +25,26 @@ namespace Dukebox.Desktop.ViewModel
         private readonly IMusicLibraryEventService _eventService;
 
         private List<ITrack> _tracks;
-        private List<TrackWrapper> _uiTracks;
         private string _selectedAudioCdDrivePath;
 
         public ICommand ClearSearch { get; private set; }
         public string SearchText { get; set; }
-        public List<TrackWrapper> Tracks
+        public VirtualizingObservableCollection<ITrack> Tracks
         {
             get
             {
-                return _uiTracks;
+                return null; //_tracks;
             }
             private set
             {
-                _uiTracks = value;
+                //_tracks = value;
                 OnPropertyChanged("Tracks");
             }
         }
 
         private void UpdateTracks(List<ITrack> tracks)
         {
-            _tracks = tracks;
-            Tracks = _tracks.Select(t => new TrackWrapper(_musicLibraryUpdateService, _eventService, t)).ToList();
+            //Tracks = tracks;
         }
 
         public bool EditingListingsDisabled
@@ -135,7 +134,7 @@ namespace Dukebox.Desktop.ViewModel
 
             if (response == MessageBoxResult.Yes)
             {
-                _audioPlaylist.LoadPlaylistFromList(_tracks);
+                _audioPlaylist.LoadPlaylistFromList(_tracks.Select(t => t.Song.FileName).ToList());
 
                 SendNotificationMessage(NotificationMessages.AudioPlaylistLoadedNewTracks);
             }
@@ -143,8 +142,8 @@ namespace Dukebox.Desktop.ViewModel
 
         private void DoLoadTrack(ITrack track)
         {
-            _audioPlaylist.LoadPlaylistFromList(_tracks);
-            _audioPlaylist.SkipToTrack(track);
+            _audioPlaylist.LoadPlaylistFromList(_tracks.Select(t => t.Song.FileName).ToList());
+            _audioPlaylist.SkipToTrack(track.Song.FileName);
 
             SendNotificationMessage(NotificationMessages.AudioPlaylistLoadedNewTracks);
         }

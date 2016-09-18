@@ -38,9 +38,9 @@ namespace Dukebox.Desktop.Views
             _tracksDataGrid = FindName(tracksDataGridElementName) as DataGrid;
             _layoutGrid = FindName(layoutGridElementName) as Grid;
 
-            SetupEventAndMessageHandlers();
+            //SetupEventAndMessageHandlers();
 
-            UpdateTracksDataGridColumns();
+            //UpdateTracksDataGridColumns();
         }
 
         private void SetupEventAndMessageHandlers()

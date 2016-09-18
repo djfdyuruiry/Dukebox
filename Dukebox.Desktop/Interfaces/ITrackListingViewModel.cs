@@ -1,13 +1,13 @@
-﻿using Dukebox.Desktop.Services;
-using System.Collections.Generic;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Input;
+using AlphaChiTech.Virtualization;
+using Dukebox.Library.Interfaces;
 
 namespace Dukebox.Desktop.Interfaces
 {
     public interface ITrackListingViewModel : ISearchControlViewModel
     {
-        List<TrackWrapper> Tracks { get; }
+        VirtualizingObservableCollection<ITrack> Tracks { get; }
         bool EditingListingsDisabled { get; }
         ICommand LoadTrack { get; }
         Visibility ShowSearchControl { get; }
