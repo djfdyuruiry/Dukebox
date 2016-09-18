@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -7,7 +7,6 @@ using System.Threading;
 using log4net;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
-using System;
 
 namespace Dukebox.Library.Services.MusicLibrary
 {
@@ -18,13 +17,12 @@ namespace Dukebox.Library.Services.MusicLibrary
         private readonly IMusicLibraryDbContextFactory _dbContextFactory;
         private readonly IMusicLibraryEventService _eventService;
         private readonly SemaphoreSlim _cacheSemaphore;
-        private readonly BlockingCollection<string> _allFilesCache;
-        private Dictionary<string, DateTime> _fileLastScannedMap;
 
         private List<Artist> _allArtistsCache;
         private List<Album> _allAlbumsCache;
         private List<Playlist> _allPlaylistsCache;
-        private List<Song> _allSongsCache;
+        private Dictionary<string, DateTime> _fileLastScannedMap;
+        private List<string> _allFilesCache;
 
         public List<Artist> OrderedArtists
         {
@@ -74,7 +72,7 @@ namespace Dukebox.Library.Services.MusicLibrary
             }
         }
 
-        public BlockingCollection<string> FilesCache
+        public List<string> FilesCache
         {
             get
             {
@@ -82,22 +80,6 @@ namespace Dukebox.Library.Services.MusicLibrary
                 {
                     _cacheSemaphore.Wait();
                     return _allFilesCache;
-                }
-                finally
-                {
-                    _cacheSemaphore.Release();
-                }
-            }
-        }
-
-        public List<Song> SongsCache
-        {
-            get
-            {
-                try
-                {
-                    _cacheSemaphore.Wait();
-                    return _allSongsCache;
                 }
                 finally
                 {
@@ -115,7 +97,7 @@ namespace Dukebox.Library.Services.MusicLibrary
             _eventService.DatabaseChangesSaved += (o, e) => RefreshCaches();
             _eventService.SongAdded += (o, e) => RefreshCaches();
 
-            _allFilesCache = new BlockingCollection<string>();
+            _allFilesCache = new List<string>();
 
             RefreshCaches();
         }
@@ -127,7 +109,6 @@ namespace Dukebox.Library.Services.MusicLibrary
                 _cacheSemaphore.Wait();
 
                 var stopwatch = Stopwatch.StartNew();
-                List<string> files;
                 
                 using (var dukeboxData = _dbContextFactory.GetInstance())
                 {
@@ -135,23 +116,13 @@ namespace Dukebox.Library.Services.MusicLibrary
                     _allAlbumsCache = dukeboxData.Albums.OrderBy(a => a.Name).ToList();
                     _allPlaylistsCache = dukeboxData.Playlists.OrderBy(a => a.Name).ToList();
                     
-                    _allSongsCache = dukeboxData.Songs.ToList();
-
-                    files = _allSongsCache.Select(s => s.FileName).ToList();
+                    _fileLastScannedMap = dukeboxData.Songs
+                            .GroupBy(s => s.FileName)
+                            .Select(sg => sg.First())
+                            .ToDictionary(s => s.FileName, s => s.LastScanDateTime);
                 }
 
-                while (_allFilesCache.Count > 0)
-                {
-                    string item;
-                    _allFilesCache.TryTake(out item);
-                }
-
-                files.ForEach(f => _allFilesCache.Add(f));
-
-                _fileLastScannedMap = _allSongsCache
-                        .GroupBy(s => s.FileName)
-                        .Select(sg => sg.First())
-                        .ToDictionary(s => s.FileName, s => s.LastScanDateTime);
+                _allFilesCache = _fileLastScannedMap.Keys.ToList();
 
                 stopwatch.Stop();
 

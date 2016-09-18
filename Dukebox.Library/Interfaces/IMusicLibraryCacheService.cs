@@ -10,8 +10,7 @@ namespace Dukebox.Library.Interfaces
         List<Album> OrderedAlbums { get; }
         List<Artist> OrderedArtists { get; }
         List<Playlist> OrderedPlaylists { get; }
-        BlockingCollection<string> FilesCache { get; }
-        List<Song> SongsCache { get; }
+        List<string> FilesCache { get; }
         void RefreshCaches();
         bool HasFileBeenUpdatedSinceLastScan(string file, DateTime lastWriteTime);
     }
