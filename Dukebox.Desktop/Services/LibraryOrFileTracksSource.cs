@@ -1,37 +1,36 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using AlphaChiTech.Virtualization;
 using FakeItEasy;
 using Dukebox.Desktop.Interfaces;
 using Dukebox.Library.Interfaces;
-using Dukebox.Library.Factories;
-using System;
-using System.Diagnostics;
 
 namespace Dukebox.Desktop.Services
 {
-    public class LibraryTrackSource : ILibraryTracksSource
+    public class LibraryOrFileTracksSource : ILibraryOrFileTracksSource
     {
+        private readonly List<string> _tracks;
         private readonly IMusicLibrarySearchService _searchService;
-        private readonly TrackFactory _trackFactory;
 
         public int Count
         {
             get
             {
-                return _searchService.GetSongCount();
+                return _tracks.Count;
             }
         }
 
-        public LibraryTrackSource(IMusicLibrarySearchService cacheService, TrackFactory trackFactory)
+        public LibraryOrFileTracksSource(List<string> tracks, IMusicLibrarySearchService searchService)
         {
-            _searchService = cacheService;
-            _trackFactory = trackFactory;
+            _tracks = tracks;
+            _searchService = searchService;
         }
 
         public PagedSourceItemsPacket<ITrack> GetItemsAt(int pageoffset, int count, bool usePlaceholder)
         {
-            var tracks = _searchService.GetTracksForRange(pageoffset, count);
+            var tracks = _tracks.GetRange(pageoffset, count).Select(t => _searchService.GetTrackFromLibraryOrFile(t)).ToList();
 
             var itemsPacket = new PagedSourceItemsPacket<ITrack>
             {
@@ -47,7 +46,7 @@ namespace Dukebox.Desktop.Services
 
         public int IndexOf(ITrack item)
         {
-            return (int)item.Song.Id;
+            return _tracks.IndexOf(item.Song.FileName);
         }
 
         public async Task<PagedSourceItemsPacket<ITrack>> GetItemsAtAsync(int pageoffset, int count, bool usePlaceholder)

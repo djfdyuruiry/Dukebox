@@ -53,8 +53,8 @@ namespace Dukebox.Desktop
             container.RegisterSingleton<AudioCdViewModel>();
 
             // services
-            container.Register<Album>();
-            container.RegisterSingleton<ILibraryTracksSource, LibraryTrackSource>();
+            container.Register<Album>(); 
+            container.RegisterSingleton<ILibraryTracksSource, LibraryTracksSource>();
 
             // register external packages
             var assemblies = new List<Assembly> {Assembly.GetAssembly(typeof(LibraryPackage))};

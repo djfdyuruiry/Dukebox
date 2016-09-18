@@ -194,6 +194,7 @@
     <Compile Include="Converters\ListDictionaryKeyToValueConverter.cs" />
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
     <Compile Include="Interfaces\IAudioDriveListingViewModel.cs" />
+    <Compile Include="Interfaces\ILibraryOrFileTracksSource.cs" />
     <Compile Include="Interfaces\ILibraryTracksSource.cs" />
     <Compile Include="Interfaces\IMetadataColumnsSettingsViewModel.cs" />
     <Compile Include="Interfaces\IPlaylistListingViewModel.cs" />
@@ -221,7 +222,8 @@
     <Compile Include="Model\TrackUpdatedMessage.cs" />
     <Compile Include="Services\Album.cs" />
     <Compile Include="Model\NavIconNames.cs" />
-    <Compile Include="Services\LibraryTrackSource.cs" />
+    <Compile Include="Services\LibraryOrFileTracksSource.cs" />
+    <Compile Include="Services\LibraryTracksSource.cs" />
     <Compile Include="Services\PlaylistWrapper.cs" />
     <Compile Include="Services\TrackWrapper.cs" />
     <Compile Include="Services\WatchFolderWrapper.cs" />

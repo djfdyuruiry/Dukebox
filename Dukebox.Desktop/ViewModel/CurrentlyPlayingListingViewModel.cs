@@ -17,15 +17,23 @@ namespace Dukebox.Desktop.ViewModel
         private readonly IAudioPlaylist _audioPlaylist;
         private readonly IMusicLibraryUpdateService _musicLibraryUpdateService;
         private readonly IMusicLibraryEventService _eventService;
+        private readonly IMusicLibrarySearchService _searchService;
 
         private string _searchText;
         private readonly ListSearchHelper<string> _listSearchHelper;
+
+        private VirtualizingObservableCollection<ITrack> _tracksCollection;
 
         public VirtualizingObservableCollection<ITrack> Tracks
         {
             get
             {
-                return null; // _listSearchHelper.FilteredItems;
+                return _tracksCollection;
+            }
+            set
+            {
+                _tracksCollection = value;
+                OnPropertyChanged(nameof(Tracks));
             }
         }
 
@@ -73,11 +81,14 @@ namespace Dukebox.Desktop.ViewModel
 
         public ICommand LoadTrack { get; private set; }
 
-        public CurrentlyPlayingListingViewModel(IAudioPlaylist audioPlaylist, IMusicLibraryUpdateService musicLibraryUpdateService, IMusicLibraryEventService eventService) : base()
+        public CurrentlyPlayingListingViewModel(IAudioPlaylist audioPlaylist, IMusicLibraryUpdateService musicLibraryUpdateService, 
+            IMusicLibraryEventService eventService, IMusicLibrarySearchService searchService) : base()
         {
             _audioPlaylist = audioPlaylist;
             _musicLibraryUpdateService = musicLibraryUpdateService;
             _eventService = eventService;
+            _searchService = searchService;
+
             _listSearchHelper = new ListSearchHelper<string>
             {
                 FilterLambda = (t, s) => t.ToLower(CultureInfo.InvariantCulture)
@@ -94,8 +105,20 @@ namespace Dukebox.Desktop.ViewModel
 
         private void RefreshTracks()
         {
-            _listSearchHelper.Items = _audioPlaylist.Tracks.ToList();
-            OnPropertyChanged("Tracks");
+            //_listSearchHelper.Items = _audioPlaylist.Tracks.ToList();
+
+            var audioPlaylistTracks = _audioPlaylist.Tracks.ToList();
+            var trackSource = new LibraryOrFileTracksSource(audioPlaylistTracks, _searchService);
+
+            var paginationManager = new PaginationManager<ITrack>(trackSource)
+            {
+                Provider = trackSource
+            };
+
+            paginationManager.PageSize = 50;
+            paginationManager.MaxPages = 2;
+
+            Tracks = new VirtualizingObservableCollection<ITrack>(paginationManager);
         }
 
         private void DoLoadTrack(ITrack track)

@@ -15,7 +15,7 @@ namespace Dukebox.Library.Interfaces
         bool Shuffle { get; set; }
         bool StreamingPlaylist { get; }
         bool TrackLoaded { get; }
-        ObservableCollection<string> Tracks { get; }
+        SmartObservableCollection<string> Tracks { get; }
         string CurrentlyLoadedTrack { get; }
         int LoadPlaylistFromFile(string filename);
         int LoadPlaylistFromFile(string filename, bool startPlayback);

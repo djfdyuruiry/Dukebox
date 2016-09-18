@@ -62,7 +62,7 @@ namespace Dukebox.Library.Services
         /// <summary>
         /// The list of tracks in the playlist.
         /// </summary>
-        public ObservableCollection<string> Tracks { get; private set; }
+        public SmartObservableCollection<string> Tracks { get; private set; }
         
         /// <summary>
         /// The track currently loaded into memory for playback.
@@ -188,7 +188,7 @@ namespace Dukebox.Library.Services
             _playlistGenerator = playlistGenerator;
             _mediaPlayer = mediaPlayer;
 
-            Tracks = new ObservableCollection<string>();
+            Tracks = new SmartObservableCollection<string>();
             Tracks.CollectionChanged += (o, e) => CallTrackModifiedHandler();
 
             _previousTracks = new Stack<int>();
@@ -476,9 +476,7 @@ namespace Dukebox.Library.Services
 
         public int LoadPlaylistFromList(List<string> tracks, bool startPlayback)
         {
-            ClearPlaylist();
-
-            tracks.ForEach(t => Tracks.Add(t));
+            Tracks.Reset(tracks);
 
             if (startPlayback)
             {
