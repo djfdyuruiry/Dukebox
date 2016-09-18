@@ -1,8 +1,5 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Threading;
 using Application = System.Windows.Application;
 using System.Windows.Forms;
 using System.Windows.Input;

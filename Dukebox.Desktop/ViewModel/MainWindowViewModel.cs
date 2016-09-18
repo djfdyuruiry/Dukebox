@@ -174,7 +174,7 @@ namespace Dukebox.Desktop.ViewModel
             var splashScreen = new LoadingScreen();
             splashScreen.DataContext = DesktopContainer.GetInstance<ILoadingScreenViewModel>();
 
-            splashScreen.Show();
+            splashScreen.ShowDialog();
         }
 
         private void DoStopAudio()

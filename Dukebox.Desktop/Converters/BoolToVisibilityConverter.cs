@@ -5,18 +5,18 @@ using System.Windows.Data;
 
 namespace Dukebox.Desktop.Converters
 {
-    public class ReverseBoolToVisibilityConverter : IValueConverter
+    public class BoolToVisibilityConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             var boolValue = (bool)value;
-            return boolValue ? Visibility.Hidden : Visibility.Visible;
+            return boolValue ? Visibility.Visible : Visibility.Hidden;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             var visibilityValue = (Visibility)value;
-            return visibilityValue != Visibility.Visible;
+            return visibilityValue == Visibility.Visible;
         }
     }
 }

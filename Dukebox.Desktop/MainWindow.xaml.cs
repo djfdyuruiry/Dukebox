@@ -1,18 +1,19 @@
-﻿using GalaSoft.MvvmLight.Messaging;
+﻿using System;
+using System.Windows.Threading;
+using AlphaChiTech.Virtualization;
+using GalaSoft.MvvmLight.Messaging;
 using MahApps.Metro.Controls;
 using Dukebox.Desktop.Interfaces;
 using Dukebox.Desktop.Model;
 
 namespace Dukebox.Desktop
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : MetroWindow
     {
         public MainWindow()
         {
             InitializeComponent();
+            InitialiseCollectionVirtualizationManager();
 
             var viewModel = DataContext as IMainWindowViewModel;
             viewModel?.ShowLoadingScreen?.Execute(null);
@@ -27,6 +28,19 @@ namespace Dukebox.Desktop
                     }
                 });
             });
+        }
+
+        private void InitialiseCollectionVirtualizationManager()
+        {
+            if (!VirtualizationManager.IsInitialized)
+            {
+                VirtualizationManager.Instance.UIThreadExcecuteAction = a => Dispatcher.Invoke(a);
+
+                new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Background, delegate
+                {
+                    VirtualizationManager.Instance.ProcessActions();
+                }, Dispatcher).Start();
+            }
         }
     }
 }

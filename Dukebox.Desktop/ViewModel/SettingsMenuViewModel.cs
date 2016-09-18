@@ -19,13 +19,13 @@ namespace Dukebox.Desktop.ViewModel
         private void ShowTrackColumnsSettingsWindow()
         {
             var metadataSettingsWindow = new MetadataColumnsSettings();
-            metadataSettingsWindow.Show();
+            metadataSettingsWindow.ShowDialog();
         }
 
         private void ShowWatchFolderSettings()
         {
             var watchFoldersSettingsWindow = new WatchFolderSettings();
-            watchFoldersSettingsWindow.Show();
+            watchFoldersSettingsWindow.ShowDialog();
         }
     }
 }
