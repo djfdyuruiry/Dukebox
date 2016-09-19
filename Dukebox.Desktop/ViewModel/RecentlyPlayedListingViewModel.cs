@@ -19,9 +19,11 @@ namespace Dukebox.Desktop.ViewModel
         private readonly IRecentlyPlayedRepository _recentlyPlayedRepo;
         private readonly IAudioPlaylist _audioPlaylist;
         private readonly IMusicLibraryEventService _eventService;
+        private readonly IMusicLibrarySearchService _searchService;
         private readonly ListSearchHelper<string> _listSearchHelper;
         
         private string _searchText;
+        private VirtualizingObservableCollection<ITrack> _tracksCollection;
 
         public ICommand ClearSearch { get; private set; }
         public string SearchText
@@ -43,7 +45,12 @@ namespace Dukebox.Desktop.ViewModel
         {
             get
             {
-                return null; // _listSearchHelper.FilteredItems;
+                return _tracksCollection;
+            }
+            set
+            {
+                _tracksCollection = value;
+                OnPropertyChanged(nameof(Tracks));
             }
         }
 
@@ -73,12 +80,13 @@ namespace Dukebox.Desktop.ViewModel
         public ICommand LoadTrack { get; private set; }
 
         public RecentlyPlayedListingViewModel(IMusicLibraryUpdateService musicLibraryUpdateService, IRecentlyPlayedRepository recentlyPlayedRepo, 
-            IAudioPlaylist audioPlaylist, IMusicLibraryEventService eventService) : base()
+            IAudioPlaylist audioPlaylist, IMusicLibraryEventService eventService, IMusicLibrarySearchService searchService) : base()
         {
             _musicLibraryUpdateService = musicLibraryUpdateService;
             _recentlyPlayedRepo = recentlyPlayedRepo;
             _audioPlaylist = audioPlaylist;
             _eventService = eventService;
+            _searchService = searchService;
 
             _listSearchHelper = new ListSearchHelper<string>
             {
@@ -95,7 +103,7 @@ namespace Dukebox.Desktop.ViewModel
 
         private void DoLoadTrack(ITrack track)
         {
-            _audioPlaylist.LoadPlaylistFromList(_listSearchHelper.FilteredItems);
+            _audioPlaylist.LoadPlaylistFromList(Tracks.Select(t => t.Song.FileName).ToList());
             _audioPlaylist.SkipToTrack(track.Song.FileName);
 
             SendNotificationMessage(NotificationMessages.AudioPlaylistLoadedNewTracks);
@@ -103,16 +111,23 @@ namespace Dukebox.Desktop.ViewModel
 
         public void RefreshRecentlyPlayedFromLibrary()
         {
-            _listSearchHelper.Items = _recentlyPlayedRepo.RecentlyPlayedAsList;
-            OnPropertyChanged("Tracks");
+            var recentlyPlayedTracks = _recentlyPlayedRepo.RecentlyPlayedAsList;
+            var trackSource = new LibraryOrFileTracksSource(recentlyPlayedTracks, _searchService);
+
+            var paginationManager = new PaginationManager<ITrack>(trackSource)
+            {
+                Provider = trackSource
+            };
+
+            paginationManager.PageSize = 50;
+            paginationManager.MaxPages = 2;
+
+            Tracks = new VirtualizingObservableCollection<ITrack>(paginationManager);
         }
 
         private void DoSearch()
         {
-            _listSearchHelper.SearchFilter = SearchText;
-
-            // trigger filtered items call via Tracks property
-            OnPropertyChanged("Tracks");
+            // TODO: Search logic
         }
     }
 }
