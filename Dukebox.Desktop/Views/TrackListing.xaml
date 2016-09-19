@@ -97,13 +97,6 @@
                                            Grid.Column="0" 
                                            Visibility="{Binding ElementName=TrackListingControl, Path=DataContext.EditingListingsDisabled}" 
                                            Text="{Binding ArtistName}"/>
-                                <!--
-                                <TextBox Grid.Row="0" 
-                                         Grid.Column="0"  
-                                         Visibility="{Binding ElementName=TrackListingControl, Path=DataContext.EditingListingsDisabled, Converter={StaticResource BoolToVisibilityConverter}}" 
-                                         Text="{Binding ArtistName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                         Style="{StaticResource MetadataTextBox}"/>
-                                -->
                             </Grid>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -126,13 +119,6 @@
                                            Grid.Column="0" 
                                            Visibility="{Binding ElementName=TrackListingControl, Path=DataContext.EditingListingsDisabled}" 
                                            Text="{Binding AlbumName}"/>
-                                <!--
-                                <TextBox Grid.Row="0" 
-                                         Grid.Column="0"  
-                                         Visibility="{Binding ElementName=TrackListingControl, Path=DataContext.EditingListingsDisabled, Converter={StaticResource BoolToVisibilityConverter}}" 
-                                         Text="{Binding AlbumName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                         Style="{StaticResource MetadataTextBox}"/>
-                                -->
                             </Grid>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -155,13 +141,6 @@
                                            Grid.Column="0" 
                                            Visibility="{Binding ElementName=TrackListingControl, Path=DataContext.EditingListingsDisabled}" 
                                            Text="{Binding Title}"/>
-                                <!--
-                                <TextBox Grid.Row="0" 
-                                         Grid.Column="0"  
-                                         Visibility="{Binding ElementName=TrackListingControl, Path=DataContext.EditingListingsDisabled, Converter={StaticResource BoolToVisibilityConverter}}" 
-                                         Text="{Binding Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                         Style="{StaticResource MetadataTextBox}"/>
-                                -->
                             </Grid>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
