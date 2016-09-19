@@ -3,12 +3,12 @@ using System.Globalization;
 using System.Linq;
 using System.Windows.Input;
 using System.Windows;
+using AlphaChiTech.Virtualization;
 using GalaSoft.MvvmLight.Command;
 using Dukebox.Desktop.Helper;
 using Dukebox.Desktop.Interfaces;
 using Dukebox.Desktop.Services;
 using Dukebox.Library.Interfaces;
-using AlphaChiTech.Virtualization;
 
 namespace Dukebox.Desktop.ViewModel
 {

@@ -223,6 +223,7 @@
     <Compile Include="Services\Album.cs" />
     <Compile Include="Model\NavIconNames.cs" />
     <Compile Include="Services\LibraryOrFileTracksSource.cs" />
+    <Compile Include="Services\TracksSource.cs" />
     <Compile Include="Services\LibraryTracksSource.cs" />
     <Compile Include="Services\PlaylistWrapper.cs" />
     <Compile Include="Services\TrackWrapper.cs" />

@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using AlphaChiTech.Virtualization;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using Dukebox.Desktop.Interfaces;
@@ -12,21 +13,21 @@ using Dukebox.Desktop.Services;
 using Dukebox.Library.Interfaces;
 using Dukebox.Library.Model;
 using Dukebox.Desktop.Helper;
-using AlphaChiTech.Virtualization;
 
 namespace Dukebox.Desktop.ViewModel
 {
     public class TrackListingPreviewViewModel : ViewModelBase, ITrackListingViewModel, ISearchControlViewModel
     {
         private readonly IAudioPlaylist _audioPlaylist;
-
-        private List<string> _tracks;
+        
         private readonly IMusicLibraryRepository _musicLibraryRepo;
         private readonly IMusicLibraryUpdateService _musicLibraryUpdateService;
         private readonly IMusicLibraryEventService _eventService;
         private string _trackFilter;
         private string _trackFilterName;
         private readonly ListSearchHelper<string> _listSearchHelper;
+
+        private VirtualizingObservableCollection<ITrack> _tracksCollection;
 
         public ICommand ClearSearch { get; private set; }
 
@@ -74,7 +75,12 @@ namespace Dukebox.Desktop.ViewModel
         {
             get
             {
-                return null; // _listSearchHelper.FilteredItems;
+                return _tracksCollection;
+            }
+            set
+            {
+                _tracksCollection = value;
+                OnPropertyChanged(nameof(Tracks));
             }
         }
 
@@ -85,16 +91,13 @@ namespace Dukebox.Desktop.ViewModel
             _musicLibraryRepo = libraryRepo;
             _musicLibraryUpdateService = updateService;
             _eventService = eventService;
-
-            _tracks = new List<string>();
-
+            
             _listSearchHelper = new ListSearchHelper<string>
             {
                 FilterLambda = (t, s) => t.ToLower(CultureInfo.InvariantCulture)
                     .Contains(s.ToLower(CultureInfo.InvariantCulture)),
                 SortResults = true,
-                SortLambda = (t) => t.ToLower(CultureInfo.InvariantCulture),
-                Items = _tracks
+                SortLambda = (t) => t.ToLower(CultureInfo.InvariantCulture)
             };
 
             LoadTrack = new RelayCommand<ITrack>(DoLoadTrack);
@@ -111,7 +114,7 @@ namespace Dukebox.Desktop.ViewModel
 
         private void DoLoadTrack(ITrack track)
         {
-            _audioPlaylist.LoadPlaylistFromList(_tracks, false);
+            _audioPlaylist.LoadPlaylistFromList(Tracks.Select(t => t.Song.FileName).ToList(), false);
             _audioPlaylist.SkipToTrack(track.Song.FileName);
 
             SendNotificationMessage(NotificationMessages.AudioPlaylistLoadedNewTracks);
@@ -147,19 +150,28 @@ namespace Dukebox.Desktop.ViewModel
 
         private void UpdateTracks(Func<List<ITrack>> tracksGenerator)
         {
+            List<ITrack> tracks;
+
             try
             {
-                _tracks = tracksGenerator().Select(t => t.Song.FileName).ToList();
+                tracks = tracksGenerator();
             }
             catch (Exception)
             {
-                _tracks = new List<string>();
+                // TODO: Review this...
+                tracks = new List<ITrack>();
             }
-            finally
+
+            var trackSource = new TracksSource(tracks);
+            var paginationManager = new PaginationManager<ITrack>(trackSource)
             {
-                _listSearchHelper.Items = _tracks;
-                OnPropertyChanged(nameof(Tracks));
-            }
+                Provider = trackSource
+            };
+
+            paginationManager.PageSize = 50;
+            paginationManager.MaxPages = 2;
+
+            Tracks = new VirtualizingObservableCollection<ITrack>(paginationManager);
         }
 
         private void ReloadTracksIfNeccessary(Song song)
