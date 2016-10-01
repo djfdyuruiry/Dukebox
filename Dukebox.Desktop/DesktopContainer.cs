@@ -7,6 +7,7 @@ using Dukebox.Desktop.Interfaces;
 using Dukebox.Desktop.Services;
 using Dukebox.Desktop.ViewModel;
 using Dukebox.Library;
+using Dukebox.Desktop.Factories;
 
 namespace Dukebox.Desktop
 {
@@ -54,7 +55,7 @@ namespace Dukebox.Desktop
 
             // services
             container.Register<Album>(); 
-            container.RegisterSingleton<ILibraryTracksSource, LibraryTracksSource>();
+            container.RegisterSingleton<LibraryTrackSourceFactory>();
 
             // register external packages
             var assemblies = new List<Assembly> {Assembly.GetAssembly(typeof(LibraryPackage))};

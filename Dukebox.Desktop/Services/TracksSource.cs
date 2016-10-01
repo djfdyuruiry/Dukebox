@@ -23,6 +23,11 @@ namespace Dukebox.Desktop.Services
 
         public TracksSource(List<ITrack> tracks)
         {
+            if (tracks == null)
+            {
+                throw new ArgumentNullException(nameof(tracks));
+            }
+
             _tracks = tracks;
         }
 

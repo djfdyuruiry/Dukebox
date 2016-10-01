@@ -65,7 +65,7 @@ namespace Dukebox.Desktop.ViewModel
         {
             get
             {
-                return true;
+                return false;
             }
         }
 

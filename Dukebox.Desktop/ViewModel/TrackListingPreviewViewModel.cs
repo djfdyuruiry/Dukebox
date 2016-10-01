@@ -25,7 +25,7 @@ namespace Dukebox.Desktop.ViewModel
         private readonly IMusicLibraryEventService _eventService;
         private string _trackFilter;
         private string _trackFilterName;
-        private readonly ListSearchHelper<string> _listSearchHelper;
+        private readonly ListSearchHelper<ITrack> _listSearchHelper;
 
         private VirtualizingObservableCollection<ITrack> _tracksCollection;
 
@@ -58,8 +58,9 @@ namespace Dukebox.Desktop.ViewModel
             set
             {
                 _listSearchHelper.SearchFilter = value;
+                UpdateTracks();
 
-                OnPropertyChanged(nameof(Tracks));
+                OnPropertyChanged(nameof(SearchText));
             }
         }
 
@@ -92,12 +93,11 @@ namespace Dukebox.Desktop.ViewModel
             _musicLibraryUpdateService = updateService;
             _eventService = eventService;
             
-            _listSearchHelper = new ListSearchHelper<string>
+            _listSearchHelper = new ListSearchHelper<ITrack>
             {
-                FilterLambda = (t, s) => t.ToLower(CultureInfo.InvariantCulture)
-                    .Contains(s.ToLower(CultureInfo.InvariantCulture)),
+                FilterLambda = (t, s) => t.ToString().ToLower(CultureInfo.InvariantCulture).Contains(s.ToLower(CultureInfo.InvariantCulture)),
                 SortResults = true,
-                SortLambda = (t) => t.ToLower(CultureInfo.InvariantCulture)
+                SortLambda = (t) => t.ToString().ToLower(CultureInfo.InvariantCulture)
             };
 
             LoadTrack = new RelayCommand<ITrack>(DoLoadTrack);
@@ -162,7 +162,15 @@ namespace Dukebox.Desktop.ViewModel
                 tracks = new List<ITrack>();
             }
 
-            var trackSource = new TracksSource(tracks);
+            _listSearchHelper.Items = tracks;
+
+            UpdateTracks();
+        }
+
+        private void UpdateTracks()
+        {
+            var trackSource = new TracksSource(_listSearchHelper.FilteredItems);
+
             var paginationManager = new PaginationManager<ITrack>(trackSource)
             {
                 Provider = trackSource

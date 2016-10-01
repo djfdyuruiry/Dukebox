@@ -190,6 +190,7 @@
     <Compile Include="DesktopContainer.cs" />
     <Compile Include="DukeboxUserSettings.cs" />
     <Compile Include="Factories\DukeboxUserSettingsFactory.cs" />
+    <Compile Include="Factories\LibraryTrackSourceFactory.cs" />
     <Compile Include="Helper\AudioCdHelper.cs" />
     <Compile Include="Converters\ListDictionaryKeyToValueConverter.cs" />
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
@@ -202,6 +203,7 @@
     <Compile Include="Interfaces\ISettingsMenuViewModel.cs" />
     <Compile Include="Interfaces\IWatchFolderSettingsViewModel.cs" />
     <Compile Include="Model\ExtendedMetadataColumnSetting.cs" />
+    <Compile Include="Model\ValueLibrarySourceFilter.cs.cs" />
     <Compile Include="Model\PreviewTracksMessage.cs" />
     <Compile Include="Converters\ReverseBoolToVisibilityConverter.cs" />
     <Compile Include="Converters\ArtistToCardPathConverter.cs" />
@@ -219,6 +221,7 @@
       <DependentUpon>LoadingScreen.xaml</DependentUpon>
     </Compile>
     <Compile Include="Model\NotificationMessages.cs" />
+    <Compile Include="Model\IdLibrarySourceFilter.cs" />
     <Compile Include="Model\TrackUpdatedMessage.cs" />
     <Compile Include="Services\Album.cs" />
     <Compile Include="Model\NavIconNames.cs" />
