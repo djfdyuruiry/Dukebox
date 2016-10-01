@@ -89,7 +89,7 @@ namespace Dukebox.Desktop.ViewModel
 
         public void RefreshArtistsFromLibrary()
         {
-            Artists = new List<Artist>();// _cacheService.OrderedArtists;
+            Artists =  _cacheService.OrderedArtists;
         }
 
         private void DoLoadArtist(Artist artist)

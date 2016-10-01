@@ -14,18 +14,27 @@
              DataContext="{Binding IAlbumListing, Source={StaticResource ViewModelLocator}}">
     <UserControl.Resources>
         <DataTemplate DataType="{x:Type DukeboxServices:Album}">
-            <StackPanel Margin="6" Width="194">
-                <Image x:Name="AlbumArt" Width="194" Height="194" IsHitTestVisible="False">
-                    <Image.Source>
-                        <BitmapImage DecodePixelHeight="194"
-                                     DecodePixelWidth="194"
-                                     UriSource="{Binding AlbumArtPath, Mode=OneWay, UpdateSourceTrigger=Explicit}" 
-                                     CreateOptions="DelayCreation" 
-                                     CacheOption="None"/>
-                    </Image.Source>
-                </Image>
-                <TextBlock Text="{Binding Data.Name}" Width="185" TextWrapping="Wrap"/>
-            </StackPanel>
+            <Grid Margin="5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition SharedSizeGroup="SharedGroup" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <!--
+                        TODO: Find solution to displaying album art here
+                        <Image x:Name="AlbumArt" Width="194" Height="194" IsHitTestVisible="False">
+                            <Image.Source>
+                                <BitmapImage DecodePixelHeight="194"
+                                             DecodePixelWidth="194"
+                                             UriSource="{Binding AlbumArtPath, Mode=OneWay, UpdateSourceTrigger=Explicit}" 
+                                             CreateOptions="DelayCreation" 
+                                             CacheOption="None"/>
+                            </Image.Source>
+                        </Image>
+                    -->
+                    <Image x:Name="AlbumArt" Width="32" Height="32" IsHitTestVisible="False" Source="../Graphics/ic_album.png"/>
+                    <TextBlock Text="{Binding Data.Name}" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
         </DataTemplate>
     </UserControl.Resources>
     <Grid>
@@ -65,7 +74,7 @@
             </ListBox.Resources>
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate >
-                    <StackPanel  IsItemsHost="True" VirtualizingPanel.IsVirtualizing="True" VirtualizingStackPanel.VirtualizationMode="Recycling"/>
+                    <WrapPanel IsItemsHost="True" Grid.IsSharedSizeScope="True"/>
                 </ItemsPanelTemplate>
             </ListBox.ItemsPanel>
         </ListBox>

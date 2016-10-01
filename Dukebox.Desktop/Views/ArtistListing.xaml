@@ -12,18 +12,27 @@
              DataContext="{Binding IArtistListing, Source={StaticResource ViewModelLocator}}">
     <UserControl.Resources>
         <DataTemplate DataType="{x:Type DukeboxLibrary:Artist}">
-            <StackPanel Name="Artist" Margin="6" Width="194">
-                <Image x:Name="ArtistCard" Width="194" Height="194" IsHitTestVisible="False">
-                    <Image.Source>
-                        <BitmapImage DecodePixelHeight="194"
-                                     DecodePixelWidth="194"
-                                     UriSource="{Binding Path=., Converter={StaticResource ArtistToCardPathConverter}}" 
-                                     CreateOptions="DelayCreation" 
-                                     CacheOption="OnDemand"/>
-                    </Image.Source>
-                </Image>
-                <TextBlock Text="{Binding Name}" Width="185" TextWrapping="Wrap"/>
-            </StackPanel>
+            <Grid Margin="5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition SharedSizeGroup="SharedGroup" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" Name="Artist" Orientation="Horizontal">
+                    <!--
+                        TODO: Find solution to displaying artist cards here
+                        <Image x:Name="ArtistCard" Width="194" Height="194" IsHitTestVisible="False">
+                            <Image.Source>
+                                <BitmapImage DecodePixelHeight="194"
+                                             DecodePixelWidth="194"
+                                             UriSource="{Binding Path=., Converter={StaticResource ArtistToCardPathConverter}}" 
+                                             CreateOptions="DelayCreation" 
+                                             CacheOption="OnDemand"/>
+                            </Image.Source>
+                        </Image>
+                     -->
+                    <Image x:Name="ArtistCard" Width="32" Height="32" IsHitTestVisible="False" Source="../Graphics/icon-ios7-people.png"/>
+                    <TextBlock Text="{Binding Name}" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
         </DataTemplate>
     </UserControl.Resources>
     <Grid>
@@ -47,7 +56,7 @@
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled">
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <WrapPanel ItemWidth="200" IsItemsHost="True"/>
+                    <WrapPanel IsItemsHost="True" Grid.IsSharedSizeScope="True"/>
                 </ItemsPanelTemplate>
             </ListBox.ItemsPanel>
         </ListBox>
