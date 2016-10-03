@@ -168,6 +168,7 @@
     <Compile Include="Interfaces\IMusicLibraryDbContext.cs" />
     <Compile Include="Model\DirectoryImportReport.cs" />
     <Compile Include="Model\MusicLibraryEvent.cs" />
+    <Compile Include="Model\RangedTrackSearchResults.cs" />
     <Compile Include="Model\SmartObservableCollection.cs" />
     <Compile Include="Model\TagTypeMap.cs" />
     <Compile Include="Model\GenericEventArgs.cs" />

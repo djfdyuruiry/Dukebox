@@ -139,10 +139,12 @@ namespace Dukebox.Library.Services.MusicLibrary
 
         public List<ITrack> GetTracksByAttributeValue(SearchAreas attribute, string attributeValue)
         {
-            return GetTracksByAttributeValue(attribute, attributeValue, 0, 100000);
+            var results = GetTracksByAttributeValue(attribute, attributeValue, 0, 100000);
+
+            return results.RangedResults;
         }
         
-        public List<ITrack> GetTracksByAttributeValue(SearchAreas attribute, string attributeValue, int numberToSkip, int maxResults)
+        public RangedTrackSearchResults GetTracksByAttributeValue(SearchAreas attribute, string attributeValue, int numberToSkip, int maxResults)
         {
             using (var dukeboxData = _dbContextFactory.GetInstance())
             {
@@ -160,13 +162,13 @@ namespace Dukebox.Library.Services.MusicLibrary
 
                 if (searchAllAreas || attribute == SearchAreas.Album)
                 {
-                    var matchingAlbums = GetMatchingAttributeIds(SearchAreas.Album, lowerAttributeValue, true);
+                    var matchingAlbums = GetMatchingAttributeIds(SearchAreas.Album, lowerAttributeValue);
                     matchingSongs = matchingSongs.Concat(songs.Where(s => matchingAlbums.Contains(s.AlbumName)));
                 }
 
                 if (searchAllAreas || attribute == SearchAreas.Artist)
                 {
-                    var matchingArtists = GetMatchingAttributeIds(SearchAreas.Artist, lowerAttributeValue, true);
+                    var matchingArtists = GetMatchingAttributeIds(SearchAreas.Artist, lowerAttributeValue);
                     matchingSongs = matchingSongs.Concat(songs.Where(s => matchingArtists.Contains(s.ArtistName)));
                 }
 
@@ -180,13 +182,22 @@ namespace Dukebox.Library.Services.MusicLibrary
                     matchingSongs = matchingSongs.Concat(songs.Where(s => s.FileName.ToLower().Equals(lowerAttributeValue)));
                 }
 
+                var matchingIdsList = matchingSongs.Distinct().Select(s => s.Id).ToList().ConvertAll(id => (int)id);
                 var matchingSongsList = matchingSongs.Distinct().Skip(numberToSkip).Take(maxResults).ToList();
 
                 stopwatch.Stop();
                 logger.DebugFormat("Getting tracks by attribute(s) '{0}' where name or title equal '{1}' took {2}ms and returned {3} results.",
                     attribute, lowerAttributeValue, stopwatch.ElapsedMilliseconds, matchingSongsList.Count);
 
-                return !matchingSongsList.Any() ? new List<ITrack>() : matchingSongsList.Select(s => _trackFactory.BuildTrackInstance(s)).ToList();
+                var resultTracks = !matchingSongsList.Any() ? new List<ITrack>() : matchingSongsList.Select(s => _trackFactory.BuildTrackInstance(s)).ToList();
+
+                var rangedSearchResults = new RangedTrackSearchResults
+                {
+                    RangedResults = resultTracks,
+                    FullResultSetIds = matchingIdsList
+                };
+
+                return rangedSearchResults;
             }
         }
 
@@ -217,6 +228,12 @@ namespace Dukebox.Library.Services.MusicLibrary
 
             return Enumerable.Empty<string>();
         }
+        public List<ITrack> GetTracksByAttributeId(SearchAreas attribute, string attributeValue)
+        {
+            var results = GetTracksByAttributeId(attribute, attributeValue, 0, 100000);
+
+            return results.RangedResults;
+        }
 
         /// <summary>
         /// Get a list of tracks who's attribute type equals the id specified. Filename 
@@ -225,7 +242,7 @@ namespace Dukebox.Library.Services.MusicLibrary
         /// <param name="attribute">The attribute type to select.</param>
         /// <param name="attributeId">The id of the attribute.</param>
         /// <returns>A list of tracks that match the given attribute keypair.</returns>
-        public List<ITrack> GetTracksByAttributeId(SearchAreas attribute, string attributeId)
+        public RangedTrackSearchResults GetTracksByAttributeId(SearchAreas attribute, string attributeId, int numberToSkip, int maxResults)
         {
             using (var dukeboxData = _dbContextFactory.GetInstance())
             {
@@ -263,14 +280,22 @@ namespace Dukebox.Library.Services.MusicLibrary
                     matchingSongs = matchingSongs.Concat(songs.Where(s => s.Id.ToString() == attributeId));
                 }
 
-                var matchingSongsList = matchingSongs.Distinct().ToList();
-
+                var matchingIdsList = matchingSongs.Distinct().Select(s => s.Id).ToList().ConvertAll(id => (int)id);
+                var matchingSongsList = matchingSongs.Distinct().Skip(numberToSkip).Take(maxResults).ToList();
 
                 stopwatch.Stop();
                 logger.DebugFormat("Getting tracks by attribute {0} and value {1} took {2}ms and returned {3} results.",
                     Enum.GetName(typeof(SearchAreas), attribute), attributeId, stopwatch.ElapsedMilliseconds, matchingSongsList.Count);
 
-                return !matchingSongsList.Any() ? new List<ITrack>() : matchingSongsList.Select(s => _trackFactory.BuildTrackInstance(s)).ToList();
+                var resultTracks = !matchingSongsList.Any() ? new List<ITrack>() : matchingSongsList.Select(s => _trackFactory.BuildTrackInstance(s)).ToList();
+
+                var rangedSearchResults = new RangedTrackSearchResults
+                {
+                    RangedResults = resultTracks,
+                    FullResultSetIds = matchingIdsList
+                };
+
+                return rangedSearchResults;
             }
         }
     }

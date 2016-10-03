@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using AlphaChiTech.Virtualization;
 using FakeItEasy;
@@ -17,13 +18,17 @@ namespace Dukebox.Desktop.Services
         private readonly IdLibrarySourceFilter _idFilter;
         private readonly ValueLibrarySourceFilter _valueFilter;
 
+        private List<int> _fullSearchResultSetIds;
+
         public int Count
         {
             get
             {
-                return _searchService.GetSongCount();
+                return TracksFiltersPresent ? _fullSearchResultSetIds?.Count ?? 0 : _searchService.GetSongCount();
             }
         }
+
+        public bool TracksFiltersPresent => _idFilter != null || _valueFilter != null;
 
         public LibraryTracksSource(IMusicLibrarySearchService cacheService, TrackFactory trackFactory)
         {
@@ -35,31 +40,46 @@ namespace Dukebox.Desktop.Services
             : this(cacheService, trackFactory)
         {
             _idFilter = idFilter;
+
+            PopulateFullSearchResultIds();
         }
 
         public LibraryTracksSource(IMusicLibrarySearchService cacheService, TrackFactory trackFactory, ValueLibrarySourceFilter valueFilter)
             : this(cacheService, trackFactory)
         {
             _valueFilter = valueFilter;
+
+            PopulateFullSearchResultIds();
         }
+
+        private void PopulateFullSearchResultIds() => GetItemsAt(0, 0, false);
 
         public PagedSourceItemsPacket<ITrack> GetItemsAt(int pageoffset, int count, bool usePlaceholder)
         {
             List<ITrack> tracks;
 
-            if (_idFilter == null && _valueFilter == null)
+            Debug.WriteLine($"idFilter? {_idFilter != null} - valueFilter? {_valueFilter != null} -> Library page requested for tracks {pageoffset}-{pageoffset+count}");
+
+            if (!TracksFiltersPresent)
             {
                 tracks = _searchService.GetTracksForRange(pageoffset, count);
             }
             else if (_idFilter != null)
             {
-                tracks = _searchService.GetTracksByAttributeId(_idFilter.SearchAreas, _idFilter.Id);
+                var results = _searchService.GetTracksByAttributeId(_idFilter.SearchAreas, _idFilter.Id, pageoffset, count);
+
+                tracks = results.RangedResults;
+                _fullSearchResultSetIds = results.FullResultSetIds;
             }
             else
             {
-                tracks = _searchService.GetTracksByAttributeValue(_valueFilter.SearchAreas, _valueFilter.Value, pageoffset, count);
+                var results = _searchService.GetTracksByAttributeValue(_valueFilter.SearchAreas, _valueFilter.Value, pageoffset, count);
+
+                tracks = results.RangedResults;
+                _fullSearchResultSetIds = results.FullResultSetIds;
             }
 
+            Debug.WriteLine($"idFilter? {_idFilter != null} - valueFilter? {_valueFilter != null} -> Library returned {tracks?.Count} tracks");
 
             var itemsPacket = new PagedSourceItemsPacket<ITrack>
             {
@@ -77,10 +97,24 @@ namespace Dukebox.Desktop.Services
         {
             if (item == null || item.Song == null)
             {
+                Debug.WriteLine($"null item passed for index check, returning -1");
                 return -1;
             }
 
-            return (int)item.Song.Id;
+            var songId = (int)item.Song.Id;
+
+            if (TracksFiltersPresent)
+            {
+                Debug.WriteLine($"item passed for index check, not TracksFiltersPresent so returning library id of {(int)item.Song.Id}");
+
+                return songId;
+            }
+
+            var searchResultIndex = _fullSearchResultSetIds?.IndexOf(songId) ?? -1;
+
+            Debug.WriteLine($"item passed for index check, TracksFiltersPresent so returning searchResultIndex of {(int)item.Song.Id}");
+
+            return searchResultIndex;
         }
 
         public async Task<PagedSourceItemsPacket<ITrack>> GetItemsAtAsync(int pageoffset, int count, bool usePlaceholder)
