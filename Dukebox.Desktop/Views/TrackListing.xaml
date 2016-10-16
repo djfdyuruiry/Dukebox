@@ -79,6 +79,24 @@
                 </Style>
             </DataGrid.CellStyle>
             <DataGrid.Columns>
+                <DataGridTemplateColumn Header="" 
+                                        Width="auto" 
+                                        CanUserSort="False"
+                                        Visibility="{Binding Path=DataContext.EditingListingsDisabled, ElementName=TrackListingControl, Converter={StaticResource ReverseBoolToVisibilityConverter}}">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"></RowDefinition>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <Image Grid.Row="0" Grid.Column="0" Width="16" Height="16" IsHitTestVisible="False" Source="../Graphics/ic_mode_edit_48px.png"/>
+                            </Grid>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
                 <DataGridTemplateColumn Header="Artist" 
                                         Width="auto" 
                                         SortMemberPath="ArtistName" 
@@ -95,7 +113,6 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Row="0" 
                                            Grid.Column="0" 
-                                           Visibility="{Binding ElementName=TrackListingControl, Path=DataContext.EditingListingsDisabled}" 
                                            Text="{Binding ArtistName}"/>
                             </Grid>
                         </DataTemplate>
@@ -117,7 +134,6 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Row="0" 
                                            Grid.Column="0" 
-                                           Visibility="{Binding ElementName=TrackListingControl, Path=DataContext.EditingListingsDisabled}" 
                                            Text="{Binding AlbumName}"/>
                             </Grid>
                         </DataTemplate>
@@ -139,7 +155,6 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Row="0" 
                                            Grid.Column="0" 
-                                           Visibility="{Binding ElementName=TrackListingControl, Path=DataContext.EditingListingsDisabled}" 
                                            Text="{Binding Title}"/>
                             </Grid>
                         </DataTemplate>

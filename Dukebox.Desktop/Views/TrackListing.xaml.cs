@@ -11,7 +11,6 @@ using GalaSoft.MvvmLight.Messaging;
 using Dukebox.Desktop.Factories;
 using Dukebox.Desktop.Model;
 using Dukebox.Desktop.Interfaces;
-using Dukebox.Desktop.Services;
 using Dukebox.Desktop.ViewModel;
 using Dukebox.Library.Interfaces;
 
@@ -80,7 +79,8 @@ namespace Dukebox.Desktop.Views
                     var headerName = c.Header.ToString();
 
                     return !_columnsToKeep.Contains(headerName) &&
-                        !extendedMetadataColumns.Contains(headerName);
+                        !extendedMetadataColumns.Contains(headerName) && 
+                        !string.IsNullOrEmpty(headerName);
                 })
                 .ToList();            
 
@@ -118,7 +118,7 @@ namespace Dukebox.Desktop.Views
             });
             var xamlDesignerSerializationManager = new XamlDesignerSerializationManager(xmlWriter) { XamlWriterMode = XamlWriterMode.Expression };
 
-            var firstColumn = _tracksDataGrid.Columns.First() as DataGridTemplateColumn;
+            var firstColumn = _tracksDataGrid.Columns[1] as DataGridTemplateColumn;
             XamlWriter.Save(firstColumn, xamlDesignerSerializationManager);
 
             var firstColumnXamlString = xmlStringBuilder.ToString();
