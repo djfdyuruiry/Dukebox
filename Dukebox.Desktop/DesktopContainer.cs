@@ -55,7 +55,7 @@ namespace Dukebox.Desktop
 
             // services
             container.Register<Album>(); 
-            container.RegisterSingleton<LibraryTrackSourceFactory>();
+            container.RegisterSingleton<TrackSourceFactory>();
 
             // register external packages
             var assemblies = new List<Assembly> {Assembly.GetAssembly(typeof(LibraryPackage))};

@@ -2,13 +2,13 @@
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
-using GalaSoft.MvvmLight.Command;
-using Dukebox.Desktop.Interfaces;
-using Dukebox.Library.Interfaces;
-using Dukebox.Desktop.Model;
-using Dukebox.Desktop.Helper;
-using Dukebox.Desktop.Services;
 using AlphaChiTech.Virtualization;
+using GalaSoft.MvvmLight.Command;
+using Dukebox.Desktop.Factories;
+using Dukebox.Desktop.Helper;
+using Dukebox.Desktop.Interfaces;
+using Dukebox.Desktop.Model;
+using Dukebox.Library.Interfaces;
 
 namespace Dukebox.Desktop.ViewModel
 {
@@ -17,15 +17,14 @@ namespace Dukebox.Desktop.ViewModel
         private const string loadAudioCdPromptFormat = "A new Audio CD ({0}) has been detected, would you like to play it?";
         private const string audioCdDriveIsNotReadyErrorMsg = "Audio drive is not ready, check a working Audio CD is in the drive.";
         
-        private readonly IMusicLibraryUpdateService _musicLibraryUpdateService;
         private readonly IAudioPlaylist _audioPlaylist;
         private readonly IAudioCdDriveMonitoringService _audioCdDriveMonitor;
         private readonly IAudioCdRippingService _cdRippingService;
         private readonly ITrackGeneratorService _trackGenerator;
-        private readonly IMusicLibraryEventService _eventService;
+        private readonly TrackSourceFactory _trackSourceFactory;
 
-        private List<ITrack> _tracks;
         private string _selectedAudioCdDrivePath;
+        private VirtualizingObservableCollection<ITrack> _tracksCollection;
 
         public ICommand ClearSearch { get; private set; }
         public string SearchText { get; set; }
@@ -33,18 +32,13 @@ namespace Dukebox.Desktop.ViewModel
         {
             get
             {
-                return null; //_tracks;
+                return _tracksCollection;
             }
-            private set
+            set
             {
-                //_tracks = value;
-                OnPropertyChanged("Tracks");
+                _tracksCollection = value;
+                OnPropertyChanged(nameof(Tracks));
             }
-        }
-
-        private void UpdateTracks(List<ITrack> tracks)
-        {
-            //Tracks = tracks;
         }
 
         public bool EditingListingsDisabled
@@ -93,15 +87,14 @@ namespace Dukebox.Desktop.ViewModel
 
         public ICommand RipCd { get; private set; }
 
-        public AudioCdViewModel(IMusicLibraryUpdateService musicLibraryUpdateService, ITrackGeneratorService trackGenerator, IAudioPlaylist audioPlaylist, 
-            IAudioCdDriveMonitoringService audioCdDriveMonitor, IAudioCdRippingService cdRippingService, IMusicLibraryEventService eventService) : base()
+        public AudioCdViewModel(ITrackGeneratorService trackGenerator, IAudioPlaylist audioPlaylist, IAudioCdDriveMonitoringService audioCdDriveMonitor, 
+            IAudioCdRippingService cdRippingService, TrackSourceFactory trackSourceFactory) : base()
         {
-            _musicLibraryUpdateService = musicLibraryUpdateService;
             _audioPlaylist = audioPlaylist;
             _audioCdDriveMonitor = audioCdDriveMonitor;
             _cdRippingService = cdRippingService;
             _trackGenerator = trackGenerator;
-            _eventService = eventService;
+            _trackSourceFactory = trackSourceFactory;
 
             _audioCdDriveMonitor.AudioCdInsertedOnLoad += (o, e) =>
             {
@@ -126,7 +119,22 @@ namespace Dukebox.Desktop.ViewModel
 
             _audioCdDriveMonitor.StartMonitoring();
         }
-        
+
+        private void UpdateTracks(List<ITrack> tracks)
+        {
+            var trackSource = _trackSourceFactory.BuildMemoryTracksSource(tracks);
+
+            var paginationManager = new PaginationManager<ITrack>(trackSource)
+            {
+                Provider = trackSource
+            };
+
+            paginationManager.PageSize = 50;
+            paginationManager.MaxPages = 2;
+
+            Tracks = new VirtualizingObservableCollection<ITrack>(paginationManager);
+        }
+
         private void OfferToLoadCd(string audioCdDrivePath)
         {
             var msg = string.Format(loadAudioCdPromptFormat, audioCdDrivePath);
@@ -134,7 +142,7 @@ namespace Dukebox.Desktop.ViewModel
 
             if (response == MessageBoxResult.Yes)
             {
-                _audioPlaylist.LoadPlaylistFromList(_tracks.Select(t => t.Song.FileName).ToList());
+                _audioPlaylist.LoadPlaylistFromList(Tracks.Select(t => t.Song.FileName).ToList());
 
                 SendNotificationMessage(NotificationMessages.AudioPlaylistLoadedNewTracks);
             }
@@ -142,7 +150,7 @@ namespace Dukebox.Desktop.ViewModel
 
         private void DoLoadTrack(ITrack track)
         {
-            _audioPlaylist.LoadPlaylistFromList(_tracks.Select(t => t.Song.FileName).ToList());
+            _audioPlaylist.LoadPlaylistFromList(Tracks.Select(t => t.Song.FileName).ToList());
             _audioPlaylist.SkipToTrack(track.Song.FileName);
 
             SendNotificationMessage(NotificationMessages.AudioPlaylistLoadedNewTracks);
@@ -174,7 +182,7 @@ namespace Dukebox.Desktop.ViewModel
                 return;
             }
 
-            AudioCdHelper.RipCdToFolder(_cdRippingService, SelectedAudioCdDrivePath, _tracks);
+            AudioCdHelper.RipCdToFolder(_cdRippingService, SelectedAudioCdDrivePath, Tracks.ToList());
         }
 
         private void ShowCdDriveNotReadyError(string operation)

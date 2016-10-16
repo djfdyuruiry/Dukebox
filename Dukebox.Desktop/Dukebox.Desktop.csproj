@@ -190,12 +190,13 @@
     <Compile Include="DesktopContainer.cs" />
     <Compile Include="DukeboxUserSettings.cs" />
     <Compile Include="Factories\DukeboxUserSettingsFactory.cs" />
-    <Compile Include="Factories\LibraryTrackSourceFactory.cs" />
+    <Compile Include="Factories\TrackSourceFactory.cs" />
     <Compile Include="Helper\AudioCdHelper.cs" />
     <Compile Include="Converters\ListDictionaryKeyToValueConverter.cs" />
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
     <Compile Include="Interfaces\IAudioDriveListingViewModel.cs" />
     <Compile Include="Interfaces\ILibraryOrFileTracksSource.cs" />
+    <Compile Include="Interfaces\IMemoryTracksSource.cs" />
     <Compile Include="Interfaces\ILibraryTracksSource.cs" />
     <Compile Include="Interfaces\IMetadataColumnsSettingsViewModel.cs" />
     <Compile Include="Interfaces\IPlaylistListingViewModel.cs" />
@@ -226,6 +227,7 @@
     <Compile Include="Services\Album.cs" />
     <Compile Include="Model\NavIconNames.cs" />
     <Compile Include="Services\LibraryOrFileTracksSource.cs" />
+    <Compile Include="Services\MemoryTracksSource.cs" />
     <Compile Include="Services\TracksSource.cs" />
     <Compile Include="Services\LibraryTracksSource.cs" />
     <Compile Include="Services\PlaylistWrapper.cs" />

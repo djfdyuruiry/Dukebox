@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Linq;
 using System.Windows.Input;
 using System.Windows;
@@ -9,15 +8,14 @@ using Dukebox.Desktop.Helper;
 using Dukebox.Desktop.Interfaces;
 using Dukebox.Desktop.Services;
 using Dukebox.Library.Interfaces;
+using Dukebox.Desktop.Factories;
 
 namespace Dukebox.Desktop.ViewModel
 {
     public class CurrentlyPlayingListingViewModel : ViewModelBase, ITrackListingViewModel, ISearchControlViewModel
     {
         private readonly IAudioPlaylist _audioPlaylist;
-        private readonly IMusicLibraryUpdateService _musicLibraryUpdateService;
-        private readonly IMusicLibraryEventService _eventService;
-        private readonly IMusicLibrarySearchService _searchService;
+        private readonly TrackSourceFactory _trackSourceFactory;
 
         private string _searchText;
         private readonly ListSearchHelper<string> _listSearchHelper;
@@ -73,7 +71,7 @@ namespace Dukebox.Desktop.ViewModel
         {
             get
             {
-                return Visibility.Visible;
+                return Visibility.Hidden;
             }
         }
 
@@ -81,13 +79,10 @@ namespace Dukebox.Desktop.ViewModel
 
         public ICommand LoadTrack { get; private set; }
 
-        public CurrentlyPlayingListingViewModel(IAudioPlaylist audioPlaylist, IMusicLibraryUpdateService musicLibraryUpdateService, 
-            IMusicLibraryEventService eventService, IMusicLibrarySearchService searchService) : base()
+        public CurrentlyPlayingListingViewModel(IAudioPlaylist audioPlaylist, TrackSourceFactory trackSourceFactory) : base()
         {
             _audioPlaylist = audioPlaylist;
-            _musicLibraryUpdateService = musicLibraryUpdateService;
-            _eventService = eventService;
-            _searchService = searchService;
+            _trackSourceFactory = trackSourceFactory;
 
             _listSearchHelper = new ListSearchHelper<string>
             {
@@ -108,7 +103,7 @@ namespace Dukebox.Desktop.ViewModel
             //_listSearchHelper.Items = _audioPlaylist.Tracks.ToList();
 
             var audioPlaylistTracks = _audioPlaylist.Tracks.ToList();
-            var trackSource = new LibraryOrFileTracksSource(audioPlaylistTracks, _searchService);
+            var trackSource = _trackSourceFactory.BuildLibraryOrFileTracksSource(audioPlaylistTracks);
 
             var paginationManager = new PaginationManager<ITrack>(trackSource)
             {
@@ -131,7 +126,7 @@ namespace Dukebox.Desktop.ViewModel
             _listSearchHelper.SearchFilter = SearchText;
 
             // trigger filtered items call via Tracks property
-            OnPropertyChanged("Tracks");
+            OnPropertyChanged(nameof(Tracks));
         }
     }
 }

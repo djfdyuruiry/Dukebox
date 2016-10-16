@@ -1,27 +1,22 @@
-﻿using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
+﻿using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using AlphaChiTech.Virtualization;
 using GalaSoft.MvvmLight.Command;
-using Dukebox.Desktop.Helper;
+using Dukebox.Desktop.Factories;
 using Dukebox.Desktop.Interfaces;
 using Dukebox.Desktop.Model;
-using Dukebox.Library.Interfaces;
 using Dukebox.Desktop.Services;
-using AlphaChiTech.Virtualization;
+using Dukebox.Library.Interfaces;
 
 namespace Dukebox.Desktop.ViewModel
 {
     public class RecentlyPlayedListingViewModel : ViewModelBase, ITrackListingViewModel, ISearchControlViewModel
     {
-        private readonly IMusicLibraryUpdateService _musicLibraryUpdateService;
         private readonly IRecentlyPlayedRepository _recentlyPlayedRepo;
         private readonly IAudioPlaylist _audioPlaylist;
-        private readonly IMusicLibraryEventService _eventService;
-        private readonly IMusicLibrarySearchService _searchService;
-        private readonly ListSearchHelper<string> _listSearchHelper;
-        
+        private readonly TrackSourceFactory _trackSourceFactory;
+
         private string _searchText;
         private VirtualizingObservableCollection<ITrack> _tracksCollection;
 
@@ -73,26 +68,18 @@ namespace Dukebox.Desktop.ViewModel
         {
             get
             {
-                return Visibility.Visible;
+                return Visibility.Hidden;
             }
         }
 
         public ICommand LoadTrack { get; private set; }
 
-        public RecentlyPlayedListingViewModel(IMusicLibraryUpdateService musicLibraryUpdateService, IRecentlyPlayedRepository recentlyPlayedRepo, 
-            IAudioPlaylist audioPlaylist, IMusicLibraryEventService eventService, IMusicLibrarySearchService searchService) : base()
+        public RecentlyPlayedListingViewModel(IRecentlyPlayedRepository recentlyPlayedRepo, IAudioPlaylist audioPlaylist, 
+            TrackSourceFactory trackSourceFactory) : base()
         {
-            _musicLibraryUpdateService = musicLibraryUpdateService;
             _recentlyPlayedRepo = recentlyPlayedRepo;
             _audioPlaylist = audioPlaylist;
-            _eventService = eventService;
-            _searchService = searchService;
-
-            _listSearchHelper = new ListSearchHelper<string>
-            {
-                FilterLambda = (t, s) => t.ToLower(CultureInfo.InvariantCulture)
-                .Contains(s.ToLower(CultureInfo.InvariantCulture))
-            };
+            _trackSourceFactory = trackSourceFactory;
 
             ClearSearch = new RelayCommand(() => SearchText = string.Empty);
             LoadTrack = new RelayCommand<ITrack>(DoLoadTrack);
@@ -112,7 +99,7 @@ namespace Dukebox.Desktop.ViewModel
         public void RefreshRecentlyPlayedFromLibrary()
         {
             var recentlyPlayedTracks = _recentlyPlayedRepo.RecentlyPlayedAsList;
-            var trackSource = new LibraryOrFileTracksSource(recentlyPlayedTracks, _searchService);
+            var trackSource = _trackSourceFactory.BuildLibraryOrFileTracksSource(recentlyPlayedTracks);
 
             var paginationManager = new PaginationManager<ITrack>(trackSource)
             {

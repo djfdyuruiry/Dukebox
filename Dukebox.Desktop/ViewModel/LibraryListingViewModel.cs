@@ -19,7 +19,7 @@ namespace Dukebox.Desktop.ViewModel
         private readonly IAudioPlaylist _audioPlaylist;
         private readonly IMusicLibrarySearchService _musicLibrarySearcher;
         private readonly IMusicLibraryEventService _eventService;
-        private readonly LibraryTrackSourceFactory _trackSourceFactory;
+        private readonly TrackSourceFactory _trackSourceFactory;
 
         private ILibraryTracksSource _libraryTrackSource;
         private VirtualizingObservableCollection<ITrack> _virtualTrackCollection = null;
@@ -91,7 +91,7 @@ namespace Dukebox.Desktop.ViewModel
 
 
         public LibraryListingViewModel(IMusicLibraryUpdateService musicLibraryUpdateService, IMusicLibraryEventService eventService,
-            IMusicLibrarySearchService musicLibrarySearcher, IAudioPlaylist audioPlaylist, LibraryTrackSourceFactory trackSourceFactory) : base()
+            IMusicLibrarySearchService musicLibrarySearcher, IAudioPlaylist audioPlaylist, TrackSourceFactory trackSourceFactory) : base()
         {
             _musicLibraryUpdateService = musicLibraryUpdateService;
             _eventService = eventService;
