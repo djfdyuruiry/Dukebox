@@ -1,0 +1,29 @@
+Music Note: https://www.iconfinder.com/icons/208035/music_node_sound_icon#size=128
+Playback Controls: https://www.iconfinder.com/icons/208018/audio_play_sound_start_video_icon#size=128
+Songs Icon: https://www.iconfinder.com/icons/208033/music_nodes_sound_icon#size=128
+
+Author: https://www.iconfinder.com/icons4android.com
+
+---
+
+Currently Playing Icon: https://www.iconfinder.com/icons/352072/arrow_play_icon#size=128
+Album Icon: https://www.iconfinder.com/icons/352015/album_icon#size=128
+Recently Played Icon: https://www.iconfinder.com/icons/352426/history_icon#size=128
+Playlist Icon: https://www.iconfinder.com/icons/352076/add_playlist_icon#size=128
+Search Icon: https://www.iconfinder.com/icons/352575/pageview_icon#size=64
+Clear Icon: https://www.iconfinder.com/icons/352270/close_icon#size=64
+Edit Icon: https://www.iconfinder.com/icons/352547/edit_mode_icon#size=16
+
+Author: http://google.com/design/
+
+---
+
+Artists Icon: https://www.iconfinder.com/icons/211793/people_icon#size=128
+
+Author: http://ionicons.com/
+
+---
+
+Audio CD Icon: https://www.iconfinder.com/icons/905553/cd_media_multimedia_music_player_icon#size=128
+
+Author: https://www.iconfinder.com/butterflytronics
