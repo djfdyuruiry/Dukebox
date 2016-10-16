@@ -9,6 +9,7 @@ using Dukebox.Desktop.Helper;
 using Dukebox.Desktop.Interfaces;
 using Dukebox.Desktop.Model;
 using Dukebox.Library.Interfaces;
+using System;
 
 namespace Dukebox.Desktop.ViewModel
 {
@@ -86,6 +87,8 @@ namespace Dukebox.Desktop.ViewModel
         public ICommand PlayCd { get; private set; }
 
         public ICommand RipCd { get; private set; }
+
+        public ICommand EditTrack => null;
 
         public AudioCdViewModel(ITrackGeneratorService trackGenerator, IAudioPlaylist audioPlaylist, IAudioCdDriveMonitoringService audioCdDriveMonitor, 
             IAudioCdRippingService cdRippingService, TrackSourceFactory trackSourceFactory) : base()

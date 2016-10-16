@@ -79,6 +79,8 @@ namespace Dukebox.Desktop.ViewModel
 
         public ICommand LoadTrack { get; private set; }
 
+        public ICommand EditTrack => null;
+
         public CurrentlyPlayingListingViewModel(IAudioPlaylist audioPlaylist, TrackSourceFactory trackSourceFactory) : base()
         {
             _audioPlaylist = audioPlaylist;

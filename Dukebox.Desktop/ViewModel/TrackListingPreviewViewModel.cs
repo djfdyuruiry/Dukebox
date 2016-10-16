@@ -85,6 +85,8 @@ namespace Dukebox.Desktop.ViewModel
             }
         }
 
+        public ICommand EditTrack => null;
+
         public TrackListingPreviewViewModel(IAudioPlaylist audioPlaylist, IMusicLibraryRepository libraryRepo,
             IMusicLibraryUpdateService updateService, IMusicLibraryEventService eventService)
         {

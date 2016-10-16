@@ -73,6 +73,7 @@ namespace Dukebox.Desktop.ViewModel
         }
 
         public ICommand LoadTrack { get; private set; }
+        public ICommand EditTrack => null;
 
         public RecentlyPlayedListingViewModel(IRecentlyPlayedRepository recentlyPlayedRepo, IAudioPlaylist audioPlaylist, 
             TrackSourceFactory trackSourceFactory) : base()

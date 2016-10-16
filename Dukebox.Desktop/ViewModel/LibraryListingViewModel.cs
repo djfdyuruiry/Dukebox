@@ -89,6 +89,7 @@ namespace Dukebox.Desktop.ViewModel
 
         public ICommand LoadTrack { get; private set; }
 
+        public ICommand EditTrack { get; private set; }
 
         public LibraryListingViewModel(IMusicLibraryUpdateService musicLibraryUpdateService, IMusicLibraryEventService eventService,
             IMusicLibrarySearchService musicLibrarySearcher, IAudioPlaylist audioPlaylist, TrackSourceFactory trackSourceFactory) : base()
@@ -105,6 +106,7 @@ namespace Dukebox.Desktop.ViewModel
 
             ClearSearch = new RelayCommand(() => SearchText = string.Empty);
             LoadTrack = new RelayCommand<ITrack>(DoLoadTrack);
+            EditTrack = new RelayCommand<ITrack>(DoEditTrack);
                         
             RefreshTrackListing();
         }
@@ -123,6 +125,11 @@ namespace Dukebox.Desktop.ViewModel
 
             SendNotificationMessage(NotificationMessages.AudioPlaylistLoadedNewTracks);
         }
+
+        private void DoEditTrack(ITrack track)
+        {
+        }
+
         private void RefreshTrackListing() => RefreshTrackListing(null);
 
         private void RefreshTrackListing(ValueLibrarySourceFilter trackFilter)

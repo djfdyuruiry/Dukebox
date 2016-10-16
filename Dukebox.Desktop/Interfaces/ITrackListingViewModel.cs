@@ -10,6 +10,7 @@ namespace Dukebox.Desktop.Interfaces
         VirtualizingObservableCollection<ITrack> Tracks { get; }
         bool EditingListingsDisabled { get; }
         ICommand LoadTrack { get; }
+        ICommand EditTrack { get; }
         Visibility ShowSearchControl { get; }
     }
 }

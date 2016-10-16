@@ -91,8 +91,15 @@
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"></ColumnDefinition>
-                                </Grid.ColumnDefinitions>
-                                <Image Grid.Row="0" Grid.Column="0" Width="16" Height="16" IsHitTestVisible="False" Source="../Graphics/ic_mode_edit_48px.png"/>
+                                </Grid.ColumnDefinitions>                                
+                                <Button Command="{Binding Path=DataContext.EditTrack, ElementName=TrackListingControl}">
+                                    <Image Grid.Row="0" 
+                                       Grid.Column="0" 
+                                       Width="16" 
+                                       Height="16" 
+                                       IsHitTestVisible="False" 
+                                       Source="../Graphics/ic_mode_edit_48px.png"/>
+                                </Button>                                
                             </Grid>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
