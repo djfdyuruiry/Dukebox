@@ -9,7 +9,7 @@ An audio library manager and media-player
 
 Latest Version Screenshot:
 
-![dukebox media-player](https://raw.githubusercontent.com/djfdyuruiry/Dukebox/develop/Dukebox.sln)
+![dukebox media-player](https://github.com/djfdyuruiry/Dukebox/blob/develop/screenshot.png?raw=true)
 
 ### Technical Overview
 
