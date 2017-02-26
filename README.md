@@ -7,6 +7,10 @@ An audio library manager and media-player
 
 ### 
 
+Latest Version Screenshot:
+
+![dukebox media-player](https://raw.githubusercontent.com/djfdyuruiry/Dukebox/develop/Dukebox.sln)
+
 ### Technical Overview
 
 Dukebox is .NET desktop music jukebox designed to play a wide variety of audio formats and provide simple library management. It uses the [BASS audio library](http://www.un4seen.com/) for playback, [TagLib.Portable](https://github.com/timheuer/taglib-sharp-portable) for audio file metadata, SQLite3 & Entity Framework for music library data and WPF as the main GUI framework.
